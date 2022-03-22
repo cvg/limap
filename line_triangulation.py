@@ -99,39 +99,6 @@ def compute_matches(cfg, imname_list, descinfo_folder, neighbors):
             raise ValueError("Folder {0} not found.".format(folder))
         return folder
 
-def debug_VP(imname_list, cameras, all_2d_lines):
-    # debug on VP
-    for img_id, (imname, cam, lines2d) in enumerate(zip(imname_list, cameras, all_2d_lines)):
-        img = utils.read_image(imname, max_image_dim=800, set_gray=False)
-        vpresult = _vpdet.AssociateVPs(lines2d)
-        labels, vps = vpresult.labels, vpresult.vps
-        dir_list = []
-        for vp in vps:
-            direc = cam.K_inv @ vp
-            direc = direc / np.linalg.norm(direc)
-            direc = cam.R.T @ direc
-            dir_list.append(direc)
-
-        n_vps = len(vps)
-        print("imname: {0}, n_vps = {1}".format(imname, n_vps))
-        if n_vps == 0:
-            continue
-        import seaborn as sns
-        import cv2
-        colors = sns.color_palette("husl", n_colors=n_vps)
-        colors = (np.array(colors) * 255).astype(np.uint8).tolist()
-        if n_vps == 1:
-            colors = [[255, 0, 0]]
-        for line_id, line in enumerate(lines2d):
-            label = labels[line_id]
-            if label < 0:
-                continue
-            c = colors[label]
-            cv2.line(img, (int(line.start[0]), int(line.start[1])), (int(line.end[0]), int(line.end[1])), c, 2)
-        cv2.imwrite("temp_{0}.png".format(img_id), img)
-        import pdb
-        pdb.set_trace()
-
 def line_triangulation(cfg, imname_list, cameras, neighbors=None, ranges=None, resize_hw=None, max_image_dim=None, valid_index_list=None):
     '''
     Args:
@@ -185,7 +152,6 @@ def line_triangulation(cfg, imname_list, cameras, neighbors=None, ranges=None, r
     Triangulator = _tri.Triangulator(cfg["triangulation"])
     Triangulator.SetRanges(ranges)
     all_2d_lines = _tri.GetAllLines2D(all_2d_segs)
-    # debug_VP(imname_list, cameras, all_2d_lines)
     Triangulator.Init(all_2d_lines, cameras)
     if valid_index_list is None:
         valid_index_list = np.arange(0, len(imname_list)).tolist()
@@ -253,19 +219,6 @@ def line_triangulation(cfg, imname_list, cameras, neighbors=None, ranges=None, r
         import pdb
         pdb.set_trace()
         VisTrack.vis_all_lines(img_hw, n_visible_views=cfg["n_visible_views"], width=2)
-        pdb.set_trace()
-        # debug
-        tuples = Triangulator.GetValidScoredTrisNodeSet(1, 20)
-        valid_tuples = [tpl for tpl in tuples if tpl[1] > 6]
-        invalid_tuples = [tpl for tpl in tuples if tpl[1] < 4]
-        for idx in range(len(valid_tuples)):
-            tpl = valid_tuples[idx]
-            img_id, line_id = tpl[2][0], tpl[2][1]
-            vis.visualize_2d_line('tmp/valid_vis_{0}.png'.format(idx), imname_list, all_2d_lines, img_id, line_id, resize_hw=resize_hw, max_image_dim=max_image_dim)
-        for idx in range(len(invalid_tuples)):
-            tpl = invalid_tuples[idx]
-            img_id, line_id = tpl[2][0], tpl[2][1]
-            vis.visualize_2d_line('tmp/invalid_vis_{0}.png'.format(idx), imname_list, all_2d_lines, img_id, line_id, resize_hw=resize_hw, max_image_dim=max_image_dim)
         pdb.set_trace()
     return linetracks
 

@@ -83,7 +83,6 @@ def line_fitnmerge(cfg, imname_list, cameras, depths, neighbors=None, ranges=Non
     ##########################################################
     # [D] merge 3d segments
     ##########################################################
-    import pdb
     img_hw = utils.read_image(imname_list[0], resize_hw=resize_hw, max_image_dim=max_image_dim).shape[:2]
     fname_all_3d_segs = '{0}_all_3d_segs_wv.npy'.format(cfg["line2d"]["detector"])
     linker = _base.LineLinker(cfg["merging"]["linker2d"], cfg["merging"]["linker3d"])
@@ -119,6 +118,7 @@ def line_fitnmerge(cfg, imname_list, cameras, depths, neighbors=None, ranges=Non
     vis.save_obj(os.path.join(cfg["dir_save"], 'lines_to_vis.obj'), lines_np, counts=counts_np, n_visible_views=cfg['n_visible_views'])
 
     if cfg["visualize"]:
+        import pdb
         pdb.set_trace()
         VisTrack.vis_all_lines(img_hw=img_hw, n_visible_views=cfg["n_visible_views"])
         pdb.set_trace()

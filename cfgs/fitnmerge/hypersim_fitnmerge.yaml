@@ -1,10 +1,12 @@
 ---
 ##############################
 # global config
-data_dir: "data"
+data_dir: "/local/home/shaoliu/data/Hypersim"
 scene_id: "ai_001_001"
 cam_id: 0
 max_image_dim: 800
 input_n_views: 100
 input_stride: 1
+sfm:
+    fbase: "hloc"
 
