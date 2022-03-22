@@ -1,0 +1,112 @@
+---
+##############################
+# global config
+cfg_type: "triangulation"
+load_meta: False
+load_det: False 
+load_match: False
+use_tmp: False
+n_visible_views: 4
+n_neighbors: 20 
+use_cuda: True
+visualize: True
+max_image_dim: 1600
+folder_to_save: null 
+
+##############################
+# sfm config
+sfm: 
+    colmap_output_path: "tmp/tmp_colmap"
+    reuse: False
+    min_triangulation_angle: 1.0
+    neighbor_type: "dice" # ["overlap", "iou", "dice"]
+    ranges:
+        range_robust: [0.05, 0.95]
+        k_stretch: 1.25
+    fbase: "sift" # ["sift", "hloc"]
+    hloc:
+        descriptor: "superpoint_aachen"
+        matcher: "NN-superpoint"
+
+##############################
+# line detection and matching config
+line2d:
+    detector: "sold2" # ["sold2", "lsd"]
+    topk: 10 # 0 for mutual test
+    max_num_2d_segs: 3000
+    load_sold2: False
+    visualize: False
+    n_jobs: 3 # parallelization for matching descinfos
+    save_l3dpp: False
+    compute_descinfo: False
+var2d:
+    sold2: 5.0
+    lsd: 2.0
+
+##############################
+# triangulation config
+triangulation:
+    use_exhaustive_matcher: False
+    add_halfpix: false
+    var2d: -1.0 # depending on the detector
+    plane_angle_threshold: 1.0
+    IoU_threshold: 0.1
+    sensitivity_threshold: 70.0
+    fullscore_th: 1.0
+    max_valid_conns: 1000
+    min_num_outer_edges: 0
+    merging_strategy: "greedy"
+    num_outliers_aggregator: 2
+    debug_mode: False
+    linker2d_config:
+        score_th: 0.5
+        th_angle: 5.0
+        th_perp: 2.0 # in pixels
+        th_overlap: 0.05
+    linker3d_config:
+        score_th: 0.5
+        th_angle: 10.0
+        th_overlap: 0.05
+        th_smartoverlap: 0.1
+        th_smartangle: 2.0
+        th_perp: 1.0
+        th_innerseg: 1.0
+        th_scaleinv: 0.015
+    remerging:
+        disable: False
+        linker3d:
+            score_th: 0.5
+            th_angle: 5.0
+            th_overlap: 0.001
+            th_smartoverlap: 0.1
+            th_smartangle: 1.0
+            th_perp: 1.0
+            th_innerseg: 1.0
+    filtering2d:
+        th_angular_2d: 8.0
+        th_perp_2d: 5.0 # in pixels
+        th_sv_angular_3d: 75.0 # for sensitivity
+        th_sv_num_supports: 3
+        th_overlap: 0.5
+        th_overlap_num_supports: 3
+    use_vp: False 
+    vpdet_config:
+        min_length: 40
+        inlier_threshold: 1.0
+        min_num_supports: 10
+
+##############################
+# geometric refinement config
+refinement:
+    disable: False
+    constant_pose: True
+    constant_line: False
+    min_num_images: 4
+    num_outliers_aggregator: 2
+    use_geometric: True
+    geometric_alpha: 10.0
+    use_vp: False 
+    vp_multiplier: 0.1
+    use_heatmap: False 
+    use_feature: False
+

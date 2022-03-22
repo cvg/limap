@@ -1,0 +1,12 @@
+---
+##############################
+# global config
+n_neighbors: 20
+max_image_dim: 800
+use_descriptor: False
+line2d:
+    detector: "lsd"
+    n_jobs: 1
+triangulation:
+    add_halfpix: True
+

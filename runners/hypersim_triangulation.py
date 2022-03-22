@@ -1,0 +1,65 @@
+import os, sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import numpy as np
+from core.dataset import Hypersim
+import core.utils as utils
+from line_triangulation import line_triangulation
+
+import limap.base as _base
+import limap.triangulation as _tri
+
+def process_hypersim_scene(cfg, dataset_hypersim, scene_id, cam_id=0):
+    # set scene id
+    dataset_hypersim.set_scene_id(scene_id)
+    dataset_hypersim.set_max_dim(cfg["max_image_dim"])
+
+    # generate image indexes
+    index_list = np.arange(0, cfg["input_n_views"], cfg["input_stride"]).tolist()
+    index_list = dataset_hypersim.filter_index_list(index_list, cam_id=cam_id)
+
+    # get imname_list
+    imname_list = []
+    for image_id in index_list:
+        imname = dataset_hypersim.load_imname(image_id, cam_id=cam_id)
+        imname_list.append(imname)
+
+    # get cameras
+    K = dataset_hypersim.K.astype(np.float32)
+    Ts, Rs = dataset_hypersim.load_cameras(cam_id=cam_id)
+    cameras = [_base.Camera(K, Rs[idx], Ts[idx]) for idx in index_list]
+
+    # run triangulation
+    linetracks = line_triangulation(cfg, imname_list, cameras, max_image_dim=cfg["max_image_dim"])
+
+def parse_config():
+    import argparse
+    arg_parser = argparse.ArgumentParser(description='triangulate 3d lines')
+    arg_parser.add_argument('-c', '--config_file', type=str, default='cfgs/triangulation/hypersim_triangulation.yaml', help='config file')
+    arg_parser.add_argument('--default_config_file', type=str, default='cfgs/triangulation/default_triangulation.yaml', help='default config file')
+    arg_parser.add_argument('--npyfolder', type=str, default=None, help='folder to load precomputed results')
+
+    args, unknown = arg_parser.parse_known_args()
+    cfg = utils.load_config(args.config_file, default_path=args.default_config_file)
+    shortcuts = dict()
+    shortcuts['-nv'] = '--n_visible_views'
+    shortcuts['-nn'] = '--n_neighbors'
+    shortcuts['-sid'] = '--scene_id'
+    cfg = utils.update_config(cfg, unknown, shortcuts)
+    cfg["folder_to_load"] = args.npyfolder
+    if cfg["folder_to_load"] is None:
+        cfg["folder_to_load"] = os.path.join("precomputed", "hypersim", cfg["scene_id"])
+    return cfg
+
+def init_workspace():
+    if not os.path.exists('tmp'):
+        os.makedirs('tmp')
+
+def main():
+    cfg = parse_config()
+    init_workspace()
+    dataset_hypersim = Hypersim(cfg["data_dir"])
+    process_hypersim_scene(cfg, dataset_hypersim, cfg["scene_id"], cam_id=cfg["cam_id"])
+
+if __name__ == '__main__':
+    main()
+

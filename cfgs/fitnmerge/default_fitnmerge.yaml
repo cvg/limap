@@ -1,0 +1,92 @@
+---
+##############################
+# global config
+cfg_type: "fitnmerge"
+load_meta: False
+load_det: False 
+load_fit: False 
+use_tmp: False
+n_visible_views: 4
+n_neighbors: 100 
+use_cuda: True
+folder_to_save: null 
+visualize: True
+
+##############################
+# sfm config
+sfm: 
+    colmap_output_path: "tmp/tmp_colmap"
+    reuse: False
+    min_triangulation_angle: 1.0
+    neighbor_type: "dice" # ["overlap", "iou", "dice"]
+    ranges:
+        range_robust: [0.05, 0.95]
+        k_stretch: 1.25
+    fbase: "sift" # ["sift", "hloc"]
+    hloc:
+        descriptor: "superpoint_aachen"
+        matcher: "NN-superpoint"
+
+##############################
+# line detection config
+line2d:
+    detector: "sold2" # ["sold2", "lsd"]
+    max_num_2d_segs: 3000
+    visualize: False
+    save_l3dpp: False
+    compute_descinfo: False
+var2d:
+    sold2: 5.0
+    lsd: 2.0
+
+##############################
+# fitting config
+fitting:
+    ransac_th: 0.75
+    min_percentage_inliers: 0.9
+    n_jobs: 4
+    var2d: -1.0 # depends on the detector
+
+##############################
+# merging config
+merging:
+    var2d: -1.0
+    linker3d:
+        score_th: 0.5
+        th_angle: 8.0
+        th_overlap: 0.01
+        th_smartoverlap: 0.1
+        th_smartangle: 1.0
+        th_perp: 0.75
+        th_innerseg: 0.75
+    linker2d:
+        score_th: 0.5
+        th_angle: 5.0
+        th_perp: 2.0 # in pixels
+        th_overlap: 0.05
+remerging:
+    disable: False
+    linker3d:
+        score_th: 0.5
+        th_angle: 5.0
+        th_overlap: 0.001
+        th_smartoverlap: 0.1
+        th_smartangle: 1.0
+        th_perp: 0.5
+        th_innerseg: 0.5
+filtering2d:
+    th_angular_2d: 8.0
+    th_perp_2d: 5.0 # in pixels
+
+##############################
+# geometric refinement config
+refinement:
+    disable: True 
+    constant_pose: True
+    constant_line: False
+    min_num_images: 4
+    use_geometric: True
+    use_heatmap: False 
+    use_feature: False
+
+

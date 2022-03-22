@@ -1,0 +1,34 @@
+refinement:
+    dtype: "float16"
+    min_num_images: 4
+    print_summary: False 
+    constant_pose: True 
+    constant_line: False
+    
+    # geometric
+    use_geometric: True
+
+    # vp
+    use_vp: False
+    vp_multiplier: 0.1
+    
+    # heatmap
+    use_heatmap: False 
+    sample_range_min: 0.05
+    sample_range_max: 0.95
+    n_samples_heatmap: 10
+    heatmap_multiplier: 1.0
+    
+    # features
+    use_feature: False
+    channels: 128
+    n_samples_feature: 100
+    n_samples_feature_2d: 10 # for keyline adjustment
+    use_ref_descriptor: False
+    ref_multiplier: 5.0
+    patch:
+        k_stretch: 1.0 # by default we do not use k_stretch
+        t_stretch: 10 # in pixels
+        range_perp: 16 # in pixels
+    fconsis_multiplier: 0.1
+

@@ -1,0 +1,20 @@
+set(FOLDER_NAME "base")
+
+LIMAP_ADD_SOURCES(
+    graph.h graph.cc
+    camera.h camera.cc
+
+    linebase.h linebase.cc
+    linetrack.h linetrack.cc
+    line_dists.h line_dists.cc
+    line_linker.h line_linker.cc
+    infinite_line.h infinite_line.cc
+    line_reconstruction.h line_reconstruction.cc
+    line2d_parameterization.h line2d_parameterization.cc
+
+    featuremap.h featuremap.cc
+    featurepatch.h featurepatch.cc
+
+    bindings.cc
+)
+

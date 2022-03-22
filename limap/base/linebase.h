@@ -1,0 +1,61 @@
+#ifndef LIMAP_BASE_LINEBASE_H
+#define LIMAP_BASE_LINEBASE_H
+
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
+#include <pybind11/eigen.h>
+#include <cmath>
+#include <set>
+
+namespace py = pybind11;
+
+#include "util/types.h"
+#include "base/camera.h"
+
+namespace limap {
+
+class Line2d {
+public:
+    Line2d() {}
+    Line2d(V2D start, V2D end, double score=-1);
+    V2D start, end;
+    double score = -1;
+
+    double length() const {return (start - end).norm();}
+    V2D midpoint() const {return 0.5 * (start + end);}
+    V2D direction() const {return (end - start).normalized();}
+    V2D perp_direction() const {V2D dir = direction(); return V2D(dir[1], -dir[0]); }
+    Eigen::MatrixXd as_array() const;
+};
+
+class Line3d {
+public:
+    Line3d() {}
+    Line3d(const Eigen::MatrixXd& seg3d);
+    Line3d(V3D start, V3D end, double score=-1, double depth_start=-1, double depth_end=-1, double uncertainty=-1);
+    V3D start, end;
+    double score = -1;
+    double uncertainty = -1.0;
+    V2D depths; // [depth_start, depth_end] for the source perspective image
+
+    void set_uncertainty(const double val) { uncertainty = val; }
+    double length() const {return (start - end).norm();}
+    V3D midpoint() const {return 0.5 * (start + end);}
+    V3D direction() const {return (end - start).normalized();}
+    Eigen::MatrixXd as_array() const;
+    Line2d projection(const PinholeCamera& camera) const;
+    double sensitivity(const PinholeCamera& camera) const; // in angle, 0 for perfect view, 90 for collapsing
+    double computeUncertainty(const PinholeCamera& camera, const double var2d=5.0) const;
+};
+
+Line2d projection_line3d(const Line3d& line3d, const PinholeCamera& camera);
+
+Line3d unprojection_line2d(const Line2d& line2d, const PinholeCamera& camera, const std::pair<double, double>& depths);
+
+void GetAllLines2D(const std::vector<Eigen::MatrixXd>& all_2d_segs,
+                 std::vector<std::vector<Line2d>>& all_lines);
+
+} // namespace limap
+
+#endif
+
