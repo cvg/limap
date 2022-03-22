@@ -65,25 +65,3 @@ def estimate_seg3d_from_depth(seg2d, depth, cam, hw, ransac_th=0.75, min_percent
         start_3dpt, end_3dpt, inlier_mask = result
         return start_3dpt, end_3dpt
 
-def estimate_seg3d_from_raydepth(seg2d, raydepth, cam, hw, ransac_th=0.015, min_percentage_inliers=0.6):
-    K, R, T = cam[0], cam[1], cam[2]
-    h, w = hw[0], hw[1]
-
-    seg2d = seg2d.astype(int)
-    seg1_pts = np.array(list(bresenham(seg2d[0], seg2d[1], seg2d[2], seg2d[3]))).T
-    valid_pxs = (seg1_pts[0] >= 0) & (seg1_pts[1] >= 0) & (seg1_pts[0] < w) & (seg1_pts[1] < h)
-    seg1_pts = seg1_pts[:, valid_pxs]
-    seg1_raydepths = raydepth[seg1_pts[1], seg1_pts[0]]
-    unprojected = np.linalg.inv(K) @ to_homogeneous_t(seg1_pts)
-    unprojected = unprojected * seg1_raydepths / np.linalg.norm(unprojected, axis=0)
-    segment_3d_pts = (R.T @ unprojected) - (R.T @ T)[:, None].repeat(unprojected.shape[1], 1)
-    segment_3d_pts = segment_3d_pts.T
-
-    result = fit_3d_seg(segment_3d_pts, ransac_th=ransac_th, min_percentage_inliers=min_percentage_inliers)
-    if result is None:
-        return None
-    else:
-        start_3dpt, end_3dpt, inlier_mask = result
-        return start_3dpt, end_3dpt
-
-

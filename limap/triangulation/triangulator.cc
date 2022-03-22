@@ -555,7 +555,7 @@ void Triangulator::ComputeLineTracks() {
     }
     std::vector<int> track_labels;
     if (config_.merging_strategy == "greedy")
-        track_labels = merging::ComputeLineTrackLabelsGreedy(finalgraph_, lines_nodes, linker3d);
+        track_labels = merging::ComputeLineTrackLabelsGreedy(finalgraph_, lines_nodes);
     else if (config_.merging_strategy == "exhaustive")
         track_labels = merging::ComputeLineTrackLabelsExhaustive(finalgraph_, lines_nodes, linker3d);
     else if (config_.merging_strategy == "avg")

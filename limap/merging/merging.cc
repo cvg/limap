@@ -14,10 +14,8 @@ namespace limap {
 
 namespace merging {
 
-std::vector<int> ComputeLineTrackLabelsGreedy(const Graph& graph, const std::vector<Line3d>& line3d_list_nodes, LineLinker3d linker3d)
+std::vector<int> ComputeLineTrackLabelsGreedy(const Graph& graph, const std::vector<Line3d>& line3d_list_nodes)
 {
-    // set the mode to avgtest merging
-    linker3d.config.set_to_avgtest_merging();
     const size_t n_nodes = graph.nodes.size();
     std::vector<edge_tuple> edges;
     for (Edge* edge : graph.undirected_edges) {
@@ -424,7 +422,7 @@ void MergeToLineTracks(Graph& graph,
 
     // compute tracks
     int n_nodes = graph.nodes.size();
-    std::vector<int> track_labels = ComputeLineTrackLabelsGreedy(graph, line3d_list_nodes, linker.linker_3d);
+    std::vector<int> track_labels = ComputeLineTrackLabelsGreedy(graph, line3d_list_nodes);
 
     int n_tracks = *std::max_element(track_labels.begin(), track_labels.end()) + 1;
     linetracks.resize(n_tracks);

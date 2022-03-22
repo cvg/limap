@@ -21,8 +21,7 @@ namespace merging {
 
 // Modified track computation based on Kruskal 
 std::vector<int> ComputeLineTrackLabelsGreedy(const Graph& graph, 
-                                              const std::vector<Line3d>& line3d_list_nodes, 
-                                              LineLinker3d linker3d);
+                                              const std::vector<Line3d>& line3d_list_nodes);
 std::vector<int> ComputeLineTrackLabelsExhaustive(const Graph& graph, 
                                                   const std::vector<Line3d>& line3d_list_nodes, 
                                                   LineLinker3d linker3d);

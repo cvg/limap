@@ -4,6 +4,7 @@
 
 * [ ] Port RANSAC to C++
 * [ ] Change camera base class definition
+* [ ] abstract Detection, Matching, Fitting and Merging 
 
 ## Dependencies
 * Python 3.6 (just the version I am using, guess it is compatible to higher version)
