@@ -11,6 +11,7 @@ add_subdirectory(refinement)
 add_subdirectory(lineKA)
 add_subdirectory(lineBA)
 add_subdirectory(evaluation)
+add_subdirectory(fitting)
 
 add_subdirectory(_limap)
 

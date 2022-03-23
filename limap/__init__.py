@@ -13,4 +13,5 @@ from . import features
 from . import lineKA
 from . import lineBA
 from . import evaluation
+from . import fitting
 

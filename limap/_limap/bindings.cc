@@ -20,6 +20,7 @@ namespace py = pybind11;
 #include "lineBA/bindings.cc"
 #include "vpdetection/bindings.cc"
 #include "evaluation/bindings.cc"
+#include "fitting/bindings.cc"
 
 #include "_limap/helpers.h"
 
@@ -35,6 +36,7 @@ void bind_lineKA(py::module &);
 void bind_lineBA(py::module &);
 void bind_vpdetection(py::module &);
 void bind_evaluation(py::module &);
+void bind_fitting(py::module &);
 
 namespace limap {
 
@@ -55,6 +57,7 @@ PYBIND11_MODULE(_limap, m) {
     pybind11::module_ _lineba = m.def_submodule("_lineBA");
     pybind11::module_ _vpdet = m.def_submodule("_vpdet");
     pybind11::module_ _eval = m.def_submodule("_evaluation");
+    pybind11::module_ _fitting = m.def_submodule("_fitting");
 
     // bind modules
     bind_base(_b);
@@ -69,6 +72,7 @@ PYBIND11_MODULE(_limap, m) {
     bind_lineBA(_lineba);
     bind_vpdetection(_vpdet);
     bind_evaluation(_eval);
+    bind_fitting(_fitting);
 }
 
 }
