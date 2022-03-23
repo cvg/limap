@@ -16,7 +16,3 @@
 [submodule "third-party/pytlsd"]
 	path = third-party/pytlsd
 	url = git@github.com:B1ueber2y/pytlsd.git
-[submodule "RansacLib"]
-	path = third-party/RansacLib
-	url = git@github.com:B1ueber2y/RansacLib.git
-    branch = header-only
