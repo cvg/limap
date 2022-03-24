@@ -1,6 +1,3 @@
-[submodule "third-party/HighFive"]
-	path = third-party/HighFive
-	url = git@github.com:B1ueber2y/HighFive.git
 [submodule "third-party/pybind11"]
 	path = third-party/pybind11
 	url = git@github.com:pybind/pybind11.git

@@ -2,17 +2,13 @@
 #define LIMAP_CERESBASE_INTERPOLATION_H
 
 // Modified from the pixel-perfect-sfm project
+// [LINK] https://github.com/cvg/pixel-perfect-sfm
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include "_limap/helpers.h"
 
 namespace py = pybind11;
-
-#include <highfive/H5File.hpp>
-#include <highfive/H5DataSet.hpp>
-#include <highfive/H5DataSpace.hpp>
-#include <highfive/H5Group.hpp>
 
 #include <boost/serialization/vector.hpp>
 #include <utility>

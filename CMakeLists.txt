@@ -47,7 +47,6 @@ endif()
 ################################################################################
 
 set(LIMAP_INCLUDE_DIRS
-  ${HDF5_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIR}
   ${PROJECT_SOURCE_DIR}
   ${FREEIMAGE_INCLUDE_DIRS}
@@ -63,7 +62,6 @@ set(LIMAP_EXTERNAL_LIBRARIES
   ${CERES_LIBRARIES}
   ${FREEIMAGE_LIBRARIES}
   ${COLMAP_LIBRARIES}
-  ${HDF5_C_LIBRARIES}
   ${Boost_LIBRARIES}
 )
 
@@ -72,7 +70,6 @@ if(OPENMP_FOUND)
 endif()
 
 set(LIMAP_INTERNAL_LIBRARIES
-  HighFive
   pybind11::module
   pybind11::embed
   JLinkage
