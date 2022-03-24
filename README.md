@@ -18,7 +18,10 @@ cd third-party/Hierarchical-Localization && python -m pip install -e . && cd ../
 mkdir -p build && cd build && cmake .. && make -j8 && cd ..
 ```
 
-For SOLD2 line detector, the pretrained models need to be downloaded from the links provided in the [SOLD2 repo](https://github.com/cvg/SOLD2) and put into `core/detector/SOLD2/pretrained_models`.
+For SOLD2 line detector, the pretrained models need to be downloaded from the links provided in the [SOLD2 repo](https://github.com/cvg/SOLD2) and put into `core/detector/SOLD2/pretrained_models`. A one-button download script is provided here to make things easier:
+```bash
+bash scripts/download_sold2_model.sh
+```
 
 ## Quickstart
 
