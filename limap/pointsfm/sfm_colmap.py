@@ -1,4 +1,4 @@
-from _limap import _base, _sfm
+from _limap import _base, _pointsfm
 from .read_write_model import *
 
 def compute_neighbors(model, n_neighbors, min_triangulation_angle=1.0, neighbor_type="iou"):
@@ -13,7 +13,7 @@ def compute_neighbors(model, n_neighbors, min_triangulation_angle=1.0, neighbor_
     return neighbors
 
 def ComputeNeighbors(colmap_output_path, n_neighbors, min_triangulation_angle=1.0, neighbor_type="iou", sparse_dir="sparse", images_dir="images"):
-    model = _sfm.SfmModel()
+    model = _pointsfm.SfmModel()
     model.ReadFromCOLMAP(colmap_output_path, sparse_dir, images_dir)
 
     # get neighbors
@@ -23,7 +23,7 @@ def ComputeNeighbors(colmap_output_path, n_neighbors, min_triangulation_angle=1.
 
 # compute neighborhood for a image list sorted as 'image{0:08d}.png'
 def ComputeNeighborsSorted(colmap_output_path, n_neighbors, min_triangulation_angle=1.0, neighbor_type="iou", sparse_dir="sparse", images_dir="images"):
-    model = _sfm.SfmModel()
+    model = _pointsfm.SfmModel()
     model.ReadFromCOLMAP(colmap_output_path, sparse_dir, images_dir)
 
     # get neighbors
@@ -38,7 +38,7 @@ def ComputeNeighborsSorted(colmap_output_path, n_neighbors, min_triangulation_an
     return neighbors
 
 def ComputeRanges(colmap_output_path, range_robust=[0.01, 0.99], k_stretch=1.25, sparse_dir="sparse", images_dir="images"):
-    model = _sfm.SfmModel()
+    model = _pointsfm.SfmModel()
     model.ReadFromCOLMAP(colmap_output_path, sparse_dir, images_dir)
     ranges = model.ComputeRanges(range_robust, k_stretch)
     return ranges
@@ -130,7 +130,7 @@ def ReadInfosFromModel(model, colmap_path, model_path="sparse", image_path="imag
     return imname_list, cameras, cam_id_list
 
 def ReadInfos(colmap_path, model_path="sparse", image_path="images", max_image_dim=None, check_undistorted=True):
-    model = _sfm.SfmModel()
+    model = _pointsfm.SfmModel()
     model.ReadFromCOLMAP(colmap_path, model_path, image_path)
     return ReadInfosFromModel(model, colmap_path, model_path=model_path, image_path=image_path, max_image_dim=max_image_dim, check_undistorted=check_undistorted)
 

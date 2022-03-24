@@ -27,14 +27,14 @@ def setup(cfg, imname_list, cameras, max_image_dim=None):
     return cfg
 
 def compute_sfminfos(cfg, imname_list, cameras, fname="sfm_metainfos.npy", resize_hw=None, max_image_dim=None):
-    import limap.sfm as _sfm
+    import limap.pointsfm as _psfm
     if not cfg["load_meta"]:
         # run colmap sfm and compute neighbors, ranges
         colmap_output_path = cfg["sfm"]["colmap_output_path"]
         if not cfg["sfm"]["reuse"]:
-            _sfm.run_colmap_sfm_with_known_poses(cfg["sfm"], imname_list, cameras, resize_hw=resize_hw, max_image_dim=max_image_dim, output_path=colmap_output_path, use_cuda=cfg["use_cuda"])
-        neighbors = _sfm.ComputeNeighborsSorted(colmap_output_path, cfg["n_neighbors"], min_triangulation_angle=cfg["sfm"]["min_triangulation_angle"], neighbor_type=cfg["sfm"]["neighbor_type"])
-        ranges = _sfm.ComputeRanges(colmap_output_path, range_robust=cfg["sfm"]["ranges"]["range_robust"], k_stretch=cfg["sfm"]["ranges"]["k_stretch"])
+            _psfm.run_colmap_sfm_with_known_poses(cfg["sfm"], imname_list, cameras, resize_hw=resize_hw, max_image_dim=max_image_dim, output_path=colmap_output_path, use_cuda=cfg["use_cuda"])
+        neighbors = _psfm.ComputeNeighborsSorted(colmap_output_path, cfg["n_neighbors"], min_triangulation_angle=cfg["sfm"]["min_triangulation_angle"], neighbor_type=cfg["sfm"]["neighbor_type"])
+        ranges = _psfm.ComputeRanges(colmap_output_path, range_robust=cfg["sfm"]["ranges"]["range_robust"], k_stretch=cfg["sfm"]["ranges"]["k_stretch"])
     else:
         fname_load = os.path.join(cfg["dir_load"], fname)
         with open(fname_load, 'rb') as f:

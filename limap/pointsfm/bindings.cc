@@ -7,14 +7,14 @@
 #include <Eigen/Core>
 #include "_limap/helpers.h"
 
-#include "sfm/sfm_model.h"
+#include "pointsfm/sfm_model.h"
 
 namespace py = pybind11;
 
 namespace limap {
 
-void bind_sfm(py::module &m) {
-    using namespace sfm;
+void bind_pointsfm(py::module &m) {
+    using namespace pointsfm;
 
     // bind the colmap mvs image
     py::class_<colmap::mvs::Image>(m, "SfmImage")

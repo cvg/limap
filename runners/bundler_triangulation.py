@@ -5,7 +5,7 @@ import cv2
 import core.utils as utils
 
 import limap.base as _base
-import limap.sfm as _sfm
+import limap.pointsfm as _psfm
 import limap.undistortion as _undist
 
 from line_triangulation import line_triangulation
@@ -16,10 +16,10 @@ def read_infos_bundler(cfg, bundler_path, list_path, model_path, max_image_dim=N
     '''
     Read all infos from bundler including imname_list, cameras, neighbors, ranges
     '''
-    model, imname_list, cameras = _sfm.ReadModelBundler(bundler_path, list_path, model_path, max_image_dim=max_image_dim)
+    model, imname_list, cameras = _psfm.ReadModelBundler(bundler_path, list_path, model_path, max_image_dim=max_image_dim)
 
     # get neighbors
-    neighbors = _sfm.compute_neighbors(model, cfg["n_neighbors"], min_triangulation_angle=cfg["sfm"]["min_triangulation_angle"], neighbor_type=cfg["sfm"]["neighbor_type"])
+    neighbors = _psfm.compute_neighbors(model, cfg["n_neighbors"], min_triangulation_angle=cfg["sfm"]["min_triangulation_angle"], neighbor_type=cfg["sfm"]["neighbor_type"])
 
     # get ranges
     ranges = model.ComputeRanges(cfg["sfm"]["ranges"]["range_robust"], cfg["sfm"]["ranges"]["k_stretch"])
@@ -73,7 +73,7 @@ def run_bundler_undistortion(cfg, bundler_path, list_path, model_path):
     Run undistortion from bundler input
     '''
     if cfg["info_path"] is None:
-        _, imname_list, cameras = _sfm.ReadModelBundler(bundler_path, list_path, model_path)
+        _, imname_list, cameras = _psfm.ReadModelBundler(bundler_path, list_path, model_path)
     else:
         with open(cfg["info_path"], 'rb') as f:
             data = np.load(f, allow_pickle=True)

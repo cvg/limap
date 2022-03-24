@@ -1,4 +1,4 @@
-set(FOLDER_NAME "sfm")
+set(FOLDER_NAME "pointsfm")
 
 LIMAP_ADD_SOURCES(
     bindings.cc

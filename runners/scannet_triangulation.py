@@ -3,7 +3,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 from core.dataset import ScanNet
 import core.utils as utils
-import lineopt.base
+import limap.base
 from line_triangulation import line_triangulation
 
 def process_scannet_scene(cfg, dataset_scannet, scene_id):
@@ -19,7 +19,7 @@ def process_scannet_scene(cfg, dataset_scannet, scene_id):
     Ts, Rs = dataset_scannet.load_cameras()
     cameras = []
     for idx in range(len(imname_list)):
-        cam = lineopt.base.Camera(K, Rs[idx], Ts[idx])
+        cam = limap.base.Camera(K, Rs[idx], Ts[idx])
         cam.set_hw(img_hw[0], img_hw[1])
         cameras.append(cam)
 

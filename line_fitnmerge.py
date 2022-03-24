@@ -8,7 +8,6 @@ import core.visualize as vis
 import core.utils as utils
 
 import limap.base as _base
-import limap.sfm as _sfm
 import limap.fitting as _fit
 import limap.merging as _mrg
 import limap.lineBA as _lineBA

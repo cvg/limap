@@ -3,21 +3,21 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 import core.utils as utils
 import limap.base as _base
-import limap.sfm as _sfm
+import limap.pointsfm as _psfm
 from line_triangulation import line_triangulation
 
 def read_infos_colmap(cfg, colmap_path, model_path="sparse", image_path="images", max_image_dim=None):
     '''
     Read all infos from colmap including imname_list, cameras, neighbors, ranges and cam_id_list
     '''
-    model = _sfm.SfmModel()
+    model = _psfm.SfmModel()
     model.ReadFromCOLMAP(colmap_path, model_path, image_path)
 
     # get imname_list and cameras
-    imname_list, cameras, cam_id_list = _sfm.ReadInfos(colmap_path, model_path=model_path, image_path=image_path, max_image_dim=max_image_dim, check_undistorted=True)
+    imname_list, cameras, cam_id_list = _psfm.ReadInfos(colmap_path, model_path=model_path, image_path=image_path, max_image_dim=max_image_dim, check_undistorted=True)
 
     # get neighbors
-    neighbors = _sfm.compute_neighbors(model, cfg["n_neighbors"], min_triangulation_angle=cfg["sfm"]["min_triangulation_angle"], neighbor_type=cfg["sfm"]["neighbor_type"])
+    neighbors = _psfm.compute_neighbors(model, cfg["n_neighbors"], min_triangulation_angle=cfg["sfm"]["min_triangulation_angle"], neighbor_type=cfg["sfm"]["neighbor_type"])
 
     # get ranges
     ranges = model.ComputeRanges(cfg["sfm"]["ranges"]["range_robust"], cfg["sfm"]["ranges"]["k_stretch"])

@@ -6,7 +6,7 @@ from . import base
 from . import vpdetection
 from . import triangulation
 from . import merging
-from . import sfm
+from . import pointsfm
 from . import undistortion
 from . import refinement
 from . import features

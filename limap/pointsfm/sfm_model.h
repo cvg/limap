@@ -1,5 +1,5 @@
-#ifndef LIMAP_SFM_SFM_MODEL_H_
-#define LIMAP_SFM_SFM_MODEL_H_
+#ifndef LIMAP_POINTSFM_SFM_MODEL_H_
+#define LIMAP_POINTSFM_SFM_MODEL_H_
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
@@ -13,7 +13,7 @@ namespace py = pybind11;
 
 namespace limap {
 
-namespace sfm {
+namespace pointsfm {
 
 colmap::mvs::Image CreateSfmImage(const std::string& filename, 
                                   const int width, const int height, 
@@ -45,7 +45,7 @@ private:
     std::pair<float, float> get_robust_range(std::vector<float>& data, const std::pair<double, double>& range_robust, const double& kstretch) const;
 };
 
-} // namespace sfm
+} // namespace pointsfm
 
 } // namespace limap
 

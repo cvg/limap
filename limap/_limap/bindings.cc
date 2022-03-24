@@ -10,7 +10,7 @@ namespace py = pybind11;
 
 #include "base/bindings.cc"
 #include "ceresbase/bindings.cc"
-#include "sfm/bindings.cc"
+#include "pointsfm/bindings.cc"
 #include "triangulation/bindings.cc"
 #include "merging/bindings.cc"
 #include "undistortion/bindings.cc"
@@ -26,7 +26,7 @@ namespace py = pybind11;
 
 void bind_base(py::module &);
 void bind_ceresbase(py::module &);
-void bind_sfm(py::module &);
+void bind_pointsfm(py::module &);
 void bind_triangulation(py::module &);
 void bind_merging(py::module &);
 void bind_undistortion(py::module &);
@@ -47,7 +47,7 @@ PYBIND11_MODULE(_limap, m) {
 
     pybind11::module_ _b = m.def_submodule("_base");
     pybind11::module_ _ceresb = m.def_submodule("_ceresbase");
-    pybind11::module_ _sfm = m.def_submodule("_sfm");
+    pybind11::module_ _pointsfm = m.def_submodule("_pointsfm");
     pybind11::module_ _tri = m.def_submodule("_triangulation");
     pybind11::module_ _mrg = m.def_submodule("_merging");
     pybind11::module_ _undist = m.def_submodule("_undistortion");
@@ -62,7 +62,7 @@ PYBIND11_MODULE(_limap, m) {
     // bind modules
     bind_base(_b);
     bind_ceresbase(_ceresb);
-    bind_sfm(_sfm);
+    bind_pointsfm(_pointsfm);
     bind_triangulation(_tri);
     bind_merging(_mrg);
     bind_undistortion(_undist);

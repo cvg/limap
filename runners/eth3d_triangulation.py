@@ -5,7 +5,6 @@ import numpy as np
 from core.dataset import ETH3D
 import core.utils as utils
 import limap.base as _base
-import limap.sfm as _sfm
 from colmap_triangulation import read_infos_colmap, filter_by_cam_id
 from line_triangulation import line_triangulation
 

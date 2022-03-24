@@ -1,4 +1,4 @@
-from _limap import _base, _sfm
+from _limap import _base, _pointsfm
 
 import os
 import numpy as np
@@ -30,7 +30,7 @@ def ReadModelBundler(bundler_path, list_path, model_path, max_image_dim=None):
     counter += 1
 
     # construct SfmModel instance
-    model = _sfm.SfmModel()
+    model = _pointsfm.SfmModel()
     cameras = []
     # read cameras
     for image_id in tqdm(range(n_images)):
@@ -64,7 +64,7 @@ def ReadModelBundler(bundler_path, list_path, model_path, max_image_dim=None):
             camera.set_max_image_dim(max_image_dim)
         cameras.append(camera)
         # add image
-        image = _sfm.SfmImage(imname_list[image_id], img_hw[1], img_hw[0], K.reshape(-1).tolist(), R.reshape(-1).tolist(), T.tolist())
+        image = _pointsfm.SfmImage(imname_list[image_id], img_hw[1], img_hw[0], K.reshape(-1).tolist(), R.reshape(-1).tolist(), T.tolist())
         model.addImage(image)
 
     # read points

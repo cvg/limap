@@ -1,10 +1,10 @@
-#include "sfm/sfm_model.h"
+#include "pointsfm/sfm_model.h"
 
 #include <colmap/util/math.h>
 
 namespace limap {
 
-namespace sfm {
+namespace pointsfm {
 
 colmap::mvs::Image CreateSfmImage(const std::string& filename, 
                                   const int width, const int height, 
@@ -198,7 +198,7 @@ std::pair<V3D, V3D> SfmModel::ComputeRanges(const std::pair<double, double>& ran
     return std::make_pair(V3D(range_x.first, range_y.first, range_z.first), V3D(range_x.second, range_y.second, range_z.second));
 }
 
-} // namespace sfm
+} // namespace pointsfm
 
 } // namespace limap
 

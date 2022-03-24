@@ -2,14 +2,9 @@ import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 import core.utils as utils
-from tqdm import tqdm
 
-import lineopt.base as _base
-import lineopt.sfm as _sfm
-import lineopt.undistortion as _undist
-
-from line_triangulation import line_triangulation
 from bundler_triangulation import run_bundler_undistortion, load_all_infos_bundler
+from line_triangulation import line_triangulation
 
 def run_rome16k_triangulation(cfg, bundler_path, list_path, model_path):
     imname_list, cameras, neighbors, ranges = load_all_infos_bundler(cfg, bundler_path, list_path, model_path)
