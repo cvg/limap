@@ -20,7 +20,7 @@ V3D InfiniteLine2d::GetLineCoordinate() const {
 
 V2D InfiniteLine2d::point_projection(const V2D& p2d) const {
     V2D dir = direc.normalized();
-    return p2d - (p2d - p).dot(dir) * dir;
+    return p + (p2d - p).dot(dir) * dir;
 }
 
 std::pair<V2D, bool> Intersect_InfiniteLine2d(const InfiniteLine2d& l1, const InfiniteLine2d& l2) {
@@ -44,7 +44,7 @@ InfiniteLine3d::InfiniteLine3d(const Line3d& line) {
 
 V3D InfiniteLine3d::point_projection(const V3D& p3d) const {
     V3D dir = direc.normalized();
-    return p3d - (p3d - p).dot(dir) * dir;
+    return p + (p3d - p).dot(dir) * dir;
 }
 
 InfiniteLine2d InfiniteLine3d::projection(const PinholeCamera& camera) const {
@@ -147,6 +147,7 @@ InfiniteLine3d MinimalInfiniteLine3d::GetInfiniteLine() const {
 }
 
 Line3d GetLineSegmentFromInfiniteLine3d(const InfiniteLine3d& inf_line, const std::vector<PinholeCamera>& cameras, const std::vector<Line2d>& line2ds, const int num_outliers) {
+    // TODO: not sure this function is working.
     THROW_CHECK_EQ(cameras.size(), line2ds.size());
     int n_lines = line2ds.size();
     V3D dir = inf_line.direc.normalized();

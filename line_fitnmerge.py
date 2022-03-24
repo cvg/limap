@@ -6,10 +6,10 @@ import core.detector.LSD as lsd
 import core.detector.SOLD2 as sold2
 import core.visualize as vis
 import core.utils as utils
-from core.estimators import *
 
 import limap.base as _base
 import limap.sfm as _sfm
+import limap.fitting as _fit
 import limap.merging as _mrg
 import limap.lineBA as _lineBA
 from tqdm import tqdm
@@ -17,30 +17,28 @@ import joblib
 
 from line_triangulation import *
 
-def fit_3d_segs(imname_list, all_2d_segs, cameras, depths, fitting_config, resize_hw=None, max_image_dim=None):
+def fit_3d_segs(all_2d_segs, cameras, depths, fitting_config):
     '''
     Args:
     - all_2d_segs: list of 2d segs
     - cameras: list of limap.base.Camera
     - depths: list of depth images
     '''
-    n_images = len(imname_list)
+    n_images = len(all_2d_segs)
     seg3d_list = []
-    def process(imname_list, all_2d_segs, cameras_np, depths, fitting_config, resize_hw, max_image_dim, idx):
-        imname, segs, cam, depth = imname_list[idx], all_2d_segs[idx], cameras_np[idx], depths[idx]
-        img_hw = utils.read_image(imname, resize_hw=resize_hw, max_image_dim=max_image_dim).shape[:2]
+    def process(all_2d_segs, cameras_np, depths, fitting_config, idx):
+        segs, cam, depth = all_2d_segs[idx], cameras_np[idx], depths[idx]
+        img_hw = [cam[3], cam[4]]
         seg3d_list_idx = []
-        counter_seg3d = 0
         for seg_id, s in enumerate(segs):
-            seg3d = estimate_seg3d_from_depth(s, depth, [cam[0], cam[1], cam[2]], [img_hw[0], img_hw[1]], ransac_th=fitting_config["ransac_th"], min_percentage_inliers=fitting_config["min_percentage_inliers"], var2d=fitting_config["var2d"])
+            seg3d = _fit.estimate_seg3d_from_depth(s, depth, [cam[0], cam[1], cam[2]], [img_hw[0], img_hw[1]], ransac_th=fitting_config["ransac_th"], min_percentage_inliers=fitting_config["min_percentage_inliers"], var2d=fitting_config["var2d"])
             if seg3d is None:
                 seg3d_list_idx.append((np.array([0., 0., 0.]), np.array([0., 0., 0.])))
             else:
                 seg3d_list_idx.append(seg3d)
-                counter_seg3d += 1
         return seg3d_list_idx
-    cameras_np = [[cam.K, cam.R, cam.T] for cam in cameras]
-    seg3d_list = joblib.Parallel(n_jobs=fitting_config["n_jobs"])(joblib.delayed(process)(imname_list, all_2d_segs, cameras_np, depths, fitting_config, resize_hw, max_image_dim, idx) for idx in tqdm(range(n_images)))
+    cameras_np = [[cam.K, cam.R, cam.T, cam.h, cam.w] for cam in cameras]
+    seg3d_list = joblib.Parallel(n_jobs=fitting_config["n_jobs"])(joblib.delayed(process)(all_2d_segs, cameras_np, depths, fitting_config, idx) for idx in tqdm(range(n_images)))
     return seg3d_list
 
 def line_fitnmerge(cfg, imname_list, cameras, depths, neighbors=None, ranges=None, resize_hw=None, max_image_dim=None):
@@ -73,7 +71,7 @@ def line_fitnmerge(cfg, imname_list, cameras, depths, neighbors=None, ranges=Non
     ##########################################################
     fname_fit_segs = '{0}_fit_segs.npy'.format(cfg["line2d"]["detector"])
     if not cfg["load_fit"]:
-        seg3d_list = fit_3d_segs(imname_list, all_2d_segs, cameras, depths, cfg["fitting"], resize_hw=resize_hw, max_image_dim=max_image_dim)
+        seg3d_list = fit_3d_segs(all_2d_segs, cameras, depths, cfg["fitting"])
         with open(os.path.join(cfg["dir_save"], fname_fit_segs), 'wb') as f: np.savez(f, fit_segs=seg3d_list)
     else:
         with open(os.path.join(cfg["dir_load"], fname_fit_segs), 'rb') as f:
