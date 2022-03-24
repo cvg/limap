@@ -36,7 +36,3 @@ To run **Line Reconstruction** on Hypersim:
 ```bash
 python runners/hypersim_triangulation.py
 ```
-``-nv ${N_VISIBLE_VIEWS}`` is used to select lines that have enough supporting images for visualization.
-
-``-nn ${N_NEIGHBORS}`` is used to determine number of neighbors (default: exhaustively matching all image pairs).
-
