@@ -3,9 +3,11 @@
 ## TODO
 
 * [ ] Change camera base class definition
-* [ ] abstract Detection, Matching, Fitting and Merging 
+* [ ] Abstract Detection, Matching, Fitting and Merging 
+* [ ] Remove OpenCV dependency for pytlsd
 
 ## Dependencies
+* CMake >= 3.17
 * Python 3.6 (just the version I am using, guess it is compatible to higher version)
 * Eigen3
 * COLMAP
