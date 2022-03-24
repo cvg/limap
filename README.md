@@ -2,7 +2,6 @@
 
 ## TODO
 
-* [ ] Port RANSAC to C++
 * [ ] Change camera base class definition
 * [ ] abstract Detection, Matching, Fitting and Merging 
 
