@@ -10,6 +10,11 @@
 
 namespace py = pybind11;
 
+#include <highfive/H5File.hpp>
+#include <highfive/H5DataSet.hpp>
+#include <highfive/H5DataSpace.hpp>
+#include <highfive/H5Group.hpp>
+
 #include <boost/serialization/vector.hpp>
 #include <utility>
 #include <vector>
