@@ -148,9 +148,17 @@ void Camera::set_max_image_dim(const int& val) {
 }
 
 double Camera::uncertainty(double depth, double var2d) const {
-    double fx = FocalLengthX();
-    double fy = FocalLengthY();
-    double f = (fx + fy) / 2.0;
+    double f = -1.0;
+    const std::vector<size_t>& idxs = FocalLengthIdxs();
+    if (idxs.size() == 1)
+        f = FocalLength();
+    else if (idxs.size() == 2) {
+        double fx = FocalLengthX();
+        double fy = FocalLengthY();
+        f = (fx + fy) / 2.0;
+    }
+    else
+        throw std::runtime_error("Error! FocalLengthIdxs() should be either 1 or 2");
     double uncertainty = var2d * depth / f;
     return uncertainty;
 }

@@ -77,6 +77,8 @@ public:
     
     M3D K() const { return cam.K(); }
     M3D K_inv() const { return cam.K_inv(); }
+    double h() const { return cam.h(); }
+    double w() const { return cam.w(); }
     M3D R() const { return pose.R(); }
     V3D T() const { return pose.T(); }
 

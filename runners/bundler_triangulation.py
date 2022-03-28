@@ -16,34 +16,35 @@ def read_infos_bundler(cfg, bundler_path, list_path, model_path, max_image_dim=N
     '''
     Read all infos from bundler including imname_list, cameras, neighbors, ranges
     '''
-    model, imname_list, cameras = _psfm.ReadModelBundler(bundler_path, list_path, model_path, max_image_dim=max_image_dim)
+    model, imname_list, camviews = _psfm.ReadModelBundler(bundler_path, list_path, model_path, max_image_dim=max_image_dim)
 
     # get neighbors
     neighbors = _psfm.compute_neighbors(model, cfg["n_neighbors"], min_triangulation_angle=cfg["sfm"]["min_triangulation_angle"], neighbor_type=cfg["sfm"]["neighbor_type"])
 
     # get ranges
     ranges = model.ComputeRanges(cfg["sfm"]["ranges"]["range_robust"], cfg["sfm"]["ranges"]["k_stretch"])
-    return imname_list, cameras, neighbors, ranges
+    return imname_list, camviews, neighbors, ranges
 
 def load_all_infos_bundler(cfg, bundler_path, list_path, model_path):
     if cfg["info_path"] is None:
         if cfg["use_undist"]:
-            imname_list, cameras, neighbors, ranges = read_infos_bundler(cfg, bundler_path, list_path, model_path, max_image_dim=-1)
+            imname_list, camviews, neighbors, ranges = read_infos_bundler(cfg, bundler_path, list_path, model_path, max_image_dim=-1)
         else:
-            imname_list, cameras, neighbors, ranges = read_infos_bundler(cfg, bundler_path, list_path, model_path, max_image_dim=cfg["max_image_dim"])
+            imname_list, camviews, neighbors, ranges = read_infos_bundler(cfg, bundler_path, list_path, model_path, max_image_dim=cfg["max_image_dim"])
+        with open(os.path.join("tmp", "infos_bundler.npy"), 'wb') as f:
+            camviews_np = [[view.K(), view.R(), view.T()[:,None].repeat(3, 1)] for view in camviews]
+            np.savez(f, imname_list=imname_list, camviews_np=camviews_np, neighbors=neighbors, ranges=ranges, cam_id_list=cam_id_list)
+
     else:
         with open(cfg["info_path"], 'rb') as f:
             data = np.load(f, allow_pickle=True)
-            imname_list, cameras_np, neighbors, ranges = data["imname_list"], data["cameras_np"], data["neighbors"], data["ranges"]
-            cameras = [_base.Camera(cam[0], cam[1], cam[2][:,0], cam[3], cam[4]) for cam in cameras_np]
-    with open(os.path.join("tmp", "infos_bundler.npy"), 'wb') as f:
-        cameras_np = [[cam.K, cam.R, cam.T[:,None].repeat(3, 1), cam.dist_coeffs, [cam.h, cam.w]] for cam in cameras]
-        np.savez(f, imname_list=imname_list, cameras_np=cameras_np, neighbors=neighbors, ranges=ranges)
+            imname_list, camviews_np, neighbors, ranges = data["imname_list"], data["camviews_np"], data["neighbors"], data["ranges"]
+            camviews = [_base.CameraView(_base.Camera(view[0]), _base.CameraPose(view[1], view[2][:,0])) for view in camviews_np]
 
-    # load from undistortion folder
+    # TODO: load from undistortion folder
     if cfg["use_undist"]:
         n_images = len(imname_list)
-        imname_list_new, cameras_new = [], []
+        imname_list_new, camviews_new = [], []
         for image_id in tqdm(range(n_images)):
             imname = imname_list[image_id]
             relpath = Path(imname).relative_to(Path(bundler_path))
@@ -59,7 +60,7 @@ def load_all_infos_bundler(cfg, bundler_path, list_path, model_path):
             np.savez(f, imname_list=imname_list, cameras_np=cameras_np, neighbors=neighbors, ranges=ranges)
 
     # return all infos
-    return imname_list, cameras, neighbors, ranges
+    return imname_list, camviews, neighbors, ranges
 
 def run_bundler_triangulation(cfg, bundler_path, list_path, model_path):
     # load all infos
@@ -130,13 +131,8 @@ def parse_config():
         cfg["max_image_dim"] = args.max_image_dim
     return cfg
 
-def init_workspace():
-    if not os.path.exists('tmp'):
-        os.makedirs('tmp')
-
 def main():
     cfg = parse_config()
-    init_workspace()
     if cfg["undistortion"]:
         run_bundler_undistortion(cfg, cfg["bundler_path"], cfg["list_path"], cfg["model_path"])
     else:

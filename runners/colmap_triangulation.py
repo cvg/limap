@@ -8,29 +8,29 @@ from line_triangulation import line_triangulation
 
 def read_infos_colmap(cfg, colmap_path, model_path="sparse", image_path="images", max_image_dim=None):
     '''
-    Read all infos from colmap including imname_list, cameras, neighbors, ranges and cam_id_list
+    Read all infos from colmap including imname_list, camviews, neighbors, ranges and cam_id_list
     '''
     model = _psfm.SfmModel()
     model.ReadFromCOLMAP(colmap_path, model_path, image_path)
 
-    # get imname_list and cameras
-    imname_list, cameras, cam_id_list = _psfm.ReadInfos(colmap_path, model_path=model_path, image_path=image_path, max_image_dim=max_image_dim, check_undistorted=True)
+    # get imname_list and camviews
+    imname_list, camviews, cam_id_list = _psfm.ReadInfos(colmap_path, model_path=model_path, image_path=image_path, max_image_dim=max_image_dim, check_undistorted=True)
 
     # get neighbors
     neighbors = _psfm.compute_neighbors(model, cfg["n_neighbors"], min_triangulation_angle=cfg["sfm"]["min_triangulation_angle"], neighbor_type=cfg["sfm"]["neighbor_type"])
 
     # get ranges
     ranges = model.ComputeRanges(cfg["sfm"]["ranges"]["range_robust"], cfg["sfm"]["ranges"]["k_stretch"])
-    return imname_list, cameras, neighbors, ranges, cam_id_list
+    return imname_list, camviews, neighbors, ranges, cam_id_list
 
-def filter_by_cam_id(cam_id, prev_imname_list, prev_cameras, prev_neighbors, cam_id_list):
+def filter_by_cam_id(cam_id, prev_imname_list, prev_camviews, prev_neighbors, cam_id_list):
     '''
-    Filter the list by camera id
+    Filter the list by camview id
     '''
     assert len(prev_imname_list) == len(cam_id_list)
-    assert len(prev_cameras) == len(cam_id_list)
+    assert len(prev_camviews) == len(cam_id_list)
     assert len(prev_neighbors) == len(cam_id_list)
-    imname_list, cameras, neighbors = [], [], []
+    imname_list, camviews, neighbors = [], [], []
     id_maps = {}
     # filter ids
     for idx in range(len(cam_id_list)):
@@ -40,7 +40,7 @@ def filter_by_cam_id(cam_id, prev_imname_list, prev_cameras, prev_neighbors, cam
             continue
         id_maps[idx] = len(imname_list)
         imname_list.append(prev_imname_list[idx])
-        cameras.append(prev_cameras[idx])
+        camviews.append(prev_camviews[idx])
         neighbors.append(prev_neighbors[idx])
     # map ids for neighbors
     for idx in range(len(imname_list)):
@@ -48,25 +48,25 @@ def filter_by_cam_id(cam_id, prev_imname_list, prev_cameras, prev_neighbors, cam
         n1 = [id_maps[k] for k in n0]
         n2 = [k for k in n1 if k != -1]
         neighbors[idx] = n2
-    return imname_list, cameras, neighbors
+    return imname_list, camviews, neighbors
 
 def run_colmap_triangulation(cfg, colmap_path, model_path="sparse", image_path="images"):
     '''
     Run triangulation from COLMAP input
     '''
     if cfg["info_path"] is None:
-        imname_list, cameras, neighbors, ranges, _ = read_infos_colmap(cfg, colmap_path, model_path=model_path, image_path=image_path, max_image_dim=cfg["max_image_dim"])
+        imname_list, camviews, neighbors, ranges, _ = read_infos_colmap(cfg, colmap_path, model_path=model_path, image_path=image_path, max_image_dim=cfg["max_image_dim"])
         with open(os.path.join("tmp", "infos_colmap.npy"), 'wb') as f:
-            cameras_np = [[cam.K, cam.R, cam.T[:,None].repeat(3, 1), cam.dist_coeffs, [cam.h, cam.w]] for cam in cameras]
-            np.savez(f, imname_list=imname_list, cameras_np=cameras_np, neighbors=neighbors, ranges=ranges)
+            camviews_np = [[view.K(), view.R(), view.T()[:,None].repeat(3, 1)] for view in camviews]
+            np.savez(f, imname_list=imname_list, camviews_np=camviews_np, neighbors=neighbors, ranges=ranges, cam_id_list=cam_id_list)
     else:
         with open(cfg["info_path"], 'rb') as f:
             data = np.load(f, allow_pickle=True)
-            imname_list, cameras_np, neighbors, ranges = data["imname_list"], data["cameras_np"], data["neighbors"], data["ranges"]
-            cameras = [_base.Camera(cam[0], cam[1], cam[2][:,0], cam[3], cam[4]) for cam in cameras_np]
+            imname_list, camviews_np, neighbors, ranges, cam_id_list = data["imname_list"], data["camviews_np"], data["neighbors"], data["ranges"], data["cam_id_list"]
+            camviews = [_base.CameraView(_base.Camera(view[0]), _base.CameraPose(view[1], view[2][:,0])) for view in camviews_np]
 
     # run triangulation
-    line_triangulation(cfg, imname_list, cameras, neighbors=neighbors, ranges=ranges, max_image_dim=cfg["max_image_dim"])
+    line_triangulation(cfg, imname_list, camviews, neighbors=neighbors, ranges=ranges, max_image_dim=cfg["max_image_dim"])
 
 def parse_config():
     import argparse
@@ -98,13 +98,8 @@ def parse_config():
         cfg["max_image_dim"] = args.max_image_dim
     return cfg
 
-def init_workspace():
-    if not os.path.exists('tmp'):
-        os.makedirs('tmp')
-
 def main():
     cfg = parse_config()
-    init_workspace()
     run_colmap_triangulation(cfg, cfg["colmap_path"], cfg["model_path"], cfg["image_path"])
 
 if __name__ == '__main__':

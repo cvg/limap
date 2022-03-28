@@ -12,10 +12,10 @@ import limap.triangulation as _tri
 import limap.vpdetection as _vpdet
 import limap.lineBA as _lineBA
 
-def setup(cfg, imname_list, cameras, max_image_dim=None):
+def setup(cfg, imname_list, camviews, max_image_dim=None):
     # assertion check
     print("number of images: {0}".format(len(imname_list)))
-    assert len(imname_list) == len(cameras), "number of images should match number of cameras"
+    assert len(imname_list) == len(camviews), "number of images should match number of camviews"
     folder_to_save = cfg["folder_to_save"]
     if cfg["folder_to_save"] is None:
         folder_to_save = 'tmp'
@@ -26,13 +26,13 @@ def setup(cfg, imname_list, cameras, max_image_dim=None):
     cfg["dir_load"] = folder_to_load
     return cfg
 
-def compute_sfminfos(cfg, imname_list, cameras, fname="sfm_metainfos.npy", resize_hw=None, max_image_dim=None):
+def compute_sfminfos(cfg, imname_list, camviews, fname="sfm_metainfos.npy", resize_hw=None, max_image_dim=None):
     import limap.pointsfm as _psfm
     if not cfg["load_meta"]:
         # run colmap sfm and compute neighbors, ranges
         colmap_output_path = cfg["sfm"]["colmap_output_path"]
         if not cfg["sfm"]["reuse"]:
-            _psfm.run_colmap_sfm_with_known_poses(cfg["sfm"], imname_list, cameras, resize_hw=resize_hw, max_image_dim=max_image_dim, output_path=colmap_output_path, use_cuda=cfg["use_cuda"])
+            _psfm.run_colmap_sfm_with_known_poses(cfg["sfm"], imname_list, camviews, resize_hw=resize_hw, max_image_dim=max_image_dim, output_path=colmap_output_path, use_cuda=cfg["use_cuda"])
         neighbors = _psfm.ComputeNeighborsSorted(colmap_output_path, cfg["n_neighbors"], min_triangulation_angle=cfg["sfm"]["min_triangulation_angle"], neighbor_type=cfg["sfm"]["neighbor_type"])
         ranges = _psfm.ComputeRanges(colmap_output_path, range_robust=cfg["sfm"]["ranges"]["range_robust"], k_stretch=cfg["sfm"]["ranges"]["k_stretch"])
     else:
@@ -99,18 +99,18 @@ def compute_matches(cfg, imname_list, descinfo_folder, neighbors):
             raise ValueError("Folder {0} not found.".format(folder))
         return folder
 
-def line_triangulation(cfg, imname_list, cameras, neighbors=None, ranges=None, resize_hw=None, max_image_dim=None, valid_index_list=None):
+def line_triangulation(cfg, imname_list, camviews, neighbors=None, ranges=None, resize_hw=None, max_image_dim=None, valid_index_list=None):
     '''
     Args:
     - image_names: list of imname
-    - cameras: list of limap.base.Camera
+    - camviews: list of limap.base.CameraView
     '''
-    cfg = setup(cfg, imname_list, cameras, max_image_dim=None)
+    cfg = setup(cfg, imname_list, camviews, max_image_dim=None)
     if cfg["triangulation"]["var2d"] == -1:
         cfg["triangulation"]["var2d"] = cfg["var2d"][cfg["line2d"]["detector"]]
     if (max_image_dim is not None) and max_image_dim != -1:
-        for camera in cameras:
-            camera.set_max_image_dim(cfg["max_image_dim"])
+        for camview in camviews:
+            camview.cam.set_max_image_dim(cfg["max_image_dim"])
     if valid_index_list is not None:
         assert len(valid_index_list) == len(imname_list)
 
@@ -118,7 +118,7 @@ def line_triangulation(cfg, imname_list, cameras, neighbors=None, ranges=None, r
     # [A] sfm metainfos (neighbors, ranges)
     ##########################################################
     if neighbors is None:
-        neighbors, ranges = compute_sfminfos(cfg, imname_list, cameras, resize_hw=resize_hw, max_image_dim=max_image_dim)
+        neighbors, ranges = compute_sfminfos(cfg, imname_list, camviews, resize_hw=resize_hw, max_image_dim=max_image_dim)
 
     ##########################################################
     # [B] get 2D line segments and line heatmaps for each image
@@ -152,7 +152,7 @@ def line_triangulation(cfg, imname_list, cameras, neighbors=None, ranges=None, r
     Triangulator = _tri.Triangulator(cfg["triangulation"])
     Triangulator.SetRanges(ranges)
     all_2d_lines = _tri.GetAllLines2D(all_2d_segs)
-    Triangulator.Init(all_2d_lines, cameras)
+    Triangulator.Init(all_2d_lines, camviews)
     if valid_index_list is None:
         valid_index_list = np.arange(0, len(imname_list)).tolist()
     for img_id, index in enumerate(tqdm(valid_index_list)):
@@ -168,21 +168,21 @@ def line_triangulation(cfg, imname_list, cameras, neighbors=None, ranges=None, r
     linetracks = Triangulator.GetTracks()
 
     # filtering 2d supports
-    linetracks = _mrg.filtertracksbyreprojection(linetracks, cameras, cfg["triangulation"]["filtering2d"]["th_angular_2d"], cfg["triangulation"]["filtering2d"]["th_perp_2d"])
+    linetracks = _mrg.filtertracksbyreprojection(linetracks, camviews, cfg["triangulation"]["filtering2d"]["th_angular_2d"], cfg["triangulation"]["filtering2d"]["th_perp_2d"])
     if not cfg["triangulation"]["remerging"]["disable"]:
         # remerging
         linker3d = _base.LineLinker3d(cfg["triangulation"]["remerging"]["linker3d"])
         linetracks = _mrg.remerge(linker3d, linetracks)
-        linetracks = _mrg.filtertracksbyreprojection(linetracks, cameras, cfg["triangulation"]["filtering2d"]["th_angular_2d"], cfg["triangulation"]["filtering2d"]["th_perp_2d"])
-    linetracks = _mrg.filtertracksbysensitivity(linetracks, cameras, cfg["triangulation"]["filtering2d"]["th_sv_angular_3d"], cfg["triangulation"]["filtering2d"]["th_sv_num_supports"])
-    linetracks = _mrg.filtertracksbyoverlap(linetracks, cameras, cfg["triangulation"]["filtering2d"]["th_overlap"], cfg["triangulation"]["filtering2d"]["th_overlap_num_supports"])
+        linetracks = _mrg.filtertracksbyreprojection(linetracks, camviews, cfg["triangulation"]["filtering2d"]["th_angular_2d"], cfg["triangulation"]["filtering2d"]["th_perp_2d"])
+    linetracks = _mrg.filtertracksbysensitivity(linetracks, camviews, cfg["triangulation"]["filtering2d"]["th_sv_angular_3d"], cfg["triangulation"]["filtering2d"]["th_sv_num_supports"])
+    linetracks = _mrg.filtertracksbyoverlap(linetracks, camviews, cfg["triangulation"]["filtering2d"]["th_overlap"], cfg["triangulation"]["filtering2d"]["th_overlap_num_supports"])
     validtracks = [track for track in linetracks if track.count_images() >= cfg["n_visible_views"]]
 
     ##########################################################
     # [E] geometric refinement
     ##########################################################
     if not cfg["refinement"]["disable"]:
-        reconstruction = _base.LineReconstruction(linetracks, cameras)
+        reconstruction = _base.LineReconstruction(linetracks, camviews)
         vpresults = None
         if cfg["refinement"]["use_vp"]:
             vpresults = _vpdet.AssociateVPsParallel(all_2d_lines)
@@ -198,15 +198,15 @@ def line_triangulation(cfg, imname_list, cameras, neighbors=None, ranges=None, r
     if not os.path.exists(final_output_dir): os.makedirs(final_output_dir)
     vis.save_linetracks_to_folder(linetracks, final_output_dir)
     vis.txt_save_linetracks(linetracks, os.path.join(loc_dir, "alltracks.txt"), n_visible_views=4)
-    cameras_np = [[cam.K, cam.R, cam.T[:,None].repeat(3, 1), [cam.h, cam.w]] for cam in cameras]
+    camviews_np = [[view.K(), view.R(), view.T()[:,None].repeat(3, 1), [view.h(), view.w()]] for view in camviews]
     with open(os.path.join(final_output_dir, "all_infos.npy"), "wb") as f:
-        np.savez(f, imname_list=imname_list, all_2d_segs=all_2d_segs, cameras_np=cameras_np, cfg=cfg, n_tracks=len(linetracks))
+        np.savez(f, imname_list=imname_list, all_2d_segs=all_2d_segs, camviews_np=camviews_np, cfg=cfg, n_tracks=len(linetracks))
 
     VisTrack = vis.TrackVisualizer(linetracks, visualize=cfg["visualize"])
     VisTrack.report()
     lines_np = VisTrack.get_lines_np()
     counts_np = VisTrack.get_counts_np()
-    img_hw = utils.read_image(imname_list[0], resize_hw=resize_hw, max_image_dim=max_image_dim).shape[:2]
+    img_hw = [camviews[0].h(), camviews[1].w()]
     with open(os.path.join(cfg["dir_save"], 'lines_to_vis.npy'), 'wb') as f: np.savez(f, lines=lines_np, counts=counts_np, img_hw=img_hw, ranges=None)
     vis.save_obj(os.path.join(cfg["dir_save"], 'lines_to_vis.obj'), lines_np, counts=counts_np, n_visible_views=cfg['n_visible_views'])
     # vis.save_obj(os.path.join(cfg["dir_save"], 'lines_nodes.obj'), Triangulator.GetAllValidBestTris())
@@ -215,7 +215,7 @@ def line_triangulation(cfg, imname_list, cameras, neighbors=None, ranges=None, r
     # visualize
     if cfg["visualize"]:
         def report_track(track_id):
-            vis.visualize_line_track(imname_list, validtracks[track_id], max_image_dim=cfg["max_image_dim"], cameras=cameras, prefix="track.{0}".format(track_id))
+            vis.visualize_line_track(imname_list, validtracks[track_id], max_image_dim=cfg["max_image_dim"], camviews=camviews, prefix="track.{0}".format(track_id))
         import pdb
         pdb.set_trace()
         VisTrack.vis_all_lines(img_hw, n_visible_views=cfg["n_visible_views"], width=2)

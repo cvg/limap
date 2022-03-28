@@ -313,7 +313,7 @@ void bind_line_reconstruction(py::module& m) {
 }
 
 void bind_camera(py::module& m) {
-    py::class_<Camera>(m, "NewCamera")
+    py::class_<Camera>(m, "Camera")
         .def(py::init<>())
         .def(py::init<int, const std::vector<double>&, int, std::pair<int, int>>(), py::arg("model_id"), py::arg("params"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1))
         .def(py::init<const std::string&, const std::vector<double>&, int, std::pair<int, int>>(), py::arg("model_name"), py::arg("params"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1))
@@ -335,6 +335,8 @@ void bind_camera(py::module& m) {
         .def(py::init<>())
         .def(py::init<V4D, V3D>())
         .def(py::init<M3D, V3D>())
+        .def_readonly("qvec", &CameraPose::qvec)
+        .def_readonly("tvec", &CameraPose::tvec)
         .def("R", &CameraPose::R)
         .def("T", &CameraPose::T)
         .def("center", &CameraPose::center)
@@ -347,6 +349,8 @@ void bind_camera(py::module& m) {
         .def_readwrite("pose", &CameraView::pose)
         .def("K", &CameraView::K)
         .def("K_inv", &CameraView::K_inv)
+        .def("h", &CameraView::h)
+        .def("w", &CameraView::w)
         .def("R", &CameraView::R)
         .def("T", &CameraView::T)
         .def("projection", &CameraView::projection)

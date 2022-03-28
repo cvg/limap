@@ -7,7 +7,7 @@ from bundler_triangulation import run_bundler_undistortion, load_all_infos_bundl
 from line_triangulation import line_triangulation
 
 def run_rome16k_triangulation(cfg, bundler_path, list_path, model_path):
-    imname_list, cameras, neighbors, ranges = load_all_infos_bundler(cfg, bundler_path, list_path, model_path)
+    imname_list, camviews, neighbors, ranges = load_all_infos_bundler(cfg, bundler_path, list_path, model_path)
 
     # components
     valid_index_list = np.arange(0, len(imname_list)).tolist()
@@ -19,17 +19,17 @@ def run_rome16k_triangulation(cfg, bundler_path, list_path, model_path):
             comp_id = dataset.get_component_id_for_image_id(img_id)
             if comp_id == cfg["comp_id"]:
                 valid_index_list.append(img_id)
-        new_imname_list, new_cameras, new_neighbors = [], [], []
+        new_imname_list, new_camviews, new_neighbors = [], [], []
         for img_id in valid_index_list:
             new_imname_list.append(imname_list[img_id])
-            new_cameras.append(cameras[img_id])
+            new_camviews.append(camviews[img_id])
             neighbor = neighbors[img_id]
             new_neighbor = [valid_index_list.index(k) for k in neighbor if k in valid_index_list]
             new_neighbors.append(new_neighbor)
-        imname_list, cameras, neighbors = new_imname_list, new_cameras, new_neighbors
+        imname_list, camviews, neighbors = new_imname_list, new_camviews, new_neighbors
 
     # run triangulation
-    line_triangulation(cfg, imname_list, cameras, neighbors=neighbors, ranges=ranges, max_image_dim=cfg["max_image_dim"], valid_index_list=valid_index_list)
+    line_triangulation(cfg, imname_list, camviews, neighbors=neighbors, ranges=ranges, max_image_dim=cfg["max_image_dim"], valid_index_list=valid_index_list)
 
 def parse_config():
     import argparse
@@ -73,13 +73,8 @@ def parse_config():
     cfg["comp_id"] = args.comp_id
     return cfg
 
-def init_workspace():
-    if not os.path.exists('tmp'):
-        os.makedirs('tmp')
-
 def main():
     cfg = parse_config()
-    init_workspace()
     if cfg["undistortion"]:
         run_bundler_undistortion(cfg, cfg["bundler_path"], cfg["list_path"], cfg["model_path"])
     else:

@@ -3,7 +3,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 from core.dataset import Hypersim
 import core.utils as utils
-import limap.base
+
+import limap.base as _base
 from line_fitnmerge import line_fitnmerge
 
 def process_hypersim_scene(cfg, dataset_hypersim, scene_id, cam_id=0):
@@ -23,8 +24,10 @@ def process_hypersim_scene(cfg, dataset_hypersim, scene_id, cam_id=0):
 
     # get cameras
     K = dataset_hypersim.K.astype(np.float32)
+    img_hw = [dataset_hypersim.h, dataset_hypersim.w]
     Ts, Rs = dataset_hypersim.load_cameras(cam_id=cam_id)
-    cameras = [limap.base.Camera(K, Rs[idx], Ts[idx]) for idx in index_list]
+    cameras = [_base.Camera("SIMPLE_PINHOLE", K, cam_id=0, hw=img_hw)]
+    camviews = [_base.CameraView(cameras[0], _base.CameraPose(Rs[idx], Ts[idx])) for idx in index_list]
 
     # get depths
     depths = []
@@ -33,7 +36,7 @@ def process_hypersim_scene(cfg, dataset_hypersim, scene_id, cam_id=0):
         depths.append(depth)
 
     # fit and merge
-    line_fitnmerge(cfg, imname_list, cameras, depths, max_image_dim=cfg["max_image_dim"])
+    line_fitnmerge(cfg, imname_list, camviews, depths, max_image_dim=cfg["max_image_dim"])
 
 def parse_config():
     import argparse
@@ -53,13 +56,8 @@ def parse_config():
         cfg["folder_to_load"] = os.path.join("precomputed", "hypersim", cfg["scene_id"])
     return cfg
 
-def init_workspace():
-    if not os.path.exists('tmp'):
-        os.makedirs('tmp')
-
 def main():
     cfg = parse_config()
-    init_workspace()
     dataset_hypersim = Hypersim(cfg["data_dir"])
     process_hypersim_scene(cfg, dataset_hypersim, cfg["scene_id"], cam_id=cfg["cam_id"])
 

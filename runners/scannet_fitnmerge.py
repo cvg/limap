@@ -3,14 +3,14 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 from core.dataset import ScanNet
 import core.utils as utils
-import limap.base
+
+import limap.base as _base
 from line_fitnmerge import line_fitnmerge
 
 def process_scannet_scene(cfg, dataset_scannet, scene_id):
     # set scene id
     dataset_scannet.set_scene_id(scene_id)
     dataset_scannet.set_img_hw_resized((480, 640))
-    # dataset_scannet.set_max_dim(cfg["max_image_dim"])
 
     # get imname_list and cameras
     dataset_scannet.set_stride(cfg["stride"])
@@ -18,11 +18,8 @@ def process_scannet_scene(cfg, dataset_scannet, scene_id):
     K = dataset_scannet.load_intrinsics()
     img_hw = dataset_scannet.get_img_hw()
     Ts, Rs = dataset_scannet.load_cameras()
-    cameras = []
-    for idx in range(len(imname_list)):
-        cam = limap.base.Camera(K, Rs[idx], Ts[idx])
-        cam.set_hw(img_hw[0], img_hw[1])
-        cameras.append(cam)
+    cameras = [_base.Camera("PINHOLE", K, cam_id=0, hw=img_hw)]
+    camviews = [_base.CameraView(cameras[0], _base.CameraPose(Rs[idx], Ts[idx])) for idx in range(len(imname_list))]
 
     # trivial neighbors
     index_list = np.arange(0, len(imname_list)).tolist()
@@ -35,7 +32,6 @@ def process_scannet_scene(cfg, dataset_scannet, scene_id):
     neighbors = np.array(neighbors)
     for idx, index in enumerate(index_list):
         neighbors[neighbors == index] = idx
-    # neighbors = None
 
     # get depth
     depths = []
@@ -44,7 +40,7 @@ def process_scannet_scene(cfg, dataset_scannet, scene_id):
         depths.append(depth)
 
     # run triangulation
-    line_fitnmerge(cfg, imname_list, cameras, depths, neighbors=neighbors, resize_hw=(480, 640))
+    line_fitnmerge(cfg, imname_list, camviews, depths, neighbors=neighbors, resize_hw=(480, 640))
 
 def parse_config():
     import argparse
@@ -62,13 +58,8 @@ def parse_config():
     cfg["folder_to_load"] = os.path.join("precomputed", "scannet", cfg["scene_id"])
     return cfg
 
-def init_workspace():
-    if not os.path.exists('tmp'):
-        os.makedirs('tmp')
-
 def main():
     cfg = parse_config()
-    init_workspace()
     dataset_scannet = ScanNet(cfg["data_dir"])
     process_scannet_scene(cfg, dataset_scannet, cfg["scene_id"])
 

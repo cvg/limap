@@ -58,7 +58,8 @@ double Line3d::computeUncertainty(const CameraView& view, const double var2d) co
     double d1 = view.pose.projdepth(start);
     double d2 = view.pose.projdepth(end);
     double d = (d1 + d2) / 2.0;
-    return view.cam.uncertainty(d, var2d);
+    double uncertainty = view.cam.uncertainty(d, var2d);
+    return uncertainty;
 }
 
 Line2d projection_line3d(const Line3d& line3d, const CameraView& view) {

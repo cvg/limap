@@ -231,6 +231,7 @@ void Triangulator::triangulateOneNode(const int img_id, const int line_id) {
     const CameraView& view1 = views_[img_id];
     int n_conns = connections.size();
     std::vector<std::vector<TriTuple>> results(n_conns);
+
 #pragma omp parallel for
     for (int conn_id = 0; conn_id < n_conns; ++conn_id) {
         int ng_img_id = connections[conn_id].first;

@@ -110,24 +110,32 @@ def ReadInfosFromModel(model, colmap_path, model_path="sparse", image_path="imag
         raise ValueError("Error! The model file does not exist at {0}".format(model_path))
     print("Reconstruction loaded. (n_images = {0})".format(len(colmap_images)))
 
-    n_images = len(colmap_images)
+    # read cameras
     cam_dict = {}
+    for cam_id, colmap_cam in colmap_cameras.items():
+        cam = _base.Camera(colmap_cam.model, colmap_cam.params, cam_id=cam_id, hw=[colmap_cam.height, colmap_cam.width])
+        cam_dict[cam_id] = cam
+
+    # read images
+    n_images = len(colmap_images)
+    camview_dict = {}
     for image_id, colmap_image in colmap_images.items():
         imname = colmap_image.name
         cam_id = colmap_image.camera_id
-        colmap_cam = colmap_cameras[cam_id]
-        K, dist_coeffs, img_hw = get_camera_info(colmap_cam, max_image_dim=max_image_dim, check_undistorted=check_undistorted)
-        R = qvec2rotmat(colmap_image.qvec)
-        T = colmap_image.tvec
-        cam = _base.Camera(K, R, T, dist_coeffs)
-        cam.set_hw(img_hw[0], img_hw[1])
-        cam_dict[imname] = [cam_id, cam]
-    imname_list, cameras, cam_id_list = [], [], []
+        camera = cam_dict[cam_id]
+        pose = _base.CameraPose(colmap_image.qvec, colmap_image.tvec)
+        view = _base.CameraView(camera, pose)
+        camview_dict[imname] = view
+
+    # map to the correct order
+    # TODO: remove cam_id_list
+    imname_list, camviews, cam_id_list = [], [], []
     for imname in image_names:
         imname_list.append(os.path.join(image_path, imname))
-        cam_id_list.append(cam_dict[imname][0])
-        cameras.append(cam_dict[imname][1])
-    return imname_list, cameras, cam_id_list
+        view = cam_dict[imname]
+        camviews.append(view)
+        cam_id_list.append(view.cam.cam_id())
+    return imname_list, camviews, cam_id_list
 
 def ReadInfos(colmap_path, model_path="sparse", image_path="images", max_image_dim=None, check_undistorted=True):
     model = _pointsfm.SfmModel()

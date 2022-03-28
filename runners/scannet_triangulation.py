@@ -17,11 +17,8 @@ def process_scannet_scene(cfg, dataset_scannet, scene_id):
     K = dataset_scannet.load_intrinsics()
     img_hw = dataset_scannet.get_img_hw()
     Ts, Rs = dataset_scannet.load_cameras()
-    cameras = []
-    for idx in range(len(imname_list)):
-        cam = limap.base.Camera(K, Rs[idx], Ts[idx])
-        cam.set_hw(img_hw[0], img_hw[1])
-        cameras.append(cam)
+    cameras = [_base.Camera("PINHOLE", K, cam_id=0, hw=img_hw)]
+    camviews = [_base.CameraView(cameras[0], _base.CameraPose(Rs[idx], Ts[idx])) for idx in range(len(imname_list))]
 
     # trivial neighbors
     index_list = np.arange(0, len(imname_list)).tolist()
@@ -36,7 +33,7 @@ def process_scannet_scene(cfg, dataset_scannet, scene_id):
         neighbors[neighbors == index] = idx
 
     # run triangulation
-    line_triangulation(cfg, imname_list, cameras, neighbors=neighbors, max_image_dim=cfg["max_image_dim"])
+    line_triangulation(cfg, imname_list, camviews, neighbors=neighbors, max_image_dim=cfg["max_image_dim"])
 
 def parse_config():
     import argparse
@@ -54,13 +51,8 @@ def parse_config():
     cfg["folder_to_load"] = os.path.join("precomputed", "scannet", cfg["scene_id"])
     return cfg
 
-def init_workspace():
-    if not os.path.exists('tmp'):
-        os.makedirs('tmp')
-
 def main():
     cfg = parse_config()
-    init_workspace()
     dataset_scannet = ScanNet(cfg["data_dir"])
     process_scannet_scene(cfg, dataset_scannet, cfg["scene_id"])
 
