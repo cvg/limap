@@ -43,54 +43,6 @@ def ComputeRanges(colmap_output_path, range_robust=[0.01, 0.99], k_stretch=1.25,
     ranges = model.ComputeRanges(range_robust, k_stretch)
     return ranges
 
-def get_camera_info(camera, max_image_dim=None, check_undistorted=True):
-    # get original K
-    K = np.zeros((3, 3))
-    K[2, 2] = 1.0
-    dist_coeffs = np.zeros((8))
-    if camera.model == "SIMPLE_PINHOLE":
-        K[0, 0] = K[1, 1] = camera.params[0]
-        K[0, 2], K[1, 2] = camera.params[1], camera.params[2]
-    elif camera.model == "PINHOLE":
-        K[0, 0], K[1, 1] = camera.params[0], camera.params[1]
-        K[0, 2], K[1, 2] = camera.params[2], camera.params[3]
-    elif check_undistorted:
-        raise ValueError("Image (model = {0}) should be undistorted.".format(camera.model))
-    elif camera.model == "SIMPLE_RADIAL":
-        K[0, 0] = K[1, 1] = camera.params[0]
-        K[0, 2], K[1, 2] = camera.params[1], camera.params[2]
-        dist_coeffs[0] = camera.params[3]
-    elif camera.model == "RADIAL":
-        K[0, 0] = K[1, 1] = camera.params[0]
-        K[0, 2], K[1, 2] = camera.params[1], camera.params[2]
-        dist_coeffs[0] = camera.params[3]
-        dist_coeffs[1] = camera.params[4]
-    elif camera.model == "OPENCV":
-        K[0, 0], K[1, 1] = camera.params[0], camera.params[1]
-        K[0, 2], K[1, 2] = camera.params[2], camera.params[3]
-        for i in range(4):
-            dist_coeffs = camera.params[i + 4]
-    elif camera.model == "FULL_OPENCV":
-        K[0, 0], K[1, 1] = camera.params[0], camera.params[1]
-        K[0, 2], K[1, 2] = camera.params[2], camera.params[3]
-        for i in range(8):
-            dist_coeffs[i] = camera.params[i + 4]
-    else:
-        raise NotImplementedError
-
-    # reshape w.r.t max_image_dim
-    h_orig, w_orig = camera.height, camera.width
-    img_hw = (h_orig, w_orig)
-    if (max_image_dim is not None) and max_image_dim != -1:
-        ratio = max_image_dim / max(h_orig, w_orig)
-        if ratio < 1.0:
-            h_new = int(round(h_orig * ratio))
-            w_new = int(round(w_orig * ratio))
-            K[0,:] = K[0,:] * w_new / w_orig
-            K[1,:] = K[1,:] * h_new / h_orig
-            img_hw = (h_new, w_new)
-    return K, dist_coeffs, img_hw
-
 def ReadInfosFromModel(model, colmap_path, model_path="sparse", image_path="images", max_image_dim=None, check_undistorted=True):
     print("Start loading COLMAP sparse reconstruction.")
     image_names = model.GetImageNames()
