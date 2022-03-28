@@ -313,6 +313,45 @@ void bind_line_reconstruction(py::module& m) {
 }
 
 void bind_camera(py::module& m) {
+    py::class_<Camera>(m, "NewCamera")
+        .def(py::init<>())
+        .def(py::init<int, const std::vector<double>&, int, std::pair<int, int>>(), py::arg("model_id"), py::arg("params"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1))
+        .def(py::init<const std::string&, const std::vector<double>&, int, std::pair<int, int>>(), py::arg("model_name"), py::arg("params"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1))
+        .def(py::init<M3D, int, std::pair<int, int>>(), py::arg("K"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1))
+        .def(py::init<int, M3D, int, std::pair<int, int>>(), py::arg("model_id"), py::arg("K"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1))
+        .def(py::init<const std::string&, M3D, int, std::pair<int, int>>(), py::arg("model_name"), py::arg("K"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1))
+        .def("h", &Camera::h)
+        .def("w", &Camera::w)
+        .def("K", &Camera::K)
+        .def("K_inv", &Camera::K_inv)
+        .def("cam_id", &Camera::CameraId)
+        .def("model_id", &Camera::ModelId)
+        .def("params", &Camera::params)
+        .def("num_params", &Camera::NumParams)
+        .def("resize", &Camera::resize)
+        .def("set_max_image_dim", &Camera::set_max_image_dim);
+
+    py::class_<CameraPose>(m, "CameraPose")
+        .def(py::init<>())
+        .def(py::init<V4D, V3D>())
+        .def(py::init<M3D, V3D>())
+        .def("R", &CameraPose::R)
+        .def("T", &CameraPose::T)
+        .def("center", &CameraPose::center)
+        .def("projdepth", &CameraPose::projdepth);
+
+    py::class_<View>(m, "View")
+        .def(py::init<>())
+        .def(py::init<const Camera&, const CameraPose&>())
+        .def_readwrite("cam", &View::cam)
+        .def_readwrite("pose", &View::pose)
+        .def("K", &View::K)
+        .def("K_inv", &View::K_inv)
+        .def("R", &View::R)
+        .def("T", &View::T)
+        .def("projection", &View::projection)
+        .def("ray_direction", &View::ray_direction);
+
     py::class_<PinholeCamera>(m, "Camera")
         .def(py::init<>())
         .def(py::init<PinholeCamera>())
