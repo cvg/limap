@@ -52,11 +52,11 @@ std::vector<int> LineTrack::GetIndexesforSorted() const {
     return p_image_ids;
 }
 
-std::vector<Line2d> LineTrack::projection(const std::vector<PinholeCamera>& cameras) const {
+std::vector<Line2d> LineTrack::projection(const std::vector<CameraView>& views) const {
     std::vector<Line2d> line2ds;
     size_t num_lines = node_id_list.size();
     for (size_t line_id = 0; line_id < num_lines; ++line_id) {
-        line2ds.push_back(line.projection(cameras[image_id_list[line_id]]));
+        line2ds.push_back(line.projection(views[image_id_list[line_id]]));
     }
     return line2ds;
 }
@@ -240,7 +240,7 @@ void ComputeHeatmapSamples(const LineTrack& track,
 }
 
 void ComputeFConsistencySamples(const LineTrack& track,
-                                const std::map<int, PinholeCamera>& cameras,
+                                const std::map<int, CameraView>& views,
                                 std::vector<std::tuple<int, InfiniteLine2d, std::vector<int>>>& fconsis_samples,
                                 const std::pair<double, double> sample_range,
                                 const int n_samples)
@@ -249,7 +249,7 @@ void ComputeFConsistencySamples(const LineTrack& track,
     fconsis_samples.clear();
     std::vector<int> image_ids = track.GetSortedImageIds();
     for (auto it = image_ids.begin(); it != image_ids.end(); ++it) {
-        if (cameras.count(*it) == 0)
+        if (views.count(*it) == 0)
             throw std::runtime_error("Error! some cameras are missing");
     }
 
@@ -265,8 +265,8 @@ void ComputeFConsistencySamples(const LineTrack& track,
     // get all line projections
     std::map<int, Line2d> line_projections;
     for (auto it = image_ids.begin(); it != image_ids.end(); ++it) {
-        const auto& cam = cameras.at(*it);
-        Line2d line_projection = track.line.projection(cam);
+        const auto& view = views.at(*it);
+        Line2d line_projection = track.line.projection(view);
         line_projections.insert(std::make_pair(*it, line_projection));
     }
 
@@ -274,11 +274,8 @@ void ComputeFConsistencySamples(const LineTrack& track,
         // get projections to all images
         std::map<int, V2D> projections;
         for (auto it = image_ids.begin(); it != image_ids.end(); ++it) {
-            const auto& cam = cameras.at(*it);
-            V3D homo = cam.K * (cam.R * point + cam.T);
-            V2D projection;
-            projection[0] = homo[0] / homo[2];
-            projection[1] = homo[1] / homo[2];
+            const auto& view = views.at(*it);
+            V2D projection = view.projection(point);
             projections.insert(std::make_pair(*it, projection));
         }
         

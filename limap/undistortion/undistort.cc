@@ -8,20 +8,24 @@ namespace limap {
 
 namespace undistortion {
 
-PinholeCamera Undistort(const std::string& imname_in, const PinholeCamera& camera, const std::string& imname_out) {
+Camera Undistort(const std::string& imname_in, const Camera& camera, const std::string& imname_out) {
     colmap::Bitmap img, img_undistorted;
     img.Read(imname_in);
-    colmap::Camera cam, cam_undistorted;
-    cam = cam_ours2colmap(camera);
+    colmap::Camera cam = camera;
     colmap::UndistortCameraOptions undist_options;
 
+    colmap::Camera cam_undistorted;
     colmap::UndistortImage(undist_options, img, cam, &img_undistorted, &cam_undistorted);
     img_undistorted.Write(imname_out);
 
-    PinholeCamera camera_undistorted = cam_colmap2ours(cam_undistorted);
-    camera_undistorted.R = camera.R;
-    camera_undistorted.T = camera.T;
+    Camera camera_undistorted = cam_undistorted;
     return camera_undistorted;
+}
+
+CameraView Undistort(const std::string& imname_in, const CameraView& view, const std::string& imname_out) {
+    CameraView new_view = view;
+    new_view.cam = Undistort(imname_in, view.cam, imname_out);
+    return new_view;
 }
 
 } // namespace undistortion

@@ -288,7 +288,7 @@ void bind_line_linker(py::module& m) {
 void bind_line_reconstruction(py::module& m) {
     py::class_<LineReconstruction>(m, "LineReconstruction")
         .def(py::init<>())
-        .def(py::init<const std::vector<LineTrack>&, const std::vector<PinholeCamera>&>())
+        .def(py::init<const std::vector<LineTrack>&, const std::vector<CameraView>&>())
         .def("NumTracks", &LineReconstruction::NumTracks)
         .def("NumCameras", &LineReconstruction::NumCameras)
         .def("GetInitTrack", &LineReconstruction::GetInitTrack)
@@ -340,44 +340,17 @@ void bind_camera(py::module& m) {
         .def("center", &CameraPose::center)
         .def("projdepth", &CameraPose::projdepth);
 
-    py::class_<View>(m, "View")
+    py::class_<CameraView>(m, "CameraView")
         .def(py::init<>())
         .def(py::init<const Camera&, const CameraPose&>())
-        .def_readwrite("cam", &View::cam)
-        .def_readwrite("pose", &View::pose)
-        .def("K", &View::K)
-        .def("K_inv", &View::K_inv)
-        .def("R", &View::R)
-        .def("T", &View::T)
-        .def("projection", &View::projection)
-        .def("ray_direction", &View::ray_direction);
-
-    py::class_<PinholeCamera>(m, "Camera")
-        .def(py::init<>())
-        .def(py::init<PinholeCamera>())
-        .def(py::init<M3F, M3F, V3F>())
-        .def(py::init<M3F, M3F, V3F, const std::pair<int, int>&>())
-        .def(py::init<M3F, M3F, V3F, const std::vector<double>&>())
-        .def(py::init<M3F, M3F, V3F, const std::vector<double>&, const std::pair<int, int>&>())
-        .def(py::init<M3F, M3F, V3F, const std::pair<int, int>&, const std::vector<double>&>())
-        .def(py::init<M3D, M3D, V3D>())
-        .def(py::init<M3D, M3D, V3D, const std::pair<int, int>&>())
-        .def(py::init<M3D, M3D, V3D, const std::vector<double>&>())
-        .def(py::init<M3D, M3D, V3D, const std::vector<double>&, const std::pair<int, int>&>())
-        .def(py::init<M3D, M3D, V3D, const std::pair<int, int>&, const std::vector<double>&>())
-        .def("set_hw", &PinholeCamera::set_hw)
-        .def("set_max_image_dim", &PinholeCamera::set_max_image_dim)
-        .def("checkUndistorted", &PinholeCamera::checkUndistorted)
-        .def("Read", &PinholeCamera::Read)
-        .def("Write", &PinholeCamera::Write)
-        .def("GetCameraRay", &PinholeCamera::GetCameraRay)
-        .def_readonly("K", &PinholeCamera::K)
-        .def_readonly("K_inv", &PinholeCamera::K_inv)
-        .def_readwrite("R", &PinholeCamera::R)
-        .def_readwrite("T", &PinholeCamera::T)
-        .def_readwrite("h", &PinholeCamera::height)
-        .def_readwrite("w", &PinholeCamera::width)
-        .def_readwrite("dist_coeffs", &PinholeCamera::dist_coeffs);
+        .def_readwrite("cam", &CameraView::cam)
+        .def_readwrite("pose", &CameraView::pose)
+        .def("K", &CameraView::K)
+        .def("K_inv", &CameraView::K_inv)
+        .def("R", &CameraView::R)
+        .def("T", &CameraView::T)
+        .def("projection", &CameraView::projection)
+        .def("ray_direction", &CameraView::ray_direction);
 }
 
 template <typename DTYPE>

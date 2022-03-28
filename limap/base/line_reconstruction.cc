@@ -2,7 +2,7 @@
 
 namespace limap {
 
-LineReconstruction::LineReconstruction(const std::vector<LineTrack>& linetracks, const std::vector<PinholeCamera>& cameras) 
+LineReconstruction::LineReconstruction(const std::vector<LineTrack>& linetracks, const std::vector<CameraView>& views) 
 {
     // initialize minimal infinite lines
     init_tracks_ = linetracks;
@@ -11,28 +11,28 @@ LineReconstruction::LineReconstruction(const std::vector<LineTrack>& linetracks,
     }
 
     // initialize minimal cameras
-    int n_cameras = cameras.size();
-    for (int cam_id = 0; cam_id < n_cameras; ++cam_id) {
-        init_cameras_.insert(std::make_pair(cam_id, cameras[cam_id]));
-        cameras_.push_back(MinimalPinholeCamera(cameras[cam_id]));
+    int n_views = views.size();
+    for (int view_id = 0; view_id < n_views; ++view_id) {
+        init_cameras_.insert(std::make_pair(view_id, views[view_id]));
+        cameras_.push_back(MinimalPinholeCamera(views[view_id]));
     }
 }
 
-std::vector<PinholeCamera> LineReconstruction::GetCameras() const {
-    std::vector<PinholeCamera> cameras;
+std::vector<CameraView> LineReconstruction::GetCameras() const {
+    std::vector<CameraView> cameras;
     for (auto it = cameras_.begin(); it != cameras_.end(); ++it) {
-        cameras.push_back(it->GetCamera());
+        cameras.push_back(it->GetCameraView());
     }
     return cameras;
 }
 
 std::vector<Line3d> LineReconstruction::GetLines(const int num_outliers) const {
-    std::vector<PinholeCamera> cameras = GetCameras();
+    std::vector<CameraView> cameras = GetCameras();
     std::vector<Line3d> lines;
     int n_tracks = lines_.size();
     for (int track_id = 0; track_id < n_tracks; ++track_id) {
         std::vector<int> image_ids = GetImageIds(track_id);
-        std::vector<PinholeCamera> p_cameras;
+        std::vector<CameraView> p_cameras;
         for (auto it = image_ids.begin(); it != image_ids.end(); ++it) {
             p_cameras.push_back(cameras[*it]);
         }

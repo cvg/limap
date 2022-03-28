@@ -20,7 +20,7 @@ namespace limap {
 class LineReconstruction {
 public:
     LineReconstruction() {}
-    LineReconstruction(const std::vector<LineTrack>& linetracks, const std::vector<PinholeCamera>& cameras);
+    LineReconstruction(const std::vector<LineTrack>& linetracks, const std::vector<CameraView>& cameras);
 
     // minimal data
     std::vector<MinimalInfiniteLine3d> lines_; // minimal line for each track
@@ -29,7 +29,7 @@ public:
     // interface
     LineTrack GetInitTrack(const int track_id) const {return init_tracks_[track_id]; }
     std::vector<LineTrack> GetInitTracks() const {return init_tracks_; }
-    std::map<int, PinholeCamera> GetCameraMap() const {return init_cameras_; }
+    std::map<int, CameraView> GetCameraMap() const {return init_cameras_; }
     size_t NumTracks() const {return lines_.size(); }
     size_t NumCameras() const {return cameras_.size(); }
 
@@ -40,14 +40,14 @@ public:
     std::vector<Line3d> GetLine3ds(const int track_id) const {return init_tracks_[track_id].line3d_list; }
 
     std::vector<MinimalInfiniteLine3d> GetStates() const {return lines_;}
-    std::vector<PinholeCamera> GetCameras() const;
+    std::vector<CameraView> GetCameras() const;
     std::vector<Line3d> GetLines(const int num_outliers = 2) const;
     std::vector<LineTrack> GetTracks(const int num_outliers = 2) const;
 
 private:
     // original data
     std::vector<LineTrack> init_tracks_;
-    std::map<int, PinholeCamera> init_cameras_; // cameras in map format {img_id, camera}
+    std::map<int, CameraView> init_cameras_; // cameras in map format {img_id, camera}
 };
 
 } // namespace limap

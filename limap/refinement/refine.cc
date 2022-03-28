@@ -12,14 +12,14 @@ namespace refinement {
 
 template <typename DTYPE, int CHANNELS>
 void RefinementEngine<DTYPE, CHANNELS>::Initialize(const LineTrack& track,
-                                  const std::vector<PinholeCamera>& p_cameras) 
+                                  const std::vector<CameraView>& p_camviews) 
 {
     // validity check
     track_ = track;
-    p_cameras_.clear();
-    for (auto it = p_cameras.begin(); it != p_cameras.end(); ++it) {
-        p_cameras_matrixform_.push_back(*it);
-        p_cameras_.push_back(cam2minimalcam(*it));
+    p_camviews_.clear();
+    for (auto it = p_camviews.begin(); it != p_camviews.end(); ++it) {
+        p_camviews_matrixform_.push_back(*it);
+        p_camviews_.push_back(cam2minimalcam(*it));
     }
 
     // initialize optimized line
@@ -38,8 +38,8 @@ void RefinementEngine<DTYPE, CHANNELS>::InitializeHeatmaps(const std::vector<Eig
     int n_images = track_.count_images();
     THROW_CHECK_EQ(p_heatmaps.size(), n_images);
     for (int i = 0; i < n_images; ++i) {
-        THROW_CHECK_EQ(p_cameras_[i].height, p_heatmaps[i].rows());
-        THROW_CHECK_EQ(p_cameras_[i].width, p_heatmaps[i].cols());
+        THROW_CHECK_EQ(p_camviews_[i].height, p_heatmaps[i].rows());
+        THROW_CHECK_EQ(p_camviews_[i].width, p_heatmaps[i].cols());
     }
     
     auto& interp_cfg = config_.heatmap_interpolation_config;
@@ -132,7 +132,7 @@ void RefinementEngine<DTYPE, CHANNELS>::AddGeometricResiduals() {
     for (int i = 0; i < n_images; ++i) {
         ceres::LossFunction* loss_function = config_.geometric_loss_function.get();
 
-        auto& camera = p_cameras_[i];
+        auto& camera = p_camviews_[i];
         int img_id = image_ids[i];
         const auto& ids = idmap.at(img_id);
         for (auto it = ids.begin(); it != ids.end(); ++it) {
@@ -157,7 +157,7 @@ void RefinementEngine<DTYPE, CHANNELS>::AddVPResiduals() {
     std::vector<int> image_ids = track_.GetSortedImageIds();
     ceres::LossFunction* loss_function = config_.vp_loss_function.get();
     for (int i = 0; i < n_images; ++i) {
-        auto& camera = p_cameras_[i];
+        auto& camera = p_camviews_[i];
         int img_id = image_ids[i];
         const auto& ids = idmap.at(img_id);
         for (auto it = ids.begin(); it != ids.end(); ++it) {
@@ -192,7 +192,7 @@ void RefinementEngine<DTYPE, CHANNELS>::AddHeatmapResiduals() {
     std::vector<int> image_ids = track_.GetSortedImageIds();
     for (int i = 0; i < n_images; ++i) {
         ceres::LossFunction* loss_function = config_.heatmap_loss_function.get();
-        auto& camera = p_cameras_[i];
+        auto& camera = p_camviews_[i];
         int img_id = image_ids[i];
         const auto& ids = idmap.at(img_id);
         for (auto it = ids.begin(); it != ids.end(); ++it) {
@@ -211,9 +211,9 @@ void RefinementEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals() {
     std::vector<std::tuple<int, InfiniteLine2d, std::vector<int>>> fconsis_samples; // [referenece_image_id, infiniteline2d, {target_image_ids}]
     int n_images = track_.count_images();
     std::vector<int> image_ids = track_.GetSortedImageIds();
-    std::map<int, PinholeCamera> cameramap;
+    std::map<int, CameraView> cameramap;
     for (int i = 0; i < n_images; ++i) {
-        cameramap.insert(std::make_pair(image_ids[i], p_cameras_matrixform_[i]));
+        cameramap.insert(std::make_pair(image_ids[i], p_camviews_matrixform_[i]));
     }
 
     ComputeFConsistencySamples(track_,
@@ -233,7 +233,7 @@ void RefinementEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals() {
         int ref_index = idmap.at(ref_image_id);
         const auto& sample = std::get<1>(sample_tp);
         std::vector<int> tgt_image_ids = std::get<2>(sample_tp);
-        auto& cam_ref = p_cameras_[ref_index];
+        auto& cam_ref = p_camviews_[ref_index];
 
         // get reference descriptor and compute ref residuals
         double weight = config_.fconsis_multiplier / (double(n_samples / 100.0) * double(tgt_image_ids.size() / 5.0));
@@ -268,7 +268,7 @@ void RefinementEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals() {
         // compute tgt residuals
         for (const int& tgt_image_id: tgt_image_ids) {
             int tgt_index = idmap.at(tgt_image_id);
-            auto& cam_tgt = p_cameras_[tgt_index];
+            auto& cam_tgt = p_camviews_[tgt_index];
             // tgt residuals
             ceres::CostFunction* cost_function = nullptr;
             if (use_patches) {
@@ -344,11 +344,11 @@ Line3d RefinementEngine<DTYPE, CHANNELS>::GetLine3d() const {
     // get cameras for each line
     std::vector<int> p_image_ids = track_.GetIndexesforSorted();
 
-    std::vector<PinholeCamera> cameras;
+    std::vector<CameraView> cameras;
     int n_lines = track_.count_lines();
     for (int i = 0; i < n_lines; ++i) {
         int index = p_image_ids[i];
-        cameras.push_back(p_cameras_matrixform_[index]);
+        cameras.push_back(p_camviews_matrixform_[index]);
     }
 
     // get line segment
@@ -361,11 +361,11 @@ std::vector<Line3d> RefinementEngine<DTYPE, CHANNELS>::GetAllStates() const {
     // get cameras for each line
     std::vector<int> p_image_ids = track_.GetIndexesforSorted();
 
-    std::vector<PinholeCamera> cameras;
+    std::vector<CameraView> cameras;
     int n_lines = track_.count_lines();
     for (int i = 0; i < n_lines; ++i) {
         int index = p_image_ids[i];
-        cameras.push_back(p_cameras_matrixform_[index]);
+        cameras.push_back(p_camviews_matrixform_[index]);
     }
     
     // get line segment for each state
@@ -396,7 +396,7 @@ std::vector<std::vector<V2D>> RefinementEngine<DTYPE, CHANNELS>::GetHeatmapInter
     // compute intersections for each supporting image
     std::vector<std::vector<V2D>> out_samples;
     for (int i = 0; i < n_images; ++i) {
-        const auto& camera = p_cameras_[i];
+        const auto& camera = p_camviews_[i];
         int img_id = image_ids[i];
         const auto& ids = idmap.at(img_id);
 
@@ -425,9 +425,9 @@ std::vector<std::vector<std::pair<int, V2D>>> RefinementEngine<DTYPE, CHANNELS>:
     std::vector<std::tuple<int, InfiniteLine2d, std::vector<int>>> fconsis_samples; // [referenece_image_id, infiniteline2d, {target_image_ids}]
     int n_images = track_.count_images();
     std::vector<int> image_ids = track_.GetSortedImageIds();
-    std::map<int, PinholeCamera> cameramap;
+    std::map<int, CameraView> cameramap;
     for (int i = 0; i < n_images; ++i) {
-        cameramap.insert(std::make_pair(image_ids[i], p_cameras_matrixform_[i]));
+        cameramap.insert(std::make_pair(image_ids[i], p_camviews_matrixform_[i]));
     }
 
     ComputeFConsistencySamples(track_,
@@ -444,7 +444,7 @@ std::vector<std::vector<std::pair<int, V2D>>> RefinementEngine<DTYPE, CHANNELS>:
         int ref_index = idmap.at(ref_image_id);
         const InfiniteLine2d& sample = std::get<1>(sample_tp);
         std::vector<int> tgt_image_ids = std::get<2>(sample_tp);
-        const auto& cam_ref = p_cameras_[ref_index];
+        const auto& cam_ref = p_camviews_[ref_index];
 
         // get ref_intersection
         std::vector<std::pair<int, V2D>> out_samples_idx;
@@ -458,7 +458,7 @@ std::vector<std::vector<std::pair<int, V2D>>> RefinementEngine<DTYPE, CHANNELS>:
         // get tgt_intersection for each target image
         for (const int& tgt_image_id: tgt_image_ids) {
             int tgt_index = idmap.at(tgt_image_id);
-            const auto& cam_tgt = p_cameras_[tgt_index];
+            const auto& cam_tgt = p_camviews_[tgt_index];
             V3D epiline_coord;
             V2D tgt_intersection;
             GetEpipolarLineCoordinate<double>(cam_ref.kvec.data(), cam_ref.qvec.data(), cam_ref.tvec.data(),

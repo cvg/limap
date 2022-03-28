@@ -1,7 +1,7 @@
 from _limap import _base, _ceresbase, _lineKA
 import numpy as np
 
-def solve(cfg, all_lines, cameras, all_matches, neighbors, heatmaps=None, patches_list=None, dtype="float16"):
+def solve(cfg, all_lines, camviews, all_matches, neighbors, heatmaps=None, patches_list=None, dtype="float16"):
     '''
     patches_list: list of PatchInfo_f objects
     '''
@@ -16,7 +16,7 @@ def solve(cfg, all_lines, cameras, all_matches, neighbors, heatmaps=None, patche
     lineka_engine_name = "LineKAEngine_f{0}_c{1}".format(dtype[-2:], channels)
     print("Refinement type: ", lineka_engine_name)
     lineka_engine = getattr(_lineKA, lineka_engine_name)(ka_config)
-    lineka_engine.Initialize(all_lines, cameras)
+    lineka_engine.Initialize(all_lines, camviews)
     lineka_engine.InitializeMatches(all_matches, neighbors)
 
     # initialize data interpolator

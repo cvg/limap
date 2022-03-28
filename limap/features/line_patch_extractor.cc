@@ -124,7 +124,7 @@ std::vector<PatchInfo<DTYPE>> LinePatchExtractor<DTYPE, CHANNELS>::ExtractLinePa
 }
 
 template <typename DTYPE, int CHANNELS>
-Line2d LinePatchExtractor<DTYPE, CHANNELS>::GetLine2DRange(const LineTrack& track, const int image_id, const PinholeCamera& camera) {
+Line2d LinePatchExtractor<DTYPE, CHANNELS>::GetLine2DRange(const LineTrack& track, const int image_id, const CameraView& view) {
     // collect all supporting 2d segments
     std::vector<Line2d> line2d_supports;
     for (int line_id; line_id < track.count_lines(); ++line_id) {
@@ -134,7 +134,7 @@ Line2d LinePatchExtractor<DTYPE, CHANNELS>::GetLine2DRange(const LineTrack& trac
     }
 
     // get global 2d projection and project all endpoints on it to get 2d range along the line
-    Line2d line2d_global = track.line.projection(camera);
+    Line2d line2d_global = track.line.projection(view);
     V2D direc = line2d_global.direction();
     std::vector<double> projections;
     for (const auto& line2d: line2d_supports) {
@@ -152,11 +152,11 @@ Line2d LinePatchExtractor<DTYPE, CHANNELS>::GetLine2DRange(const LineTrack& trac
 template <typename DTYPE, int CHANNELS>
 PatchInfo<DTYPE> LinePatchExtractor<DTYPE, CHANNELS>::ExtractOneImage(const LineTrack& track,
                                                             const int image_id,
-                                                            const PinholeCamera& camera,
+                                                            const CameraView& view,
                                                             const py::array_t<DTYPE, py::array::c_style>& feature)
 {
     // get a global line2d
-    Line2d line2d_range = GetLine2DRange(track, image_id, camera);
+    Line2d line2d_range = GetLine2DRange(track, image_id, view);
 
     // extract line patch
     return ExtractLinePatch(line2d_range, feature);
@@ -164,18 +164,18 @@ PatchInfo<DTYPE> LinePatchExtractor<DTYPE, CHANNELS>::ExtractOneImage(const Line
 
 template <typename DTYPE, int CHANNELS>
 void LinePatchExtractor<DTYPE, CHANNELS>::Extract(const LineTrack& track,
-                                   const std::vector<PinholeCamera>& p_cameras,
+                                   const std::vector<CameraView>& p_views,
                                    const std::vector<py::array_t<DTYPE, py::array::c_style>>& p_features,
                                    std::vector<PatchInfo<DTYPE>>& patchinfos)
 {
     patchinfos.clear();
     int n_images = track.count_images();
-    THROW_CHECK_EQ(p_cameras.size(), n_images);
+    THROW_CHECK_EQ(p_views.size(), n_images);
     THROW_CHECK_EQ(p_features.size(), n_images);
     std::vector<int> sorted_ids = track.GetSortedImageIds();
     THROW_CHECK_EQ(sorted_ids.size(), n_images);
     for (int i = 0; i < n_images; ++i) {
-        PatchInfo<DTYPE> patchinfo = ExtractOneImage(track, sorted_ids[i], p_cameras[i], p_features[i]);
+        PatchInfo<DTYPE> patchinfo = ExtractOneImage(track, sorted_ids[i], p_views[i], p_features[i]);
         patchinfos.push_back(patchinfo);
     }
     return;

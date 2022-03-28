@@ -20,32 +20,32 @@ void GetLines(const std::vector<Eigen::MatrixXd>& segs3d, std::vector<Line3d>& l
 
 void GetSegs3d(const std::vector<Line3d>& lines, std::vector<Eigen::MatrixXd>& segs3d);
 
-std::vector<Line3d> SetUncertaintySegs3d(const std::vector<Line3d>& lines, const PinholeCamera& camera, const double var2d=5.0);
+std::vector<Line3d> SetUncertaintySegs3d(const std::vector<Line3d>& lines, const CameraView& view, const double var2d=5.0);
 
 void CheckReprojection(std::vector<bool>& results,
                        const LineTrack& linetrack, 
-                       const std::vector<PinholeCamera>& cameras, 
+                       const std::vector<CameraView>& views, 
                        const double& th_angular2d, const double& th_perp2d);
 
 void FilterSupportingLines(std::vector<LineTrack>& new_linetracks, 
                            const std::vector<LineTrack>& linetracks, 
-                           const std::vector<PinholeCamera>& cameras, 
+                           const std::vector<CameraView>& views, 
                            const double& th_angular2d, const double& th_perp2d,
                            const int num_outliers = 2);
 
 void CheckSensitivity(std::vector<bool>& results,
                       const LineTrack& linetrack,
-                      const std::vector<PinholeCamera>& cameras,
+                      const std::vector<CameraView>& views,
                       const double& th_angular3d);
 
 void FilterTracksBySensitivity(std::vector<LineTrack>& new_linetracks,
                                const std::vector<LineTrack>& linetracks,
-                               const std::vector<PinholeCamera>& cameras,
+                               const std::vector<CameraView>& views,
                                const double& th_angular3d, const int& min_support_ns);
 
 void FilterTracksByOverlap(std::vector<LineTrack>& new_linetracks,
                            const std::vector<LineTrack>& linetracks,
-                           const std::vector<PinholeCamera>& cameras,
+                           const std::vector<CameraView>& views,
                            const double& th_overlap, const int& min_support_ns);
 
 } // namespace merging

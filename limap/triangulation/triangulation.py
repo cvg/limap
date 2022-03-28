@@ -2,23 +2,23 @@ from _limap import _triangulation as _tri
 from _limap import _base
 import numpy as np
 
-def get_normal_direction(l, cam):
-    return _tri.get_normal_direction(l, cam)
+def get_normal_direction(l, view):
+    return _tri.get_normal_direction(l, view)
 
-def get_direction_from_VP(vp, cam):
-    return _tri.get_direction_from_VP(vp, cam)
+def get_direction_from_VP(vp, view):
+    return _tri.get_direction_from_VP(vp, view)
 
-def compute_epipolar_IoU(l1, cam1, l2, cam2):
-    return _tri.compute_epipolar_IoU(l1, cam1, l2, cam2)
+def compute_epipolar_IoU(l1, view1, l2, view2):
+    return _tri.compute_epipolar_IoU(l1, view1, l2, view2)
 
-def triangulate_endpoints(l1, cam1, l2, cam2):
-    return _tri.triangulate_endpoints(l1, cam1, l2, cam2)
+def triangulate_endpoints(l1, view1, l2, view2):
+    return _tri.triangulate_endpoints(l1, view1, l2, view2)
 
-def triangulate(l1, cam1, l2, cam2):
-    return _tri.triangulate(l1, cam1, l2, cam2)
+def triangulate(l1, view1, l2, view2):
+    return _tri.triangulate(l1, view1, l2, view2)
 
-def triangulate_with_direction(l1, cam1, l2, cam2, direc):
-    return _tri.triangulate_with_direction(l1, cam1, l2, cam2, direc)
+def triangulate_with_direction(l1, view1, l2, view2, direc):
+    return _tri.triangulate_with_direction(l1, view1, l2, view2, direc)
 
 def GetAllLines2D(all_2d_segs):
     all_lines_2d = _base._GetAllLines2D(all_2d_segs)

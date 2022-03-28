@@ -25,7 +25,8 @@ void bind_undistortion(py::module &m) {
         .def("Height", &colmap::Bitmap::Height)
         .def("Channels", &colmap::Bitmap::Channels);
 
-    m.def("_Undistort", &Undistort);
+    m.def("_UndistortCamera", &UndistortCamera);
+    m.def("_UndistortCameraView", &UndistortCameraView);
 }
 
 } // namespace limap

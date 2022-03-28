@@ -30,7 +30,7 @@ private:
     std::vector<std::vector<std::shared_ptr<Line2d_2DOF>>> all_lines_2dof_; 
 
     // cameras
-    std::vector<PinholeCamera> cameras_matrixform_; // original input, with matrices as attributes
+    std::vector<CameraView> cameras_matrixform_; // original input, with matrices as attributes
     std::vector<MinimalPinholeCamera> cameras_; 
 
     // matching information
@@ -60,7 +60,7 @@ public:
     LineKAEngine(const LineKAConfig& cfg): config_(cfg) {}
 
     void Initialize(const std::vector<std::vector<Line2d>>& all_lines_2d, 
-                    const std::vector<PinholeCamera>& cameras);
+                    const std::vector<CameraView>& cameras);
     void InitializeMatches(const std::vector<std::vector<Eigen::MatrixXi>>& all_matches,
                            const std::vector<std::vector<int>>& neighbors);
     void InitializeHeatmaps(const std::vector<Eigen::MatrixXd>& heatmaps);

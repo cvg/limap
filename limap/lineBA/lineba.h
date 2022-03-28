@@ -54,7 +54,7 @@ public:
     LineBAEngine() {}
     LineBAEngine(const LineBAConfig& cfg): config_(cfg) {}
 
-    void Initialize(const std::vector<LineTrack>& tracks, const std::vector<PinholeCamera>& cameras) {
+    void Initialize(const std::vector<LineTrack>& tracks, const std::vector<CameraView>& cameras) {
         reconstruction_ = LineReconstruction(tracks, cameras);
     }
     void InitializeReconstruction(const LineReconstruction& reconstruction) {
@@ -67,7 +67,7 @@ public:
     bool Solve();
 
     // output
-    std::vector<PinholeCamera> GetOutputCameras() const {return reconstruction_.GetCameras(); }
+    std::vector<CameraView> GetOutputCameras() const {return reconstruction_.GetCameras(); }
     std::vector<Line3d> GetOutputLines() const {return reconstruction_.GetLines(); }
     std::vector<LineTrack> GetOutputTracks() const {return reconstruction_.GetTracks(); }
     LineReconstruction GetOutputReconstruction() const {return reconstruction_; }

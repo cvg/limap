@@ -22,13 +22,13 @@ void bind_merging_core(py::module &m) {
     m.def("_MergeToLineTracks", 
         [] (Graph& graph,
             const std::vector<std::vector<Line2d>>& all_lines_2d, 
-            const std::vector<PinholeCamera>& cameras,
+            const std::vector<CameraView>& views,
             const std::vector<std::vector<Line3d>>& all_lines_3d,
             const std::vector<std::vector<int>>& neighbors,
             LineLinker linker) 
         {
             std::vector<LineTrack> linetracks;
-            MergeToLineTracks(graph, linetracks, all_lines_2d, cameras, all_lines_3d, neighbors, linker);
+            MergeToLineTracks(graph, linetracks, all_lines_2d, views, all_lines_3d, neighbors, linker);
             return linetracks;
         }
     );
@@ -66,44 +66,44 @@ void bind_merging_utils(py::module& m) {
 
     m.def("_SetUncertaintySegs3d", &SetUncertaintySegs3d);
 
-    m.def("_CheckReprojection", [] (const LineTrack& linetrack, const std::vector<PinholeCamera>& cameras, const double& th_angular2d, const double& th_perp2d) 
+    m.def("_CheckReprojection", [] (const LineTrack& linetrack, const std::vector<CameraView>& views, const double& th_angular2d, const double& th_perp2d) 
         {
             std::vector<bool> results;
-            CheckReprojection(results, linetrack, cameras, th_angular2d, th_perp2d);
+            CheckReprojection(results, linetrack, views, th_angular2d, th_perp2d);
             return results;
         }
     );
-    m.def("_FilterSupportLines", [] (const std::vector<LineTrack>& linetracks, const std::vector<PinholeCamera>& cameras, const double& th_angular2d, const double& th_perp2d, const int num_outliers)
+    m.def("_FilterSupportLines", [] (const std::vector<LineTrack>& linetracks, const std::vector<CameraView>& views, const double& th_angular2d, const double& th_perp2d, const int num_outliers)
         {
             std::vector<LineTrack> new_linetracks;
-            FilterSupportingLines(new_linetracks, linetracks, cameras, th_angular2d, th_perp2d, num_outliers);
+            FilterSupportingLines(new_linetracks, linetracks, views, th_angular2d, th_perp2d, num_outliers);
             return new_linetracks;
         },
         py::arg("linetracks"),
-        py::arg("cameras"),
+        py::arg("views"),
         py::arg("th_angular2d"),
         py::arg("th_perp2d"),
         py::arg("num_outliers") = 2
     );
 
-    m.def("_CheckSensitivity", [] (const LineTrack& linetrack, const std::vector<PinholeCamera>& cameras, const double& th_angular3d)
+    m.def("_CheckSensitivity", [] (const LineTrack& linetrack, const std::vector<CameraView>& views, const double& th_angular3d)
         {
             std::vector<bool> results;
-            CheckSensitivity(results, linetrack, cameras, th_angular3d);
+            CheckSensitivity(results, linetrack, views, th_angular3d);
             return results;
         }
     );
-    m.def("_FilterTracksBySensitivity", [] (const std::vector<LineTrack>& linetracks, const std::vector<PinholeCamera>& cameras, const double& th_angular3d, const int& min_support_ns)
+    m.def("_FilterTracksBySensitivity", [] (const std::vector<LineTrack>& linetracks, const std::vector<CameraView>& views, const double& th_angular3d, const int& min_support_ns)
         {
             std::vector<LineTrack> newtracks;
-            FilterTracksBySensitivity(newtracks, linetracks, cameras, th_angular3d, min_support_ns);
+            FilterTracksBySensitivity(newtracks, linetracks, views, th_angular3d, min_support_ns);
             return newtracks;
         }
     );
-    m.def("_FilterTracksByOverlap", [] (const std::vector<LineTrack>& linetracks, const std::vector<PinholeCamera>& cameras, const double& th_overlap, const int& min_support_ns)
+    m.def("_FilterTracksByOverlap", [] (const std::vector<LineTrack>& linetracks, const std::vector<CameraView>& views, const double& th_overlap, const int& min_support_ns)
         {
             std::vector<LineTrack> newtracks;
-            FilterTracksByOverlap(newtracks, linetracks, cameras, th_overlap, min_support_ns);
+            FilterTracksByOverlap(newtracks, linetracks, views, th_overlap, min_support_ns);
             return newtracks;
         }
     );

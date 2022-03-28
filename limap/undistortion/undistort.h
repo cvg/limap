@@ -14,7 +14,9 @@ namespace limap {
 
 namespace undistortion {
 
-PinholeCamera Undistort(const std::string& imname_in, const PinholeCamera& camera, const std::string& imname_out);
+Camera UndistortCamera(const std::string& imname_in, const Camera& camera, const std::string& imname_out);
+
+CameraView UndistortCameraView(const std::string& imname_in, const CameraView& view, const std::string& imname_out);
 
 } // namespace undistortion
 

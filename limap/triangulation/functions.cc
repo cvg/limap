@@ -24,34 +24,32 @@ bool test_line_inside_ranges(const Line3d& line, const std::pair<V3D, V3D>& rang
     return true;
 }
 
-V3D getNormalDirection(const Line2d& l, const PinholeCamera& cam) {
-    const M3D& K_inv = cam.K_inv;
-    const M3D& R = cam.R;
+V3D getNormalDirection(const Line2d& l, const CameraView& view) {
+    const M3D K_inv = view.K_inv();
+    const M3D R = view.R();
     V3D c_start = R.transpose() * K_inv * V3D(l.start[0], l.start[1], 1);
     V3D c_end = R.transpose() * K_inv * V3D(l.end[0], l.end[1], 1);
     V3D n = c_start.cross(c_end);
     return n.normalized();
 }
 
-V3D getDirectionFromVP(const V3D& vp, const PinholeCamera& cam) {
-    const M3D& K_inv = cam.K_inv;
-    const M3D& R = cam.R;
+V3D getDirectionFromVP(const V3D& vp, const CameraView& view) {
+    const M3D K_inv = view.K_inv();
+    const M3D R = view.R();
     V3D direc = R.transpose() * K_inv * vp;
     return direc.normalized();
 }
 
-double compute_epipolar_IoU(const Line2d& l1, const PinholeCamera& cam1,
-                            const Line2d& l2, const PinholeCamera& cam2) 
+double compute_epipolar_IoU(const Line2d& l1, const CameraView& view1,
+                            const Line2d& l2, const CameraView& view2) 
 {
-    const M3D& K1 = cam1.K;
-    const M3D& K1_inv = cam1.K_inv;
-    const M3D& R1 = cam1.R;
-    const V3D& T1 = cam1.T;
+    const M3D K1_inv = view1.K_inv();
+    const M3D R1 = view1.R();
+    const V3D T1 = view1.T();
 
-    const M3D& K2 = cam2.K;
-    const M3D& K2_inv = cam2.K_inv;
-    const M3D& R2 = cam2.R;
-    const V3D& T2 = cam2.T;
+    const M3D K2_inv = view2.K_inv();
+    const M3D R2 = view2.R();
+    const V3D T2 = view2.T();
 
     // compose relative pose
     M3D relR = R2 * R1.transpose();
@@ -83,18 +81,16 @@ double compute_epipolar_IoU(const Line2d& l1, const PinholeCamera& cam1,
     return IoU;
 }
 
-V3D point_triangulation(const V2D& p1, const PinholeCamera& cam1,
-                        const V2D& p2, const PinholeCamera& cam2) 
+V3D point_triangulation(const V2D& p1, const CameraView& view1,
+                        const V2D& p2, const CameraView& view2) 
 {
-    const M3D& K1 = cam1.K;
-    const M3D& K1_inv = cam1.K_inv;
-    const M3D& R1 = cam1.R;
-    const V3D& T1 = cam1.T;
+    const M3D K1_inv = view1.K_inv();
+    const M3D R1 = view1.R();
+    const V3D T1 = view1.T();
 
-    const M3D& K2 = cam2.K;
-    const M3D& K2_inv = cam2.K_inv;
-    const M3D& R2 = cam2.R;
-    const V3D& T2 = cam2.T;
+    const M3D K2_inv = view2.K_inv();
+    const M3D R2 = view2.R();
+    const V3D T2 = view2.T();
 
     V3D C1 = - R1.transpose() * T1;
     V3D C2 = - R2.transpose() * T2;
@@ -108,28 +104,26 @@ V3D point_triangulation(const V2D& p1, const PinholeCamera& cam1,
 }
 
 // Triangulating endpoints for triangulation
-Line3d triangulate_endpoints(const Line2d& l1, const PinholeCamera& cam1,
-                                  const Line2d& l2, const PinholeCamera& cam2) 
+Line3d triangulate_endpoints(const Line2d& l1, const CameraView& view1,
+                                  const Line2d& l2, const CameraView& view2) 
 {
-    V3D pstart = point_triangulation(l1.start, cam1, l2.start, cam2);
-    V3D pend = point_triangulation(l1.end, cam1, l2.end, cam2);
+    V3D pstart = point_triangulation(l1.start, view1, l2.start, view2);
+    V3D pend = point_triangulation(l1.end, view1, l2.end, view2);
     return Line3d(pstart, pend);
 }
 
-// Asymmetric perspective to (cam1, l1)
+// Asymmetric perspective to (view1, l1)
 // Triangulation by plane intersection
-Line3d triangulate(const Line2d& l1, const PinholeCamera& cam1,
-                   const Line2d& l2, const PinholeCamera& cam2) 
+Line3d triangulate(const Line2d& l1, const CameraView& view1,
+                   const Line2d& l2, const CameraView& view2) 
 {
-    const M3D& K1 = cam1.K;
-    const M3D& K1_inv = cam1.K_inv;
-    const M3D& R1 = cam1.R;
-    const V3D& T1 = cam1.T;
+    const M3D K1_inv = view1.K_inv();
+    const M3D R1 = view1.R();
+    const V3D T1 = view1.T();
 
-    const M3D& K2 = cam2.K;
-    const M3D& K2_inv = cam2.K_inv;
-    const M3D& R2 = cam2.R;
-    const V3D& T2 = cam2.T;
+    const M3D K2_inv = view2.K_inv();
+    const M3D R2 = view2.R();
+    const V3D T2 = view2.T();
 
     V3D c1_start = R1.transpose() * K1_inv * V3D(l1.start[0], l1.start[1], 1);
     V3D c1_end = R1.transpose() * K1_inv * V3D(l1.end[0], l1.end[1], 1);
@@ -153,8 +147,8 @@ Line3d triangulate(const Line2d& l1, const PinholeCamera& cam1,
     if (z_start < EPS || z_end < EPS)
         return Line3d(V3D(0, 0, 0), V3D(1, 1, 1), -1.0);
     double d21, d22;
-    d21 = cam2.projdepth(l3d_start);
-    d22 = cam2.projdepth(l3d_end);
+    d21 = view2.pose.projdepth(l3d_start);
+    d22 = view2.pose.projdepth(l3d_end);
     if (d21 < EPS || d22 < EPS)
         return Line3d(V3D(0, 0, 0), V3D(1, 1, 1), -1.0);
 
@@ -165,24 +159,22 @@ Line3d triangulate(const Line2d& l1, const PinholeCamera& cam1,
         return Line3d(l3d_start, l3d_end, 1.0, z_start, z_end);
 }
 
-// Asymmetric perspective to (cam1, l1)
+// Asymmetric perspective to (view1, l1)
 // Triangulation with known direction
-Line3d triangulate_with_direction(const Line2d& l1, const PinholeCamera& cam1,
-                                  const Line2d& l2, const PinholeCamera& cam2,
+Line3d triangulate_with_direction(const Line2d& l1, const CameraView& view1,
+                                  const Line2d& l2, const CameraView& view2,
                                   const V3D& direction) 
 {
-    const M3D& K1 = cam1.K;
-    const M3D& K1_inv = cam1.K_inv;
-    const M3D& R1 = cam1.R;
-    const V3D& T1 = cam1.T;
+    const M3D K1_inv = view1.K_inv();
+    const M3D R1 = view1.R();
+    const V3D T1 = view1.T();
 
-    const M3D& K2 = cam2.K;
-    const M3D& K2_inv = cam2.K_inv;
-    const M3D& R2 = cam2.R;
-    const V3D& T2 = cam2.T;
-    
+    const M3D K2_inv = view2.K_inv();
+    const M3D R2 = view2.R();
+    const V3D T2 = view2.T();
+
     // Step 1: project direction onto plane 1
-    V3D n1 = getNormalDirection(l1, cam1);
+    V3D n1 = getNormalDirection(l1, view1);
     V3D direc = direction - (n1.dot(direction)) * n1;
     if (direc.norm() < EPS)
         return Line3d(V3D(0, 0, 0), V3D(1, 1, 1), -1.0);
@@ -204,7 +196,7 @@ Line3d triangulate_with_direction(const Line2d& l1, const PinholeCamera& cam1,
     // Step 3: min [(c1s * d1s - b)^2 + (c1e * d1e - b)^2]
     V3D C1 = -R1.transpose() * T1;
     V3D C2 = -R2.transpose() * T2;
-    V3D n2 = getNormalDirection(l2, cam2);
+    V3D n2 = getNormalDirection(l2, view2);
     double c1s = n2.dot(v1s);
     double c1e = n2.dot(v1e);
     double b = n2.dot(C2 - C1);
@@ -223,8 +215,8 @@ Line3d triangulate_with_direction(const Line2d& l1, const PinholeCamera& cam1,
     V3D lstart = d1s * v1s + C1;
     V3D lend = d1e * v1e + C1;
     double d21, d22;
-    d21 = cam2.projdepth(lstart);
-    d22 = cam2.projdepth(lend);
+    d21 = view2.pose.projdepth(lstart);
+    d22 = view2.pose.projdepth(lend);
     if (d21 < EPS || d22 < EPS)
         return Line3d(V3D(0, 0, 0), V3D(1, 1, 1), -1.0);
     return Line3d(lstart, lend, 1.0, d1s, d1e);

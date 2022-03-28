@@ -36,8 +36,8 @@ public:
     InfiniteLine3d(const V3D& p_, const V3D& direc_): p(p_), direc(direc_) {};
     InfiniteLine3d(const Line3d& line);
     V3D point_projection(const V3D& p3d) const;
-    InfiniteLine2d projection(const PinholeCamera& camera) const;
-    V3D unprojection(const V2D& p2d, const PinholeCamera& camera) const;
+    InfiniteLine2d projection(const CameraView& view) const;
+    V3D unprojection(const V2D& p2d, const CameraView& view) const;
 
     V3D p;
     V3D direc;
@@ -56,7 +56,7 @@ public:
     V2D wvec; // homogenous vector for SO(2)
 };
 
-Line3d GetLineSegmentFromInfiniteLine3d(const InfiniteLine3d& inf_line, const std::vector<PinholeCamera>& cameras, const std::vector<Line2d>& line2ds, const int num_outliers = 2); // cameras.size() == line2ds.size()
+Line3d GetLineSegmentFromInfiniteLine3d(const InfiniteLine3d& inf_line, const std::vector<CameraView>& views, const std::vector<Line2d>& line2ds, const int num_outliers = 2); // views.size() == line2ds.size()
 Line3d GetLineSegmentFromInfiniteLine3d(const InfiniteLine3d& inf_line, const std::vector<Line3d>& line3ds, const int num_outliers = 2);
 
 ////////////////////////////////////////////
@@ -133,7 +133,7 @@ bool CeresIntersect_InfiniteLine2d(const T p1[2], const T dir1[2], const T p2[2]
 
 template <typename T>
 bool GetIntersection2d(const T uvec[4], const T wvec[2], // MinimalLine
-                       const T kvec[4], const T qvec[4], const T tvec[3], // Camera
+                       const T kvec[4], const T qvec[4], const T tvec[3], // CameraView 
                        const T p_sample[2], const T dir_sample[2], // InfiniteLine2d sample
                        T xy[2]) 
 {
@@ -146,7 +146,7 @@ bool GetIntersection2d(const T uvec[4], const T wvec[2], // MinimalLine
 
 template <typename T>
 bool GetIntersection2d_line_coordinate(const T uvec[4], const T wvec[2], // MinimalLine
-                                       const T kvec[4], const T qvec[4], const T tvec[3], // Camera
+                                       const T kvec[4], const T qvec[4], const T tvec[3], // CameraView
                                        const T coor[3], // the line coordinate of the sample
                                        T xy[2]) 
 {

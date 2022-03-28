@@ -13,7 +13,7 @@ namespace lineKA {
 
 template <typename DTYPE, int CHANNELS>
 void LineKAEngine<DTYPE, CHANNELS>::Initialize(const std::vector<std::vector<Line2d>>& all_lines_2d,
-                                               const std::vector<PinholeCamera>& cameras) 
+                                               const std::vector<CameraView>& cameras) 
 {
     // initialize cameras
     for (auto it = cameras.begin(); it != cameras.end(); ++it) {

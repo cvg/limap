@@ -52,12 +52,12 @@ public:
 template <typename DTYPE, int CHANNELS>
 class RefinementEngine {
 private:
-    // p_cameras_ and p_heatmaps have same size with track.count_images(), and the order is the same as track.GetSortedImageIds()
+    // p_camviews_ and p_heatmaps have same size with track.count_images(), and the order is the same as track.GetSortedImageIds()
     RefinementConfig config_;
     LineTrack track_;
     // cameras are with the same order as track_.GetSortedImageIds()
-    std::vector<PinholeCamera> p_cameras_matrixform_; // original input, with matrices as attributes
-    std::vector<MinimalPinholeCamera> p_cameras_; 
+    std::vector<CameraView> p_camviews_matrixform_; // original input, with matrices as attributes
+    std::vector<MinimalPinholeCamera> p_camviews_; 
 
     // optimized line
     MinimalInfiniteLine3d inf_line_;
@@ -94,7 +94,7 @@ public:
     RefinementEngine(const RefinementConfig& cfg): config_(cfg) {}
 
     void Initialize(const LineTrack& track,
-                    const std::vector<PinholeCamera>& p_cameras); // the order of p_cameras conform that of track.GetSortedImageIds()
+                    const std::vector<CameraView>& p_views); // the order of p_camviews conform that of track.GetSortedImageIds()
     void InitializeVPs(const std::vector<vpdetection::VPResult>& p_vpresults);
     void InitializeHeatmaps(const std::vector<Eigen::MatrixXd>& p_heatmaps);
     void InitializeFeatures(const std::vector<py::array_t<DTYPE, py::array::c_style>>& p_featuremaps);

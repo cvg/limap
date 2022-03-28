@@ -45,15 +45,15 @@ public:
 
     Line2d GetLine2DRange(const LineTrack& track, 
                           const int image_id,
-                          const PinholeCamera& camera);
+                          const CameraView& view);
 
     PatchInfo<DTYPE> ExtractOneImage(const LineTrack& track,
                                      const int image_id,
-                                     const PinholeCamera& camera,
+                                     const CameraView& view,
                                      const py::array_t<DTYPE, py::array::c_style>& feature);
 
     void Extract(const LineTrack& track,
-                 const std::vector<PinholeCamera>& p_cameras,
+                 const std::vector<CameraView>& p_views,
                  const std::vector<py::array_t<DTYPE, py::array::c_style>>& p_features,
                  std::vector<PatchInfo<DTYPE>>& patchinfos);
 private:

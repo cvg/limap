@@ -47,24 +47,24 @@ V3D InfiniteLine3d::point_projection(const V3D& p3d) const {
     return p + (p3d - p).dot(dir) * dir;
 }
 
-InfiniteLine2d InfiniteLine3d::projection(const PinholeCamera& camera) const {
+InfiniteLine2d InfiniteLine3d::projection(const CameraView& view) const {
     InfiniteLine2d inf_line2d;
-    V2D p2d  = camera.projection(p);
-    V2D p2d_prime = camera.projection(p + direc * 1.0);
+    V2D p2d  = view.projection(p);
+    V2D p2d_prime = view.projection(p + direc * 1.0);
     inf_line2d.p = p2d;
     inf_line2d.direc = (p2d_prime - p2d).normalized();
 }
 
-V3D InfiniteLine3d::unprojection(const V2D& p2d, const PinholeCamera& camera) const {
+V3D InfiniteLine3d::unprojection(const V2D& p2d, const CameraView& view) const {
     // take the closest point along the 3D lines towards the camera ray
     // min |C0 + C1 * t1 + C2 * t2|^2, C0 = p1 - p2
     V3D p1, p2;
     V3D C0, C1, C2;
     p1 = p; 
-    p2 = camera.GetPosition(); 
+    p2 = view.pose.center(); 
     C0 = p1 - p2;
     C1 = direc;
-    C2 = camera.GetCameraRay(p2d);
+    C2 = view.ray_direction(p2d);
     C1 = C1.normalized(); C2 = C2.normalized();
     
     double A11, A12, A21, A22, B1, B2;
@@ -146,23 +146,23 @@ InfiniteLine3d MinimalInfiniteLine3d::GetInfiniteLine() const {
     return inf_line;
 }
 
-Line3d GetLineSegmentFromInfiniteLine3d(const InfiniteLine3d& inf_line, const std::vector<PinholeCamera>& cameras, const std::vector<Line2d>& line2ds, const int num_outliers) {
+Line3d GetLineSegmentFromInfiniteLine3d(const InfiniteLine3d& inf_line, const std::vector<CameraView>& views, const std::vector<Line2d>& line2ds, const int num_outliers) {
     // TODO: not sure this function is working.
-    THROW_CHECK_EQ(cameras.size(), line2ds.size());
+    THROW_CHECK_EQ(views.size(), line2ds.size());
     int n_lines = line2ds.size();
     V3D dir = inf_line.direc.normalized();
 
     std::vector<double> values;
     for (int i = 0; i < n_lines; ++i) {
-        const auto& cam = cameras[i];
+        const auto& view = views[i];
         const Line2d& line2d = line2ds[i];
-        InfiniteLine2d inf_line2d_proj = inf_line.projection(cam);
+        InfiniteLine2d inf_line2d_proj = inf_line.projection(view);
         // project the two 2D endpoints to the 2d projection of the infinite line
         V2D pstart_2d = inf_line2d_proj.point_projection(line2d.start);
-        V3D pstart_3d = inf_line.unprojection(pstart_2d, cam);
+        V3D pstart_3d = inf_line.unprojection(pstart_2d, view);
         double tstart = (pstart_3d - inf_line.p).dot(dir);
         V2D pend_2d = inf_line2d_proj.point_projection(line2d.end);
-        V3D pend_3d = inf_line.unprojection(pend_2d, cam);
+        V3D pend_3d = inf_line.unprojection(pend_2d, view);
         double tend = (pend_3d - inf_line.p).dot(dir);
 
         values.push_back(tstart);

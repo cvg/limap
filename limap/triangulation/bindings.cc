@@ -93,15 +93,15 @@ void bind_triangulator(py::module &m) {
         .def("InitAll", 
                 [] (Triangulator& self,
                     const std::vector<std::vector<Line2d>>& all_2d_segs,
-                    const std::vector<PinholeCamera>& cameras,
+                    const std::vector<CameraView>& views,
                     const std::vector<std::vector<Eigen::MatrixXi>>& all_matches,
                     const std::vector<std::vector<int>>& all_neighbors,
                     bool use_triangulate,
                     bool use_scoring) {
-                    return self.InitAll(all_2d_segs, cameras, all_matches, all_neighbors, use_triangulate, use_scoring);
+                    return self.InitAll(all_2d_segs, views, all_matches, all_neighbors, use_triangulate, use_scoring);
                 },
                 py::arg("all_2d_segs"),
-                py::arg("cameras"),
+                py::arg("views"),
                 py::arg("all_matches"),
                 py::arg("all_neighbors"),
                 py::arg("triangulate") = true,

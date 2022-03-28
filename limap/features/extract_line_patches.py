@@ -25,7 +25,7 @@ def get_extractor(cfg, channels):
     extractor = getattr(_features, patch_extractor_name)(lpe_options)
     return extractor
 
-def extract_line_patch_oneimage(cfg, track, img_id, camera, feature):
+def extract_line_patch_oneimage(cfg, track, img_id, camview, feature):
     '''
     Returns:
     _base.PatchInfo_fx
@@ -33,10 +33,10 @@ def extract_line_patch_oneimage(cfg, track, img_id, camera, feature):
     lpe_options = _features.LinePatchExtractorOptions(cfg)
     patch_extractor_name = "LinePatchExtractor_f64_c{0}".format(feature.shape[2])
     extractor = getattr(_features, patch_extractor_name)(lpe_options)
-    patch = extractor.ExtractOneImage(track, img_id, camera, feature)
+    patch = extractor.ExtractOneImage(track, img_id, camview, feature)
     return patch
 
-def extract_line_patches(cfg, track, p_cameras, p_features):
+def extract_line_patches(cfg, track, p_camviews, p_features):
     '''
     Returns:
     list of _base.PatchInfo_fx
@@ -44,6 +44,6 @@ def extract_line_patches(cfg, track, p_cameras, p_features):
     lpe_options = _features.LinePatchExtractorOptions(cfg)
     patch_extractor_name = "LinePatchExtractor_f64_c{0}".format(p_features[0].shape[2])
     extractor = getattr(_features, patch_extractor_name)(lpe_options)
-    patches = extractor.Extract(track, p_cameras, p_features)
+    patches = extractor.Extract(track, p_camviews, p_features)
     return patches
 

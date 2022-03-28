@@ -33,7 +33,7 @@ std::vector<int> ComputeLineTrackLabelsAvg(const Graph& graph,
 void MergeToLineTracks(Graph& graph,
                        std::vector<LineTrack>& linetracks,
                        const std::vector<std::vector<Line2d>>& all_lines_2d,
-                       const std::vector<PinholeCamera>& cameras,
+                       const std::vector<CameraView>& views,
                        const std::vector<std::vector<Line3d>>& all_lines_3d,
                        const std::vector<std::vector<int>>& neighbors,
                        LineLinker linker);

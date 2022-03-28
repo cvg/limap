@@ -38,43 +38,39 @@ Eigen::MatrixXd Line3d::as_array() const {
     return arr;
 }
 
-Line2d Line3d::projection(const PinholeCamera& camera) const {
+Line2d Line3d::projection(const CameraView& view) const {
     Line2d line2d;
-    V3D start_homo = camera.K * (camera.R * start + camera.T);
-    line2d.start[0] = start_homo[0] / start_homo[2];
-    line2d.start[1] = start_homo[1] / start_homo[2];
-    V3D end_homo = camera.K * (camera.R * end + camera.T);
-    line2d.end[0] = end_homo[0] / end_homo[2];
-    line2d.end[1] = end_homo[1] / end_homo[2];
+    line2d.start = view.projection(start);
+    line2d.end = view.projection(end);
     return line2d;
 }
 
-double Line3d::sensitivity(const PinholeCamera& camera) const {
-    Line2d line2d = projection(camera);
-    V3D dir3d = camera.GetCameraRay(line2d.midpoint());
+double Line3d::sensitivity(const CameraView& view) const {
+    Line2d line2d = projection(view);
+    V3D dir3d = view.ray_direction(line2d.midpoint());
     double cos_val = std::abs(direction().dot(dir3d));
     double angle = acos(cos_val) * 180.0 / M_PI;
     double sensitivity = 90 - angle;
     return sensitivity;
 }
 
-double Line3d::computeUncertainty(const PinholeCamera& camera, const double var2d) const {
-    double d1 = camera.projdepth(start);
-    double d2 = camera.projdepth(end);
+double Line3d::computeUncertainty(const CameraView& view, const double var2d) const {
+    double d1 = view.pose.projdepth(start);
+    double d2 = view.pose.projdepth(end);
     double d = (d1 + d2) / 2.0;
-    return camera.computeUncertainty(d, var2d);
+    return view.cam.uncertainty(d, var2d);
 }
 
-Line2d projection_line3d(const Line3d& line3d, const PinholeCamera& camera) {
-    return line3d.projection(camera);
+Line2d projection_line3d(const Line3d& line3d, const CameraView& view) {
+    return line3d.projection(view);
 }
 
-Line3d unprojection_line2d(const Line2d& line2d, const PinholeCamera& camera, const std::pair<double, double>& depths) {
+Line3d unprojection_line2d(const Line2d& line2d, const CameraView& view, const std::pair<double, double>& depths) {
     Line3d line3d;
     V3D start_homo = V3D(line2d.start[0], line2d.start[1], 1.0) * depths.first;
-    line3d.start = camera.R.transpose() * (camera.K_inv * start_homo - camera.T);
+    line3d.start = view.R().transpose() * (view.K_inv() * start_homo - view.T());
     V3D end_homo = V3D(line2d.end[0], line2d.end[1], 1.0) * depths.second;
-    line3d.end = camera.R.transpose() * (camera.K_inv * end_homo - camera.T);
+    line3d.end = view.R().transpose() * (view.K_inv() * end_homo - view.T());
     return line3d;
 }
 

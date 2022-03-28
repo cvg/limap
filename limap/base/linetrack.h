@@ -42,7 +42,7 @@ public:
     std::map<int, int> GetIndexMapforSorted() const;
     std::vector<int> GetIndexesforSorted() const;
     size_t count_images() const {return GetSortedImageIds().size(); }
-    std::vector<Line2d> projection(const std::vector<PinholeCamera>& cameras) const;
+    std::vector<Line2d> projection(const std::vector<CameraView>& views) const;
     std::map<int, std::vector<int>> GetIdMap() const; // (img_id, {index})
 
     void Resize(const size_t& n_lines);
@@ -63,7 +63,7 @@ void ComputeHeatmapSamples(const LineTrack& track,
                            const int n_samples); 
 
 void ComputeFConsistencySamples(const LineTrack& track,
-                                const std::map<int, PinholeCamera>& cameras, // {img_id, camera}
+                                const std::map<int, CameraView>& views, // {img_id, view}
                                 std::vector<std::tuple<int, InfiniteLine2d, std::vector<int>>>& fconsis_samples, // [ref_image_id, sample, {tgt_image_id(s)}]
                                 const std::pair<double, double> sample_range,
                                 const int n_samples);

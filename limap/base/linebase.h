@@ -43,14 +43,14 @@ public:
     V3D midpoint() const {return 0.5 * (start + end);}
     V3D direction() const {return (end - start).normalized();}
     Eigen::MatrixXd as_array() const;
-    Line2d projection(const PinholeCamera& camera) const;
-    double sensitivity(const PinholeCamera& camera) const; // in angle, 0 for perfect view, 90 for collapsing
-    double computeUncertainty(const PinholeCamera& camera, const double var2d=5.0) const;
+    Line2d projection(const CameraView& view) const;
+    double sensitivity(const CameraView& view) const; // in angle, 0 for perfect view, 90 for collapsing
+    double computeUncertainty(const CameraView& view, const double var2d=5.0) const;
 };
 
-Line2d projection_line3d(const Line3d& line3d, const PinholeCamera& camera);
+Line2d projection_line3d(const Line3d& line3d, const CameraView& view);
 
-Line3d unprojection_line2d(const Line2d& line2d, const PinholeCamera& camera, const std::pair<double, double>& depths);
+Line3d unprojection_line2d(const Line2d& line2d, const CameraView& view, const std::pair<double, double>& depths);
 
 void GetAllLines2D(const std::vector<Eigen::MatrixXd>& all_2d_segs,
                  std::vector<std::vector<Line2d>>& all_lines);

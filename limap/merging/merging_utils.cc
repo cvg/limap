@@ -32,11 +32,11 @@ void GetSegs3d(const std::vector<Line3d>& lines, std::vector<Eigen::MatrixXd>& s
     }
 }
 
-std::vector<Line3d> SetUncertaintySegs3d(const std::vector<Line3d>& lines, const PinholeCamera& camera, const double var2d) {
+std::vector<Line3d> SetUncertaintySegs3d(const std::vector<Line3d>& lines, const CameraView& view, const double var2d) {
     std::vector<Line3d> new_lines;
     for (size_t line_id = 0; line_id < lines.size(); ++line_id) {
         Line3d line = lines[line_id];
-        line.set_uncertainty(line.computeUncertainty(camera, var2d));
+        line.set_uncertainty(line.computeUncertainty(view, var2d));
         new_lines.push_back(line);
     }
     return new_lines;
@@ -44,14 +44,14 @@ std::vector<Line3d> SetUncertaintySegs3d(const std::vector<Line3d>& lines, const
 
 void CheckReprojection(std::vector<bool>& results,
                        const LineTrack& linetrack, 
-                       const std::vector<PinholeCamera>& cameras, 
+                       const std::vector<CameraView>& views, 
                        const double& th_angular2d, const double& th_perp2d)
 {
     results.clear();
     size_t num_supports = linetrack.count_lines();
     for (size_t i = 0; i < num_supports; ++i) {
         const Line2d& line2d = linetrack.line2d_list[i];
-        Line2d line2d_projection = linetrack.line.projection(cameras[linetrack.image_id_list[i]]); 
+        Line2d line2d_projection = linetrack.line.projection(views[linetrack.image_id_list[i]]); 
         double angle = compute_angle<Line2d>(line2d, line2d_projection);
         if (angle > th_angular2d) {
             results.push_back(false);
@@ -68,7 +68,7 @@ void CheckReprojection(std::vector<bool>& results,
 
 void FilterSupportingLines(std::vector<LineTrack>& new_linetracks, 
                            const std::vector<LineTrack>& linetracks, 
-                           const std::vector<PinholeCamera>& cameras, 
+                           const std::vector<CameraView>& views, 
                            const double& th_angular2d, const double& th_perp2d,
                            const int num_outliers) 
 {
@@ -77,7 +77,7 @@ void FilterSupportingLines(std::vector<LineTrack>& new_linetracks,
     for (size_t track_id = 0; track_id < num_tracks; ++track_id) {
         const auto& track = linetracks[track_id];
         std::vector<bool> results;
-        CheckReprojection(results, track, cameras, th_angular2d, th_perp2d);
+        CheckReprojection(results, track, views, th_angular2d, th_perp2d);
         size_t num_supports = track.count_lines();
         THROW_CHECK_EQ(num_supports, results.size());
         LineTrack newtrack;
@@ -101,17 +101,17 @@ void FilterSupportingLines(std::vector<LineTrack>& new_linetracks,
 
 void CheckSensitivity(std::vector<bool>& results,
                       const LineTrack& linetrack,
-                      const std::vector<PinholeCamera>& cameras,
+                      const std::vector<CameraView>& views,
                       const double& th_angular3d)
 {
     results.clear();
     size_t num_supports = linetrack.count_lines();
     for (size_t i = 0; i < num_supports; ++i) {
         // get line3d at the camera coordinate system
-        const PinholeCamera& camera = cameras[linetrack.image_id_list[i]];
+        const CameraView& view = views[linetrack.image_id_list[i]];
 
         // project and get camera ray corresponding to midpoint 
-        double sensi = linetrack.line.sensitivity(camera);
+        double sensi = linetrack.line.sensitivity(view);
 
         // compute angle
         if (sensi > th_angular3d)
@@ -123,7 +123,7 @@ void CheckSensitivity(std::vector<bool>& results,
 
 void FilterTracksBySensitivity(std::vector<LineTrack>& new_linetracks,
                                const std::vector<LineTrack>& linetracks,
-                               const std::vector<PinholeCamera>& cameras,
+                               const std::vector<CameraView>& views,
                                const double& th_angular3d, const int& min_support_ns)
 {
     new_linetracks.clear();
@@ -132,7 +132,7 @@ void FilterTracksBySensitivity(std::vector<LineTrack>& new_linetracks,
         size_t num_supports = track.count_lines();
 
         std::vector<bool> results;
-        CheckSensitivity(results, track, cameras, th_angular3d);
+        CheckSensitivity(results, track, views, th_angular3d);
         std::set<int> support_images;
         for (size_t i = 0; i < num_supports; ++i) {
             if (results[i])
@@ -147,7 +147,7 @@ void FilterTracksBySensitivity(std::vector<LineTrack>& new_linetracks,
 
 void FilterTracksByOverlap(std::vector<LineTrack>& new_linetracks,
                            const std::vector<LineTrack>& linetracks,
-                           const std::vector<PinholeCamera>& cameras,
+                           const std::vector<CameraView>& views,
                            const double& th_overlap, const int& min_support_ns)
 {
     new_linetracks.clear();
@@ -157,7 +157,7 @@ void FilterTracksByOverlap(std::vector<LineTrack>& new_linetracks,
 
         std::set<int> support_images;
         for (size_t i = 0; i < num_supports; ++i) {
-            Line2d line2d_proj = track.line.projection(cameras[track.image_id_list[i]]);
+            Line2d line2d_proj = track.line.projection(views[track.image_id_list[i]]);
             Line2d line2d = track.line2d_list[i];
             double overlap = compute_overlap<Line2d>(line2d_proj, line2d);
             if (overlap >= th_overlap)

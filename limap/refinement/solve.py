@@ -1,7 +1,7 @@
 from _limap import _base, _ceresbase, _refinement
 import numpy as np
 
-def solve(cfg, track, p_cameras, p_vpresults=None, p_heatmaps=None, p_patches=None, p_features=None, dtype="float16"):
+def solve(cfg, track, p_camviews, p_vpresults=None, p_heatmaps=None, p_patches=None, p_features=None, dtype="float16"):
     '''
     p_patches: list of PatchInfo_f objects
     '''
@@ -21,8 +21,8 @@ def solve(cfg, track, p_cameras, p_vpresults=None, p_heatmaps=None, p_patches=No
     # print("Refinement type: ", rf_engine_name)
     rf_engine = getattr(_refinement, rf_engine_name)(rf_config)
 
-    # initialize track and camera
-    rf_engine.Initialize(track, p_cameras)
+    # initialize track and camview
+    rf_engine.Initialize(track, p_camviews)
 
     # initialize data interpolator
     if p_vpresults is not None:

@@ -15,7 +15,7 @@ def UndistortImageCamera(camera, imname_in, imname_out):
         img = cv2.imread(imname_in)
         cv2.imwrite(imname_out, img)
         return camera
-    camera_undistorted = _undistortion._Undistort(imname_in, camera, imname_out)
+    camera_undistorted = _undistortion._UndistortCameraView(imname_in, camera, imname_out)
     return camera_undistorted
 
 def UndistortImageCamera_OPENCV(camera, imname_in, imname_out):

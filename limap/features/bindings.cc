@@ -29,10 +29,10 @@ void bind_extractor_dtype(py::module& m, std::string type_suffix) {
         .def("ExtractOneImage", &LPExtractor::ExtractOneImage)
         .def("Extract", [] (LPExtractor& extractor,
                             const LineTrack& track, 
-                            const std::vector<PinholeCamera>& p_cameras, 
+                            const std::vector<CameraView>& p_views, 
                             const std::vector<py::array_t<DTYPE, py::array::c_style>>& p_features) {
             std::vector<PatchInfo<DTYPE>> patchinfos;
-            extractor.Extract(track, p_cameras, p_features, patchinfos);
+            extractor.Extract(track, p_views, p_features, patchinfos);
             return patchinfos;
         });
 }

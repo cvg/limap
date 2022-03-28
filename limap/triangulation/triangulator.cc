@@ -24,12 +24,12 @@ void Triangulator::offsetHalfPixel() {
 }
 
 void Triangulator::Init(const std::vector<std::vector<Line2d>>& all_2d_segs,
-                        const std::vector<PinholeCamera>& cameras) 
+                        const std::vector<CameraView>& views) 
 {
     all_lines_2d_ = all_2d_segs;
     if (config_.add_halfpix)
         offsetHalfPixel();
-    cameras_ = cameras;
+    views_ = views;
     
     // compute vanishing points (optional)
     if (config_.use_vp) {
@@ -193,13 +193,13 @@ void Triangulator::InitExhaustiveMatchImage(const int img_id,
 }
 
 void Triangulator::InitAll(const std::vector<std::vector<Line2d>>& all_2d_segs,
-                           const std::vector<PinholeCamera>& cameras,
+                           const std::vector<CameraView>& views,
                            const std::vector<std::vector<Eigen::MatrixXi>>& all_matches,
                            const std::vector<std::vector<int>>& all_neighbors,
                            bool use_triangulate,
                            bool use_scoring)
 {
-    Init(all_2d_segs, cameras);
+    Init(all_2d_segs, views);
     InitMatches(all_matches, all_neighbors, use_triangulate, use_scoring);
 }
 
@@ -228,7 +228,7 @@ int Triangulator::countEdges() const {
 void Triangulator::triangulateOneNode(const int img_id, const int line_id) {
     auto& connections = edges_[img_id][line_id];
     const Line2d& l1 = all_lines_2d_[img_id][line_id];
-    const PinholeCamera& cam1 = cameras_[img_id];
+    const CameraView& view1 = views_[img_id];
     int n_conns = connections.size();
     std::vector<std::vector<TriTuple>> results(n_conns);
 #pragma omp parallel for
@@ -236,27 +236,27 @@ void Triangulator::triangulateOneNode(const int img_id, const int line_id) {
         int ng_img_id = connections[conn_id].first;
         int ng_line_id = connections[conn_id].second;
         const Line2d& l2 = all_lines_2d_[ng_img_id][ng_line_id];
-        const PinholeCamera& cam2 = cameras_[ng_img_id];
+        const CameraView& view2 = views_[ng_img_id];
 
         // test degeneracy by plane angle
-        V3D n1 = getNormalDirection(l1, cam1);
-        V3D n2 = getNormalDirection(l2, cam2);
+        V3D n1 = getNormalDirection(l1, view1);
+        V3D n2 = getNormalDirection(l2, view2);
         double plane_angle = acos(std::abs(n1.dot(n2))) * 180.0 / M_PI;
         if (plane_angle < config_.plane_angle_threshold)
             continue;
 
         // test weak epipolar constraints
-        double IoU = compute_epipolar_IoU(l1, cam1, l2, cam2);
+        double IoU = compute_epipolar_IoU(l1, view1, l2, view2);
         if (IoU < config_.IoU_threshold)
             continue;
 
         // triangulation with weak epipolar constraints test
-        Line3d line = triangulate(l1, cam1, l2, cam2);
-        if (line.sensitivity(cam1) > config_.sensitivity_threshold && line.sensitivity(cam2) > config_.sensitivity_threshold)
+        Line3d line = triangulate(l1, view1, l2, view2);
+        if (line.sensitivity(view1) > config_.sensitivity_threshold && line.sensitivity(view2) > config_.sensitivity_threshold)
             line.score = -1;
         if (line.score > 0) {
-            double u1 = line.computeUncertainty(cam1, config_.var2d);
-            double u2 = line.computeUncertainty(cam2, config_.var2d);
+            double u1 = line.computeUncertainty(view1, config_.var2d);
+            double u2 = line.computeUncertainty(view2, config_.var2d);
             line.uncertainty = std::min(u1, u2);
             results[conn_id].push_back(std::make_tuple(line, -1.0, std::make_pair(ng_img_id, ng_line_id)));
         }
@@ -265,22 +265,22 @@ void Triangulator::triangulateOneNode(const int img_id, const int line_id) {
         if (config_.use_vp) {
             // vp1
             if (vpresults_[img_id].HasVP(line_id)) {
-                V3D direc = getDirectionFromVP(vpresults_[img_id].GetVP(line_id), cam1);
-                Line3d line = triangulate_with_direction(l1, cam1, l2, cam2, direc);
+                V3D direc = getDirectionFromVP(vpresults_[img_id].GetVP(line_id), view1);
+                Line3d line = triangulate_with_direction(l1, view1, l2, view2, direc);
                 if (line.score > 0) {
-                    double u1 = line.computeUncertainty(cam1, config_.var2d);
-                    double u2 = line.computeUncertainty(cam2, config_.var2d);
+                    double u1 = line.computeUncertainty(view1, config_.var2d);
+                    double u2 = line.computeUncertainty(view2, config_.var2d);
                     line.uncertainty = std::min(u1, u2);
                     results[conn_id].push_back(std::make_tuple(line, -1.0, std::make_pair(ng_img_id, ng_line_id)));
                 }
             }
             // vp2
             if (vpresults_[ng_img_id].HasVP(ng_line_id)) {
-                V3D direc = getDirectionFromVP(vpresults_[ng_img_id].GetVP(ng_line_id), cam1);
-                Line3d line = triangulate_with_direction(l1, cam1, l2, cam2, direc);
+                V3D direc = getDirectionFromVP(vpresults_[ng_img_id].GetVP(ng_line_id), view1);
+                Line3d line = triangulate_with_direction(l1, view1, l2, view2, direc);
                 if (line.score > 0) {
-                    double u1 = line.computeUncertainty(cam1, config_.var2d);
-                    double u2 = line.computeUncertainty(cam2, config_.var2d);
+                    double u1 = line.computeUncertainty(view1, config_.var2d);
+                    double u2 = line.computeUncertainty(view2, config_.var2d);
                     line.uncertainty = std::min(u1, u2);
                     results[conn_id].push_back(std::make_tuple(line, -1.0, std::make_pair(ng_img_id, ng_line_id)));
                 }
@@ -332,7 +332,7 @@ void Triangulator::scoreOneNode(const int img_id, const int line_id, const LineL
         const Line3d& l1 = std::get<0>(tris[i]);
         int img_id = std::get<2>(tris[i]).first;
         int line_id = std::get<2>(tris[i]).second;
-        const PinholeCamera& cam1 = cameras_[img_id];
+        const CameraView& view1 = views_[img_id];
         for (size_t j = 0; j < n_tris; ++j) {
             if (i == j)
                 continue;
@@ -341,11 +341,11 @@ void Triangulator::scoreOneNode(const int img_id, const int line_id, const LineL
             int ng_line_id = std::get<2>(tris[j]).second;
             if (ng_img_id == img_id)
                 continue;
-            const PinholeCamera& cam2 = cameras_[ng_img_id];
+            const CameraView& view2 = views_[ng_img_id];
             double score3d = linker.compute_score_3d(l1, l2);
             if (score3d == 0)
                 continue;
-            double score2d = linker.compute_score_2d(l1.projection(cam2), all_lines_2d_[ng_img_id][ng_line_id]);
+            double score2d = linker.compute_score_2d(l1.projection(view2), all_lines_2d_[ng_img_id][ng_line_id]);
             if (score2d == 0)
                 continue;
             double score = std::min(score3d, score2d);
@@ -519,16 +519,16 @@ void Triangulator::RunClustering() {
     for (auto it = edges.begin(); it != edges.end(); ++it) {
         int img_id1 = it->first.first; int line_id1 = it->first.second;
         int img_id2 = it->second.first; int line_id2 = it->second.second;
-        PinholeCamera& cam1 = cameras_[img_id1];
-        PinholeCamera& cam2 = cameras_[img_id2];
+        const CameraView& view1 = views_[img_id1];
+        const CameraView& view2 = views_[img_id2];
         const Line3d& line1 = std::get<0>(getBestTri(img_id1, line_id1));
         const Line3d& line2 = std::get<0>(getBestTri(img_id2, line_id2));
         Line2d& line2d1 = all_lines_2d_[img_id1][line_id1];
         Line2d& line2d2 = all_lines_2d_[img_id2][line_id2];
 
         double score_3d = linker_clustering.compute_score_3d(line1, line2);
-        double score_2d_1to2 = linker_clustering.compute_score_2d(line1.projection(cam2), line2d2);
-        double score_2d_2to1 = linker_clustering.compute_score_2d(line2.projection(cam1), line2d1);
+        double score_2d_1to2 = linker_clustering.compute_score_2d(line1.projection(view2), line2d2);
+        double score_2d_2to1 = linker_clustering.compute_score_2d(line2.projection(view1), line2d1);
         double score_2d = std::min(score_2d_1to2, score_2d_2to1);
         double score = std::min(score_3d, score_2d);
         score = score_3d;
