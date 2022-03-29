@@ -291,13 +291,13 @@ def vis_3d_lines(lines, img_hw=(600, 800), counts=None, n_visible_views=2, range
         print("[n_visible_views = {0}] number of 3d segments: {1}".format(n_visible_views, counter_seg3d))
     plotter.show()
 
-def report_dist_reprojection(line3d, line2d, camera, prefix=None):
+def report_dist_reprojection(line3d, line2d, camview, prefix=None):
     import limap.base as _base
-    line2d_proj = line3d.projection(camera)
+    line2d_proj = line3d.projection(camview)
     angle = _base.compute_distance_2d(line2d, line2d_proj, _base.LineDistType.ANGULAR)
     perp_dist = _base.compute_distance_2d(line2d, line2d_proj, _base.LineDistType.PERPENDICULAR_ONEWAY)
     overlap = _base.compute_distance_2d(line2d_proj, line2d, _base.LineDistType.OVERLAP)
-    sensitivity = line3d.sensitivity(camera)
+    sensitivity = line3d.sensitivity(camview)
     if prefix is None:
         print("angle = {0:.4f}, perp = {1:.4f}, overlap = {2:.4f}, sensi = {3:.4f}".format(angle, perp_dist, overlap, sensitivity))
     else:
@@ -308,7 +308,7 @@ def visualize_2d_line(fname, imname_list, all_lines_2d, img_id, line_id, resize_
     img = draw_segments(img, [all_lines_2d[img_id][line_id].as_array().reshape(-1)], (0, 255, 0))
     cv2.imwrite(fname, img)
 
-def visualize_line_track(imname_list, linetrack, prefix='linetrack', resize_hw=None, max_image_dim=None, cameras=None):
+def visualize_line_track(imname_list, linetrack, prefix='linetrack', resize_hw=None, max_image_dim=None, camviews=None):
     print("[VISUALIZE]: line length: {0}, num_supporting_lines: {1}".format(linetrack.line.length(), len(linetrack.image_id_list)))
     for idx, (img_id, line2d) in enumerate(zip(linetrack.image_id_list, linetrack.line2d_list)):
         img = utils.read_image(imname_list[img_id], resize_hw=resize_hw, max_image_dim=max_image_dim, set_gray=False)
@@ -322,9 +322,9 @@ def visualize_line_track(imname_list, linetrack, prefix='linetrack', resize_hw=N
         # rgba[:,:,3] = 127
         # rgba[valid_mask, :3] = blank_image[valid_mask]
         # rgba[valid_mask, 3] = 255
-        if cameras is not None:
-            report_dist_reprojection(linetrack.line, line2d, cameras[img_id], prefix="Reprojecting to line {0} (img {1}, line {2})".format(idx, img_id, linetrack.line_id_list[idx]))
-            line2d_proj = linetrack.line.projection(cameras[img_id])
+        if camviews is not None:
+            report_dist_reprojection(linetrack.line, line2d, camviews[img_id], prefix="Reprojecting to line {0} (img {1}, line {2})".format(idx, img_id, linetrack.line_id_list[idx]))
+            line2d_proj = linetrack.line.projection(camviews[img_id])
             img = draw_segments(img, [line2d_proj.as_array().reshape(-1)], (255, 0, 0), thickness=1)
         img = draw_segments(img, [line2d.as_array().reshape(-1)], (0, 0, 255), thickness=1)
         fname = os.path.join('tmp', '{0}.{1}.{2}.png'.format(prefix, idx, os.path.basename(imname_list[img_id])[:-4]))

@@ -18,13 +18,13 @@ def process_eth3d_scene(cfg, dataset_eth3d, reso_type, scene_id, cam_id=0):
     if cfg["info_path"] is None:
         imname_list, camviews, neighbors, ranges, cam_id_list = read_infos_colmap(tmp_cfg, dataset_eth3d.scene_dir, model_path=dataset_eth3d.sparse_folder, image_path=dataset_eth3d.image_folder, max_image_dim=cfg["max_image_dim"])
         with open(os.path.join("tmp", "infos_eth3d.npy"), 'wb') as f:
-            camviews_np = [[view.K(), view.R(), view.T()[:,None].repeat(3, 1)] for view in camviews]
+            camviews_np = [view.as_dict() for view in camviews]
             np.savez(f, imname_list=imname_list, camviews_np=camviews_np, neighbors=neighbors, ranges=ranges, cam_id_list=cam_id_list)
     else:
         with open(cfg["info_path"], 'rb') as f:
             data = np.load(f, allow_pickle=True)
             imname_list, camviews_np, neighbors, ranges, cam_id_list = data["imname_list"], data["camviews_np"], data["neighbors"], data["ranges"], data["cam_id_list"]
-            camviews = [_base.CameraView(_base.Camera(view[0]), _base.CameraPose(view[1], view[2][:,0])) for view in camviews_np]
+            camviews = [_base.CameraView(view_np) for view_np in camviews_np]
 
     # filter by camera ids for eth3d
     if dataset_eth3d.cam_id != -1:
@@ -37,8 +37,8 @@ def process_eth3d_scene(cfg, dataset_eth3d, reso_type, scene_id, cam_id=0):
 def parse_config():
     import argparse
     arg_parser = argparse.ArgumentParser(description='triangulate 3d lines')
-    arg_parser.add_argument('-c', '--config_file', type=str, default='cfgs/eth3d_triangulation.yaml', help='config file')
-    arg_parser.add_argument('--default_config_file', type=str, default='cfgs/default_triangulation.yaml', help='default config file')
+    arg_parser.add_argument('-c', '--config_file', type=str, default='cfgs/triangulation/eth3d_triangulation.yaml', help='config file')
+    arg_parser.add_argument('--default_config_file', type=str, default='cfgs/triangulation/default_triangulation.yaml', help='default config file')
     arg_parser.add_argument('--info_reuse', action='store_true', help="whether to use infonpy at tmp/infos_eth3d.npy")
     arg_parser.add_argument('--info_path', type=str, default=None, help='load precomputed info')
 

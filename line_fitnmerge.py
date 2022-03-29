@@ -53,6 +53,9 @@ def line_fitnmerge(cfg, imname_list, camviews, depths, neighbors=None, ranges=No
         cfg["fitting"]["var2d"] = cfg["var2d"][cfg["line2d"]["detector"]]
     if cfg["merging"]["var2d"] == -1:
         cfg["merging"]["var2d"] = cfg["var2d"][cfg["line2d"]["detector"]]
+    if (max_image_dim is not None) and max_image_dim != -1:
+        for camview in camviews:
+            camview.cam.set_max_image_dim(cfg["max_image_dim"])
 
     ##########################################################
     # [A] sfm metainfos (neighbors, ranges)
