@@ -30,22 +30,21 @@ def ReadModelBundler(bundler_path, list_path, model_path, max_image_dim=None):
     counter += 1
 
     # construct SfmModel instance
+    camviews = []
     model = _pointsfm.SfmModel()
-    cameras = []
-    # read cameras
+    # read camviews
     for image_id in tqdm(range(n_images)):
-        # read K and dist coeffs
+        # read camera
         line = lines[counter].strip('\n').split(' ')
         f, k1, k2 = float(line[0]), float(line[1]), float(line[2])
         counter += 1
         img_hw = cv2.imread(imname_list[image_id]).shape[:2]
         K = np.zeros((3, 3))
-        K[0, 0] = K[1, 1] = f
-        K[0, 2] = img_hw[1] / 2.0
-        K[1, 2] = img_hw[0] / 2.0
-        dist_coeffs = np.zeros((8))
-        dist_coeffs[0], dist_coeffs[1] = k1, k2
-        # read R
+        cx = img_hw[1] / 2.0
+        cy = img_hw[0] / 2.0
+        params = [f, cx, cy, k1, k2]
+        camera = _base.Camera("RADIAL", params, cam_id=image_id, hw=img_hw)
+        # read pose
         R = np.zeros((3, 3))
         for row_id in range(3):
             line = lines[counter].strip('\n').split(' ')
@@ -53,18 +52,16 @@ def ReadModelBundler(bundler_path, list_path, model_path, max_image_dim=None):
             counter += 1
         R[1,:] = -R[1,:] # for bundler format
         R[2,:] = -R[2,:] # for bundler format
-        # read T
         T = np.zeros((3))
         line = lines[counter].strip('\n').split(' ')
         T[0], T[1], T[2] = float(line[0]), float(line[1]), float(line[2])
         T[1:] = -T[1:] # for bundler format
         counter += 1
-        camera = _base.Camera(K, R, T, dist_coeffs)
-        if (max_image_dim is not None) and (max_image_dim != -1):
-            camera.set_max_image_dim(max_image_dim)
-        cameras.append(camera)
+        pose = _base.CameraPose(R, T)
+        camview = _base.CameraView(cam, pose)
+        camviews.append(camview)
         # add image
-        image = _pointsfm.SfmImage(imname_list[image_id], img_hw[1], img_hw[0], K.reshape(-1).tolist(), R.reshape(-1).tolist(), T.tolist())
+        image = _pointsfm.SfmImage(imname_list[image_id], img_hw[1], img_hw[0], camview.K().reshape(-1).tolist(), camview.R().reshape(-1).tolist(), camview.T().tolist())
         model.addImage(image)
 
     # read points
@@ -82,5 +79,5 @@ def ReadModelBundler(bundler_path, list_path, model_path, max_image_dim=None):
             subcounter += 4
         model.addPoint(x, y, z, track)
         counter += 1
-    return model, imname_list, cameras
+    return model, imname_list, camviews
 
