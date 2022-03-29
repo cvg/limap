@@ -16,19 +16,19 @@ def process_eth3d_scene(cfg, dataset_eth3d, reso_type, scene_id, cam_id=0):
     tmp_cfg = copy.deepcopy(cfg)
     tmp_cfg["n_neighbors"] = 100000 # collect enough neighbors for cam id filtering
     if cfg["info_path"] is None:
-        imname_list, camviews, neighbors, ranges, cam_id_list = read_infos_colmap(tmp_cfg, dataset_eth3d.scene_dir, model_path=dataset_eth3d.sparse_folder, image_path=dataset_eth3d.image_folder, max_image_dim=cfg["max_image_dim"])
+        imname_list, camviews, neighbors, ranges = read_infos_colmap(tmp_cfg, dataset_eth3d.scene_dir, model_path=dataset_eth3d.sparse_folder, image_path=dataset_eth3d.image_folder, max_image_dim=cfg["max_image_dim"])
         with open(os.path.join("tmp", "infos_eth3d.npy"), 'wb') as f:
             camviews_np = [view.as_dict() for view in camviews]
-            np.savez(f, imname_list=imname_list, camviews_np=camviews_np, neighbors=neighbors, ranges=ranges, cam_id_list=cam_id_list)
+            np.savez(f, imname_list=imname_list, camviews_np=camviews_np, neighbors=neighbors, ranges=ranges)
     else:
         with open(cfg["info_path"], 'rb') as f:
             data = np.load(f, allow_pickle=True)
-            imname_list, camviews_np, neighbors, ranges, cam_id_list = data["imname_list"], data["camviews_np"], data["neighbors"], data["ranges"], data["cam_id_list"]
+            imname_list, camviews_np, neighbors, ranges = data["imname_list"], data["camviews_np"], data["neighbors"], data["ranges"]
             camviews = [_base.CameraView(view_np) for view_np in camviews_np]
 
     # filter by camera ids for eth3d
     if dataset_eth3d.cam_id != -1:
-        imname_list, camviews, neighbors = filter_by_cam_id(dataset_eth3d.cam_id, imname_list, camviews, neighbors, cam_id_list)
+        imname_list, camviews, neighbors = filter_by_cam_id(dataset_eth3d.cam_id, imname_list, camviews, neighbors)
     neighbors = [neighbor[:cfg["n_neighbors"]] for neighbor in neighbors]
 
     # run triangulation

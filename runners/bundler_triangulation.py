@@ -33,7 +33,7 @@ def load_all_infos_bundler(cfg, bundler_path, list_path, model_path):
             imname_list, camviews, neighbors, ranges = read_infos_bundler(cfg, bundler_path, list_path, model_path, max_image_dim=cfg["max_image_dim"])
         with open(os.path.join("tmp", "infos_bundler.npy"), 'wb') as f:
             camviews_np = [[view.K(), view.R(), view.T()[:,None].repeat(3, 1)] for view in camviews]
-            np.savez(f, imname_list=imname_list, camviews_np=camviews_np, neighbors=neighbors, ranges=ranges, cam_id_list=cam_id_list)
+            np.savez(f, imname_list=imname_list, camviews_np=camviews_np, neighbors=neighbors, ranges=ranges)
 
     else:
         with open(cfg["info_path"], 'rb') as f:

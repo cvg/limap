@@ -80,14 +80,12 @@ def ReadInfosFromModel(model, colmap_path, model_path="sparse", image_path="imag
         camview_dict[imname] = view
 
     # map to the correct order
-    # TODO: remove cam_id_list
-    imname_list, camviews, cam_id_list = [], [], []
+    imname_list, camviews = [], []
     for imname in image_names:
         imname_list.append(os.path.join(image_path, imname))
         view = camview_dict[imname]
         camviews.append(view)
-        cam_id_list.append(view.cam.cam_id())
-    return imname_list, camviews, cam_id_list
+    return imname_list, camviews
 
 def ReadInfos(colmap_path, model_path="sparse", image_path="images", max_image_dim=None, check_undistorted=True):
     model = _pointsfm.SfmModel()
