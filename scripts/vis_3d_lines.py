@@ -1,7 +1,5 @@
-'''
-Used for visualization with scp
-Visualization lines_to_vis.npy
-'''
+import os, sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 from core.visualize import vis_3d_lines, save_obj
 from eval_hypersim import read_lines_from_input
