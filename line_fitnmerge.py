@@ -56,6 +56,9 @@ def line_fitnmerge(cfg, imname_list, camviews, depths, neighbors=None, ranges=No
     if (max_image_dim is not None) and max_image_dim != -1:
         for camview in camviews:
             camview.cam.set_max_image_dim(cfg["max_image_dim"])
+    if (resize_hw is not None):
+        for camview in camviews:
+            camview.cam.resize(resize_hw[1], resize_hw[0])
 
     ##########################################################
     # [A] sfm metainfos (neighbors, ranges)

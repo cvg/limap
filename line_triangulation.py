@@ -111,6 +111,9 @@ def line_triangulation(cfg, imname_list, camviews, neighbors=None, ranges=None, 
     if (max_image_dim is not None) and max_image_dim != -1:
         for camview in camviews:
             camview.cam.set_max_image_dim(cfg["max_image_dim"])
+    if (resize_hw is not None):
+        for camview in camviews:
+            camview.cam.resize(resize_hw[1], resize_hw[0])
     if valid_index_list is not None:
         assert len(valid_index_list) == len(imname_list)
 

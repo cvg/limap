@@ -20,8 +20,8 @@ def estimate_seg3d_from_depth(seg2d, depth, cam, hw, ransac_th=0.75, min_percent
     seg1_pts_homo = np.vstack([seg1_pts, np.ones((1, seg1_pts.shape[1]))])
     unprojected = np.linalg.inv(K) @ seg1_pts_homo
     unprojected = unprojected * seg1_depths
-    segment_3d_pts = (R.T @ unprojected) - (R.T @ T)[:, None].repeat(unprojected.shape[1], 1)
-    if segment_3d_pts.shape[1] <= 6:
+    points = (R.T @ unprojected) - (R.T @ T)[:, None].repeat(unprojected.shape[1], 1)
+    if points.shape[1] <= 6:
         return None
 
     # fitting
@@ -29,7 +29,7 @@ def estimate_seg3d_from_depth(seg2d, depth, cam, hw, ransac_th=0.75, min_percent
     ransac_th = ransac_th * uncertainty
     options = _fit.LORansacOptions()
     options.squared_inlier_threshold_ = ransac_th * ransac_th
-    result = _fit.Fit3DPoints(segment_3d_pts, options)
+    result = _fit.Fit3DPoints(points, options)
     line, stats = result[0], result[1]
     if stats.inlier_ratio < min_percentage_inliers:
         return None

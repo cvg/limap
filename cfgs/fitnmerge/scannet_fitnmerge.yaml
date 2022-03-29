@@ -4,7 +4,7 @@
 data_dir: "/local/home/shaoliu/data/ScanNet"
 scene_id: "scene0678_01"
 max_image_dim: 800 
-stride: 10
+stride: 5 
 
 # sfm config
 sfm:

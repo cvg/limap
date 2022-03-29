@@ -24,6 +24,8 @@ std::pair<Line3d, ransac_lib::RansacStatistics> Fit3DPoints(const Eigen::Matrix3
         double projection = (p - best_model.p).dot(direc);
         projections.push_back(projection);
     }
+    if (projections.empty())
+        return std::make_pair(Line3d(), ransac_stats);
     std::sort(projections.begin(), projections.end());
     size_t n_projs = projections.size();
     Eigen::Vector3d start = best_model.p + direc * projections[0];

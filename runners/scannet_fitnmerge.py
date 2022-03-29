@@ -1,6 +1,7 @@
 import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
+from tqdm import tqdm
 from core.dataset import ScanNet
 import core.utils as utils
 
@@ -34,6 +35,7 @@ def process_scannet_scene(cfg, dataset_scannet, scene_id):
         neighbors[neighbors == index] = idx
 
     # get depth
+    print("Start loading depth maps...")
     depths = []
     for imname in tqdm(imname_list):
         depth = dataset_scannet.get_depth(imname)
