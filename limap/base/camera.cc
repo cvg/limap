@@ -202,6 +202,66 @@ CameraView MinimalPinholeCamera::GetCameraView() const {
     return view;
 }
 
+Camera::Camera(py::dict dict) {
+    // load data
+    int model_id;
+    ASSIGN_PYDICT_ITEM(dict, model_id, int);
+    std::vector<double> params;
+    ASSIGN_PYDICT_ITEM(dict, params, std::vector<double>);
+    int cam_id;
+    ASSIGN_PYDICT_ITEM(dict, cam_id, int);
+    int height, width;
+    ASSIGN_PYDICT_ITEM(dict, height, int);
+    ASSIGN_PYDICT_ITEM(dict, width, int);
+
+    // set camera
+    SetModelId(model_id);
+    THROW_CHECK_EQ(params.size(), NumParams());
+    SetParams(params);
+    SetCameraId(cam_id);
+    SetHeight(height);
+    SetWidth(width);
+}
+
+py::dict Camera::as_dict() const {
+    py::dict output;
+    output["model_id"] = ModelId();
+    output["params"] = params();
+    output["cam_id"] = CameraId();
+    output["height"] = h();
+    output["width"] = w();
+    return output;
+}
+
+CameraPose::CameraPose(py::dict dict) {
+    ASSIGN_PYDICT_ITEM(dict, qvec, V4D);
+    ASSIGN_PYDICT_ITEM(dict, tvec, V3D);
+}
+
+py::dict CameraPose::as_dict() const {
+    py::dict output;
+    output["qvec"] = qvec;
+    output["tvec"] = tvec;
+    return output;
+}
+
+CameraView::CameraView(py::dict dict) {
+    cam = Camera(dict);
+    pose = CameraPose(dict);
+}
+
+py::dict CameraView::as_dict() const {
+    py::dict output;
+    output["model_id"] = cam.ModelId();
+    output["params"] = cam.params();
+    output["cam_id"] = cam.CameraId();
+    output["height"] = cam.h();
+    output["width"] = cam.w();
+    output["qvec"] = pose.qvec;
+    output["tvec"] = pose.tvec;
+    return output;
+}
+
 MinimalPinholeCamera cam2minimalcam(const CameraView& view) {
     MinimalPinholeCamera cam = MinimalPinholeCamera(view);
     return cam;

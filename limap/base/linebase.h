@@ -17,6 +17,7 @@ namespace limap {
 class Line2d {
 public:
     Line2d() {}
+    Line2d(const Eigen::MatrixXd& seg2d);
     Line2d(V2D start, V2D end, double score=-1);
     V2D start, end;
     double score = -1;

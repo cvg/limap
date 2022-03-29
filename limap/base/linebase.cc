@@ -9,6 +9,13 @@ Line2d::Line2d(V2D start_, V2D end_, double score_) {
     score = score_;
 }
 
+Line2d::Line2d(const Eigen::MatrixXd& seg) {
+    THROW_CHECK_EQ(seg.rows(), 2);
+    THROW_CHECK_EQ(seg.cols(), 2);
+    start = V2D(seg(0, 0), seg(0, 1));
+    end = V2D(seg(1, 0), seg(1, 1));
+}
+
 Eigen::MatrixXd Line2d::as_array() const {
     Eigen::MatrixXd arr(2, 2);
     arr(0, 0) = start[0]; arr(0, 1) = start[1];

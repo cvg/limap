@@ -55,15 +55,15 @@ def run_colmap_triangulation(cfg, colmap_path, model_path="sparse", image_path="
     Run triangulation from COLMAP input
     '''
     if cfg["info_path"] is None:
-        imname_list, camviews, neighbors, ranges, _ = read_infos_colmap(cfg, colmap_path, model_path=model_path, image_path=image_path, max_image_dim=cfg["max_image_dim"])
+        imname_list, camviews, neighbors, ranges, cam_id_list = read_infos_colmap(cfg, colmap_path, model_path=model_path, image_path=image_path, max_image_dim=cfg["max_image_dim"])
         with open(os.path.join("tmp", "infos_colmap.npy"), 'wb') as f:
-            camviews_np = [[view.K(), view.R(), view.T()[:,None].repeat(3, 1)] for view in camviews]
+            camviews_np = [view.as_dict() for view in camviews]
             np.savez(f, imname_list=imname_list, camviews_np=camviews_np, neighbors=neighbors, ranges=ranges, cam_id_list=cam_id_list)
     else:
         with open(cfg["info_path"], 'rb') as f:
             data = np.load(f, allow_pickle=True)
             imname_list, camviews_np, neighbors, ranges, cam_id_list = data["imname_list"], data["camviews_np"], data["neighbors"], data["ranges"], data["cam_id_list"]
-            camviews = [_base.CameraView(_base.Camera(view[0]), _base.CameraPose(view[1], view[2][:,0])) for view in camviews_np]
+            camviews = [_base.CameraView(view_np) for view_np in camviews_np]
 
     # run triangulation
     line_triangulation(cfg, imname_list, camviews, neighbors=neighbors, ranges=ranges, max_image_dim=cfg["max_image_dim"])

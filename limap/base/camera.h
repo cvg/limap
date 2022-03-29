@@ -4,12 +4,15 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <pybind11/eigen.h>
+#include <pybind11/stl.h>
 #include <cmath>
 #include <fstream>
 
 namespace py = pybind11;
 
 #include "util/types.h"
+#include "_limap/helpers.h"
+
 #include <colmap/base/camera.h>
 #include <colmap/base/camera_models.h>
 #include <colmap/base/pose.h>
@@ -39,13 +42,15 @@ public:
     Camera(M3D K, int cam_id=-1, std::pair<int, int> hw=std::make_pair<int, int>(-1, -1));
     Camera(int model_id, M3D K, int cam_id=-1, std::pair<int, int> hw=std::make_pair<int, int>(-1, -1));
     Camera(const std::string& model_name, M3D K, int cam_id=-1, std::pair<int, int> hw=std::make_pair<int, int>(-1, -1));
+    Camera(py::dict dict);
 
+    py::dict as_dict() const;
     void resize(const size_t width, const size_t height) { Rescale(width, height); }
     void set_max_image_dim(const int& val);
     M3D K() const { return CalibrationMatrix(); }
     M3D K_inv() const { return K().inverse(); }
-    double h() const { return Height(); }
-    double w() const { return Width(); }
+    int h() const { return Height(); }
+    int w() const { return Width(); }
     std::vector<double> params() const { return Params(); }
     
     double uncertainty(double depth, double var2d = 5.0) const;
@@ -56,10 +61,12 @@ public:
     CameraPose() {}
     CameraPose(V4D qqvec, V3D ttvec): qvec(qqvec), tvec(ttvec) {}
     CameraPose(M3D R, V3D T): tvec(T) { qvec = colmap::RotationMatrixToQuaternion(R); }
+    CameraPose(py::dict dict);
 
     V4D qvec;
     V3D tvec;
 
+    py::dict as_dict() const;
     M3D R() const { return colmap::QuaternionToRotationMatrix(qvec); }
     V3D T() const { return tvec; }
 
@@ -71,14 +78,16 @@ class CameraView {
 public:
     CameraView() {}
     CameraView(const Camera& input_cam, const CameraPose& input_pose): cam(input_cam), pose(input_pose) {}
+    CameraView(py::dict dict);
 
     Camera cam;
     CameraPose pose;
     
+    py::dict as_dict() const;
     M3D K() const { return cam.K(); }
     M3D K_inv() const { return cam.K_inv(); }
-    double h() const { return cam.h(); }
-    double w() const { return cam.w(); }
+    int h() const { return cam.h(); }
+    int w() const { return cam.w(); }
     M3D R() const { return pose.R(); }
     V3D T() const { return pose.T(); }
 
