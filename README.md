@@ -2,7 +2,6 @@
 
 ## TODO
 
-* [ ] Change camera base class definition
 * [ ] Abstract Detection, Matching, Fitting and Merging 
 * [ ] Remove OpenCV dependency for pytlsd
 
