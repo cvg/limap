@@ -43,8 +43,3 @@ def quaternion2rotmat(quad):
     rot_mat[2,2] = 1 - 2 * (qi ** 2 + qj ** 2)
     return rot_mat
 
-def rotmat2quaternion(rotmat):
-    from mathutils import Matrix
-    quad = Matrix(rotmat).to_quaternion()
-    return quad
-
