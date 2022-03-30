@@ -3,7 +3,6 @@
 ## TODO
 
 * [ ] Abstract Detection, Matching, Fitting and Merging 
-* [ ] Remove OpenCV dependency for pytlsd
 
 ## Dependencies
 * CMake >= 3.17
