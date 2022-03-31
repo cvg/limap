@@ -20,7 +20,8 @@ if __name__ == '__main__':
     lines, _, _ = read_lines_from_input(args.input_dir, n_visible_views=args.n_visible_views)
     lines = np.array([line.as_array() for line in lines])
     counts = np.array([args.n_visible_views for line in lines])
-    vis_3d_lines(lines, img_hw, counts=counts, n_visible_views=args.n_visible_views)
     if args.save_obj:
         save_obj('output.obj', lines, counts, n_visible_views = args.n_visible_views)
+    else:
+        vis_3d_lines(lines, img_hw, counts=counts, n_visible_views=args.n_visible_views)
 
