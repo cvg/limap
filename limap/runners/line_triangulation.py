@@ -30,6 +30,8 @@ def line_triangulation(cfg, imname_list, camviews, neighbors=None, ranges=None, 
             camview.cam.resize(resize_hw[1], resize_hw[0])
     if valid_index_list is not None:
         assert len(valid_index_list) == len(imname_list)
+    if neighbors is not None:
+        neighbors = [neighbor[:cfg["n_neighbors"]] for neighbor in neighbors]
 
     ##########################################################
     # [A] sfm metainfos (neighbors, ranges)

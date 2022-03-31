@@ -58,6 +58,8 @@ def line_fitnmerge(cfg, imname_list, camviews, depths, neighbors=None, ranges=No
     if (resize_hw is not None):
         for camview in camviews:
             camview.cam.resize(resize_hw[1], resize_hw[0])
+    if neighbors is not None:
+        neighbors = [neighbor[:cfg["n_neighbors"]] for neighbor in neighbors]
 
     ##########################################################
     # [A] sfm metainfos (neighbors, ranges)

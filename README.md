@@ -2,7 +2,11 @@
 
 ## TODO
 
-* [ ] Abstract Detection, Matching, Fitting and Merging 
+* [ ] Abstract detection, matching, fitting, merging.
+* [ ] Refactor IO.
+* [ ] Port undistortion and feature extraction.
+* [ ] Merge image name into CameraView.
+* [ ] CameraRig optimization.
 
 ## Dependencies
 * CMake >= 3.17
