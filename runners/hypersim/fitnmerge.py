@@ -9,8 +9,8 @@ import core.utils as utils
 import limap.runners
 
 def run_scene_hypersim(cfg, dataset, scene_id, cam_id=0):
-    imname_list, camviews, depths = read_scene_hypersim(cfg, dataset, scene_id, cam_id=cam_id, load_depth=True)
-    linetracks = limap.runners.line_fitnmerge(cfg, imname_list, camviews, depths, max_image_dim=cfg["max_image_dim"])
+    camviews, depths = read_scene_hypersim(cfg, dataset, scene_id, cam_id=cam_id, load_depth=True)
+    linetracks = limap.runners.line_fitnmerge(cfg, camviews, depths)
     return linetracks
 
 def parse_config():

@@ -212,21 +212,21 @@ def make_bigimage(imgs, pad=20):
     imgs_collections.append(imgs_now)
     return cat_to_bigimage(imgs_collections, (n_rows, n_cols), pad=pad)
 
-def tmp_visualize_2d_segs(imname_list, all_2d_segs, resize_hw=None, max_image_dim=None):
+def tmp_visualize_2d_segs(camviews, all_2d_segs):
     n_vis_images = 10
-    for image_id, (imname, segs) in enumerate(zip(imname_list[:n_vis_images], all_2d_segs[:n_vis_images])):
-        img = utils.read_image(imname, resize_hw=resize_hw, max_image_dim=max_image_dim)
+    for image_id, (camview, segs) in enumerate(zip(camviews[:n_vis_images], all_2d_segs[:n_vis_images])):
+        img = utils.imread_camview(camview)
         img = draw_segments(img, segs, (0, 255, 0))
         fname = os.path.join('tmp', 'img_{0}_det.png'.format(image_id))
         cv2.imwrite(fname, img)
 
-def tmp_visualize_2d_segs_on_one_image(imname, segs, resize_hw=None, max_image_dim=None):
-    img = utils.read_image(imname, resize_hw=resize_hw, max_image_dim=max_image_dim)
+def tmp_visualize_2d_segs_on_one_image(camview, segs):
+    img = utils.imread_camview(camview)
     n_lines = segs.shape[0]
     for idx in range(n_lines):
         img_new = copy.deepcopy(img)
         draw_segments(img_new, [segs[idx]], (0, 255, 0))
-        fname = os.path.join('tmp', 'vis_line{1}_sold2det.png'.format(imname[:-4], idx))
+        fname = os.path.join('tmp', 'vis_line{1}_sold2det.png'.format(camview.image_name()[:-4], idx))
         cv2.imwrite(fname, img_new)
     draw_segments(img, segs, (0, 255, 0))
     fname = os.path.join('tmp', 'vis_all_lines_sold2det.png')
@@ -303,32 +303,23 @@ def report_dist_reprojection(line3d, line2d, camview, prefix=None):
     else:
         print("{4}: angle = {0:.4f}, perp = {1:.4f}, overlap = {2:.4f}, sensi = {3:.4f}".format(angle, perp_dist, overlap, sensitivity, prefix))
 
-def visualize_2d_line(fname, imname_list, all_lines_2d, img_id, line_id, resize_hw=None, max_image_dim=None):
-    img = utils.read_image(imname_list[img_id], resize_hw=resize_hw, max_image_dim=max_image_dim, set_gray=False)
+def visualize_2d_line(fname, camviews, all_lines_2d, img_id, line_id):
+    img = utils.imread_camview(camviews[img_id])
     img = draw_segments(img, [all_lines_2d[img_id][line_id].as_array().reshape(-1)], (0, 255, 0))
     cv2.imwrite(fname, img)
 
-def visualize_line_track(imname_list, linetrack, prefix='linetrack', resize_hw=None, max_image_dim=None, camviews=None):
+def visualize_line_track(camviews, linetrack, prefix='linetrack', report=False):
     print("[VISUALIZE]: line length: {0}, num_supporting_lines: {1}".format(linetrack.line.length(), len(linetrack.image_id_list)))
     for idx, (img_id, line2d) in enumerate(zip(linetrack.image_id_list, linetrack.line2d_list)):
-        img = utils.read_image(imname_list[img_id], resize_hw=resize_hw, max_image_dim=max_image_dim, set_gray=False)
+        img = utils.imread_camview(camviews[img_id], set_gray=False)
         if len(img.shape) == 2:
             img = img[:,:,None].repeat(3, 2)
-        # img = (img.astype(float) * 0.5).astype(np.uint8)
-        # blank_image = np.zeros((img.shape[0], img.shape[1], 3))
-        # blank_image = draw_segments(blank_image, [line2d.as_array().reshape(-1)], (0, 0, 255), thickness=3)
-        # rgba = cv2.cvtColor(img, cv2.COLOR_RGB2RGBA)
-        # valid_mask = (blank_image > 0).sum(2).astype(bool)
-        # rgba[:,:,3] = 127
-        # rgba[valid_mask, :3] = blank_image[valid_mask]
-        # rgba[valid_mask, 3] = 255
         if camviews is not None:
             report_dist_reprojection(linetrack.line, line2d, camviews[img_id], prefix="Reprojecting to line {0} (img {1}, line {2})".format(idx, img_id, linetrack.line_id_list[idx]))
             line2d_proj = linetrack.line.projection(camviews[img_id])
             img = draw_segments(img, [line2d_proj.as_array().reshape(-1)], (255, 0, 0), thickness=1)
         img = draw_segments(img, [line2d.as_array().reshape(-1)], (0, 0, 255), thickness=1)
-        fname = os.path.join('tmp', '{0}.{1}.{2}.png'.format(prefix, idx, os.path.basename(imname_list[img_id])[:-4]))
-        # print(fname)
+        fname = os.path.join('tmp', '{0}.{1}.{2}.png'.format(prefix, idx, os.path.basename(camviews[img_id].image_name())[:-4]))
         cv2.imwrite(fname, img)
 
 def vis_vpresult(img, lines, vpres, show_original=False):

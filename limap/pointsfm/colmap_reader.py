@@ -25,7 +25,7 @@ def ComputeNeighborsSorted(model, n_neighbors, min_triangulation_angle=1.0, neig
     neighbors = n2
     return neighbors
 
-def ReadInfos(model, colmap_path, model_path="sparse", image_path="images", max_image_dim=None, check_undistorted=True):
+def ReadInfos(model, colmap_path, model_path="sparse", image_path="images", check_undistorted=True):
     print("Start loading COLMAP sparse reconstruction.")
     image_names = model.GetImageNames()
     model_path = os.path.join(colmap_path, model_path)
@@ -58,14 +58,13 @@ def ReadInfos(model, colmap_path, model_path="sparse", image_path="images", max_
         cam_id = colmap_image.camera_id
         camera = cam_dict[cam_id]
         pose = _base.CameraPose(colmap_image.qvec, colmap_image.tvec)
-        view = _base.CameraView(camera, pose)
+        view = _base.CameraView(camera, pose, image_name=os.path.join(image_path, imname))
         camview_dict[imname] = view
 
     # map to the correct order
-    imname_list, camviews = [], []
+    camviews = []
     for imname in image_names:
-        imname_list.append(os.path.join(image_path, imname))
         view = camview_dict[imname]
         camviews.append(view)
-    return imname_list, camviews
+    return camviews
 

@@ -248,6 +248,11 @@ py::dict CameraPose::as_dict() const {
 CameraView::CameraView(py::dict dict) {
     cam = Camera(dict);
     pose = CameraPose(dict);
+
+    // load image name
+    std::string image_name;
+    ASSIGN_PYDICT_ITEM(dict, image_name, std::string);
+    SetImageName(image_name);
 }
 
 py::dict CameraView::as_dict() const {
@@ -259,6 +264,7 @@ py::dict CameraView::as_dict() const {
     output["width"] = cam.w();
     output["qvec"] = pose.qvec;
     output["tvec"] = pose.tvec;
+    output["image_name"] = image_name_;
     return output;
 }
 

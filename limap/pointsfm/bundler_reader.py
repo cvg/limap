@@ -5,7 +5,7 @@ import numpy as np
 import cv2
 from tqdm import tqdm
 
-def ReadModelBundler(bundler_path, list_path, model_path, max_image_dim=None):
+def ReadModelBundler(bundler_path, list_path, model_path):
     ################################
     # read imname_list
     ################################
@@ -37,7 +37,8 @@ def ReadModelBundler(bundler_path, list_path, model_path, max_image_dim=None):
         line = lines[counter].strip('\n').split(' ')
         f, k1, k2 = float(line[0]), float(line[1]), float(line[2])
         counter += 1
-        img_hw = cv2.imread(imname_list[image_id]).shape[:2]
+        imname = imname_list[image_id]
+        img_hw = cv2.imread(imname).shape[:2]
         K = np.zeros((3, 3))
         cx = img_hw[1] / 2.0
         cy = img_hw[0] / 2.0
@@ -57,10 +58,10 @@ def ReadModelBundler(bundler_path, list_path, model_path, max_image_dim=None):
         T[1:] = -T[1:] # for bundler format
         counter += 1
         pose = _base.CameraPose(R, T)
-        camview = _base.CameraView(cam, pose)
+        camview = _base.CameraView(cam, pose, image_name=imname)
         camviews.append(camview)
         # add image
-        image = _pointsfm.SfmImage(imname_list[image_id], img_hw[1], img_hw[0], camview.K().reshape(-1).tolist(), camview.R().reshape(-1).tolist(), camview.T().tolist())
+        image = _pointsfm.SfmImage(imname, img_hw[1], img_hw[0], camview.K().reshape(-1).tolist(), camview.R().reshape(-1).tolist(), camview.T().tolist())
         model.addImage(image)
 
     # read points
@@ -78,5 +79,5 @@ def ReadModelBundler(bundler_path, list_path, model_path, max_image_dim=None):
             subcounter += 4
         model.addPoint(x, y, z, track)
         counter += 1
-    return model, imname_list, camviews
+    return model, camviews
 

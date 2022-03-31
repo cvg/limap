@@ -13,18 +13,17 @@ def read_scene_hypersim(cfg, dataset, scene_id, cam_id=0, load_depth=False):
     index_list = np.arange(0, cfg["input_n_views"], cfg["input_stride"]).tolist()
     index_list = dataset.filter_index_list(index_list, cam_id=cam_id)
 
-    # get imname_list
-    imname_list = []
-    for image_id in index_list:
-        imname = dataset.load_imname(image_id, cam_id=cam_id)
-        imname_list.append(imname)
-
-    # get cameras
+    # get camviews
     K = dataset.K.astype(np.float32)
     img_hw = [dataset.h, dataset.w]
     Ts, Rs = dataset.load_cameras(cam_id=cam_id)
     cameras = [_base.Camera("SIMPLE_PINHOLE", K, cam_id=0, hw=img_hw)]
-    camviews = [_base.CameraView(cameras[0], _base.CameraPose(Rs[idx], Ts[idx])) for idx in index_list]
+    camviews = []
+    for image_id in index_list:
+        pose = _base.CameraPose(Rs[image_id], Ts[image_id])
+        imname = dataset.load_imname(image_id, cam_id=cam_id)
+        camview = _base.CameraView(cameras[0], pose, image_name=imname)
+        camviews.append(camview)
 
     if load_depth:
         # get depths
@@ -32,11 +31,7 @@ def read_scene_hypersim(cfg, dataset, scene_id, cam_id=0, load_depth=False):
         for image_id in index_list:
             depth = dataset.load_depth(image_id, cam_id=cam_id)
             depths.append(depth)
-        return imname_list, camviews, depths
+        return camviews, depths
     else:
-        return imname_list, camviews
-
-    # fit and merge
-    line_fitnmerge(cfg, imname_list, camviews, depths, max_image_dim=cfg["max_image_dim"])
-
+        return camviews
 

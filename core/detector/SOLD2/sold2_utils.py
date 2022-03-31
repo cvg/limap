@@ -7,13 +7,13 @@ import joblib
 import utils
 import torch
 
-def sold2_detect_2d_segs_on_images(imname_list, resize_hw=None, max_image_dim=None, set_gray=True, heatmap_dir=None, descriptor_dir=None, max_num_2d_segs=3000):
+def sold2_detect_2d_segs_on_images(camviews, set_gray=True, heatmap_dir=None, descriptor_dir=None, max_num_2d_segs=3000):
     all_2d_segs, descriptors, heatmaps, descinfos = [], [], [], []
-    print("Start sold2 line detection (n_images = {0}).".format(len(imname_list)))
-    for idx, imname in enumerate(tqdm(imname_list)):
-        img = utils.read_image(imname, resize_hw=resize_hw, max_image_dim=max_image_dim, set_gray=set_gray)
+    print("Start sold2 line detection (n_images = {0}).".format(len(camviews)))
+    for idx, camview in enumerate(tqdm(camviews)):
+        img = utils.imread_camview(camview, set_gray=set_gray)
         segs, descriptor, heatmap, descinfo = sold2_detect(img)
-        if segs.shape[0] < max_num_2d_segs:
+        if segs.shape[0] > max_num_2d_segs:
             lengths_squared = (segs[:,2] - segs[:,0]) ** 2 + (segs[:,3] - segs[:,1]) ** 2
             indexes = np.argsort(lengths_squared)[::-1][:max_num_2d_segs]
             segs = segs[indexes,:]
@@ -24,18 +24,14 @@ def sold2_detect_2d_segs_on_images(imname_list, resize_hw=None, max_image_dim=No
         if heatmap_dir is not None:
             if not os.path.exists(heatmap_dir):
                 os.makedirs(heatmap_dir)
-            with open(os.path.join(heatmap_dir, 'imname_list.npy'), 'wb') as f:
-                np.savez(f, imname_list=imname_list)
             with open(os.path.join(heatmap_dir, "heatmap_{0}.npy".format(idx)), "wb") as f:
                 np.savez(f, data=heatmap)
         if descriptor_dir is not None:
             if not os.path.exists(descriptor_dir):
                 os.makedirs(descriptor_dir)
-            with open(os.path.join(descriptor_dir, 'imname_list.npy'), 'wb') as f:
-                np.savez(f, imname_list=imname_list)
             with open(os.path.join(descriptor_dir, "descriptor_{0}.npy".format(idx)), "wb") as f:
                 np.savez(f, data=descriptor)
-        # print("Finishing sold2 line detection (num_lines={0}) on image (id={1}): {2}.".format(len(segs), idx, imname))
+        # print("Finishing sold2 line detection (num_lines={0}) on image (id={1}): {2}.".format(len(segs), idx, camview.image_name()))
     torch.cuda.empty_cache()
     return all_2d_segs, descinfos
 
@@ -52,26 +48,24 @@ def sold2_compute_descinfos_with_descriptors(all_2d_segs, descriptors):
         torch.cuda.empty_cache()
     return descinfos
 
-def sold2_compute_descinfos(imname_list, all_2d_segs, resize_hw=None, max_image_dim=None, set_gray=True, descinfo_dir=None):
+def sold2_compute_descinfos(camviews, all_2d_segs, set_gray=True, descinfo_dir=None):
     detector = SOLD2LineDetector()
     descinfos = []
     n_images = len(all_2d_segs)
     print("Start computing sold2 desciptors for line segments (n_images = {0}).".format(n_images))
     for idx in tqdm(range(n_images)):
         segs = all_2d_segs[idx]
-        imname = imname_list[idx]
+        camview = camviews[idx]
         if descinfo_dir is not None:
             fname = os.path.join(descinfo_dir, "descinfo_{0}.npy".format(idx))
             if os.path.isfile(fname):
                 continue
-        img = utils.read_image(imname, resize_hw=resize_hw, max_image_dim=max_image_dim, set_gray=set_gray)
+        img = utils.imread_camview(camview, set_gray=set_gray)
         _, descriptor, _, _ = sold2_detect(img, detector)
         descinfo = sold2_compute_descinfo(segs, descriptor, detector)
         if descinfo_dir is not None:
             if not os.path.exists(descinfo_dir):
                 os.makedirs(descinfo_dir)
-            with open(os.path.join(descinfo_dir, 'imname_list.npy'), 'wb') as f:
-                np.savez(f, imname_list=imname_list)
             with open(os.path.join(descinfo_dir, "descinfo_{0}.npy".format(idx)), "wb") as f:
                 arr = descinfo
                 if len(arr) == 2:

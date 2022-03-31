@@ -77,7 +77,7 @@ public:
 class CameraView {
 public:
     CameraView() {}
-    CameraView(const Camera& input_cam, const CameraPose& input_pose): cam(input_cam), pose(input_pose) {}
+    CameraView(const Camera& input_cam, const CameraPose& input_pose, const std::string& image_name = "none"): cam(input_cam), pose(input_pose), image_name_(image_name) {}
     CameraView(py::dict dict);
 
     Camera cam;
@@ -93,6 +93,13 @@ public:
 
     V2D projection(const V3D& p3d) const;
     V3D ray_direction(const V2D& p2d) const;
+
+    // image
+    void SetImageName(const std::string& image_name) { image_name_ = image_name; }
+    std::string image_name() const { return image_name_; }
+
+private:
+    std::string image_name_;
 };
 
 // used for optimization

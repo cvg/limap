@@ -347,7 +347,7 @@ void bind_camera(py::module& m) {
 
     py::class_<CameraView>(m, "CameraView")
         .def(py::init<>())
-        .def(py::init<const Camera&, const CameraPose&>())
+        .def(py::init<const Camera&, const CameraPose&, const std::string&>(), py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
         .def(py::init<py::dict>())
         .def_readwrite("cam", &CameraView::cam)
         .def_readwrite("pose", &CameraView::pose)
@@ -359,7 +359,9 @@ void bind_camera(py::module& m) {
         .def("R", &CameraView::R)
         .def("T", &CameraView::T)
         .def("projection", &CameraView::projection)
-        .def("ray_direction", &CameraView::ray_direction);
+        .def("ray_direction", &CameraView::ray_direction)
+        .def("image_name", &CameraView::image_name)
+        .def("set_image_name", &CameraView::SetImageName);
 }
 
 template <typename DTYPE>

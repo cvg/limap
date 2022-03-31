@@ -39,7 +39,7 @@ def fit_3d_segs(all_2d_segs, camviews, depths, fitting_config):
     seg3d_list = joblib.Parallel(n_jobs=fitting_config["n_jobs"])(joblib.delayed(process)(all_2d_segs, camviews_np, depths, fitting_config, idx) for idx in tqdm(range(n_images)))
     return seg3d_list
 
-def line_fitnmerge(cfg, imname_list, camviews, depths, neighbors=None, ranges=None, resize_hw=None, max_image_dim=None):
+def line_fitnmerge(cfg, camviews, depths, neighbors=None, ranges=None):
     '''
     Args:
     - image_names: list of imname
@@ -47,17 +47,11 @@ def line_fitnmerge(cfg, imname_list, camviews, depths, neighbors=None, ranges=No
     - depths: list of depth images
     '''
     # assertion check
-    cfg = _runners.setup(cfg, imname_list, camviews, max_image_dim=None)
+    cfg = _runners.setup(cfg, camviews)
     if cfg["fitting"]["var2d"] == -1:
         cfg["fitting"]["var2d"] = cfg["var2d"][cfg["line2d"]["detector"]]
     if cfg["merging"]["var2d"] == -1:
         cfg["merging"]["var2d"] = cfg["var2d"][cfg["line2d"]["detector"]]
-    if (max_image_dim is not None) and max_image_dim != -1:
-        for camview in camviews:
-            camview.cam.set_max_image_dim(cfg["max_image_dim"])
-    if (resize_hw is not None):
-        for camview in camviews:
-            camview.cam.resize(resize_hw[1], resize_hw[0])
     if neighbors is not None:
         neighbors = [neighbor[:cfg["n_neighbors"]] for neighbor in neighbors]
 
@@ -65,12 +59,12 @@ def line_fitnmerge(cfg, imname_list, camviews, depths, neighbors=None, ranges=No
     # [A] sfm metainfos (neighbors, ranges)
     ##########################################################
     if neighbors is None:
-        neighbors, ranges = _runners.compute_sfminfos(cfg, imname_list, camviews, resize_hw=resize_hw, max_image_dim=max_image_dim)
+        neighbors, ranges = _runners.compute_sfminfos(cfg, camviews)
 
     ##########################################################
     # [B] get 2D line segments for each image
     ##########################################################
-    all_2d_segs, _ = _runners.compute_2d_segs(cfg, imname_list, resize_hw=resize_hw, max_image_dim=max_image_dim, compute_descinfo=False)
+    all_2d_segs, _ = _runners.compute_2d_segs(cfg, camviews, compute_descinfo=False)
 
     ##########################################################
     # [C] fit 3d segments

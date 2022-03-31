@@ -9,8 +9,8 @@ import core.utils as utils
 import limap.runners
 
 def run_scene_scannet(cfg, dataset, scene_id):
-    imname_list, camviews, neighbors = read_scene_scannet(cfg, dataset, scene_id, load_depth=False)
-    linetracks = limap.runners.line_triangulation(cfg, imname_list, camviews, neighbors=neighbors, max_image_dim=cfg["max_image_dim"])
+    camviews, neighbors = read_scene_scannet(cfg, dataset, scene_id, load_depth=False)
+    linetracks = limap.runners.line_triangulation(cfg, camviews, neighbors=neighbors)
     return linetracks
 
 def parse_config():

@@ -8,18 +8,8 @@ import read_write_model as colmap_utils
 import database
 from pathlib import Path
 
-def read_image(imname, resize_hw=None, max_image_dim=None):
-    img = cv2.imread(imname)
-    if resize_hw is not None:
-        img = cv2.resize(img, (resize_hw[1], resize_hw[0]))
-    if (max_image_dim is not None) and max_image_dim != -1:
-        hw_now = img.shape[:2]
-        ratio = max_image_dim / max(hw_now[0], hw_now[1])
-        if ratio < 1.0:
-            h_new = int(hw_now[0] * ratio)
-            w_new = int(hw_now[1] * ratio)
-            img = cv2.resize(img, (w_new, h_new))
-    return img
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+from limap.base import imread_camview
 
 def run_colmap_sift_matches(image_path, db_path, use_cuda=False):
     ### [COLMAP] feature extraction and matching
@@ -56,7 +46,7 @@ def run_hloc_matches(cfg, image_path, db_path):
     reconstruction.import_matches(image_ids, db_path, sfm_pairs, match_path, None, None)
     triangulation.geometric_verification("colmap", db_path, sfm_pairs)
 
-def run_colmap_sfm_with_known_poses(cfg, imname_list, camviews, resize_hw=None, max_image_dim=None, output_path='tmp/tmp_colmap', use_cuda=False, overwrite=True):
+def run_colmap_sfm_with_known_poses(cfg, camviews, output_path='tmp/tmp_colmap', use_cuda=False, overwrite=True):
     ### initialize sparse folder
     if os.path.exists(output_path) and overwrite:
         shutil.rmtree(output_path)
@@ -74,8 +64,8 @@ def run_colmap_sfm_with_known_poses(cfg, imname_list, camviews, resize_hw=None, 
         os.makedirs(model_path)
 
     ### copy images to tmp folder
-    for img_id, imname in enumerate(imname_list):
-        img = read_image(imname, resize_hw=resize_hw, max_image_dim=max_image_dim)
+    for img_id, camview in enumerate(camviews):
+        img = imread_camview(camview)
         fname_to_save = os.path.join(image_path, 'image{0:08d}.png'.format(img_id))
         cv2.imwrite(fname_to_save, img)
 
@@ -106,7 +96,7 @@ def run_colmap_sfm_with_known_poses(cfg, imname_list, camviews, resize_hw=None, 
 
     ### write images.txt
     # [IMPORTANT] get image id from the database
-    num_images = len(imname_list)
+    num_images = len(camviews)
     db = database.COLMAPDatabase(db_path)
     rows = db.execute("SELECT * from images")
     colmap_images = {}

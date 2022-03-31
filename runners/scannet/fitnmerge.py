@@ -9,8 +9,8 @@ import core.utils as utils
 import limap.runners
 
 def run_scene_scannet(cfg, dataset, scene_id):
-    imname_list, camviews, neighbors, depths = read_scene_scannet(cfg, dataset, scene_id, load_depth=True)
-    linetracks = limap.runners.line_fitnmerge(cfg, imname_list, camviews, depths, neighbors=neighbors, resize_hw=(480, 640))
+    camviews, neighbors, depths = read_scene_scannet(cfg, dataset, scene_id, load_depth=True)
+    linetracks = limap.runners.line_fitnmerge(cfg, camviews, depths, neighbors=neighbors)
     return linetracks
 
 def parse_config():

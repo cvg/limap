@@ -20,7 +20,7 @@ def read_scene_scannet(cfg, dataset, scene_id, load_depth=False):
     img_hw = dataset.get_img_hw()
     Ts, Rs = dataset.load_cameras()
     cameras = [_base.Camera("PINHOLE", K, cam_id=0, hw=img_hw)]
-    camviews = [_base.CameraView(cameras[0], _base.CameraPose(Rs[idx], Ts[idx])) for idx in range(len(imname_list))]
+    camviews = [_base.CameraView(cameras[0], _base.CameraPose(Rs[idx], Ts[idx]), image_name=imname_list[idx]) for idx in range(len(imname_list))]
 
     # trivial neighbors
     index_list = np.arange(0, len(imname_list)).tolist()
@@ -41,8 +41,8 @@ def read_scene_scannet(cfg, dataset, scene_id, load_depth=False):
         for imname in tqdm(imname_list):
             depth = dataset.get_depth(imname)
             depths.append(depth)
-        return imname_list, camviews, neighbors, depths
+        return camviews, neighbors, depths
     else:
-        return imname_list, camviews, neighbors
+        return camviews, neighbors
 
 
