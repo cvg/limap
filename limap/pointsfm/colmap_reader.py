@@ -1,7 +1,7 @@
-from _limap import _base, _pointsfm
+from _limap import _base
 from .read_write_model import *
 
-def compute_neighbors(model, n_neighbors, min_triangulation_angle=1.0, neighbor_type="iou"):
+def ComputeNeighbors(model, n_neighbors, min_triangulation_angle=1.0, neighbor_type="iou"):
     if neighbor_type == "iou":
         neighbors = model.GetMaxIoUImages(n_neighbors, min_triangulation_angle)
     elif neighbor_type == "overlap":
@@ -12,38 +12,20 @@ def compute_neighbors(model, n_neighbors, min_triangulation_angle=1.0, neighbor_
         raise NotImplementedError
     return neighbors
 
-def ComputeNeighbors(colmap_output_path, n_neighbors, min_triangulation_angle=1.0, neighbor_type="iou", sparse_dir="sparse", images_dir="images"):
-    model = _pointsfm.SfmModel()
-    model.ReadFromCOLMAP(colmap_output_path, sparse_dir, images_dir)
-
-    # get neighbors
-    neighbors = compute_neighbors(model, n_neighbors, min_triangulation_angle=min_triangulation_angle, neighbor_type=neighbor_type)
-    image_names = model.GetImageNames()
-    return neighbors, image_names
-
 # compute neighborhood for a image list sorted as 'image{0:08d}.png'
-def ComputeNeighborsSorted(colmap_output_path, n_neighbors, min_triangulation_angle=1.0, neighbor_type="iou", sparse_dir="sparse", images_dir="images"):
-    model = _pointsfm.SfmModel()
-    model.ReadFromCOLMAP(colmap_output_path, sparse_dir, images_dir)
-
+def ComputeNeighborsSorted(model, n_neighbors, min_triangulation_angle=1.0, neighbor_type="iou"):
     # get neighbors
-    image_names = model.GetImageNames()
-    image_id_list = [int(name[5:-4]) for name in image_names]
-    neighbors = compute_neighbors(model, n_neighbors, min_triangulation_angle=min_triangulation_angle, neighbor_type=neighbor_type)
+    neighbors = ComputeNeighbors(model, n_neighbors, min_triangulation_angle=min_triangulation_angle, neighbor_type=neighbor_type)
 
     # map indexes
+    image_names = model.GetImageNames()
+    image_id_list = [int(name[5:-4]) for name in image_names]
     n1 = [neighbors[image_id_list.index(k)] for k in range(len(image_id_list))]
     n2 = [[image_id_list[val] for val in neighbor] for neighbor in n1]
     neighbors = n2
     return neighbors
 
-def ComputeRanges(colmap_output_path, range_robust=[0.01, 0.99], k_stretch=1.25, sparse_dir="sparse", images_dir="images"):
-    model = _pointsfm.SfmModel()
-    model.ReadFromCOLMAP(colmap_output_path, sparse_dir, images_dir)
-    ranges = model.ComputeRanges(range_robust, k_stretch)
-    return ranges
-
-def ReadInfosFromModel(model, colmap_path, model_path="sparse", image_path="images", max_image_dim=None, check_undistorted=True):
+def ReadInfos(model, colmap_path, model_path="sparse", image_path="images", max_image_dim=None, check_undistorted=True):
     print("Start loading COLMAP sparse reconstruction.")
     image_names = model.GetImageNames()
     model_path = os.path.join(colmap_path, model_path)
@@ -86,10 +68,4 @@ def ReadInfosFromModel(model, colmap_path, model_path="sparse", image_path="imag
         view = camview_dict[imname]
         camviews.append(view)
     return imname_list, camviews
-
-def ReadInfos(colmap_path, model_path="sparse", image_path="images", max_image_dim=None, check_undistorted=True):
-    model = _pointsfm.SfmModel()
-    model.ReadFromCOLMAP(colmap_path, model_path, image_path)
-    return ReadInfosFromModel(model, colmap_path, model_path=model_path, image_path=image_path, max_image_dim=max_image_dim, check_undistorted=check_undistorted)
-
 

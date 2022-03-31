@@ -4,7 +4,6 @@ import os
 import numpy as np
 import cv2
 from tqdm import tqdm
-import pdb
 
 def ReadModelBundler(bundler_path, list_path, model_path, max_image_dim=None):
     ################################

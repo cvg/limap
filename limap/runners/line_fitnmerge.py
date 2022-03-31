@@ -1,7 +1,9 @@
 import os, sys
 import numpy as np
-import cv2
-import h5py
+from tqdm import tqdm
+import joblib
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import core.detector.LSD as lsd
 import core.detector.SOLD2 as sold2
 import core.visualize as vis
@@ -11,10 +13,7 @@ import limap.base as _base
 import limap.fitting as _fit
 import limap.merging as _mrg
 import limap.lineBA as _lineBA
-from tqdm import tqdm
-import joblib
-
-from line_triangulation import *
+import limap.runners as _runners
 
 def fit_3d_segs(all_2d_segs, camviews, depths, fitting_config):
     '''
@@ -48,7 +47,7 @@ def line_fitnmerge(cfg, imname_list, camviews, depths, neighbors=None, ranges=No
     - depths: list of depth images
     '''
     # assertion check
-    cfg = setup(cfg, imname_list, camviews, max_image_dim=None)
+    cfg = _runners.setup(cfg, imname_list, camviews, max_image_dim=None)
     if cfg["fitting"]["var2d"] == -1:
         cfg["fitting"]["var2d"] = cfg["var2d"][cfg["line2d"]["detector"]]
     if cfg["merging"]["var2d"] == -1:
@@ -64,12 +63,12 @@ def line_fitnmerge(cfg, imname_list, camviews, depths, neighbors=None, ranges=No
     # [A] sfm metainfos (neighbors, ranges)
     ##########################################################
     if neighbors is None:
-        neighbors, ranges = compute_sfminfos(cfg, imname_list, camviews, resize_hw=resize_hw, max_image_dim=max_image_dim)
+        neighbors, ranges = _runners.compute_sfminfos(cfg, imname_list, camviews, resize_hw=resize_hw, max_image_dim=max_image_dim)
 
     ##########################################################
     # [B] get 2D line segments for each image
     ##########################################################
-    all_2d_segs, _ = compute_2d_segs(cfg, imname_list, resize_hw=resize_hw, max_image_dim=max_image_dim, compute_descinfo=False)
+    all_2d_segs, _ = _runners.compute_2d_segs(cfg, imname_list, resize_hw=resize_hw, max_image_dim=max_image_dim, compute_descinfo=False)
 
     ##########################################################
     # [C] fit 3d segments
@@ -124,4 +123,5 @@ def line_fitnmerge(cfg, imname_list, camviews, depths, neighbors=None, ranges=No
         pdb.set_trace()
         VisTrack.vis_all_lines(img_hw=img_hw, n_visible_views=cfg["n_visible_views"])
         pdb.set_trace()
+    return linetracks
 
