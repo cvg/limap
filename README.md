@@ -42,11 +42,11 @@ bash scripts/quickstart.sh
 
 To run **Fitnmerge** on Hypersim:
 ```bash
-python runners/hypersim_fitnmerge.py
+python runners/hypersim/fitnmerge.py
 ```
 
 To run **Line Reconstruction** on Hypersim:
 ```bash
-python runners/hypersim_triangulation.py
+python runners/hypersim/triangulation.py
 ```
 
