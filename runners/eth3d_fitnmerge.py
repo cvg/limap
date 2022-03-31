@@ -43,8 +43,8 @@ def process_eth3d_scene(cfg, dataset_eth3d, reso_type, scene_id, cam_id=0):
 def parse_config():
     import argparse
     arg_parser = argparse.ArgumentParser(description='fitnmerge 3d lines')
-    arg_parser.add_argument('-c', '--config_file', type=str, default='cfgs/fitnmerge/eth3d_fitnmerge.yaml', help='config file')
-    arg_parser.add_argument('--default_config_file', type=str, default='cfgs/fitnmerge/default_fitnmerge.yaml', help='default config file')
+    arg_parser.add_argument('-c', '--config_file', type=str, default='cfgs/fitnmerge/eth3d.yaml', help='config file')
+    arg_parser.add_argument('--default_config_file', type=str, default='cfgs/fitnmerge/default.yaml', help='default config file')
     arg_parser.add_argument('--info_reuse', action='store_true', help="whether to use infonpy at tmp/infos_eth3d.npy")
     arg_parser.add_argument('--info_path', type=str, default=None, help='load precomputed info')
 

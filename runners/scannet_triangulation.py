@@ -38,8 +38,8 @@ def process_scannet_scene(cfg, dataset_scannet, scene_id):
 def parse_config():
     import argparse
     arg_parser = argparse.ArgumentParser(description='triangulate 3d lines')
-    arg_parser.add_argument('-c', '--config_file', type=str, default='cfgs/triangulation/scannet_triangulation.yaml', help='config file')
-    arg_parser.add_argument('--default_config_file', type=str, default='cfgs/triangulation/default_triangulation.yaml', help='default config file')
+    arg_parser.add_argument('-c', '--config_file', type=str, default='cfgs/triangulation/scannet.yaml', help='config file')
+    arg_parser.add_argument('--default_config_file', type=str, default='cfgs/triangulation/default.yaml', help='default config file')
 
     args, unknown = arg_parser.parse_known_args()
     cfg = utils.load_config(args.config_file, default_path=args.default_config_file)

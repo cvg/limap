@@ -8,6 +8,8 @@
 *.mp4
 *.h5
 *.swp
+*.zip
+*.tar.gz
 
 experiments
 build

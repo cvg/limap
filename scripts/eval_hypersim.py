@@ -245,8 +245,8 @@ def read_lines_from_input(input_dir, n_visible_views=4):
 def parse_config():
     import argparse
     arg_parser = argparse.ArgumentParser(description='eval 3d lines on hypersim')
-    arg_parser.add_argument('-c', '--config_file', type=str, default='cfgs/eval/hypersim_evaluation.yaml', help='config file')
-    arg_parser.add_argument('--default_config_file', type=str, default='cfgs/eval/default_evaluation.yaml', help='default config file')
+    arg_parser.add_argument('-c', '--config_file', type=str, default='cfgs/eval/hypersim.yaml', help='config file')
+    arg_parser.add_argument('--default_config_file', type=str, default='cfgs/eval/default.yaml', help='default config file')
     arg_parser.add_argument('-i', '--input_dir', type=str, required=True, help='input line file [*.npy, *.obj, [folder-to-linetracks]]')
     arg_parser.add_argument('-r', '--ref_dir', type=str, default=None, help='reference pseudo gt lines [*.npy, *.obj]')
     arg_parser.add_argument('--mesh_dir', type=str, default=None, help='path to the .obj file')

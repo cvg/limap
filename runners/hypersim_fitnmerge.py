@@ -41,8 +41,8 @@ def process_hypersim_scene(cfg, dataset_hypersim, scene_id, cam_id=0):
 def parse_config():
     import argparse
     arg_parser = argparse.ArgumentParser(description='fit and merge 3d lines')
-    arg_parser.add_argument('-c', '--config_file', type=str, default='cfgs/fitnmerge/hypersim_fitnmerge.yaml', help='config file')
-    arg_parser.add_argument('--default_config_file', type=str, default='cfgs/fitnmerge/default_fitnmerge.yaml', help='default config file')
+    arg_parser.add_argument('-c', '--config_file', type=str, default='cfgs/fitnmerge/hypersim.yaml', help='config file')
+    arg_parser.add_argument('--default_config_file', type=str, default='cfgs/fitnmerge/default.yaml', help='default config file')
     arg_parser.add_argument('--npyfolder', type=str, default=None, help='folder to load precomputed results')
 
     args, unknown = arg_parser.parse_known_args()

@@ -70,8 +70,8 @@ def run_colmap_triangulation(cfg, colmap_path, model_path="sparse", image_path="
 def parse_config():
     import argparse
     arg_parser = argparse.ArgumentParser(description='triangulate 3d lines from COLMAP')
-    arg_parser.add_argument('-c', '--config_file', type=str, default='cfgs/triangulation/default_triangulation.yaml', help='config file')
-    arg_parser.add_argument('--default_config_file', type=str, default='cfgs/triangulation/default_triangulation.yaml', help='default config file')
+    arg_parser.add_argument('-c', '--config_file', type=str, default='cfgs/triangulation/default.yaml', help='config file')
+    arg_parser.add_argument('--default_config_file', type=str, default='cfgs/triangulation/default.yaml', help='default config file')
     arg_parser.add_argument('-a', '--colmap_path', type=str, required=True, help='colmap path')
     arg_parser.add_argument('-m', '--model_path', type=str, default='sparse', help='model path')
     arg_parser.add_argument('-i', '--image_path', type=str, default='images', help='image path')
