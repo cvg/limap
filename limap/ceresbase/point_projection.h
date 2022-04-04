@@ -9,9 +9,6 @@
 #include <ceres/ceres.h>
 #include <ceres/rotation.h>
 
-#include "util/types.h"
-#include "base/camera.h"
-
 namespace limap {
 
 template <typename T>

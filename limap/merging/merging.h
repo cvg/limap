@@ -11,7 +11,7 @@ namespace py = pybind11;
 #include "base/linebase.h"
 #include "base/linetrack.h"
 #include "base/line_linker.h"
-#include "base/camera.h"
+#include "base/camera_view.h"
 
 #include <set>
 

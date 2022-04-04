@@ -3,6 +3,7 @@ set(FOLDER_NAME "base")
 LIMAP_ADD_SOURCES(
     graph.h graph.cc
     camera.h camera.cc
+    camera_view.h camera_view.cc
 
     linebase.h linebase.cc
     linetrack.h linetrack.cc

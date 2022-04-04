@@ -11,7 +11,7 @@
 namespace py = pybind11;
 
 #include "util/types.h"
-#include "base/camera.h"
+#include "base/camera_view.h"
 #include "base/linebase.h"
 #include "base/infinite_line.h"
 

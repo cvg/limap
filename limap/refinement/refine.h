@@ -5,7 +5,7 @@
 #include <pybind11/numpy.h>
 #include "_limap/helpers.h"
 
-#include "base/camera.h"
+#include "base/camera_view.h"
 #include "base/linebase.h"
 #include "base/linetrack.h"
 #include "base/infinite_line.h"
