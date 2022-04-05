@@ -2,9 +2,10 @@ import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 import core.utils as utils
+
 import limap.base as _base
 import limap.pointsfm as _psfm
-from line_triangulation import line_triangulation
+import limap.runners
 
 def run_colmap_triangulation(cfg, colmap_path, model_path="sparse", image_path="images"):
     '''
@@ -27,7 +28,8 @@ def run_colmap_triangulation(cfg, colmap_path, model_path="sparse", image_path="
             camview.cam.set_max_image_dim(cfg["max_image_dim"])
 
     # run triangulation
-    line_triangulation(cfg, camviews, neighbors=neighbors, ranges=ranges)
+    linetracks = limap.runners.line_triangulation(cfg, camviews, neighbors=neighbors, ranges=ranges)
+    return linetracks
 
 def parse_config():
     import argparse
@@ -57,6 +59,8 @@ def parse_config():
     cfg["info_path"] = args.info_path
     if ("max_image_dim" not in cfg.keys()) or args.max_image_dim is not None:
         cfg["max_image_dim"] = args.max_image_dim
+    if not os.path.exists('tmp'):
+        os.makedirs('tmp')
     return cfg
 
 def main():
