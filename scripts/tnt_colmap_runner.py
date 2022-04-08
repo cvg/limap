@@ -21,7 +21,7 @@ for folder in folder_list:
         os.makedirs(dense_folder)
     database_path = os.path.join(output_folder, 'database.db')
 
-    cmd = 'colmap feature_extractor --database_path {0} --image_path {1} --ImageReader.single_camera 1 --ImageReader.camera_model SIMPLE_PINHOLE'.format(database_path, input_folder)
+    cmd = 'colmap feature_extractor --database_path {0} --image_path {1}'.format(database_path, input_folder)
     print(cmd)
     os.system(cmd)
     cmd = 'colmap exhaustive_matcher --database_path {0}'.format(database_path)
