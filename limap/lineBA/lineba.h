@@ -54,8 +54,8 @@ public:
     LineBAEngine() {}
     LineBAEngine(const LineBAConfig& cfg): config_(cfg) {}
 
-    void Initialize(const std::vector<LineTrack>& tracks, const std::vector<CameraView>& cameras) {
-        reconstruction_ = LineReconstruction(tracks, cameras);
+    void Initialize(const std::vector<LineTrack>& tracks, const ImageCollection& imagecols) {
+        reconstruction_ = LineReconstruction(tracks, imagecols);
     }
     void InitializeReconstruction(const LineReconstruction& reconstruction) {
         reconstruction_ = reconstruction;

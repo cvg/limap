@@ -11,7 +11,7 @@ namespace py = pybind11;
 #include "base/linebase.h"
 #include "base/linetrack.h"
 #include "base/line_linker.h"
-#include "base/camera_view.h"
+#include "base/image_collection.h"
 
 #include <set>
 
@@ -33,7 +33,7 @@ std::vector<int> ComputeLineTrackLabelsAvg(const Graph& graph,
 void MergeToLineTracks(Graph& graph,
                        std::vector<LineTrack>& linetracks,
                        const std::vector<std::vector<Line2d>>& all_lines_2d,
-                       const std::vector<CameraView>& views,
+                       const ImageCollection& imagecols,
                        const std::vector<std::vector<Line3d>>& all_lines_3d,
                        const std::vector<std::vector<int>>& neighbors,
                        LineLinker linker);

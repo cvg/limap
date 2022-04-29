@@ -4,6 +4,7 @@ LIMAP_ADD_SOURCES(
     graph.h graph.cc
     camera.h camera.cc
     camera_view.h camera_view.cc
+    image_collection.h image_collection.cc
 
     linebase.h linebase.cc
     linetrack.h linetrack.cc

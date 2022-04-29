@@ -6,6 +6,7 @@
 #include "_limap/helpers.h"
 
 #include "base/camera_view.h"
+#include "base/image_collection.h"
 #include "base/linebase.h"
 #include "base/linetrack.h"
 #include "base/infinite_line.h"
@@ -20,7 +21,7 @@ namespace limap {
 class LineReconstruction {
 public:
     LineReconstruction() {}
-    LineReconstruction(const std::vector<LineTrack>& linetracks, const std::vector<CameraView>& cameras);
+    LineReconstruction(const std::vector<LineTrack>& linetracks, const ImageCollection& imagecols);
 
     // minimal data
     std::vector<MinimalInfiniteLine3d> lines_; // minimal line for each track

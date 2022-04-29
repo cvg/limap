@@ -5,7 +5,7 @@
 #include "base/linebase.h"
 #include "base/linetrack.h"
 #include "base/line_linker.h"
-#include "base/camera_view.h"
+#include "base/image_collection.h"
 #include "base/graph.h"
 #include "vpdetection/vpdet.h"
 
@@ -72,7 +72,7 @@ public:
     const vpdetection::VPDetector vpdetector_;
 
     void Init(const std::vector<std::vector<Line2d>>& all_2d_segs,
-              const std::vector<CameraView>& views);
+              const ImageCollection& imagecols);
     void InitMatches(const std::vector<std::vector<Eigen::MatrixXi>>& all_matches,
                      const std::vector<std::vector<int>>& all_neighbors,
                      bool use_triangulate=true,
@@ -86,7 +86,7 @@ public:
                                   const std::vector<int>& neighbors,
                                   bool use_scoring=true);
     void InitAll(const std::vector<std::vector<Line2d>>& all_2d_segs,
-                 const std::vector<CameraView>& views,
+                 const ImageCollection& imagecols,
                  const std::vector<std::vector<Eigen::MatrixXi>>& all_matches,
                  const std::vector<std::vector<int>>& all_neighbors,
                  bool use_triangulate=false,
@@ -134,7 +134,7 @@ private:
     // initialization
     void offsetHalfPixel();
     std::vector<std::vector<Line2d>> all_lines_2d_;
-    std::vector<CameraView> views_;
+    ImageCollection imagecols_;
     std::vector<std::vector<int>> neighbors_; // visual neighbors for each image, initialized with InitMatch interfaces
     std::vector<vpdetection::VPResult> vpresults_; // vp results
 

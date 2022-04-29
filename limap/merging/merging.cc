@@ -314,7 +314,7 @@ std::vector<int> ComputeLineTrackLabelsAvg(const Graph& graph, const std::vector
 void MergeToLineTracks(Graph& graph,
                        std::vector<LineTrack>& linetracks,
                        const std::vector<std::vector<Line2d>>& all_lines_2d,
-                       const std::vector<CameraView>& views,
+                       const ImageCollection& imagecols,
                        const std::vector<std::vector<Line3d>>& all_lines_3d,
                        const std::vector<std::vector<int>>& neighbors,
                        LineLinker linker)
@@ -400,9 +400,9 @@ void MergeToLineTracks(Graph& graph,
                     if (!linker.check_connection_3d(l1, l2))
                         continue;
                     // check 2d
-                    if (!linker.check_connection_2d(l1.projection(views[ng_image_id]), all_lines_2d[ng_image_id][ng_line_id]))
+                    if (!linker.check_connection_2d(l1.projection(imagecols.camview(ng_image_id)), all_lines_2d[ng_image_id][ng_line_id]))
                         continue;
-                    if (!linker.check_connection_2d(l2.projection(views[image_id]), all_lines_2d[image_id][line_id]))
+                    if (!linker.check_connection_2d(l2.projection(imagecols.camview(image_id)), all_lines_2d[image_id][line_id]))
                         continue;
                     quads[image_id].push_back(std::make_pair(std::make_pair(image_id, line_id), std::make_pair(ng_image_id, ng_line_id)));
                 }

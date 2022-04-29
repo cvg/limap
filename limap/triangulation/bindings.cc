@@ -52,54 +52,25 @@ void bind_triangulator(py::module &m) {
         .def(py::init<const TriangulatorConfig&>())
         .def(py::init<py::dict>())
         .def("Init", &Triangulator::Init)
-        .def("InitMatches", 
-                [] (Triangulator& self,
-                    const std::vector<std::vector<Eigen::MatrixXi>>& all_matches,
-                    const std::vector<std::vector<int>>& all_neighbors,
-                    bool use_triangulate, bool use_scoring) {
-                    return self.InitMatches(all_matches, all_neighbors, use_triangulate, use_scoring);
-                },
+        .def("InitMatches", &Triangulator::InitMatches, 
                 py::arg("all_matches"),
                 py::arg("all_neigbhors"),
                 py::arg("triangulate") = true,
                 py::arg("scoring") = false
         )
-        .def("InitMatchImage", 
-                [] (Triangulator& self, 
-                    const int img_id, 
-                    const std::vector<Eigen::MatrixXi>& matches, 
-                    const std::vector<int>& neighbors,
-                    bool use_triangulate,
-                    bool use_scoring) {
-                    return self.InitMatchImage(img_id, matches, neighbors, use_triangulate, use_scoring);
-                },
+        .def("InitMatchImage", &Triangulator::InitMatchImage,
                 py::arg("img_id"),
                 py::arg("matches"),
                 py::arg("neighbors"),
                 py::arg("triangulate") = true,
                 py::arg("scoring") = false
         )
-        .def("InitExhaustiveMatchImage", 
-                [] (Triangulator& self,
-                    const int img_id,
-                    const std::vector<int>& neighbors,
-                    bool use_scoring) {
-                    return self.InitExhaustiveMatchImage(img_id, neighbors, use_scoring);
-                },
+        .def("InitExhaustiveMatchImage", &Triangulator::InitExhaustiveMatchImage,
                 py::arg("img_id"),
                 py::arg("neighbors"),
                 py::arg("scoring") = true
         )
-        .def("InitAll", 
-                [] (Triangulator& self,
-                    const std::vector<std::vector<Line2d>>& all_2d_segs,
-                    const std::vector<CameraView>& views,
-                    const std::vector<std::vector<Eigen::MatrixXi>>& all_matches,
-                    const std::vector<std::vector<int>>& all_neighbors,
-                    bool use_triangulate,
-                    bool use_scoring) {
-                    return self.InitAll(all_2d_segs, views, all_matches, all_neighbors, use_triangulate, use_scoring);
-                },
+        .def("InitAll", &Triangulator::InitAll,
                 py::arg("all_2d_segs"),
                 py::arg("views"),
                 py::arg("all_matches"),

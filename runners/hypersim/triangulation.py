@@ -10,8 +10,8 @@ import limap.runners
 
 def run_scene_hypersim(cfg, dataset, scene_id, cam_id=0):
     # run triangulation
-    camviews = read_scene_hypersim(cfg, dataset, scene_id, cam_id=cam_id, load_depth=False)
-    linetracks = limap.runners.line_triangulation(cfg, camviews)
+    imagecols = read_scene_hypersim(cfg, dataset, scene_id, cam_id=cam_id, load_depth=False)
+    linetracks = limap.runners.line_triangulation(cfg, imagecols)
     return linetracks
 
 def parse_config():

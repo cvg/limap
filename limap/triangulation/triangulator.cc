@@ -24,12 +24,12 @@ void Triangulator::offsetHalfPixel() {
 }
 
 void Triangulator::Init(const std::vector<std::vector<Line2d>>& all_2d_segs,
-                        const std::vector<CameraView>& views) 
+                        const ImageCollection& imagecols) 
 {
     all_lines_2d_ = all_2d_segs;
     if (config_.add_halfpix)
         offsetHalfPixel();
-    views_ = views;
+    imagecols_ = imagecols;
     
     // compute vanishing points (optional)
     if (config_.use_vp) {
@@ -193,13 +193,13 @@ void Triangulator::InitExhaustiveMatchImage(const int img_id,
 }
 
 void Triangulator::InitAll(const std::vector<std::vector<Line2d>>& all_2d_segs,
-                           const std::vector<CameraView>& views,
+                           const ImageCollection& imagecols,
                            const std::vector<std::vector<Eigen::MatrixXi>>& all_matches,
                            const std::vector<std::vector<int>>& all_neighbors,
                            bool use_triangulate,
                            bool use_scoring)
 {
-    Init(all_2d_segs, views);
+    Init(all_2d_segs, imagecols);
     InitMatches(all_matches, all_neighbors, use_triangulate, use_scoring);
 }
 
@@ -228,7 +228,7 @@ int Triangulator::countEdges() const {
 void Triangulator::triangulateOneNode(const int img_id, const int line_id) {
     auto& connections = edges_[img_id][line_id];
     const Line2d& l1 = all_lines_2d_[img_id][line_id];
-    const CameraView& view1 = views_[img_id];
+    const CameraView& view1 = imagecols_.camview(img_id);
     int n_conns = connections.size();
     std::vector<std::vector<TriTuple>> results(n_conns);
 
@@ -237,7 +237,7 @@ void Triangulator::triangulateOneNode(const int img_id, const int line_id) {
         int ng_img_id = connections[conn_id].first;
         int ng_line_id = connections[conn_id].second;
         const Line2d& l2 = all_lines_2d_[ng_img_id][ng_line_id];
-        const CameraView& view2 = views_[ng_img_id];
+        const CameraView& view2 = imagecols_.camview(ng_img_id);
 
         // test degeneracy by plane angle
         V3D n1 = getNormalDirection(l1, view1);
@@ -333,7 +333,7 @@ void Triangulator::scoreOneNode(const int img_id, const int line_id, const LineL
         const Line3d& l1 = std::get<0>(tris[i]);
         int img_id = std::get<2>(tris[i]).first;
         int line_id = std::get<2>(tris[i]).second;
-        const CameraView& view1 = views_[img_id];
+        const CameraView& view1 = imagecols_.camview(img_id);
         for (size_t j = 0; j < n_tris; ++j) {
             if (i == j)
                 continue;
@@ -342,7 +342,7 @@ void Triangulator::scoreOneNode(const int img_id, const int line_id, const LineL
             int ng_line_id = std::get<2>(tris[j]).second;
             if (ng_img_id == img_id)
                 continue;
-            const CameraView& view2 = views_[ng_img_id];
+            const CameraView& view2 = imagecols_.camview(ng_img_id);
             double score3d = linker.compute_score_3d(l1, l2);
             if (score3d == 0)
                 continue;
@@ -520,8 +520,8 @@ void Triangulator::RunClustering() {
     for (auto it = edges.begin(); it != edges.end(); ++it) {
         int img_id1 = it->first.first; int line_id1 = it->first.second;
         int img_id2 = it->second.first; int line_id2 = it->second.second;
-        const CameraView& view1 = views_[img_id1];
-        const CameraView& view2 = views_[img_id2];
+        const CameraView& view1 = imagecols_.camview(img_id1);
+        const CameraView& view2 = imagecols_.camview(img_id2);
         const Line3d& line1 = std::get<0>(getBestTri(img_id1, line_id1));
         const Line3d& line2 = std::get<0>(getBestTri(img_id2, line_id2));
         Line2d& line2d1 = all_lines_2d_[img_id1][line_id1];
