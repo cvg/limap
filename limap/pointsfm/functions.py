@@ -27,18 +27,18 @@ def filter_by_cam_id(cam_id, prev_camviews, prev_neighbors):
 
 def read_infos_colmap(cfg, colmap_path, model_path="sparse", image_path="images", n_neighbors=20):
     '''
-    Read all infos from colmap including camviews, neighbors, and ranges
+    Read all infos from colmap including imagecols, neighbors, and ranges
     '''
     model = _pointsfm.SfmModel()
     model.ReadFromCOLMAP(colmap_path, model_path, image_path)
 
-    # get camviews
-    camviews = ReadInfos(model, colmap_path, model_path=model_path, image_path=image_path, check_undistorted=True)
+    # get imagecols
+    imagecols = ReadInfos(model, colmap_path, model_path=model_path, image_path=image_path, check_undistorted=True)
 
     # get neighbors
     neighbors = ComputeNeighbors(model, n_neighbors, min_triangulation_angle=cfg["min_triangulation_angle"], neighbor_type=cfg["neighbor_type"])
 
     # get ranges
     ranges = model.ComputeRanges(cfg["ranges"]["range_robust"], cfg["ranges"]["k_stretch"])
-    return camviews, neighbors, ranges
+    return imagecols, neighbors, ranges
 

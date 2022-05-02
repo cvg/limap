@@ -43,6 +43,7 @@ public:
     Camera(int model_id, M3D K, int cam_id=-1, std::pair<int, int> hw=std::make_pair<int, int>(-1, -1));
     Camera(const std::string& model_name, M3D K, int cam_id=-1, std::pair<int, int> hw=std::make_pair<int, int>(-1, -1));
     Camera(py::dict dict);
+    bool operator ==(const Camera&);
 
     py::dict as_dict() const;
     void resize(const size_t width, const size_t height) { Rescale(width, height); }

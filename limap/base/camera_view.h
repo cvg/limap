@@ -35,7 +35,6 @@ public:
     void SetImageName(const std::string& image_name) { image_name_ = image_name; }
     std::string image_name() const { return image_name_; }
 
-
 private:
     std::string image_name_;
 };

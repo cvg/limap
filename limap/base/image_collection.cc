@@ -2,13 +2,37 @@
 
 namespace limap {
 
+ImageCollection::ImageCollection(const std::vector<Camera>& input_cameras, const std::vector<CameraImage>& input_images) {
+    int n_cameras = input_cameras.size();
+    for (int cam_id = 0; cam_id < n_cameras; ++cam_id) {
+        cameras.insert(std::make_pair(cam_id, input_cameras[cam_id]));
+    }
+    images = input_images;
+}
+
+ImageCollection::ImageCollection(const std::vector<CameraView>& camviews) {
+    for (auto it = camviews.begin(); it != camviews.end(); ++it) {
+        images.push_back(CameraImage(*it));
+        int cam_id = it->cam.CameraId();
+        if (cameras.count(cam_id) == 1) {
+            CHECK_EQ(cameras.at(cam_id) == it->cam, true);
+        }
+        else {
+            cameras.insert(std::make_pair(it->cam.CameraId(), it->cam));
+        }
+    }
+}
+
 ImageCollection::ImageCollection(py::dict dict) {
     // load cameras
-    std::vector<py::dict> dictvec_cameras;
+    std::map<int, py::dict> dictvec_cameras;
     if (dict.contains("cameras"))
-        dictvec_cameras = dict["cameras"].cast<std::vector<py::dict>>();
+        dictvec_cameras = dict["cameras"].cast<std::map<int, py::dict>>();
     for (auto it = dictvec_cameras.begin(); it != dictvec_cameras.end(); ++it) {
-        cameras.push_back(Camera(*it));
+        int cam_id = it->first;
+        Camera cam = Camera(it->second);
+        assert (cam_id == cam.CameraId());
+        cameras.insert(std::make_pair(cam_id, cam));
     }
     // load images
     std::vector<py::dict> dictvec_images;
@@ -19,11 +43,27 @@ ImageCollection::ImageCollection(py::dict dict) {
     }
 }
 
+std::vector<Camera> ImageCollection::get_cameras() const {
+    std::vector<Camera> output_cameras;
+    for (auto it = cameras.begin(); it != cameras.end(); ++it) {
+        output_cameras.push_back(it->second);
+    }
+    return output_cameras;
+}
+
+std::vector<CameraView> ImageCollection::get_camviews() const {
+    std::vector<CameraView> camviews;
+    for (int img_id = 0; img_id < NumImages(); ++img_id) {
+        camviews.push_back(camview(img_id));
+    }
+    return camviews;
+}
+
 py::dict ImageCollection::as_dict() const {
     py::dict output;
-    std::vector<py::dict> dictvec_cameras;
+    std::map<int, py::dict> dictvec_cameras;
     for (auto it = cameras.begin(); it != cameras.end(); ++it) {
-        dictvec_cameras.push_back(it->as_dict());
+        dictvec_cameras.insert(std::make_pair(it->first, it->second.as_dict()));
     }
     output["cameras"] = dictvec_cameras;
     std::vector<py::dict> dictvec_images;
@@ -35,9 +75,8 @@ py::dict ImageCollection::as_dict() const {
 }
 
 Camera ImageCollection::cam(const int cam_id) const {
-    THROW_CHECK_GE(cam_id, 0);
-    THROW_CHECK_LT(cam_id, NumCameras());
-    return cameras[cam_id];
+    THROW_CHECK_EQ(cameras.count(cam_id), 1);
+    return cameras.at(cam_id);
 }
 
 CameraImage ImageCollection::camimage(const int img_id) const {
@@ -56,7 +95,7 @@ CameraView ImageCollection::camview(const int img_id) const {
     THROW_CHECK_GE(img_id, 0);
     THROW_CHECK_LT(img_id, NumImages());
     int cam_id = images[img_id].cam_id;
-    return CameraView(cameras[cam_id], images[img_id].pose, images[img_id].image_name());
+    return CameraView(cameras.at(cam_id), images[img_id].pose, images[img_id].image_name());
 }
 
 std::string ImageCollection::image_name(const int img_id) const {

@@ -17,7 +17,8 @@ def read_scene_hypersim(cfg, dataset, scene_id, cam_id=0, load_depth=False):
     K = dataset.K.astype(np.float32)
     img_hw = [dataset.h, dataset.w]
     Ts, Rs = dataset.load_cameras(cam_id=cam_id)
-    cameras = [_base.Camera("SIMPLE_PINHOLE", K, cam_id=0, hw=img_hw)]
+    cameras = {}
+    cameras[0] = _base.Camera("SIMPLE_PINHOLE", K, cam_id=0, hw=img_hw)
     camimages = []
     for image_id in index_list:
         pose = _base.CameraPose(Rs[image_id], Ts[image_id])

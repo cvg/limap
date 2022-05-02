@@ -131,6 +131,24 @@ Camera::Camera(const std::string& model_name, M3D K, int cam_id, std::pair<int, 
     }
 }
 
+bool Camera::operator ==(const Camera& cam) {
+    if (CameraId() != cam.CameraId())
+        return false;
+    if (ModelId() != cam.ModelId())
+        return false;
+    if (h() != cam.h())
+        return false;
+    if (w() != cam.w())
+        return false;
+    std::vector<double> params = Params();
+    std::vector<double> params_cam = cam.Params();
+    for (int i = 0; i < params.size(); ++i) {
+        if (params[i] != params_cam[i])
+            return false;
+    }
+    return true;
+}
+
 void Camera::set_max_image_dim(const int& val) {
     THROW_CHECK_EQ(IsUndistorted(), true);
 
