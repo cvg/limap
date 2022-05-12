@@ -151,6 +151,7 @@ bool Camera::operator ==(const Camera& cam) {
 
 void Camera::set_max_image_dim(const int& val) {
     THROW_CHECK_EQ(IsUndistorted(), true);
+    THROW_CHECK_GT(val, 0)
 
     double height = Height();
     double width = Width();

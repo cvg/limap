@@ -30,10 +30,12 @@ public:
     size_t NumCameras() const { return cameras.size(); }
     size_t NumImages() const { return images.size(); }
     std::vector<Camera> get_cameras() const;
+    std::vector<int> get_cam_ids() const;
     std::vector<CameraImage> get_images() const { return images; }
     std::vector<CameraView> get_camviews() const;
 
     Camera cam(const int cam_id) const;
+    bool exist_cam(const int cam_id) const;
     CameraImage camimage(const int img_id) const;
     CameraPose campose(const int img_id) const;
     CameraView camview(const int img_id) const;
@@ -41,6 +43,7 @@ public:
     std::vector<std::string> get_image_list() const;
 
     py::array_t<uint8_t> read_image(const int img_id, const bool set_gray) const;
+    void set_max_image_dim(const int& val);
     
 private:
     std::map<int, Camera> cameras;

@@ -9,8 +9,8 @@ import core.utils as utils
 import limap.runners
 
 def run_scene_eth3d(cfg, dataset, reso_type, scene_id, cam_id=0):
-    camviews, neighbors, ranges = read_scene_eth3d(cfg, dataset, reso_type, scene_id, cam_id=cam_id, load_depth=False)
-    linetracks = limap.runners.line_triangulation(cfg, camviews, neighbors=neighbors, ranges=ranges)
+    imagecols, neighbors, ranges = read_scene_eth3d(cfg, dataset, reso_type, scene_id, cam_id=cam_id, load_depth=False)
+    linetracks = limap.runners.line_triangulation(cfg, imagecols, neighbors=neighbors, ranges=ranges)
     return linetracks
 
 def parse_config():

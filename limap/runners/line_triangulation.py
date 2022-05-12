@@ -118,8 +118,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None, valid_index_
     VisTrack.report()
     lines_np = VisTrack.get_lines_np()
     counts_np = VisTrack.get_counts_np()
-    img_hw = [imagecols.cam(0).h(), imagecols.cam(0).w()]
-    with open(os.path.join(cfg["dir_save"], 'lines_to_vis.npy'), 'wb') as f: np.savez(f, lines=lines_np, counts=counts_np, img_hw=img_hw, ranges=None)
+    with open(os.path.join(cfg["dir_save"], 'lines_to_vis.npy'), 'wb') as f: np.savez(f, lines=lines_np, counts=counts_np, ranges=None)
     vis.save_obj(os.path.join(cfg["dir_save"], 'lines_to_vis.obj'), lines_np, counts=counts_np, n_visible_views=cfg['n_visible_views'])
     vis.save_obj(os.path.join(cfg["dir_save"], 'lines_nodes.obj'), Triangulator.GetAllValidBestTris())
     validtracks = [track for track in linetracks if track.count_images() >= cfg["n_visible_views"]]
@@ -130,7 +129,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None, valid_index_
             vis.visualize_line_track(imagecols, validtracks[track_id], prefix="track.{0}".format(track_id))
         import pdb
         pdb.set_trace()
-        VisTrack.vis_all_lines(img_hw, n_visible_views=cfg["n_visible_views"], width=2)
+        VisTrack.vis_all_lines(n_visible_views=cfg["n_visible_views"], width=2)
         pdb.set_trace()
     return linetracks
 

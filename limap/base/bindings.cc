@@ -380,17 +380,20 @@ void bind_camera(py::module& m) {
         .def(py::init<py::dict>())
         .def("as_dict", &ImageCollection::as_dict)
         .def("get_cameras", &ImageCollection::get_cameras)
+        .def("get_cam_ids", &ImageCollection::get_cam_ids)
         .def("get_images", &ImageCollection::get_images)
         .def("get_camviews", &ImageCollection::get_camviews)
-        .def("read_image", &ImageCollection::read_image, py::arg("img_id"), py::arg("set_gray")=false)
         .def("cam", &ImageCollection::cam)
+        .def("exist_cam", &ImageCollection::exist_cam)
         .def("camimage", &ImageCollection::camimage)
         .def("campose", &ImageCollection::campose)
         .def("camview", &ImageCollection::camview)
         .def("image_name", &ImageCollection::image_name)
         .def("get_image_list", &ImageCollection::get_image_list)
         .def("NumCameras", &ImageCollection::NumCameras)
-        .def("NumImages", &ImageCollection::NumImages);
+        .def("NumImages", &ImageCollection::NumImages)
+        .def("set_max_image_dim", &ImageCollection::set_max_image_dim)
+        .def("read_image", &ImageCollection::read_image, py::arg("img_id"), py::arg("set_gray")=false);
 }
 
 template <typename DTYPE>

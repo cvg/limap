@@ -51,6 +51,14 @@ std::vector<Camera> ImageCollection::get_cameras() const {
     return output_cameras;
 }
 
+std::vector<int> ImageCollection::get_cam_ids() const {
+    std::vector<int> output_ids;
+    for (auto it = cameras.begin(); it != cameras.end(); ++it) {
+        output_ids.push_back(it->first);
+    }
+    return output_ids;
+}
+
 std::vector<CameraView> ImageCollection::get_camviews() const {
     std::vector<CameraView> camviews;
     for (int img_id = 0; img_id < NumImages(); ++img_id) {
@@ -77,6 +85,10 @@ py::dict ImageCollection::as_dict() const {
 Camera ImageCollection::cam(const int cam_id) const {
     THROW_CHECK_EQ(cameras.count(cam_id), 1);
     return cameras.at(cam_id);
+}
+
+bool ImageCollection::exist_cam(const int cam_id) const {
+    return cameras.count(cam_id) == 1;
 }
 
 CameraImage ImageCollection::camimage(const int img_id) const {
@@ -114,6 +126,12 @@ std::vector<std::string> ImageCollection::get_image_list() const {
 
 py::array_t<uint8_t> ImageCollection::read_image(const int img_id, const bool set_gray) const {
     return camview(img_id).read_image(set_gray);
+}
+
+void ImageCollection::set_max_image_dim(const int& val) {
+    for (auto it = cameras.begin(); it != cameras.end(); ++it) {
+        it->second.set_max_image_dim(val);
+    }
 }
 
 } // namespace limap
