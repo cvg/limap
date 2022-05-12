@@ -212,25 +212,14 @@ def make_bigimage(imgs, pad=20):
     imgs_collections.append(imgs_now)
     return cat_to_bigimage(imgs_collections, (n_rows, n_cols), pad=pad)
 
-def tmp_visualize_2d_segs(camviews, all_2d_segs):
-    n_vis_images = 10
-    for image_id, (camview, segs) in enumerate(zip(camviews[:n_vis_images], all_2d_segs[:n_vis_images])):
-        img = utils.imread_camview(camview)
+def tmp_visualize_2d_segs(imagecols, all_2d_segs):
+    n_vis_images = min(10, imagecols.NumImages())
+    for img_id in range(n_vis_images):
+        img = imagecols.read_image(img_id)
+        segs = all_2d_segs[img_id]
         img = draw_segments(img, segs, (0, 255, 0))
-        fname = os.path.join('tmp', 'img_{0}_det.png'.format(image_id))
+        fname = os.path.join('tmp', 'img_{0}_det.png'.format(img_id))
         cv2.imwrite(fname, img)
-
-def tmp_visualize_2d_segs_on_one_image(camview, segs):
-    img = utils.imread_camview(camview)
-    n_lines = segs.shape[0]
-    for idx in range(n_lines):
-        img_new = copy.deepcopy(img)
-        draw_segments(img_new, [segs[idx]], (0, 255, 0))
-        fname = os.path.join('tmp', 'vis_line{1}_sold2det.png'.format(camview.image_name()[:-4], idx))
-        cv2.imwrite(fname, img_new)
-    draw_segments(img, segs, (0, 255, 0))
-    fname = os.path.join('tmp', 'vis_all_lines_sold2det.png')
-    cv2.imwrite(fname, img)
 
 def tmp_visualize_heatmaps(heatmaps, output_folder='tmp/heatmap_vis'):
     import matplotlib.colors as colors
@@ -303,23 +292,22 @@ def report_dist_reprojection(line3d, line2d, camview, prefix=None):
     else:
         print("{4}: angle = {0:.4f}, perp = {1:.4f}, overlap = {2:.4f}, sensi = {3:.4f}".format(angle, perp_dist, overlap, sensitivity, prefix))
 
-def visualize_2d_line(fname, camviews, all_lines_2d, img_id, line_id):
-    img = utils.imread_camview(camviews[img_id])
+def visualize_2d_line(fname, imagecols, all_lines_2d, img_id, line_id):
+    img = imagecols.read_image(img_id)
     img = draw_segments(img, [all_lines_2d[img_id][line_id].as_array().reshape(-1)], (0, 255, 0))
     cv2.imwrite(fname, img)
 
-def visualize_line_track(camviews, linetrack, prefix='linetrack', report=False):
+def visualize_line_track(imagecols, linetrack, prefix='linetrack', report=False):
     print("[VISUALIZE]: line length: {0}, num_supporting_lines: {1}".format(linetrack.line.length(), len(linetrack.image_id_list)))
     for idx, (img_id, line2d) in enumerate(zip(linetrack.image_id_list, linetrack.line2d_list)):
-        img = utils.imread_camview(camviews[img_id], set_gray=False)
+        img = imagecols.read_image(img_id)
         if len(img.shape) == 2:
             img = img[:,:,None].repeat(3, 2)
-        if camviews is not None:
-            report_dist_reprojection(linetrack.line, line2d, camviews[img_id], prefix="Reprojecting to line {0} (img {1}, line {2})".format(idx, img_id, linetrack.line_id_list[idx]))
-            line2d_proj = linetrack.line.projection(camviews[img_id])
-            img = draw_segments(img, [line2d_proj.as_array().reshape(-1)], (255, 0, 0), thickness=1)
+        report_dist_reprojection(linetrack.line, line2d, imagecols.camview(img_id), prefix="Reprojecting to line {0} (img {1}, line {2})".format(idx, img_id, linetrack.line_id_list[idx]))
+        line2d_proj = linetrack.line.projection(imagecols.camview(img_id))
+        img = draw_segments(img, [line2d_proj.as_array().reshape(-1)], (255, 0, 0), thickness=1)
         img = draw_segments(img, [line2d.as_array().reshape(-1)], (0, 0, 255), thickness=1)
-        fname = os.path.join('tmp', '{0}.{1}.{2}.png'.format(prefix, idx, os.path.basename(camviews[img_id].image_name())[:-4]))
+        fname = os.path.join('tmp', '{0}.{1}.{2}.png'.format(prefix, idx, os.path.basename(imagecols.camimage(img_id).image_name())[:-4]))
         cv2.imwrite(fname, img)
 
 def vis_vpresult(img, lines, vpres, show_original=False):

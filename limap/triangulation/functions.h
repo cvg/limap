@@ -3,7 +3,7 @@
 
 #include "util/types.h"
 #include "base/linebase.h"
-#include "base/camera.h"
+#include "base/camera_view.h"
 #include <tuple>
 
 namespace limap {

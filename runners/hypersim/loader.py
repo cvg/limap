@@ -13,17 +13,19 @@ def read_scene_hypersim(cfg, dataset, scene_id, cam_id=0, load_depth=False):
     index_list = np.arange(0, cfg["input_n_views"], cfg["input_stride"]).tolist()
     index_list = dataset.filter_index_list(index_list, cam_id=cam_id)
 
-    # get camviews
+    # get image collections
     K = dataset.K.astype(np.float32)
     img_hw = [dataset.h, dataset.w]
     Ts, Rs = dataset.load_cameras(cam_id=cam_id)
-    cameras = [_base.Camera("SIMPLE_PINHOLE", K, cam_id=0, hw=img_hw)]
-    camviews = []
+    cameras = {}
+    cameras[0] = _base.Camera("SIMPLE_PINHOLE", K, cam_id=0, hw=img_hw)
+    camimages = []
     for image_id in index_list:
         pose = _base.CameraPose(Rs[image_id], Ts[image_id])
         imname = dataset.load_imname(image_id, cam_id=cam_id)
-        camview = _base.CameraView(cameras[0], pose, image_name=imname)
-        camviews.append(camview)
+        camimage = _base.CameraImage(0, pose, image_name=imname)
+        camimages.append(camimage)
+    imagecols = _base.ImageCollection(cameras, camimages)
 
     if load_depth:
         # get depths
@@ -31,7 +33,7 @@ def read_scene_hypersim(cfg, dataset, scene_id, cam_id=0, load_depth=False):
         for image_id in index_list:
             depth = dataset.load_depth(image_id, cam_id=cam_id)
             depths.append(depth)
-        return camviews, depths
+        return imagecols, depths
     else:
-        return camviews
+        return imagecols
 

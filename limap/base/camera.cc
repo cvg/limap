@@ -1,8 +1,5 @@
 #include "base/camera.h"
 
-#include <iomanip>
-#include <colmap/base/pose.h>
-
 namespace limap {
 
 Camera::Camera(const colmap::Camera& cam) {
@@ -134,8 +131,27 @@ Camera::Camera(const std::string& model_name, M3D K, int cam_id, std::pair<int, 
     }
 }
 
+bool Camera::operator ==(const Camera& cam) {
+    if (CameraId() != cam.CameraId())
+        return false;
+    if (ModelId() != cam.ModelId())
+        return false;
+    if (h() != cam.h())
+        return false;
+    if (w() != cam.w())
+        return false;
+    std::vector<double> params = Params();
+    std::vector<double> params_cam = cam.Params();
+    for (int i = 0; i < params.size(); ++i) {
+        if (params[i] != params_cam[i])
+            return false;
+    }
+    return true;
+}
+
 void Camera::set_max_image_dim(const int& val) {
     THROW_CHECK_EQ(IsUndistorted(), true);
+    THROW_CHECK_GT(val, 0)
 
     double height = Height();
     double width = Width();
@@ -161,45 +177,6 @@ double Camera::uncertainty(double depth, double var2d) const {
         throw std::runtime_error("Error! FocalLengthIdxs() should be either 1 or 2");
     double uncertainty = var2d * depth / f;
     return uncertainty;
-}
-
-double CameraPose::projdepth(const V3D& p3d) const {
-    V3D p_cam = R() * p3d + T();
-    return p_cam(2);
-}
-
-V2D CameraView::projection(const V3D& p3d) const {
-    V3D p_homo = K() * (R() * p3d + T());
-    V2D p2d;
-    p2d(0) = p_homo(0) / p_homo(2);
-    p2d(1) = p_homo(1) / p_homo(2);
-    return p2d;
-}
-
-V3D CameraView::ray_direction(const V2D& p2d) const {
-    return (R().transpose() * K_inv() * V3D(p2d(0), p2d(1), 1.0)).normalized();
-}
-
-MinimalPinholeCamera::MinimalPinholeCamera(const CameraView& view) {
-    THROW_CHECK_EQ(view.cam.IsUndistorted(), true);
-
-    M3D K = view.K();
-    kvec[0] = K(0, 0); kvec[1] = K(1, 1);
-    kvec[2] = K(0, 2); kvec[3] = K(1, 2);
-    qvec = view.pose.qvec;
-    tvec = view.pose.tvec;
-    height = view.cam.h(); width = view.cam.w();
-}
-
-CameraView MinimalPinholeCamera::GetCameraView() const {
-    M3D K = M3D::Zero();
-    K(0, 0) = kvec[0]; K(1, 1) = kvec[1];
-    K(0, 2) = kvec[2]; K(1, 2) = kvec[3];
-    K(2, 2) = 1.0;
-    CameraView view = CameraView(Camera(K), CameraPose(qvec, tvec));
-    view.cam.SetHeight(height);
-    view.cam.SetWidth(width);
-    return view;
 }
 
 Camera::Camera(py::dict dict) {
@@ -233,6 +210,11 @@ py::dict Camera::as_dict() const {
     return output;
 }
 
+double CameraPose::projdepth(const V3D& p3d) const {
+    V3D p_cam = R() * p3d + T();
+    return p_cam(2);
+}
+
 CameraPose::CameraPose(py::dict dict) {
     ASSIGN_PYDICT_ITEM(dict, qvec, V4D);
     ASSIGN_PYDICT_ITEM(dict, tvec, V3D);
@@ -244,38 +226,6 @@ py::dict CameraPose::as_dict() const {
     output["tvec"] = tvec;
     return output;
 }
-
-CameraView::CameraView(py::dict dict) {
-    cam = Camera(dict);
-    pose = CameraPose(dict);
-
-    // load image name
-    std::string image_name;
-    ASSIGN_PYDICT_ITEM(dict, image_name, std::string);
-    SetImageName(image_name);
-}
-
-py::dict CameraView::as_dict() const {
-    py::dict output;
-    output["model_id"] = cam.ModelId();
-    output["params"] = cam.params();
-    output["cam_id"] = cam.CameraId();
-    output["height"] = cam.h();
-    output["width"] = cam.w();
-    output["qvec"] = pose.qvec;
-    output["tvec"] = pose.tvec;
-    output["image_name"] = image_name_;
-    return output;
-}
-
-MinimalPinholeCamera cam2minimalcam(const CameraView& view) {
-    MinimalPinholeCamera cam = MinimalPinholeCamera(view);
-    return cam;
-}
-
-CameraView minimalcam2cam(const MinimalPinholeCamera& camera) {
-    return camera.GetCameraView();
-} 
 
 } // namespace limap
 

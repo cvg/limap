@@ -2,7 +2,7 @@
 
 namespace limap {
 
-LineReconstruction::LineReconstruction(const std::vector<LineTrack>& linetracks, const std::vector<CameraView>& views) 
+LineReconstruction::LineReconstruction(const std::vector<LineTrack>& linetracks, const ImageCollection& imagecols) 
 {
     // initialize minimal infinite lines
     init_tracks_ = linetracks;
@@ -11,10 +11,10 @@ LineReconstruction::LineReconstruction(const std::vector<LineTrack>& linetracks,
     }
 
     // initialize minimal cameras
-    int n_views = views.size();
-    for (int view_id = 0; view_id < n_views; ++view_id) {
-        init_cameras_.insert(std::make_pair(view_id, views[view_id]));
-        cameras_.push_back(MinimalPinholeCamera(views[view_id]));
+    int n_images = imagecols.NumImages();
+    for (int img_id = 0; img_id < n_images; ++img_id) {
+        init_cameras_.insert(std::make_pair(img_id, imagecols.camview(img_id)));
+        cameras_.push_back(MinimalPinholeCamera(imagecols.camview(img_id)));
     }
 }
 

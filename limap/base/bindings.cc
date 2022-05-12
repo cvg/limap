@@ -12,6 +12,8 @@ namespace py = pybind11;
 
 #include "base/graph.h"
 #include "base/camera.h"
+#include "base/camera_view.h"
+#include "base/image_collection.h"
 #include "base/linebase.h"
 #include "base/linetrack.h"
 #include "base/line_dists.h"
@@ -289,7 +291,7 @@ void bind_line_linker(py::module& m) {
 void bind_line_reconstruction(py::module& m) {
     py::class_<LineReconstruction>(m, "LineReconstruction")
         .def(py::init<>())
-        .def(py::init<const std::vector<LineTrack>&, const std::vector<CameraView>&>())
+        .def(py::init<const std::vector<LineTrack>&, const ImageCollection&>())
         .def("NumTracks", &LineReconstruction::NumTracks)
         .def("NumCameras", &LineReconstruction::NumCameras)
         .def("GetInitTrack", &LineReconstruction::GetInitTrack)
@@ -299,18 +301,8 @@ void bind_line_reconstruction(py::module& m) {
         .def("GetImageIds", &LineReconstruction::GetImageIds)
         .def("GetLine2ds", &LineReconstruction::GetLine2ds)
         .def("GetCameras", &LineReconstruction::GetCameras)
-        .def("GetLines", 
-                [] (LineReconstruction& self, const int num_outliers) {
-                    return self.GetTracks(num_outliers);
-                },
-                py::arg("num_outliers") = 2
-            )
-        .def("GetTracks", 
-                [] (LineReconstruction& self, const int num_outliers) {
-                    return self.GetTracks(num_outliers);
-                },
-                py::arg("num_outliers") = 2
-            );
+        .def("GetLines", &LineReconstruction::GetLines, py::arg("num_outliers") = 2)
+        .def("GetTracks", &LineReconstruction::GetTracks, py::arg("num_outliers") = 2);
 }
 
 void bind_camera(py::module& m) {
@@ -322,6 +314,7 @@ void bind_camera(py::module& m) {
         .def(py::init<int, M3D, int, std::pair<int, int>>(), py::arg("model_id"), py::arg("K"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1))
         .def(py::init<const std::string&, M3D, int, std::pair<int, int>>(), py::arg("model_name"), py::arg("K"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1))
         .def(py::init<py::dict>())
+        .def("as_dict", &Camera::as_dict)
         .def("h", &Camera::h)
         .def("w", &Camera::w)
         .def("K", &Camera::K)
@@ -338,6 +331,7 @@ void bind_camera(py::module& m) {
         .def(py::init<V4D, V3D>())
         .def(py::init<M3D, V3D>())
         .def(py::init<py::dict>())
+        .def("as_dict", &CameraPose::as_dict)
         .def_readonly("qvec", &CameraPose::qvec)
         .def_readonly("tvec", &CameraPose::tvec)
         .def("R", &CameraPose::R)
@@ -345,13 +339,28 @@ void bind_camera(py::module& m) {
         .def("center", &CameraPose::center)
         .def("projdepth", &CameraPose::projdepth);
 
+    py::class_<CameraImage>(m, "CameraImage")
+        .def(py::init<>())
+        .def(py::init<const int&, const CameraPose&, const std::string&>(), py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
+        .def(py::init<const Camera&, const CameraPose&, const std::string&>(), py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
+        .def(py::init<py::dict>())
+        .def("as_dict", &CameraImage::as_dict)
+        .def_readonly("cam_id", &CameraImage::cam_id)
+        .def_readonly("pose", &CameraImage::pose)
+        .def("R", &CameraImage::R)
+        .def("T", &CameraImage::T)
+        .def("set_camera_id", &CameraImage::SetCameraId)
+        .def("image_name", &CameraImage::image_name)
+        .def("set_image_name", &CameraImage::SetImageName);
+
     py::class_<CameraView>(m, "CameraView")
         .def(py::init<>())
         .def(py::init<const Camera&, const CameraPose&, const std::string&>(), py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
         .def(py::init<py::dict>())
-        .def_readwrite("cam", &CameraView::cam)
-        .def_readwrite("pose", &CameraView::pose)
+        .def_readonly("cam", &CameraView::cam)
+        .def_readonly("pose", &CameraView::pose)
         .def("as_dict", &CameraView::as_dict)
+        .def("read_image", &CameraView::read_image, py::arg("set_gray")=false)
         .def("K", &CameraView::K)
         .def("K_inv", &CameraView::K_inv)
         .def("h", &CameraView::h)
@@ -362,6 +371,29 @@ void bind_camera(py::module& m) {
         .def("ray_direction", &CameraView::ray_direction)
         .def("image_name", &CameraView::image_name)
         .def("set_image_name", &CameraView::SetImageName);
+
+    py::class_<ImageCollection>(m, "ImageCollection")
+        .def(py::init<>())
+        .def(py::init<const std::vector<Camera>&, const std::vector<CameraImage>&>())
+        .def(py::init<const std::map<int, Camera>&, const std::vector<CameraImage>&>())
+        .def(py::init<const std::vector<CameraView>&>())
+        .def(py::init<py::dict>())
+        .def("as_dict", &ImageCollection::as_dict)
+        .def("get_cameras", &ImageCollection::get_cameras)
+        .def("get_cam_ids", &ImageCollection::get_cam_ids)
+        .def("get_images", &ImageCollection::get_images)
+        .def("get_camviews", &ImageCollection::get_camviews)
+        .def("cam", &ImageCollection::cam)
+        .def("exist_cam", &ImageCollection::exist_cam)
+        .def("camimage", &ImageCollection::camimage)
+        .def("campose", &ImageCollection::campose)
+        .def("camview", &ImageCollection::camview)
+        .def("image_name", &ImageCollection::image_name)
+        .def("get_image_list", &ImageCollection::get_image_list)
+        .def("NumCameras", &ImageCollection::NumCameras)
+        .def("NumImages", &ImageCollection::NumImages)
+        .def("set_max_image_dim", &ImageCollection::set_max_image_dim)
+        .def("read_image", &ImageCollection::read_image, py::arg("img_id"), py::arg("set_gray")=false);
 }
 
 template <typename DTYPE>

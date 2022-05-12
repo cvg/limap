@@ -7,11 +7,11 @@ import joblib
 import utils
 import torch
 
-def sold2_detect_2d_segs_on_images(camviews, set_gray=True, heatmap_dir=None, descriptor_dir=None, max_num_2d_segs=3000):
+def sold2_detect_2d_segs_on_images(imagecols, set_gray=True, heatmap_dir=None, descriptor_dir=None, max_num_2d_segs=3000):
     all_2d_segs, descriptors, heatmaps, descinfos = [], [], [], []
-    print("Start sold2 line detection (n_images = {0}).".format(len(camviews)))
-    for idx, camview in enumerate(tqdm(camviews)):
-        img = utils.imread_camview(camview, set_gray=set_gray)
+    print("Start sold2 line detection (n_images = {0}).".format(imagecols.NumImages()))
+    for img_id in tqdm(range(imagecols.NumImages())):
+        img = imagecols.read_image(img_id, set_gray=set_gray)
         segs, descriptor, heatmap, descinfo = sold2_detect(img)
         if segs.shape[0] > max_num_2d_segs:
             lengths_squared = (segs[:,2] - segs[:,0]) ** 2 + (segs[:,3] - segs[:,1]) ** 2
@@ -24,49 +24,46 @@ def sold2_detect_2d_segs_on_images(camviews, set_gray=True, heatmap_dir=None, de
         if heatmap_dir is not None:
             if not os.path.exists(heatmap_dir):
                 os.makedirs(heatmap_dir)
-            with open(os.path.join(heatmap_dir, "heatmap_{0}.npy".format(idx)), "wb") as f:
+            with open(os.path.join(heatmap_dir, "heatmap_{0}.npy".format(img_id)), "wb") as f:
                 np.savez(f, data=heatmap)
         if descriptor_dir is not None:
             if not os.path.exists(descriptor_dir):
                 os.makedirs(descriptor_dir)
-            with open(os.path.join(descriptor_dir, "descriptor_{0}.npy".format(idx)), "wb") as f:
+            with open(os.path.join(descriptor_dir, "descriptor_{0}.npy".format(img_id)), "wb") as f:
                 np.savez(f, data=descriptor)
-        # print("Finishing sold2 line detection (num_lines={0}) on image (id={1}): {2}.".format(len(segs), idx, camview.image_name()))
+        # print("Finishing sold2 line detection (num_lines={0}) on image (id={1}): {2}.".format(len(segs), img_id, imagecols.camimage(img_id).image_name()))
     torch.cuda.empty_cache()
     return all_2d_segs, descinfos
 
 def sold2_compute_descinfos_with_descriptors(all_2d_segs, descriptors):
-    # detector = SOLD2LineDetector()
     descinfos = []
     n_images = len(all_2d_segs)
     print("Start computing sold2 desciptors for line segments (n_images = {0}).".format(n_images))
     for idx in tqdm(range(n_images)):
         segs, desc = all_2d_segs[idx], descriptors[idx]
-        # descinfo = sold2_compute_descinfo(segs, desc, detector)
         descinfo = sold2_compute_descinfo(segs, desc)
         descinfos.append(descinfo)
         torch.cuda.empty_cache()
     return descinfos
 
-def sold2_compute_descinfos(camviews, all_2d_segs, set_gray=True, descinfo_dir=None):
+def sold2_compute_descinfos(imagecols, all_2d_segs, set_gray=True, descinfo_dir=None):
     detector = SOLD2LineDetector()
     descinfos = []
     n_images = len(all_2d_segs)
     print("Start computing sold2 desciptors for line segments (n_images = {0}).".format(n_images))
-    for idx in tqdm(range(n_images)):
-        segs = all_2d_segs[idx]
-        camview = camviews[idx]
+    for img_id in tqdm(range(n_images)):
+        segs = all_2d_segs[img_id]
         if descinfo_dir is not None:
-            fname = os.path.join(descinfo_dir, "descinfo_{0}.npy".format(idx))
+            fname = os.path.join(descinfo_dir, "descinfo_{0}.npy".format(img_id))
             if os.path.isfile(fname):
                 continue
-        img = utils.imread_camview(camview, set_gray=set_gray)
+        img = imagecols.read_image(img_id, set_gray=set_gray)
         _, descriptor, _, _ = sold2_detect(img, detector)
         descinfo = sold2_compute_descinfo(segs, descriptor, detector)
         if descinfo_dir is not None:
             if not os.path.exists(descinfo_dir):
                 os.makedirs(descinfo_dir)
-            with open(os.path.join(descinfo_dir, "descinfo_{0}.npy".format(idx)), "wb") as f:
+            with open(os.path.join(descinfo_dir, "descinfo_{0}.npy".format(img_id)), "wb") as f:
                 arr = descinfo
                 if len(arr) == 2:
                     arr[1] = arr[1][None,...]

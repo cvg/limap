@@ -7,7 +7,6 @@
 
 #include "base/linebase.h"
 #include "base/linetrack.h"
-#include "base/camera.h"
 #include "base/infinite_line.h"
 #include "base/featuremap.h"
 #include "base/featurepatch.h"

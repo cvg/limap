@@ -45,26 +45,27 @@ def ReadInfos(model, colmap_path, model_path="sparse", image_path="images", chec
     print("Reconstruction loaded. (n_images = {0})".format(len(colmap_images)))
 
     # read cameras
-    cam_dict = {}
+    cameras = {}
     for cam_id, colmap_cam in colmap_cameras.items():
-        cam = _base.Camera(colmap_cam.model, colmap_cam.params, cam_id=cam_id, hw=[colmap_cam.height, colmap_cam.width])
-        cam_dict[cam_id] = cam
+        cameras[cam_id] = _base.Camera(colmap_cam.model, colmap_cam.params, cam_id=cam_id, hw=[colmap_cam.height, colmap_cam.width])
 
     # read images
     n_images = len(colmap_images)
-    camview_dict = {}
+    camimage_dict = {}
     for image_id, colmap_image in colmap_images.items():
         imname = colmap_image.name
         cam_id = colmap_image.camera_id
-        camera = cam_dict[cam_id]
         pose = _base.CameraPose(colmap_image.qvec, colmap_image.tvec)
-        view = _base.CameraView(camera, pose, image_name=os.path.join(image_path, imname))
-        camview_dict[imname] = view
+        camimage = _base.CameraImage(cam_id, pose, image_name=os.path.join(image_path, imname))
+        camimage_dict[imname] = camimage
 
     # map to the correct order
-    camviews = []
+    camimages = []
     for imname in image_names:
-        view = camview_dict[imname]
-        camviews.append(view)
-    return camviews
+        camimage = camimage_dict[imname]
+        camimages.append(camimage)
+
+    # get image collection
+    imagecols = _base.ImageCollection(cameras, camimages)
+    return imagecols
 

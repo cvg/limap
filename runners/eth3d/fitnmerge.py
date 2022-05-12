@@ -9,8 +9,8 @@ import core.utils as utils
 import limap.runners
 
 def run_scene_eth3d(cfg, dataset, reso_type, scene_id, cam_id=0):
-    camviews, neighbors, ranges, depths = read_scene_eth3d(cfg, dataset, reso_type, scene_id, cam_id=cam_id, load_depth=True)
-    linetracks = limap.runners.line_fitnmerge(cfg, camviews, depths, neighbors=neighbors, ranges=ranges)
+    imagecols, neighbors, ranges, depths = read_scene_eth3d(cfg, dataset, reso_type, scene_id, cam_id=cam_id, load_depth=True)
+    linetracks = limap.runners.line_fitnmerge(cfg, imagecols, depths, neighbors=neighbors, ranges=ranges)
     return linetracks
 
 def parse_config():

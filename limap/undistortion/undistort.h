@@ -6,6 +6,7 @@
 #include "_limap/helpers.h"
 
 #include "base/camera.h"
+#include "base/camera_view.h"
 #include "util/types.h"
 
 namespace py = pybind11;

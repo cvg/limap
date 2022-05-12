@@ -12,23 +12,21 @@ def run_colmap_triangulation(cfg, colmap_path, model_path="sparse", image_path="
     Run triangulation from COLMAP input
     '''
     if cfg["info_path"] is None:
-        camviews, neighbors, ranges = _psfm.read_infos_colmap(cfg["sfm"], colmap_path, model_path=model_path, image_path=image_path, n_neighbors=cfg["n_neighbors"])
+        imagecols, neighbors, ranges = _psfm.read_infos_colmap(cfg["sfm"], colmap_path, model_path=model_path, image_path=image_path, n_neighbors=cfg["n_neighbors"])
         with open(os.path.join("tmp", "infos_colmap.npy"), 'wb') as f:
-            camviews_np = [view.as_dict() for view in camviews]
-            np.savez(f, camviews_np=camviews_np, neighbors=neighbors, ranges=ranges)
+            np.savez(f, imagecols_np=imagecols.as_dict(), neighbors=neighbors, ranges=ranges)
     else:
         with open(cfg["info_path"], 'rb') as f:
             data = np.load(f, allow_pickle=True)
-            camviews_np, neighbors, ranges = data["camviews_np"], data["neighbors"], data["ranges"]
-            camviews = [_base.CameraView(view_np) for view_np in camviews_np]
+            imagecols_np, neighbors, ranges = data["imagecols_np"], data["neighbors"], data["ranges"]
+            imagecols = _base.ImageCollection(imagecols_np)
 
-    # resize camera
+    # resize cameras
     if cfg["max_image_dim"] != -1 and cfg["max_image_dim"] is not None:
-        for camview in camviews:
-            camview.cam.set_max_image_dim(cfg["max_image_dim"])
+        imagecols.set_max_image_dim(cfg["max_image_dim"])
 
     # run triangulation
-    linetracks = limap.runners.line_triangulation(cfg, camviews, neighbors=neighbors, ranges=ranges)
+    linetracks = limap.runners.line_triangulation(cfg, imagecols, neighbors=neighbors, ranges=ranges)
     return linetracks
 
 def parse_config():

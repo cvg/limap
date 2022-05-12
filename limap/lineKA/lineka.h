@@ -7,7 +7,7 @@
 
 #include "base/linebase.h"
 #include "base/line2d_parameterization.h"
-#include "base/camera.h"
+#include "base/camera_view.h"
 #include "base/graph.h"
 #include "base/featurepatch.h"
 #include "util/types.h"
