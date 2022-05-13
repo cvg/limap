@@ -5,44 +5,46 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 import core.detector.LSD as lsd
 import core.detector.SOLD2 as sold2
 import core.visualize as vis
-import core.utils as utils
+import limap.util.io_utils as limapio
 
-def setup(cfg, imagecols):
-    print("number of images: {0}".format(imagecols.NumImages()))
-    folder_to_save = cfg["folder_to_save"]
-    if cfg["folder_to_save"] is None:
+def setup(cfg):
+    folder_to_save = cfg["output_dir"]
+    if folder_to_save is None:
         folder_to_save = 'tmp'
     if not os.path.exists(folder_to_save): os.makedirs(folder_to_save)
-    folder_to_load = cfg["folder_to_load"]
+    folder_to_load = cfg["load_dir"]
     if cfg["use_tmp"]: folder_to_load = "tmp"
+    if folder_to_load is None:
+        folder_to_load = folder_to_save
     cfg["dir_save"] = folder_to_save
     cfg["dir_load"] = folder_to_load
+    print("output dir: {0}".format(cfg["dir_save"]))
+    print("loading dir: {0}".format(cfg["dir_load"]))
     return cfg
 
-def compute_sfminfos(cfg, imagecols, fname="sfm_metainfos.npy"):
+def compute_sfminfos(cfg, imagecols, fname="metainfos.txt"):
     import limap.pointsfm as _psfm
     if not cfg["load_meta"]:
         # run colmap sfm and compute neighbors, ranges
-        colmap_output_path = cfg["sfm"]["colmap_output_path"]
+        colmap_output_path = os.path.join(cfg["dir_save"], cfg["sfm"]["colmap_output_path"])
         if not cfg["sfm"]["reuse"]:
             _psfm.run_colmap_sfm_with_known_poses(cfg["sfm"], imagecols, output_path=colmap_output_path, use_cuda=cfg["use_cuda"])
         model = _psfm.SfmModel()
         model.ReadFromCOLMAP(colmap_output_path, "sparse", "images")
         neighbors = _psfm.ComputeNeighborsSorted(model, cfg["n_neighbors"], min_triangulation_angle=cfg["sfm"]["min_triangulation_angle"], neighbor_type=cfg["sfm"]["neighbor_type"])
         ranges = model.ComputeRanges(cfg["sfm"]["ranges"]["range_robust"], cfg["sfm"]["ranges"]["k_stretch"])
-        with open(os.path.join(cfg["dir_save"], fname), 'wb') as f: np.savez(f, neighbors=neighbors, ranges=ranges)
+        fname_save = os.path.join(cfg["dir_save"], fname)
+        limapio.save_txt_metainfos(fname_save, neighbors, ranges)
     else:
+        # load from precomputed info
+        limapio.check_path(cfg["dir_load"])
         fname_load = os.path.join(cfg["dir_load"], fname)
-        with open(fname_load, 'rb') as f:
-            data = np.load(f, allow_pickle=True)
-            neighbors = data['neighbors']
-            neighbors = [neighbor[:cfg["n_neighbors"]] for neighbor in neighbors]
-            ranges = data['ranges']
+        neighbors, ranges = limapio.read_txt_metainfos(fname_load)
+        neighbors = [neighbor[:cfg["n_neighbors"]] for neighbor in neighbors]
     return neighbors, ranges
 
 def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
     descinfo_folder = None
-    compute_descinfo = (compute_descinfo and (not cfg["load_match"]) and (not cfg["load_det"])) or cfg["line2d"]["compute_descinfo"]
     image_names = [imagecols.camimage(idx).image_name() for idx in range(imagecols.NumImages())]
     if not cfg["load_det"]:
         descinfo_folder = os.path.join(cfg["dir_save"], "{0}_descinfos".format(cfg["line2d"]["detector"]))

@@ -3,8 +3,6 @@ import numpy as np
 from tqdm import tqdm
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-import core.visualize as vis
-import core.utils as utils
 
 import limap.base as _base
 import limap.merging as _mrg
@@ -12,51 +10,41 @@ import limap.triangulation as _tri
 import limap.vpdetection as _vpdet
 import limap.lineBA as _lineBA
 import limap.runners as _runners
+import limap.util.io_utils as limapio
+import limap.visualize as limapvis
 
-def line_triangulation(cfg, imagecols, neighbors=None, ranges=None, valid_index_list=None):
+def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     '''
     Args:
     - imagecols: limap.base.ImageCollection
     '''
-    cfg = _runners.setup(cfg, imagecols)
+    print("number of images: {0}".format(imagecols.NumImages()))
+    cfg = _runners.setup(cfg)
     if cfg["triangulation"]["var2d"] == -1:
         cfg["triangulation"]["var2d"] = cfg["var2d"][cfg["line2d"]["detector"]]
-    if valid_index_list is not None:
-        assert len(valid_index_list) == imagecols.NumImages()
-    if neighbors is not None:
-        neighbors = [neighbor[:cfg["n_neighbors"]] for neighbor in neighbors]
+    limapio.save_txt_imname_list(os.path.join(cfg["dir_save"], 'image_list.txt'), imagecols.get_image_list())
+    limapio.save_npy(os.path.join(cfg["dir_save"], 'image_collection.npy'), imagecols.as_dict())
 
     ##########################################################
     # [A] sfm metainfos (neighbors, ranges)
     ##########################################################
     if neighbors is None:
         neighbors, ranges = _runners.compute_sfminfos(cfg, imagecols)
+    else:
+        neighbors = [neighbor[:cfg["n_neighbors"]] for neighbor in neighbors]
 
     ##########################################################
     # [B] get 2D line segments and line heatmaps for each image
     ##########################################################
     compute_descinfo = (not cfg["triangulation"]["use_exhaustive_matcher"])
+    compute_descinfo = (compute_descinfo and (not cfg["load_match"]) and (not cfg["load_det"])) or cfg["line2d"]["compute_descinfo"]
     all_2d_segs, descinfo_folder = _runners.compute_2d_segs(cfg, imagecols, compute_descinfo=compute_descinfo)
-    if valid_index_list is not None:
-        all_2d_segs = all_2d_segs[valid_index_list]
-
-    # Writing out information for localization
-    loc_dir = os.path.join(cfg["dir_save"], "localization")
-    if not os.path.exists(loc_dir):
-        os.makedirs(loc_dir)
-    image_names = imagecols.get_image_list()
-    vis.txt_save_image_list(image_names, os.path.join(loc_dir, "image_list.txt"))
-    vis.txt_save_neighbors(neighbors, os.path.join(loc_dir, "neighbors.txt"))
-    # vis.txt_save_detections(all_2d_segs, os.path.join(loc_dir, "detections.txt"))
 
     ##########################################################
     # [C] get line matches
     ##########################################################
-    if cfg["triangulation"]["use_exhaustive_matcher"]:
-        matches_dir = None
-    else:
+    if not cfg["triangulation"]["use_exhaustive_matcher"]:
         matches_dir = _runners.compute_matches(cfg, descinfo_folder, neighbors)
-        print("Loading {0}".format(matches_dir))
 
     ##########################################################
     # [D] multi-view triangulation
@@ -66,13 +54,11 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None, valid_index_
     Triangulator.SetRanges(ranges)
     all_2d_lines = _tri.GetAllLines2D(all_2d_segs)
     Triangulator.Init(all_2d_lines, imagecols)
-    if valid_index_list is None:
-        valid_index_list = np.arange(0, imagecols.NumImages()).tolist()
-    for img_id, index in enumerate(tqdm(valid_index_list)):
+    for img_id in range(imagecols.NumImages()):
         if cfg["triangulation"]["use_exhaustive_matcher"]:
             Triangulator.InitExhaustiveMatchImage(img_id, neighbors[img_id])
         else:
-            with open(os.path.join(matches_dir, "matches_{0}.npy".format(index)), 'rb') as f:
+            with open(os.path.join(matches_dir, "matches_{0}.npy".format(img_id)), 'rb') as f:
                 data = np.load(f, allow_pickle=True)
                 matches = data["data"]
             Triangulator.InitMatchImage(img_id, matches, neighbors[img_id], triangulate=True, scoring=True)
@@ -106,27 +92,18 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None, valid_index_
     ##########################################################
     # [F] output and visualization
     ##########################################################
-    # save info
-    final_output_dir = os.path.join(cfg["dir_save"], "finaltracks")
-    if not os.path.exists(final_output_dir): os.makedirs(final_output_dir)
-    vis.save_linetracks_to_folder(linetracks, final_output_dir)
-    vis.txt_save_linetracks(linetracks, os.path.join(loc_dir, "alltracks.txt"), n_visible_views=4)
-    with open(os.path.join(final_output_dir, "all_infos.npy"), "wb") as f:
-        np.savez(f, all_2d_segs=all_2d_segs, imagecols=imagecols.as_dict(), cfg=cfg, n_tracks=len(linetracks))
-
-    VisTrack = vis.TrackVisualizer(linetracks, visualize=cfg["visualize"])
+    # save tracks
+    limapio.save_folder_linetracks(os.path.join(cfg["dir_save"], "finaltracks"), linetracks)
+    limapio.save_txt_linetracks(os.path.join(cfg["dir_save"], "alltracks.txt"), linetracks, n_visible_views=4)
+    VisTrack = limapvis.PyVistaTrackVisualizer(linetracks, visualize=cfg["visualize"])
     VisTrack.report()
-    lines_np = VisTrack.get_lines_np()
-    counts_np = VisTrack.get_counts_np()
-    with open(os.path.join(cfg["dir_save"], 'lines_to_vis.npy'), 'wb') as f: np.savez(f, lines=lines_np, counts=counts_np, ranges=None)
-    vis.save_obj(os.path.join(cfg["dir_save"], 'lines_to_vis.obj'), lines_np, counts=counts_np, n_visible_views=cfg['n_visible_views'])
-    vis.save_obj(os.path.join(cfg["dir_save"], 'lines_nodes.obj'), Triangulator.GetAllValidBestTris())
-    validtracks = [track for track in linetracks if track.count_images() >= cfg["n_visible_views"]]
+    limapio.save_obj(os.path.join(cfg["dir_save"], 'triangulated_lines_nv{0}.obj'.format(cfg["n_visible_views"])), VisTrack.get_lines_np(n_visible_views=cfg["n_visible_views"]))
 
     # visualize
     if cfg["visualize"]:
+        validtracks = [track for track in linetracks if track.count_images() >= cfg["n_visible_views"]]
         def report_track(track_id):
-            vis.visualize_line_track(imagecols, validtracks[track_id], prefix="track.{0}".format(track_id))
+            limapvis.visualize_line_track(imagecols, validtracks[track_id], prefix="track.{0}".format(track_id))
         import pdb
         pdb.set_trace()
         VisTrack.vis_all_lines(n_visible_views=cfg["n_visible_views"], width=2)

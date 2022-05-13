@@ -15,4 +15,6 @@ from . import lineBA
 from . import evaluation
 from . import fitting
 from . import runners
+from . import util
+from . import visualize
 

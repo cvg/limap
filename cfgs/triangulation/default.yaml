@@ -11,12 +11,13 @@ n_neighbors: 20
 use_cuda: True
 visualize: True
 max_image_dim: 1600
-folder_to_save: null 
+output_dir: null 
+load_dir: null
 
 ##############################
 # sfm config
 sfm: 
-    colmap_output_path: "tmp/tmp_colmap"
+    colmap_output_path: "colmap_outputs"
     reuse: False
     min_triangulation_angle: 1.0
     neighbor_type: "dice" # ["overlap", "iou", "dice"]

@@ -4,16 +4,14 @@ from tqdm import tqdm
 import joblib
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-import core.detector.LSD as lsd
-import core.detector.SOLD2 as sold2
-import core.visualize as vis
-import core.utils as utils
 
 import limap.base as _base
 import limap.fitting as _fit
 import limap.merging as _mrg
 import limap.lineBA as _lineBA
 import limap.runners as _runners
+import limap.util.io_utils as limapio
+import limap.visualize as limapvis
 
 def fit_3d_segs(all_2d_segs, imagecols, depths, fitting_config):
     '''
@@ -47,24 +45,27 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     - depths: list of depth images
     '''
     # assertion check
-    cfg = _runners.setup(cfg, imagecols)
+    print("number of images: {0}".format(imagecols.NumImages()))
+    cfg = _runners.setup(cfg)
     if cfg["fitting"]["var2d"] == -1:
         cfg["fitting"]["var2d"] = cfg["var2d"][cfg["line2d"]["detector"]]
     if cfg["merging"]["var2d"] == -1:
         cfg["merging"]["var2d"] = cfg["var2d"][cfg["line2d"]["detector"]]
-    if neighbors is not None:
-        neighbors = [neighbor[:cfg["n_neighbors"]] for neighbor in neighbors]
+    limapio.save_txt_imname_list(os.path.join(cfg["dir_save"], 'image_list.txt'), imagecols.get_image_list())
+    limapio.save_npy(os.path.join(cfg["dir_save"], 'image_collection.npy'), imagecols.as_dict())
 
     ##########################################################
     # [A] sfm metainfos (neighbors, ranges)
     ##########################################################
     if neighbors is None:
         neighbors, ranges = _runners.compute_sfminfos(cfg, imagecols)
+    else:
+        neighbors = [neighbor[:cfg["n_neighbors"]] for neighbor in neighbors]
 
     ##########################################################
     # [B] get 2D line segments for each image
     ##########################################################
-    all_2d_segs, _ = _runners.compute_2d_segs(cfg, imagecols, compute_descinfo=False)
+    all_2d_segs, _ = _runners.compute_2d_segs(cfg, imagecols, compute_descinfo=cfg["line2d"]["compute_descinfo"])
 
     ##########################################################
     # [C] fit 3d segments
@@ -72,16 +73,13 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     fname_fit_segs = '{0}_fit_segs.npy'.format(cfg["line2d"]["detector"])
     if not cfg["load_fit"]:
         seg3d_list = fit_3d_segs(all_2d_segs, imagecols, depths, cfg["fitting"])
-        with open(os.path.join(cfg["dir_save"], fname_fit_segs), 'wb') as f: np.savez(f, fit_segs=seg3d_list)
+        limapio.save_npy(os.path.join(cfg["dir_save"], fname_fit_segs), seg3d_list)
     else:
-        with open(os.path.join(cfg["dir_load"], fname_fit_segs), 'rb') as f:
-            dd = np.load(f, allow_pickle=True)
-            seg3d_list = dd["fit_segs"]
+        seg3d_list = limapio.read_npy(os.path.join(cfg["dir_load"], fname_fit_segs))
 
     ##########################################################
     # [D] merge 3d segments
     ##########################################################
-    fname_all_3d_segs = '{0}_all_3d_segs_wv.npy'.format(cfg["line2d"]["detector"])
     linker = _base.LineLinker(cfg["merging"]["linker2d"], cfg["merging"]["linker3d"])
     graph, linetracks = _mrg.merging(linker, all_2d_segs, imagecols, seg3d_list, neighbors, var2d=cfg["merging"]["var2d"])
     linetracks = _mrg.filtertracksbyreprojection(linetracks, imagecols, cfg["filtering2d"]["th_angular_2d"], cfg["filtering2d"]["th_perp_2d"], num_outliers=0)
@@ -102,16 +100,12 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     ##########################################################
     # [F] output and visualization
     ##########################################################
-    final_output_dir = os.path.join(cfg["dir_save"], "fitnmerge_finaltracks")
-    if not os.path.exists(final_output_dir): os.makedirs(final_output_dir)
-    vis.save_linetracks_to_folder(linetracks, final_output_dir)
-
-    VisTrack = vis.TrackVisualizer(linetracks)
+    # save tracks
+    limapio.save_folder_linetracks(os.path.join(cfg["dir_save"], "fitnmerge_finaltracks"), linetracks)
+    limapio.save_txt_linetracks(os.path.join(cfg["dir_save"], "fitnmerge_alltracks.txt"), linetracks, n_visible_views=4)
+    VisTrack = limapvis.PyVistaTrackVisualizer(linetracks, visualize=cfg["visualize"])
     VisTrack.report()
-    lines_np = VisTrack.get_lines_np()
-    counts_np = VisTrack.get_counts_np()
-    with open(os.path.join(cfg["dir_save"], 'lines_to_vis.npy'), 'wb') as f: np.savez(f, lines=lines_np, counts=counts_np, ranges=None)
-    vis.save_obj(os.path.join(cfg["dir_save"], 'lines_to_vis.obj'), lines_np, counts=counts_np, n_visible_views=cfg['n_visible_views'])
+    limapio.save_obj(os.path.join(cfg["dir_save"], 'fitnmerge_lines_nv{0}.obj'.format(cfg["n_visible_views"])), VisTrack.get_lines_np(n_visible_views=cfg["n_visible_views"]))
 
     if cfg["visualize"]:
         import pdb
