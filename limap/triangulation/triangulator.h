@@ -25,6 +25,7 @@ public:
     TriangulatorConfig(py::dict dict) {
         ASSIGN_PYDICT_ITEM(dict, add_halfpix, bool)
         ASSIGN_PYDICT_ITEM(dict, use_vp, bool)
+        ASSIGN_PYDICT_ITEM(dict, min_length_2d, double)
         ASSIGN_PYDICT_ITEM(dict, var2d, double);
         ASSIGN_PYDICT_ITEM(dict, plane_angle_threshold, double)
         ASSIGN_PYDICT_ITEM(dict, IoU_threshold, double)
@@ -47,6 +48,7 @@ public:
     bool use_vp = true;
     vpdetection::VPDetectorConfig vpdet_config;
 
+    double min_length_2d = 20.0;
     double var2d = 2.0;
     double plane_angle_threshold = 5.0;
     double IoU_threshold = 0.1;

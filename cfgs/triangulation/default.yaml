@@ -57,6 +57,7 @@ var2d: # in pixels
 triangulation:
     use_exhaustive_matcher: False
     add_halfpix: false
+    min_length_2d: 20.0 # in pixels
     var2d: -1.0 # depending on the detector
     plane_angle_threshold: 1.0
     IoU_threshold: 0.1
