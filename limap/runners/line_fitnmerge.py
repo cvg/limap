@@ -47,10 +47,11 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     # assertion check
     print("number of images: {0}".format(imagecols.NumImages()))
     cfg = _runners.setup(cfg)
+    detector_name = cfg["line2d"]["detector"]["method"]
     if cfg["fitting"]["var2d"] == -1:
-        cfg["fitting"]["var2d"] = cfg["var2d"][cfg["line2d"]["detector"]]
+        cfg["fitting"]["var2d"] = cfg["var2d"][detector_name]
     if cfg["merging"]["var2d"] == -1:
-        cfg["merging"]["var2d"] = cfg["var2d"][cfg["line2d"]["detector"]]
+        cfg["merging"]["var2d"] = cfg["var2d"][detector_name]
     limapio.save_txt_imname_list(os.path.join(cfg["dir_save"], 'image_list.txt'), imagecols.get_image_list())
     limapio.save_npy(os.path.join(cfg["dir_save"], 'image_collection.npy'), imagecols.as_dict())
 
@@ -70,7 +71,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     ##########################################################
     # [C] fit 3d segments
     ##########################################################
-    fname_fit_segs = '{0}_fit_segs.npy'.format(cfg["line2d"]["detector"])
+    fname_fit_segs = '{0}_fit_segs.npy'.format(cfg["line2d"]["detector"]["method"])
     if not cfg["load_fit"]:
         seg3d_list = fit_3d_segs(all_2d_segs, imagecols, depths, cfg["fitting"])
         limapio.save_npy(os.path.join(cfg["dir_save"], fname_fit_segs), seg3d_list)

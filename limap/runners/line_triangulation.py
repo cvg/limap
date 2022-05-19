@@ -20,8 +20,9 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     '''
     print("number of images: {0}".format(imagecols.NumImages()))
     cfg = _runners.setup(cfg)
+    detector_name = cfg["line2d"]["detector"]["method"]
     if cfg["triangulation"]["var2d"] == -1:
-        cfg["triangulation"]["var2d"] = cfg["var2d"][cfg["line2d"]["detector"]]
+        cfg["triangulation"]["var2d"] = cfg["var2d"][detector_name]
     limapio.save_txt_imname_list(os.path.join(cfg["dir_save"], 'image_list.txt'), imagecols.get_image_list())
     limapio.save_npy(os.path.join(cfg["dir_save"], 'image_collection.npy'), imagecols.as_dict())
 
@@ -58,9 +59,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
         if cfg["triangulation"]["use_exhaustive_matcher"]:
             Triangulator.InitExhaustiveMatchImage(img_id, neighbors[img_id])
         else:
-            with open(os.path.join(matches_dir, "matches_{0}.npy".format(img_id)), 'rb') as f:
-                data = np.load(f, allow_pickle=True)
-                matches = data["data"]
+            matches = limapio.read_npy(os.path.join(matches_dir, "matches_{0}.npy".format(img_id)))
             Triangulator.InitMatchImage(img_id, matches, neighbors[img_id], triangulate=True, scoring=True)
     Triangulator.RunClustering()
     Triangulator.ComputeLineTracks()

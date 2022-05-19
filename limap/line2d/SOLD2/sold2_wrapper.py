@@ -4,13 +4,12 @@ import cv2
 import torch
 from skimage.draw import line
 
-import os, sys
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from experiment import load_config
-from model.line_matcher import LineMatcher
+from SOLD2.experiment import load_config
+from SOLD2.model.line_matcher import LineMatcher
 
 class SOLD2LineDetector():
     def __init__(self, device=None, cfg_path=None, ckpt_path=None):
+        import os
         nowpath = os.path.dirname(os.path.abspath(__file__))
         if cfg_path is None:
             cfg_path = 'config/export_line_features.yaml'
@@ -139,35 +138,4 @@ class SOLD2LineDetector():
         if len(descinfo) != 0:
             descinfo[0] = descinfo[0].cpu().numpy()
         return descinfo
-
-def sold2_detect(input_image, saliency=False, scale_factor=None, detector=None):
-    if detector is None:
-        detector = SOLD2LineDetector()
-    return detector.detect(input_image, saliency=saliency, scale_factor=scale_factor)
-
-def sold2_compute_descinfo(segs, desc, detector=None):
-    if detector is None:
-        detector = SOLD2LineDetector()
-    return detector.compute_descinfo(segs, desc)
-
-def sold2_match(img1, img2, detector=None):
-    if detector is None:
-        detector = SOLD2LineDetector()
-    return detector.match(img1, img2)
-
-def sold2_match_segs_with_descriptor(segs1, desc1, segs2, desc2, detector=None):
-    if detector is None:
-        detector = SOLD2LineDetector()
-    return detector.match_segs_with_descriptor(segs1, desc1, segs2, desc2, detector=None)
-
-def sold2_match_segs_with_descinfo(descinfo1, descinfo2, detector=None):
-    if detector is None:
-        detector = SOLD2LineDetector()
-    return detector.match_segs_with_descinfo(descinfo1, descinfo2)
-
-def sold2_match_segs_with_descinfo_topk(descinfo1, descinfo2, topk=10, detector=None):
-    if detector is None:
-        detector = SOLD2LineDetector()
-    return detector.match_segs_with_descinfo_topk(descinfo1, descinfo2, topk=topk)
-
 

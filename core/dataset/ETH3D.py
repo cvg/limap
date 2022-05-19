@@ -1,7 +1,6 @@
 import os, sys
 import cv2
 import numpy as np
-import utils
 
 class ETH3D:
     # constants

@@ -1,7 +1,6 @@
 import os, sys
 import cv2
 import numpy as np
-import utils
 import copy
 
 class ScanNet:

@@ -32,15 +32,21 @@ sfm:
 ##############################
 # line detection and matching config
 line2d:
-    detector: "sold2" # ["sold2", "lsd"]
-    topk: 10 # 0 for mutual test
     max_num_2d_segs: 3000
-    load_sold2: False
     visualize: False
-    n_jobs: 3 # parallelization for matching descinfos
     save_l3dpp: False
     compute_descinfo: False
-var2d:
+    detector: 
+        method: "sold2" # ["sold2", "lsd"]
+        n_jobs: 1
+    extractor: 
+        method: "sold2"
+        n_jobs: 1
+    matcher:
+        method: "sold2"
+        n_jobs: 3
+        topk: 10
+var2d: # in pixels
     sold2: 5.0
     lsd: 2.0
 

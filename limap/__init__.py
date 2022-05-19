@@ -3,18 +3,21 @@ sys.path.append("build/limap/_limap")
 from _limap import *
 
 from . import base
+from . import line2d
 from . import vpdetection
 from . import triangulation
 from . import merging
 from . import pointsfm
 from . import undistortion
-from . import refinement
-from . import features
-from . import lineKA
-from . import lineBA
 from . import evaluation
 from . import fitting
-from . import runners
 from . import util
 from . import visualize
+
+from . import runners
+
+from . import features
+from . import refinement
+from . import lineKA
+from . import lineBA
 

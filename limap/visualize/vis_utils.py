@@ -6,7 +6,6 @@ import cv2
 import math
 import numpy as np
 import pyvista as pv
-import utils
 from tqdm import tqdm
 
 def random_color():

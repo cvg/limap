@@ -17,6 +17,10 @@ def check_path(fname):
     if not os.path.exists(fname):
         raise ValueError("Error! File {0} does not exist!".format(fname))
 
+def check_makedirs(folder):
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+
 def save_npy(fname, nparray):
     check_directory(fname)
     with open(fname, 'wb') as f:
@@ -130,6 +134,42 @@ def load_obj(fname):
     lines = vertices.reshape((n_lines, 2, 3))
     return lines
 
+def save_l3dpp(folder, imagecols, all_2d_segs):
+    if os.path.exists(folder):
+        shutil.rmtree(folder)
+    os.makedirs(folder)
+    n_images = len(all_2d_segs)
+    assert imagecols.NumImages() == len(all_2d_segs)
+    image_names = imagecols.get_image_list()
+
+    # TODO make this function general for different input resolution within the set
+    first_cam = imagecols.cam(imagecols.get_cam_ids()[0])
+    height, width = first_cam.h(), first_cam.w()
+
+    # TODO now it is hard-coded here (need to deal with the weird id mapping of Line3D++)
+    mode = 'default'
+    if os.path.basename(image_names[0])[0] == '0': # tnt
+        mode = 'tnt'
+        number_list = [int(os.path.basename(imname)[:-4]) for imname in image_names]
+        index_list = np.argsort(number_list).tolist()
+    for idx in range(imagecols.NumImages()):
+        if mode == 'default':
+            image_id = idx + 1
+        elif mode == 'tnt':
+            image_id = index_list.index(idx) + 1
+        else:
+            raise NotImplementedError
+        fname = "segments_L3D++_{0}_{1}x{2}_3000.txt".format(image_id, width, height)
+        fname = os.path.join(folder, fname)
+        segs = all_2d_segs[idx]
+        n_segments = segs.shape[0]
+        with open(fname, 'w') as f:
+            f.write("{0}\n".format(n_segments))
+            for line_id in range(n_segments):
+                line = segs[line_id]
+                f.write("{0} {1} {2} {3}\n".format(line[0], line[1], line[2], line[3]))
+        print("Writing for L3DPP: {0}".format(fname))
+
 def save_txt_linetracks(fname, linetracks, n_visible_views=4):
     '''
     Save all the linetracks into a single .txt file.
@@ -177,5 +217,38 @@ def read_folder_linetracks(folder):
         track.Read(fname)
         linetracks.append(track)
     return linetracks
+
+def save_txt_segments(folder, img_id, segs):
+    fname = os.path.join(folder, 'segments_{0}.txt'.format(img_id))
+    n_segments = segs.shape[0]
+    with open(fname, 'w') as f:
+        f.write("{0}\n".format(n_segments))
+        for line_id in range(n_segments):
+            line = segs[line_id]
+            f.write("{0} {1} {2} {3}\n".format(line[0], line[1], line[2], line[3]))
+
+def read_txt_segments(folder, img_id):
+    check_path(folder)
+    fname = os.path.join(folder, 'segments_{0}.txt'.format(img_id))
+    with open(fname, 'r') as f:
+        txt_lines = f.readlines()
+    n_segments = int(txt_lines[0].strip())
+    assert n_segments + 1 == len(txt_lines)
+    segs = []
+    for idx in range(n_segments):
+        k = txt_lines[idx + 1].strip().split(' ')
+        seg = [float(kk) for kk in k]
+        segs.append(seg)
+    segs = np.array(segs)
+    return segs
+
+def read_all_segments_from_folder(folder):
+    flist = os.listdir(folder)
+    n_images = len(flist)
+    all_2d_segs = []
+    for img_id in range(n_images):
+        segs = read_txt_segments(folder, img_id)
+        all_2d_segs.append(segs)
+    return all_2d_segs
 
 
