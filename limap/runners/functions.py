@@ -15,8 +15,8 @@ def setup(cfg):
         folder_load = folder_save
     cfg["dir_save"] = folder_save
     cfg["dir_load"] = folder_load
-    print("output dir: {0}".format(cfg["dir_save"]))
-    print("loading dir: {0}".format(cfg["dir_load"]))
+    print("[LOG] Output dir: {0}".format(cfg["dir_save"]))
+    print("[LOG] Loading dir: {0}".format(cfg["dir_load"]))
     return cfg
 
 def compute_sfminfos(cfg, imagecols, fname="metainfos.txt"):
@@ -46,7 +46,8 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
     folder_save = os.path.join(cfg["dir_save"], basedir)
     descinfo_folder = None
     se_det = cfg["skip_exists"] or cfg["line2d"]["detector"]["skip_exists"]
-    se_ext = cfg["skip_exists"] or cfg["line2d"]["extractor"]["skip_exists"]
+    if compute_descinfo:
+        se_ext = cfg["skip_exists"] or cfg["line2d"]["extractor"]["skip_exists"]
     detector = limap.line2d.get_detector(cfg["line2d"]["detector"], max_num_2d_segs=cfg["line2d"]["max_num_2d_segs"])
     if not cfg["load_det"]:
         if compute_descinfo and cfg["line2d"]["detector"]["method"] == cfg["line2d"]["extractor"]["method"]:

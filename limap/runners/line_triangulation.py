@@ -18,7 +18,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     Args:
     - imagecols: limap.base.ImageCollection
     '''
-    print("number of images: {0}".format(imagecols.NumImages()))
+    print("[LOG] Number of images: {0}".format(imagecols.NumImages()))
     cfg = _runners.setup(cfg)
     detector_name = cfg["line2d"]["detector"]["method"]
     if cfg["triangulation"]["var2d"] == -1:

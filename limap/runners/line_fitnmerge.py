@@ -45,7 +45,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     - depths: list of depth images
     '''
     # assertion check
-    print("number of images: {0}".format(imagecols.NumImages()))
+    print("[LOG] Number of images: {0}".format(imagecols.NumImages()))
     cfg = _runners.setup(cfg)
     detector_name = cfg["line2d"]["detector"]["method"]
     if cfg["fitting"]["var2d"] == -1:

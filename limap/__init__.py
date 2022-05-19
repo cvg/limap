@@ -18,6 +18,5 @@ from . import runners
 
 from . import features
 from . import refinement
-from . import lineKA
 from . import lineBA
 
