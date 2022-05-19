@@ -43,23 +43,25 @@ def compute_sfminfos(cfg, imagecols, fname="metainfos.txt"):
 def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
     import limap.line2d
     basedir = os.path.join("line_detections", cfg["line2d"]["detector"]["method"])
-    detector = limap.line2d.get_detector(cfg["line2d"]["detector"], max_num_2d_segs=cfg["line2d"]["max_num_2d_segs"])
     folder_save = os.path.join(cfg["dir_save"], basedir)
     descinfo_folder = None
+    se_det = cfg["skip_exists"] or cfg["line2d"]["detector"]["skip_exists"]
+    se_ext = cfg["skip_exists"] or cfg["line2d"]["extractor"]["skip_exists"]
+    detector = limap.line2d.get_detector(cfg["line2d"]["detector"], max_num_2d_segs=cfg["line2d"]["max_num_2d_segs"])
     if not cfg["load_det"]:
         if compute_descinfo and cfg["line2d"]["detector"]["method"] == cfg["line2d"]["extractor"]["method"]:
-            all_2d_segs, descinfo_folder = detector.detect_and_extract_all_images(folder_save, imagecols)
+            all_2d_segs, descinfo_folder = detector.detect_and_extract_all_images(folder_save, imagecols, skip_exists=(se_det and se_ext))
         else:
-            all_2d_segs = detector.detect_all_images(folder_save, imagecols)
+            all_2d_segs = detector.detect_all_images(folder_save, imagecols, skip_exists=se_det)
             if compute_descinfo:
                 extractor = limap.line2d.get_extractor(cfg["line2d"]["extractor"])
-                descinfo_folder = extractor.extract_all_images(folder_save, imagecols, all_2d_segs)
+                descinfo_folder = extractor.extract_all_images(folder_save, imagecols, all_2d_segs, skip_exists=se_ext)
     else:
         folder_load = os.path.join(cfg["dir_load"], basedir)
         all_2d_segs = limapio.read_all_segments_from_folder(detector.get_segments_folder(folder_load))
         extractor = limap.line2d.get_extractor(cfg["line2d"]["extractor"])
         if compute_descinfo:
-            descinfo_folder = extractor.extract_all_images(folder_save, imagecols, all_2d_segs)
+            descinfo_folder = extractor.extract_all_images(folder_save, imagecols, all_2d_segs, skip_exists=se_ext)
         else:
             descinfo_folder = extractor.get_descinfo_folder(folder_load)
     if cfg["line2d"]["visualize"]:
@@ -72,10 +74,11 @@ def compute_matches(cfg, descinfo_folder, neighbors):
     import limap.line2d
     basedir = os.path.join("line_matchings", cfg["line2d"]["detector"]["method"], "feats_{0}".format(cfg["line2d"]["extractor"]["method"]))
     extractor = limap.line2d.get_extractor(cfg["line2d"]["extractor"])
+    se_match = cfg["skip_exists"] or cfg["line2d"]["matcher"]["skip_exists"]
     matcher = limap.line2d.get_matcher(cfg["line2d"]["matcher"], extractor, n_neighbors=cfg["n_neighbors"])
     if not cfg["load_match"]:
         folder_save = os.path.join(cfg["dir_save"], basedir)
-        matches_folder = matcher.match_all_neighbors(folder_save, neighbors, descinfo_folder)
+        matches_folder = matcher.match_all_neighbors(folder_save, neighbors, descinfo_folder, skip_exists=se_match)
     else:
         folder_load = os.path.join(cfg["dir_load"], basedir)
         matches_folder = matcher.get_matchings_folder(folder_load)

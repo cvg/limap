@@ -11,6 +11,7 @@ n_neighbors: 20
 use_cuda: True
 visualize: True
 max_image_dim: 1600
+skip_exists: False
 output_dir: null 
 load_dir: null
 
@@ -38,14 +39,15 @@ line2d:
     compute_descinfo: False
     detector: 
         method: "sold2" # ["sold2", "lsd"]
-        n_jobs: 1
+        skip_exists: False
     extractor: 
         method: "sold2"
-        n_jobs: 1
+        skip_exists: False
     matcher:
         method: "sold2"
-        n_jobs: 3
+        n_jobs: 1
         topk: 10
+        skip_exists: False
 var2d: # in pixels
     sold2: 5.0
     lsd: 2.0

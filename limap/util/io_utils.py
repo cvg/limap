@@ -17,6 +17,10 @@ def check_path(fname):
     if not os.path.exists(fname):
         raise ValueError("Error! File {0} does not exist!".format(fname))
 
+def delete_folder(folder):
+    if os.path.exists(folder):
+        shutil.rmtree(folder)
+
 def check_makedirs(folder):
     if not os.path.exists(folder):
         os.makedirs(folder)
@@ -217,6 +221,10 @@ def read_folder_linetracks(folder):
         track.Read(fname)
         linetracks.append(track)
     return linetracks
+
+def exists_txt_segments(folder, img_id):
+    fname = os.path.join(folder, 'segments_{0}.txt'.format(img_id))
+    return os.path.exists(fname)
 
 def save_txt_segments(folder, img_id, segs):
     fname = os.path.join(folder, 'segments_{0}.txt'.format(img_id))

@@ -8,24 +8,25 @@ import limap.util.io_utils as limapio
 import limap.visualize as limapvis
 
 class BaseDetector():
-    def __init__(self, set_gray=True, max_num_2d_segs=3000, n_jobs=1):
+    def __init__(self, set_gray=True, max_num_2d_segs=3000):
         self.set_gray = set_gray
         self.max_num_2d_segs = max_num_2d_segs
-        self.n_jobs = n_jobs
 
     # The functions below are required for detectors
     def get_module_name(self):
         raise NotImplementedError
-    def detect(self, output_folder, img_id, camview):
+    def detect(self, camview):
         raise NotImplementedError
-    def extract(self, output_folder, img_id, camview, segs):
+    def extract(self, camview):
         raise NotImplementedError
-    def detect_and_extract(self, output_folder, img_id, camview):
+    def detect_and_extract(self, camview):
         raise NotImplementedError
     # The functions below are required for extractors
-    def save_descinfo(self, descinfo_folder, idx, descinfo):
+    def get_descinfo_fname(self, descinfo_folder, img_id):
         raise NotImplementedError
-    def read_descinfo(self, descinfo_folder, idx):
+    def save_descinfo(self, descinfo_folder, img_id, descinfo):
+        raise NotImplementedError
+    def read_descinfo(self, descinfo_folder, img_id):
         raise NotImplementedError
 
     def get_segments_folder(self, output_folder):
@@ -40,10 +41,6 @@ class BaseDetector():
             indexes = np.argsort(lengths_squared)[::-1][:max_num_2d_segs]
             segs = segs[indexes,:]
         return segs
-    def save_segs(self, output_folder, idx, segs):
-        seg_folder = self.get_segments_folder(output_folder)
-        limapio.check_makedirs(seg_folder)
-        limapio.save_txt_segments(seg_folder, idx, segs)
     def visualize_segs(self, output_folder, imagecols, first_k=10):
         seg_folder = self.get_segments_folder(output_folder)
         n_vis_images = min(first_k, imagecols.NumImages())
@@ -56,27 +53,47 @@ class BaseDetector():
             fname = os.path.join(vis_folder, "img_{0}_det.png".format(img_id))
             cv2.imwrite(fname, img)
 
-    # TODO: multiprocessing
-    def detect_all_images(self, output_folder, imagecols):
-        limapio.check_makedirs(output_folder)
-        for img_id in tqdm(range(imagecols.NumImages())):
-            self.detect(output_folder, img_id, imagecols.camview(img_id))
+    def detect_all_images(self, output_folder, imagecols, skip_exists=False):
         seg_folder = self.get_segments_folder(output_folder)
+        if not skip_exists:
+            limapio.delete_folder(seg_folder)
+        limapio.check_makedirs(seg_folder)
+        for img_id in tqdm(range(imagecols.NumImages())):
+            if skip_exists and limapio.exists_txt_segments(seg_folder, img_id):
+                continue
+            segs = self.detect(imagecols.camview(img_id))
+            segs = self.take_longest_k(segs, max_num_2d_segs=self.max_num_2d_segs)
+            limapio.save_txt_segments(seg_folder, img_id, segs)
         all_2d_segs = limapio.read_all_segments_from_folder(seg_folder)
         return all_2d_segs
 
-    def extract_all_images(self, output_folder, imagecols, all_2d_segs):
-        limapio.check_makedirs(output_folder)
+    def extract_all_images(self, output_folder, imagecols, all_2d_segs, skip_exists=False):
+        descinfo_folder = self.get_descinfo_folder(output_folder)
+        if not skip_exists:
+            limapio.delete_folder(descinfo_folder)
+        limapio.check_makedirs(descinfo_folder)
         for img_id in tqdm(range(imagecols.NumImages())):
-            self.extract(output_folder, img_id, imagecols.camview(img_id), all_2d_segs[img_id])
-        return self.get_descinfo_folder(output_folder)
+            if skip_exists and os.path.exists(self.get_descinfo_fname(descinfo_folder, img_id)):
+                continue
+            descinfo = self.extract(imagecols.camview(img_id))
+            self.save_descinfo(descinfo_folder, img_id, descinfo)
+        return descinfo_folder
 
-    def detect_and_extract_all_images(self, output_folder, imagecols):
-        limapio.check_makedirs(output_folder)
-        for img_id in tqdm(range(imagecols.NumImages())):
-            self.detect_and_extract(output_folder, img_id, imagecols.camview(img_id))
+    def detect_and_extract_all_images(self, output_folder, imagecols, skip_exists=False):
         seg_folder = self.get_segments_folder(output_folder)
         descinfo_folder = self.get_descinfo_folder(output_folder)
+        if not skip_exists:
+            limapio.delete_folder(seg_folder)
+            limapio.delete_folder(descinfo_folder)
+        limapio.check_makedirs(seg_folder)
+        limapio.check_makedirs(descinfo_folder)
+        for img_id in tqdm(range(imagecols.NumImages())):
+            if skip_exists and os.path.exists(self.get_descinfo_fname(descinfo_folder, img_id)) and limapio.exists_txt_segments(seg_folder, img_id):
+                continue
+            segs, descinfo = self.detect_and_extract(imagecols.camview(img_id))
+            segs = self.take_longest_k(segs, max_num_2d_segs=self.max_num_2d_segs)
+            limapio.save_txt_segments(seg_folder, img_id, segs)
+            self.save_descinfo(descinfo_folder, img_id, descinfo)
         all_2d_segs = limapio.read_all_segments_from_folder(seg_folder)
         return all_2d_segs, descinfo_folder
 

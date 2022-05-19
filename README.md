@@ -2,8 +2,6 @@
 
 ## TODO
 
-* [ ] Abstract detection, matching, fitting, merging.
-* [ ] Refactor IO.
 * [ ] Port undistortion and feature extraction.
 * [ ] CameraRig optimization.
 

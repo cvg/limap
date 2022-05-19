@@ -10,6 +10,7 @@ n_visible_views: 4
 n_neighbors: 100 
 use_cuda: True
 visualize: True
+skip_exists: False
 output_dir: null 
 load_dir: null
 
@@ -33,7 +34,7 @@ sfm:
 line2d:
     detector: 
         method: "sold2" # ["sold2", "lsd"]
-        n_jobs: 1
+        skip_exists: False
     max_num_2d_segs: 3000
     visualize: False
     save_l3dpp: False
