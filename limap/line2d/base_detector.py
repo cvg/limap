@@ -17,7 +17,7 @@ class BaseDetector():
         raise NotImplementedError
     def detect(self, camview):
         raise NotImplementedError
-    def extract(self, camview):
+    def extract(self, camview, segs):
         raise NotImplementedError
     def detect_and_extract(self, camview):
         raise NotImplementedError
@@ -75,7 +75,7 @@ class BaseDetector():
         for img_id in tqdm(range(imagecols.NumImages())):
             if skip_exists and os.path.exists(self.get_descinfo_fname(descinfo_folder, img_id)):
                 continue
-            descinfo = self.extract(imagecols.camview(img_id))
+            descinfo = self.extract(imagecols.camview(img_id), all_2d_segs[img_id])
             self.save_descinfo(descinfo_folder, img_id, descinfo)
         return descinfo_folder
 

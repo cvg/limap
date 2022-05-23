@@ -39,10 +39,10 @@ class SOLD2Detector(BaseDetector):
         segs, descriptor, heatmap, descinfo = self.detector.detect(img)
         return segs
 
-    def extract(self, camview):
+    def extract(self, camview, segs):
         img = camview.read_image(set_gray=self.set_gray)
         _, descriptor, _, _ = self.detector.detect(img)
-        descinfo = self.compute_descinfo(segs, descriptor)
+        descinfo = self.detector.compute_descinfo(segs, descriptor)
         return descinfo
 
     def detect_and_extract(self, camview):

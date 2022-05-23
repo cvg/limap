@@ -25,7 +25,7 @@ def ComputeNeighborsSorted(model, n_neighbors, min_triangulation_angle=1.0, neig
     neighbors = n2
     return neighbors
 
-def ReadInfos(model, colmap_path, model_path="sparse", image_path="images", check_undistorted=True):
+def ReadInfos(model, colmap_path, model_path="sparse", image_path="images"):
     print("Start loading COLMAP sparse reconstruction.")
     image_names = model.GetImageNames()
     model_path = os.path.join(colmap_path, model_path)

@@ -5,6 +5,6 @@ n_neighbors: 20
 max_image_dim: -1 
 use_descriptor: False
 line2d:
-    detector: "lsd"
-    n_jobs: 1
+    detector: 
+        method: "lsd"
 

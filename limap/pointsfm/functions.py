@@ -39,7 +39,7 @@ def read_infos_colmap(cfg, colmap_path, model_path="sparse", image_path="images"
     model.ReadFromCOLMAP(colmap_path, model_path, image_path)
 
     # get imagecols
-    imagecols = ReadInfos(model, colmap_path, model_path=model_path, image_path=image_path, check_undistorted=True)
+    imagecols = ReadInfos(model, colmap_path, model_path=model_path, image_path=image_path)
 
     # get neighbors
     neighbors = ComputeNeighbors(model, n_neighbors, min_triangulation_angle=cfg["min_triangulation_angle"], neighbor_type=cfg["neighbor_type"])

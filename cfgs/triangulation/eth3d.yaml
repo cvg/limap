@@ -7,6 +7,7 @@ scene_id: "train/delivery_area"
 cam_id: 0 
 max_image_dim: 756
 line2d:
-    detector: "lsd"
+    detector: 
+        method: "lsd"
 triangulation:
     add_halfpix: true
