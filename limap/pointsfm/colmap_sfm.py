@@ -46,49 +46,11 @@ def run_hloc_matches(cfg, image_path, db_path):
     reconstruction.import_matches(image_ids, db_path, sfm_pairs, match_path, None, None)
     triangulation.geometric_verification("colmap", db_path, sfm_pairs)
 
-def run_colmap_sfm(cfg, input_path, output_path='tmp/tmp_colmap', use_cuda=False, overwrite=True):
+def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap', use_cuda=False, skip_exists=False):
     ### initialize sparse folder
-    if os.path.exists(output_path) and overwrite:
-        shutil.rmtree(output_path)
-    if not os.path.exists(output_path):
-        os.makedirs(output_path)
-
-    db_path = os.path.join(output_path, 'db.db')
-    image_path = os.path.join(output_path, 'images')
-    model_path = os.path.join(output_path, 'sparse', 'model')
-    mapper_path = os.path.join(output_path, 'sparse')
-
-    if not os.path.exists(image_path):
-        os.makedirs(image_path)
-    if not os.path.exists(model_path):
-        os.makedirs(model_path)
-
-    ### copy images to tmp folder
-    image_list = os.listdir(os.path.join(input_path, 'images'))
-    for img_id in tqdm(range(len(image_list))):
-        imname = os.path.join(input_path, 'images/{0:08d}.png'.format(img_id + 1))
-        img = cv2.imread(imname)
-        fname_to_save = os.path.join(image_path, 'image{0:08d}.png'.format(img_id))
-        cv2.imwrite(fname_to_save, img)
-
-    # sift feature extraction and matching
-    if cfg["fbase"] == "sift":
-        run_colmap_sift_matches(image_path, db_path, use_cuda=use_cuda)
-    elif cfg["fbase"] == "hloc":
-        assert (use_cuda == True)
-        run_hloc_matches(cfg["hloc"], image_path, db_path)
-
-    ### [COLMAP] mapper
-    # colmap mapper
-    cmd = ['colmap', 'mapper',
-           '--database_path', db_path,
-           '--image_path', image_path,
-           '--output_path', mapper_path]
-    subprocess.run(cmd, check=True)
-
-def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap', use_cuda=False, overwrite=True):
-    ### initialize sparse folder
-    if os.path.exists(output_path) and overwrite:
+    if skip_exists and os.path.exists(output_path):
+        return
+    if os.path.exists(output_path):
         shutil.rmtree(output_path)
     if not os.path.exists(output_path):
         os.makedirs(output_path)

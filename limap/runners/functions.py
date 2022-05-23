@@ -25,7 +25,7 @@ def compute_sfminfos(cfg, imagecols, fname="metainfos.txt"):
         # run colmap sfm and compute neighbors, ranges
         colmap_output_path = os.path.join(cfg["dir_save"], cfg["sfm"]["colmap_output_path"])
         if not cfg["sfm"]["reuse"]:
-            _psfm.run_colmap_sfm_with_known_poses(cfg["sfm"], imagecols, output_path=colmap_output_path, use_cuda=cfg["use_cuda"])
+            _psfm.run_colmap_sfm_with_known_poses(cfg["sfm"], imagecols, output_path=colmap_output_path, use_cuda=cfg["use_cuda"], skip_exists=cfg["skip_exists"])
         model = _psfm.SfmModel()
         model.ReadFromCOLMAP(colmap_output_path, "sparse", "images")
         neighbors = _psfm.ComputeNeighborsSorted(model, cfg["n_neighbors"], min_triangulation_angle=cfg["sfm"]["min_triangulation_angle"], neighbor_type=cfg["sfm"]["neighbor_type"])
