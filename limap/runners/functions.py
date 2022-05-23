@@ -1,6 +1,6 @@
 import os, sys
 import numpy as np
-
+import warnings
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import limap.util.io_utils as limapio
 
@@ -42,6 +42,8 @@ def compute_sfminfos(cfg, imagecols, fname="metainfos.txt"):
 
 def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
     import limap.line2d
+    if not imagecols.IsUndistorted():
+        warnings.warn("The input images are distorted!")
     basedir = os.path.join("line_detections", cfg["line2d"]["detector"]["method"])
     folder_save = os.path.join(cfg["dir_save"], basedir)
     descinfo_folder = None

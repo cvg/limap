@@ -24,17 +24,3 @@ def GetAllLines2D(all_2d_segs):
     all_lines_2d = _base._GetAllLines2D(all_2d_segs)
     return all_lines_2d
 
-def BuildInitialGraph(all_2d_segs, # list (N_images) of [num_segs_k, 5]
-                      all_matches, # list ([N_images, n_neighbors]) of [num_matches_k, 2]
-                      neighbors):  # np.ndarray [N_images, n_neighbors], correspond to index
-    '''
-    Returns:
-    - all_lines_2d: all_2d_segs all casted as Line2d object
-    - basegraph: directed line graph with edges connecting all initial matches
-    '''
-    all_lines_2d = _base._GetAllLines2D(all_2d_segs)
-
-    basegraph = _base.DirectedGraph()
-    _tri._BuildInitialGraph(basegraph, all_matches, neighbors)
-    return all_lines_2d, basegraph
-

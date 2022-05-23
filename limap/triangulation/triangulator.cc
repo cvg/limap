@@ -29,6 +29,7 @@ void Triangulator::Init(const std::vector<std::vector<Line2d>>& all_2d_segs,
     all_lines_2d_ = all_2d_segs;
     if (config_.add_halfpix)
         offsetHalfPixel();
+    THROW_CHECK_EQ(imagecols.IsUndistorted(), true);
     imagecols_ = imagecols;
     
     // compute vanishing points (optional)

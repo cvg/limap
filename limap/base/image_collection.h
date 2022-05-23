@@ -33,6 +33,7 @@ public:
     std::vector<int> get_cam_ids() const;
     std::vector<CameraImage> get_images() const { return images; }
     std::vector<CameraView> get_camviews() const;
+    bool IsUndistorted() const;
 
     Camera cam(const int cam_id) const;
     bool exist_cam(const int cam_id) const;

@@ -324,7 +324,8 @@ void bind_camera(py::module& m) {
         .def("params", &Camera::params)
         .def("num_params", &Camera::NumParams)
         .def("resize", &Camera::resize)
-        .def("set_max_image_dim", &Camera::set_max_image_dim);
+        .def("set_max_image_dim", &Camera::set_max_image_dim)
+        .def("IsUndistorted", &Camera::IsUndistorted);
 
     py::class_<CameraPose>(m, "CameraPose")
         .def(py::init<>())
@@ -393,6 +394,7 @@ void bind_camera(py::module& m) {
         .def("NumCameras", &ImageCollection::NumCameras)
         .def("NumImages", &ImageCollection::NumImages)
         .def("set_max_image_dim", &ImageCollection::set_max_image_dim)
+        .def("IsUndistorted", &ImageCollection::IsUndistorted)
         .def("read_image", &ImageCollection::read_image, py::arg("img_id"), py::arg("set_gray")=false);
 }
 

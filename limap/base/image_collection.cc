@@ -134,5 +134,13 @@ void ImageCollection::set_max_image_dim(const int& val) {
     }
 }
 
+bool ImageCollection::IsUndistorted() const {
+    for (auto it = cameras.begin(); it != cameras.end(); ++it) {
+        if (!it->second.IsUndistorted())
+            return false;
+    }
+    return true;
+}
+
 } // namespace limap
 
