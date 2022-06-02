@@ -1,6 +1,7 @@
 import os, sys
 import numpy as np
 import warnings
+from tqdm import tqdm
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import limap.util.io_utils as limapio
 
@@ -18,6 +19,42 @@ def setup(cfg):
     print("[LOG] Output dir: {0}".format(cfg["dir_save"]))
     print("[LOG] Loading dir: {0}".format(cfg["dir_load"]))
     return cfg
+
+def undistort_images(imagecols, output_dir, fname="image_collection_undistorted.npy", load_undistort=False):
+    import limap.base as _base
+    if load_undistort:
+        fname_in = os.path.join(output_dir, fname)
+        if os.path.isfile(fname_in):
+            data = limapio.read_npy(fname_in).item()
+            return _base.ImageCollection(data)
+    # start undistortion
+    print("Start undistorting images (n_images = {0})...".format(imagecols.NumImages()))
+    import limap.undistortion as _undist
+    import cv2
+    limapio.delete_folder(output_dir)
+    limapio.check_makedirs(output_dir)
+    imagecols_undistorted = _base.ImageCollection(imagecols)
+    cam_dict = {}
+    for img_id in tqdm(range(imagecols.NumImages())):
+        cam_id = imagecols.camimage(img_id).cam_id
+        cam = imagecols.cam(cam_id)
+        imname_out = os.path.join(output_dir, "image_{0:08d}.png".format(img_id))
+        # save image if resizing is needed
+        img = imagecols.read_image(img_id)
+        imname_in = imagecols.camimage(img_id).image_name()
+        if img.shape[0] != cam.h() or img.shape[1] != cam.w():
+            cv2.imwrite(imname_out, img)
+            imname_in = imname_out
+        # undistortion and save the undistorted one
+        cam_undistorted = _undist.UndistortImageCamera(cam, imname_in, imname_out)
+        cam_undistorted.set_cam_id(cam_id)
+        if cam_id not in cam_dict:
+            cam_dict[cam_id] = cam_undistorted
+        imagecols_undistorted.change_image_name(img_id, imname_out)
+    for cam_id in cam_dict:
+        imagecols_undistorted.change_camera(cam_id, cam_dict[cam_id])
+    limapio.save_npy(os.path.join(output_dir, fname), imagecols_undistorted.as_dict())
+    return imagecols_undistorted
 
 def compute_sfminfos(cfg, imagecols, fname="metainfos.txt"):
     import limap.pointsfm as _psfm

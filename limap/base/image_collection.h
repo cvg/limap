@@ -25,6 +25,7 @@ public:
     ImageCollection(const std::vector<Camera>& input_cameras, const std::vector<CameraImage>& input_images);
     ImageCollection(const std::vector<CameraView>& camviews);
     ImageCollection(py::dict dict);
+    ImageCollection(const ImageCollection& imagecols);
     py::dict as_dict() const;
 
     size_t NumCameras() const { return cameras.size(); }
@@ -45,6 +46,9 @@ public:
 
     py::array_t<uint8_t> read_image(const int img_id, const bool set_gray) const;
     void set_max_image_dim(const int& val);
+    void change_camera(const int cam_id, const Camera cam);
+    void change_image(const int img_id, const CameraImage camimage);
+    void change_image_name(const int img_id, const std::string new_name);
     
 private:
     std::map<int, Camera> cameras;

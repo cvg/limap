@@ -4,18 +4,12 @@ import cv2
 import numpy as np
 import copy
 
-def UndistortImageParams(K, dist_coeffs, img_hw, imname_in, imname_out):
-    camera = _base.Camera(K, np.eye(3), np.zeros((3)), dist_coeffs)
-    camera.set_hw(img_hw[0], img_hw[1])
-    camera_undistorted = UndistortImageCamera(camera, imname_in, imname_out)
-    return camera_undistorted.K, (camera_undistorted.h, camera_undistorted.w)
-
 def UndistortImageCamera(camera, imname_in, imname_out):
-    if camera.checkUndistorted(): # no distortion
+    if camera.IsUndistorted(): # no distortion
         img = cv2.imread(imname_in)
         cv2.imwrite(imname_out, img)
         return camera
-    camera_undistorted = _undistortion._UndistortCameraView(imname_in, camera, imname_out)
+    camera_undistorted = _undistortion._UndistortCamera(imname_in, camera, imname_out)
     return camera_undistorted
 
 def UndistortImageCamera_OPENCV(camera, imname_in, imname_out):

@@ -131,6 +131,14 @@ Camera::Camera(const std::string& model_name, M3D K, int cam_id, std::pair<int, 
     }
 }
 
+Camera::Camera(const Camera& cam) {
+    SetCameraId(cam.CameraId());
+    SetModelId(cam.ModelId());
+    SetParams(cam.Params());
+    SetHeight(cam.Height());
+    SetWidth(cam.Width());
+}
+
 bool Camera::operator ==(const Camera& cam) {
     if (CameraId() != cam.CameraId())
         return false;

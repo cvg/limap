@@ -43,6 +43,7 @@ public:
     Camera(int model_id, M3D K, int cam_id=-1, std::pair<int, int> hw=std::make_pair<int, int>(-1, -1));
     Camera(const std::string& model_name, M3D K, int cam_id=-1, std::pair<int, int> hw=std::make_pair<int, int>(-1, -1));
     Camera(py::dict dict);
+    Camera(const Camera& cam);
     bool operator ==(const Camera&);
 
     py::dict as_dict() const;
@@ -63,6 +64,7 @@ public:
     CameraPose(V4D qqvec, V3D ttvec): qvec(qqvec), tvec(ttvec) {}
     CameraPose(M3D R, V3D T): tvec(T) { qvec = colmap::RotationMatrixToQuaternion(R); }
     CameraPose(py::dict dict);
+    CameraPose(const CameraPose& campose): qvec(campose.qvec), tvec(campose.tvec) {}
 
     V4D qvec;
     V3D tvec;

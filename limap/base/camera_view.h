@@ -23,6 +23,7 @@ public:
     CameraImage(const int& input_cam_id, const CameraPose& input_pose, const std::string& image_name = "none"): cam_id(input_cam_id), pose(input_pose), image_name_(image_name) {}
     CameraImage(const Camera& input_cam, const CameraPose& input_pose, const std::string& image_name = "none"): cam_id(input_cam.CameraId()), pose(input_pose), image_name_(image_name) {}
     CameraImage(py::dict dict);
+    CameraImage(const CameraImage& camimage): cam_id(camimage.cam_id), pose(camimage.pose) {SetImageName(camimage.image_name());}
 
     int cam_id;
     CameraPose pose;
@@ -44,6 +45,7 @@ public:
     CameraView() {}
     CameraView(const Camera& input_cam, const CameraPose& input_pose, const std::string& image_name = "none"): CameraImage(input_cam, input_pose, image_name), cam(input_cam) {}
     CameraView(py::dict dict);
+    CameraView(const CameraView& camview): CameraImage(camview), cam(camview.cam) {}
 
     Camera cam;
     py::array_t<uint8_t> read_image(const bool set_gray) const;

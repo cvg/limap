@@ -314,6 +314,7 @@ void bind_camera(py::module& m) {
         .def(py::init<int, M3D, int, std::pair<int, int>>(), py::arg("model_id"), py::arg("K"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1))
         .def(py::init<const std::string&, M3D, int, std::pair<int, int>>(), py::arg("model_name"), py::arg("K"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1))
         .def(py::init<py::dict>())
+        .def(py::init<const Camera&>())
         .def("as_dict", &Camera::as_dict)
         .def("h", &Camera::h)
         .def("w", &Camera::w)
@@ -325,6 +326,7 @@ void bind_camera(py::module& m) {
         .def("num_params", &Camera::NumParams)
         .def("resize", &Camera::resize)
         .def("set_max_image_dim", &Camera::set_max_image_dim)
+        .def("set_cam_id", &Camera::SetCameraId)
         .def("IsUndistorted", &Camera::IsUndistorted);
 
     py::class_<CameraPose>(m, "CameraPose")
@@ -332,6 +334,7 @@ void bind_camera(py::module& m) {
         .def(py::init<V4D, V3D>())
         .def(py::init<M3D, V3D>())
         .def(py::init<py::dict>())
+        .def(py::init<const CameraPose&>())
         .def("as_dict", &CameraPose::as_dict)
         .def_readonly("qvec", &CameraPose::qvec)
         .def_readonly("tvec", &CameraPose::tvec)
@@ -345,6 +348,7 @@ void bind_camera(py::module& m) {
         .def(py::init<const int&, const CameraPose&, const std::string&>(), py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
         .def(py::init<const Camera&, const CameraPose&, const std::string&>(), py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
         .def(py::init<py::dict>())
+        .def(py::init<const CameraImage&>())
         .def("as_dict", &CameraImage::as_dict)
         .def_readonly("cam_id", &CameraImage::cam_id)
         .def_readonly("pose", &CameraImage::pose)
@@ -358,6 +362,7 @@ void bind_camera(py::module& m) {
         .def(py::init<>())
         .def(py::init<const Camera&, const CameraPose&, const std::string&>(), py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
         .def(py::init<py::dict>())
+        .def(py::init<const CameraView&>())
         .def_readonly("cam", &CameraView::cam)
         .def_readonly("pose", &CameraView::pose)
         .def("as_dict", &CameraView::as_dict)
@@ -379,6 +384,7 @@ void bind_camera(py::module& m) {
         .def(py::init<const std::map<int, Camera>&, const std::vector<CameraImage>&>())
         .def(py::init<const std::vector<CameraView>&>())
         .def(py::init<py::dict>())
+        .def(py::init<const ImageCollection&>())
         .def("as_dict", &ImageCollection::as_dict)
         .def("get_cameras", &ImageCollection::get_cameras)
         .def("get_cam_ids", &ImageCollection::get_cam_ids)
@@ -394,6 +400,9 @@ void bind_camera(py::module& m) {
         .def("NumCameras", &ImageCollection::NumCameras)
         .def("NumImages", &ImageCollection::NumImages)
         .def("set_max_image_dim", &ImageCollection::set_max_image_dim)
+        .def("change_camera", &ImageCollection::change_camera)
+        .def("change_image", &ImageCollection::change_image)
+        .def("change_image_name", &ImageCollection::change_image_name)
         .def("IsUndistorted", &ImageCollection::IsUndistorted)
         .def("read_image", &ImageCollection::read_image, py::arg("img_id"), py::arg("set_gray")=false);
 }

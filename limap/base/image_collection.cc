@@ -14,7 +14,7 @@ ImageCollection::ImageCollection(const std::vector<CameraView>& camviews) {
     for (auto it = camviews.begin(); it != camviews.end(); ++it) {
         images.push_back(CameraImage(*it));
         int cam_id = it->cam.CameraId();
-        if (cameras.count(cam_id) == 1) {
+        if (exist_cam(cam_id)) {
             CHECK_EQ(cameras.at(cam_id) == it->cam, true);
         }
         else {
@@ -40,6 +40,16 @@ ImageCollection::ImageCollection(py::dict dict) {
         dictvec_images = dict["images"].cast<std::vector<py::dict>>();
     for (auto it = dictvec_images.begin(); it != dictvec_images.end(); ++it) {
         images.push_back(CameraImage(*it));
+    }
+}
+
+ImageCollection::ImageCollection(const ImageCollection& imagecols) {
+    std::vector<int> cam_ids = imagecols.get_cam_ids();
+    for (auto it = cam_ids.begin(); it != cam_ids.end(); ++it) {
+        cameras.insert(std::make_pair(*it, imagecols.cam(*it)));
+    }
+    for (size_t img_id = 0; img_id < imagecols.NumImages(); ++img_id) {
+        images.push_back(imagecols.camimage(img_id));
     }
 }
 
@@ -83,7 +93,7 @@ py::dict ImageCollection::as_dict() const {
 }
 
 Camera ImageCollection::cam(const int cam_id) const {
-    THROW_CHECK_EQ(cameras.count(cam_id), 1);
+    THROW_CHECK_EQ(exist_cam(cam_id), true);
     return cameras.at(cam_id);
 }
 
@@ -132,6 +142,23 @@ void ImageCollection::set_max_image_dim(const int& val) {
     for (auto it = cameras.begin(); it != cameras.end(); ++it) {
         it->second.set_max_image_dim(val);
     }
+}
+
+void ImageCollection::change_camera(const int cam_id, const Camera cam) {
+    THROW_CHECK_EQ(exist_cam(cam_id), true);
+    cameras[cam_id] = cam;
+}
+
+void ImageCollection::change_image(const int img_id, const CameraImage camimage) {
+    THROW_CHECK_GE(img_id, 0);
+    THROW_CHECK_LT(img_id, NumImages());
+    images[img_id] = camimage;
+}
+
+void ImageCollection::change_image_name(const int img_id, const std::string new_name) {
+    THROW_CHECK_GE(img_id, 0);
+    THROW_CHECK_LT(img_id, NumImages());
+    images[img_id].SetImageName(new_name);
 }
 
 bool ImageCollection::IsUndistorted() const {

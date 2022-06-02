@@ -8,7 +8,7 @@ import limap.base as _base
 def check_directory(fname):
     if fname is None:
         raise ValueError("Error! Input directory is None!")
-    if not os.path.exists(os.path.dirname(fname)):
+    if os.path.dirname(fname) != '' and (not os.path.exists(os.path.dirname(fname))):
         raise ValueError("Error! Base directory {0} does not exist!".format(os.path.dirname(fname)))
 
 def check_path(fname):

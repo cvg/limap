@@ -21,10 +21,6 @@ def run_colmap_triangulation(cfg, colmap_path, model_path="sparse", image_path="
             imagecols_np, neighbors, ranges = data["imagecols_np"], data["neighbors"], data["ranges"]
             imagecols = _base.ImageCollection(imagecols_np)
 
-    # resize cameras
-    if cfg["max_image_dim"] != -1 and cfg["max_image_dim"] is not None:
-        imagecols.set_max_image_dim(cfg["max_image_dim"])
-
     # run triangulation
     linetracks = limap.runners.line_triangulation(cfg, imagecols, neighbors=neighbors, ranges=ranges)
     return linetracks

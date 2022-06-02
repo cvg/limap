@@ -23,6 +23,12 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     detector_name = cfg["line2d"]["detector"]["method"]
     if cfg["triangulation"]["var2d"] == -1:
         cfg["triangulation"]["var2d"] = cfg["var2d"][detector_name]
+    # undistort images
+    if not imagecols.IsUndistorted():
+        imagecols = _runners.undistort_images(imagecols, os.path.join(cfg["output_dir"], cfg["undistortion_output_dir"]), load_undistort=cfg["load_undistort"] or cfg["skip_exists"])
+    # resize cameras
+    if cfg["max_image_dim"] != -1 and cfg["max_image_dim"] is not None:
+        imagecols.set_max_image_dim(cfg["max_image_dim"])
     limapio.save_txt_imname_list(os.path.join(cfg["dir_save"], 'image_list.txt'), imagecols.get_image_list())
     limapio.save_npy(os.path.join(cfg["dir_save"], 'image_collection.npy'), imagecols.as_dict())
 

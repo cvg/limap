@@ -5,6 +5,7 @@ cfg_type: "triangulation"
 load_meta: False
 load_det: False 
 load_match: False
+load_undistort: False 
 use_tmp: False
 n_visible_views: 4
 n_neighbors: 20 
@@ -14,6 +15,7 @@ max_image_dim: 1600
 skip_exists: False
 output_dir: null 
 load_dir: null
+undistortion_output_dir: "undistorted_images"
 
 ##############################
 # sfm config
