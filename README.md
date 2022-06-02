@@ -2,7 +2,6 @@
 
 ## TODO
 
-* [ ] Port undistortion and feature extraction.
 * [ ] CameraRig optimization.
 
 ## Dependencies
