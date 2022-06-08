@@ -214,6 +214,7 @@ def read_folder_linetracks(folder):
     for fname in flist:
         if fname[-4:] == '.txt' and fname[:5] == 'track':
             n_tracks += 1
+    print("Read linetracks from {0}...".format(folder))
     linetracks = []
     for track_id in range(n_tracks):
         fname = os.path.join(folder, 'track_{0}.txt'.format(track_id))

@@ -15,7 +15,7 @@ python -m pip install -r requirements.txt
 cd third-party/Hierarchical-Localization && python -m pip install -e . && cd ../..
 ```
 
-Pretrained models for [SOLD2](https://github.com/cvg/SOLD2) and [S2DNet](https://github.com/germain-hug/S2DNet-Minimal) need to be downloaded:
+Pretrained models for [SOLD2](https://github.com/cvg/SOLD2) and [S2DNet](https://github.com/germain-hug/S2DNet-Minimal) (only for featuremetric optimization) need to be downloaded:
 ```
 bash download_pretrained_models.sh
 ```
