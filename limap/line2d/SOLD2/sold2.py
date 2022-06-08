@@ -50,6 +50,30 @@ class SOLD2Detector(BaseDetector):
         segs, descriptor, heatmap, descinfo = self.detector.detect(img)
         return segs, descinfo
 
+    def get_heatmap_fname(self, folder, img_id):
+        return os.path.join(folder, "heatmap_{0}.npy".format(img_id))
+
+    def extract_heatmap(self, camview):
+        img = camview.read_image(set_gray=self.set_gray)
+        segs, descriptor, heatmap, descinfo = self.detector.detect(img)
+        return heatmap
+
+    def extract_heatmaps_all_images(self, folder, imagecols, skip_exists=False):
+        from tqdm import tqdm
+        heatmap_folder = os.path.join(folder, "sold2_heatmaps")
+        if not skip_exists:
+            limapio.delete_folder(heatmap_folder)
+        limapio.check_makedirs(heatmap_folder)
+        if not (skip_exists and os.path.exists(os.path.join(heatmap_folder, "imagecols.npy"))):
+            limapio.save_npy(os.path.join(heatmap_folder, "imagecols.npy"), imagecols.as_dict())
+        for img_id in tqdm(range(imagecols.NumImages())):
+            heatmap_fname = self.get_heatmap_fname(heatmap_folder, img_id)
+            if skip_exists and os.path.exists(heatmap_fname):
+                continue
+            heatmap = self.extract_heatmap(imagecols.camview(img_id))
+            limapio.save_npy(heatmap_fname, heatmap)
+        return heatmap_folder
+
 class SOLD2Matcher(BaseMatcher):
     def __init__(self, extractor, n_neighbors=20, topk=10, n_jobs=1):
         super(SOLD2Matcher, self).__init__(extractor, n_neighbors=n_neighbors, topk=topk, n_jobs=n_jobs)

@@ -20,7 +20,3 @@ def triangulate(l1, view1, l2, view2):
 def triangulate_with_direction(l1, view1, l2, view2, direc):
     return _tri.triangulate_with_direction(l1, view1, l2, view2, direc)
 
-def GetAllLines2D(all_2d_segs):
-    all_lines_2d = _base._GetAllLines2D(all_2d_segs)
-    return all_lines_2d
-

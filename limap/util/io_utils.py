@@ -222,6 +222,26 @@ def read_folder_linetracks(folder):
         linetracks.append(track)
     return linetracks
 
+def save_folder_linetracks_with_info(folder, linetracks, config=None, imagecols=None, all_2d_segs=None):
+    save_folder_linetracks(folder, linetracks)
+    if config is not None:
+        save_npy(os.path.join(folder, "config.npy"), config)
+    if imagecols is not None:
+        save_npy(os.path.join(folder, "imagecols.npy"), imagecols.as_dict())
+    if all_2d_segs is not None:
+        save_npy(os.path.join(folder, "all_2d_segs.npy"), all_2d_segs)
+
+def read_folder_linetracks_with_info(folder):
+    linetracks = read_folder_linetracks(folder)
+    cfg, imagecols, all_2d_segs = None, None, None
+    if os.path.isfile(os.path.join(folder, "config.npy")):
+        cfg = read_npy(os.path.join(folder, "config.npy"))
+    if os.path.isfile(os.path.join(folder, "imagecols.npy")):
+        imagecols = _base.ImageCollection(read_npy(os.path.join(folder, "imagecols.npy")).item())
+    if os.path.isfile(os.path.join(folder, "all_2d_segs.npy")):
+        all_2d_segs = read_npy(os.path.join(folder, "all_2d_segs.npy"))
+    return linetracks, cfg, imagecols, all_2d_segs
+
 def exists_txt_segments(folder, img_id):
     fname = os.path.join(folder, 'segments_{0}.txt'.format(img_id))
     return os.path.exists(fname)

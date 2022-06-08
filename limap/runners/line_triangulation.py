@@ -30,7 +30,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     if cfg["max_image_dim"] != -1 and cfg["max_image_dim"] is not None:
         imagecols.set_max_image_dim(cfg["max_image_dim"])
     limapio.save_txt_imname_list(os.path.join(cfg["dir_save"], 'image_list.txt'), imagecols.get_image_list())
-    limapio.save_npy(os.path.join(cfg["dir_save"], 'image_collection.npy'), imagecols.as_dict())
+    limapio.save_npy(os.path.join(cfg["dir_save"], 'imagecols.npy'), imagecols.as_dict())
 
     ##########################################################
     # [A] sfm metainfos (neighbors, ranges)
@@ -59,7 +59,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     print('Start multi-view triangulation...')
     Triangulator = _tri.Triangulator(cfg["triangulation"])
     Triangulator.SetRanges(ranges)
-    all_2d_lines = _tri.GetAllLines2D(all_2d_segs)
+    all_2d_lines = _base.GetAllLines2D(all_2d_segs)
     Triangulator.Init(all_2d_lines, imagecols)
     for img_id in range(imagecols.NumImages()):
         if cfg["triangulation"]["use_exhaustive_matcher"]:
@@ -98,8 +98,8 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     # [F] output and visualization
     ##########################################################
     # save tracks
-    limapio.save_folder_linetracks(os.path.join(cfg["dir_save"], "finaltracks"), linetracks)
     limapio.save_txt_linetracks(os.path.join(cfg["dir_save"], "alltracks.txt"), linetracks, n_visible_views=4)
+    limapio.save_folder_linetracks_with_info(os.path.join(cfg["dir_save"], "finaltracks"), linetracks, config=cfg, imagecols=imagecols, all_2d_segs=all_2d_segs)
     VisTrack = limapvis.PyVistaTrackVisualizer(linetracks, visualize=cfg["visualize"])
     VisTrack.report()
     limapio.save_obj(os.path.join(cfg["dir_save"], 'triangulated_lines_nv{0}.obj'.format(cfg["n_visible_views"])), VisTrack.get_lines_np(n_visible_views=cfg["n_visible_views"]))

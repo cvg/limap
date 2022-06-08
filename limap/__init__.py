@@ -15,6 +15,7 @@ from . import util
 from . import visualize
 
 from . import runners
+from . import optimize
 
 from . import features
 from . import refinement
