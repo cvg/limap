@@ -5,7 +5,6 @@ import random
 import cv2
 import math
 import numpy as np
-import pyvista as pv
 from tqdm import tqdm
 
 def random_color():
@@ -225,38 +224,6 @@ def filter_ranges(lines_np, counts_np, ranges):
             new_lines_np.append(lines_np[idx])
             new_counts_np.append(counts_np[idx])
     return np.array(new_lines_np), np.array(new_counts_np)
-
-def vis_3d_lines(lines, img_hw=(600, 800), counts=None, n_visible_views=2, ranges=None, width=2):
-    if type(lines) == list:
-        if type(lines[0]) == np.ndarray:
-            lines = np.array(lines)
-        else:
-            lines = np.array([line.as_array() for line in lines])
-    plotter = pv.Plotter(window_size=[img_hw[1], img_hw[0]])
-    n_lines = lines.shape[0]
-    counter_seg3d = 0
-    for line_idx in range(n_lines):
-        line = lines[line_idx]
-        if counts is not None:
-            count = counts[line_idx]
-            if count < n_visible_views:
-                continue
-        if ranges is not None:
-            if not test_line_inside_ranges(line, ranges):
-                continue
-        counter_seg3d += 1
-        plotter.add_lines(line, '#ff0000', width=width)
-    if counts is not None:
-        print('[STATS] (N2, N4, N6, N8, N10, N20, N50) = ({0}, {1}, {2}, {3}, {4}, {5}, {6})'
-                .format(counts[counts >= 2].shape[0],
-                        counts[counts >= 4].shape[0],
-                        counts[counts >= 6].shape[0],
-                        counts[counts >= 8].shape[0],
-                        counts[counts >= 10].shape[0],
-                        counts[counts >= 20].shape[0],
-                        counts[counts >= 50].shape[0]))
-        print("[n_visible_views = {0}] number of 3d segments: {1}".format(n_visible_views, counter_seg3d))
-    plotter.show()
 
 def report_dist_reprojection(line3d, line2d, camview, prefix=None):
     import limap.base as _base

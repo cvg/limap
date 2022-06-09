@@ -1,3 +1,4 @@
 from .vis_utils import *
-from .trackvis_pyvista import PyVistaTrackVisualizer
+from .vis_lines import *
+from .trackvis import *
 

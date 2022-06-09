@@ -243,6 +243,88 @@ def read_folder_linetracks_with_info(folder):
         all_2d_segs = read_npy(os.path.join(folder, "all_2d_segs.npy"))
     return linetracks, cfg, imagecols, all_2d_segs
 
+def read_txt_Line3Dpp(fname):
+    linetracks = []
+    with open(fname, 'r') as f:
+        txt_lines = f.readlines()
+    line_counts = []
+    line_track_id_list = []
+    line_counters = 0
+    for txt_line in txt_lines:
+        txt_line = txt_line.strip('\n').split(' ')
+        counter = 0
+        n_lines = int(txt_line[counter])
+        counter += 1
+        line_counters += n_lines
+        # get line 3d
+        line3d_list = []
+        for idx in range(n_lines):
+            infos = [float(k) for k in txt_line[counter:(counter+6)]]
+            line3d = _base.Line3d(infos[:3], infos[3:])
+            counter += 6
+            line3d_list.append(line3d)
+        line3d = line3d_list[0]
+        n_supports = int(txt_line[counter])
+        counter += 1
+        # collect supports
+        img_id_list, line_id_list, line2d_list = [], [], []
+        for supp_id in range(n_supports):
+            img_id = int(txt_line[counter])
+            counter += 1
+            line_id = int(txt_line[counter])
+            counter += 1
+            infos = [float(k) for k in txt_line[counter:(counter+4)]]
+            line2d = _base.Line2d(infos[:2], infos[2:])
+            counter += 4
+            img_id_list.append(img_id)
+            line_id_list.append(line_id)
+            line2d_list.append(line2d)
+        track = _base.LineTrack(line3d, img_id_list, line_id_list, line2d_list)
+        linetracks.append(track)
+        for idx in range(n_lines):
+            line_counts.append(track.count_images())
+            line_track_id_list.append(len(linetracks) - 1)
+
+    # construct matrix
+    mergemat = np.zeros((len(linetracks), line_counters))
+    for idx, track_id in enumerate(line_track_id_list):
+        mergemat[track_id, idx] = 1
+    return linetracks, line_track_id_list, line_counts, mergemat
+
+def read_lines_from_input(input_file):
+    '''
+    General reader for lines
+    '''
+    if not os.path.exists(input_file):
+        raise ValueError("Error! Input file/directory {0} not found.".format(input_dir))
+
+    # linetracks folder
+    if not os.path.isfile(input_file):
+        linetracks = read_folder_linetracks(input_file)
+        lines = [track.line for track in linetracks]
+        return lines, linetracks
+
+    # npy file
+    if input_file.endswith('.npy'):
+        lines_np = read_npy(input_file)
+        lines = [_base.Line3d(arr) for arr in lines_np.tolist()]
+        return lines, None
+
+    # obj file
+    if input_file.endswith('.obj'):
+        lines_np = load_obj(input_file)
+        lines = [_base.Line3d(arr) for arr in lines_np.tolist()]
+        return lines, None
+
+    # line3dpp format
+    if input_file.endswith('.txt'):
+        linetracks, _ = read_txt_Line3Dpp(input_dir)
+        lines = [track.line for track in linetracks]
+        return lines, linetracks
+
+    # exception
+    raise ValueError("Error! File {0} not supported. should be txt, obj, or folder to the linetracks.".format(input_dir))
+
 def exists_txt_segments(folder, img_id):
     fname = os.path.join(folder, 'segments_{0}.txt'.format(img_id))
     return os.path.exists(fname)
