@@ -90,8 +90,8 @@ def line_refinement(cfg, tracks, imagecols, heatmap_dir=None, patch_dir=None, fe
             limapvis.visualize_line_track(imname_list, opttracks[track_id], max_image_dim=-1, cameras=cameras, prefix="newtrack.{0}".format(track_id))
         import pdb
         pdb.set_trace()
-        VisTrack = limapvis.PyVistaTrackVisualizer(newtracks, visualize=True)
-        VisTrack.vis_all_lines(n_visible_views=n_visible_views, width=2)
+        VisTrack = limapvis.Open3DTrackVisualizer(newtracks)
+        VisTrack.vis_reconstruction(imagecols, n_visible_views=n_visible_views, width=2)
     return newtracks
 
 

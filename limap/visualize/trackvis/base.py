@@ -76,3 +76,11 @@ class BaseTrackVisualizer(object):
         counts_np = np.array(counts)
         return lines_np, counts_np
 
+    def get_lines_n_visible_views(self, n_visible_views):
+        lines = []
+        for track in self.tracks:
+            if track.count_images() < n_visible_views:
+                continue
+            lines.append(track.line)
+        return lines
+

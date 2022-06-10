@@ -100,7 +100,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     # save tracks
     limapio.save_txt_linetracks(os.path.join(cfg["dir_save"], "alltracks.txt"), linetracks, n_visible_views=4)
     limapio.save_folder_linetracks_with_info(os.path.join(cfg["dir_save"], "finaltracks"), linetracks, config=cfg, imagecols=imagecols, all_2d_segs=all_2d_segs)
-    VisTrack = limapvis.PyVistaTrackVisualizer(linetracks, visualize=cfg["visualize"])
+    VisTrack = limapvis.Open3DTrackVisualizer(linetracks)
     VisTrack.report()
     limapio.save_obj(os.path.join(cfg["dir_save"], 'triangulated_lines_nv{0}.obj'.format(cfg["n_visible_views"])), VisTrack.get_lines_np(n_visible_views=cfg["n_visible_views"]))
 
@@ -111,7 +111,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
             limapvis.visualize_line_track(imagecols, validtracks[track_id], prefix="track.{0}".format(track_id))
         import pdb
         pdb.set_trace()
-        VisTrack.vis_all_lines(n_visible_views=cfg["n_visible_views"], width=2)
+        VisTrack.vis_reconstruction(imagecols, n_visible_views=cfg["n_visible_views"], width=2)
         pdb.set_trace()
     return linetracks
 

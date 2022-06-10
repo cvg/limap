@@ -1,4 +1,4 @@
-from _limap._base import *
+import _limap._base as _base
 
 def GetAllLines2D(all_2d_segs):
     all_lines_2d = _base._GetAllLines2D(all_2d_segs)

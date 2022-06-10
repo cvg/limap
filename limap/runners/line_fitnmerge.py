@@ -105,14 +105,14 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     # save tracks
     limapio.save_folder_linetracks_with_info(os.path.join(cfg["dir_save"], "fitnmerge_finaltracks"), linetracks, config=cfg, imagecols=imagecols, all_2d_segs=all_2d_segs)
     limapio.save_txt_linetracks(os.path.join(cfg["dir_save"], "fitnmerge_alltracks.txt"), linetracks, n_visible_views=4)
-    VisTrack = limapvis.PyVistaTrackVisualizer(linetracks, visualize=cfg["visualize"])
+    VisTrack = limapvis.Open3DTrackVisualizer(linetracks)
     VisTrack.report()
     limapio.save_obj(os.path.join(cfg["dir_save"], 'fitnmerge_lines_nv{0}.obj'.format(cfg["n_visible_views"])), VisTrack.get_lines_np(n_visible_views=cfg["n_visible_views"]))
 
     if cfg["visualize"]:
         import pdb
         pdb.set_trace()
-        VisTrack.vis_all_lines(n_visible_views=cfg["n_visible_views"])
+        VisTrack.vis_reconstruction(imagecols, n_visible_views=cfg["n_visible_views"], width=2)
         pdb.set_trace()
     return linetracks
 

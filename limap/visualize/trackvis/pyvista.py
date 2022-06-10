@@ -1,7 +1,6 @@
 from .base import BaseTrackVisualizer
 import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from vis_utils import *
 
 import pyvista as pv
 from pyvista import themes
@@ -20,10 +19,8 @@ class PyVistaTrackVisualizer(BaseTrackVisualizer):
         self.plotter = pv.Plotter(window_size=[img_hw[1], img_hw[0]], theme=my_theme)
 
     def vis_all_lines(self, n_visible_views=4, width=2):
-        for track_id, line in enumerate(self.lines):
-            if self.counts[track_id] < n_visible_views:
-                continue
-            color = '000000'
+        lines = self.get_lines_n_visible_views(n_visible_views)
+        for line in lines:
             self.plotter.add_lines(line.as_array(), color, width=width)
         self.plotter.show()
 

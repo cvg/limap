@@ -24,4 +24,5 @@ omegaconf
 rtree
 plyfile
 pathlib
+open3d
 ./third-party/pytlsd
