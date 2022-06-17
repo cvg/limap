@@ -12,7 +12,7 @@
 	url = git@github.com:B1ueber2y/libigl.git
 [submodule "third-party/pytlsd"]
 	path = third-party/pytlsd
-	url = git@github.com:B1ueber2y/pytlsd.git
+	url = git@github.com:iago-suarez/pytlsd.git
 [submodule "third-party/RansacLib"]
 	path = third-party/RansacLib
 	url = git@github.com:B1ueber2y/RansacLib.git
