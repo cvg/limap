@@ -46,9 +46,9 @@ To run **Line Reconstruction** on Hypersim:
 python runners/hypersim/triangulation.py --output_dir outputs/quickstart_triangulation
 ```
 
-[Tips] Options are stored in the config foler ``cfgs``. You can easily change the options with the argument parsing in Python. In the following shows an example:
+[Tips] Options are stored in the config folder: ``cfgs``. You can easily change the options with the Python argument parser. In the following shows an example:
 ```bash
 python runners/hypersim/triangulation.py --sfm.fbase sift --line2d.detector.method lsd --line2d.visualize --triangulation.IoU_threshold 0.2 --skip_exists --n_visible_views 5
 ```
-In particular, ``skip_exists`` is a very useful option to avoid computing point-based SfM and line detection/description repeatedly in each run.
+In particular, ``skip_exists`` is a very useful option to avoid running point-based SfM and line detection/description repeatedly in each pass.
 
