@@ -36,6 +36,24 @@ def read_npy(fname):
         nparray = np.load(f, allow_pickle=True)
     return nparray
 
+def save_ply(fname, points):
+    from plyfile import PlyData, PlyElement
+    points = np.array(points)
+    points = [(points[i, 0], points[i, 1], points[i, 2]) for i in range(points.shape[0])]
+    vertex = np.array(points, dtype=[('x', 'f4'), ('y', 'f4'), ('z', 'f4')])
+    el = PlyElement.describe(vertex, 'vertex', comments=['vertices'])
+    PlyData([el], text=True).write(fname)
+
+def read_ply(fname):
+    from plyfile import PlyData, PlyElement
+    plydata = PlyData.read(fname)
+    x = np.asarray(plydata.elements[0].data['x'])
+    y = np.asarray(plydata.elements[0].data['y'])
+    z = np.asarray(plydata.elements[0].data['z'])
+    points = np.stack([x, y, z], axis=1)
+    print("number of points: {0}".format(points.shape[0]))
+    return points
+
 def save_txt_metainfos(fname, neighbors, ranges):
     '''
     Write out .txt for neighbors and ranges

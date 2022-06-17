@@ -11,6 +11,20 @@ def pyvista_vis_3d_lines(lines, img_hw=(600, 800), width=2):
         plotter.add_lines(line.as_array(), '#ff0000', width=width)
     plotter.show()
 
+def open3d_add_points(w, points, color=[0.0, 0.0, 0.0]):
+    import open3d as o3d
+    o3d_points, o3d_colors = [], []
+    for idx in range(np.array(points).shape[0]):
+        o3d_points.append(points[idx])
+        o3d_colors.append(color)
+    pcd = o3d.geometry.PointCloud()
+    pcd.points = o3d.utility.Vector3dVector(np.stack(o3d_points))
+    pcd.colors = o3d.utility.Vector3dVector(np.stack(o3d_colors))
+    mat = o3d.visualization.rendering.MaterialRecord()
+    mat.shader = "defaultUnlit"
+    w.add_geometry("pcd", pcd, mat)
+    return w
+
 def open3d_add_line_set(w, lines, color=[0.0, 0.0, 0.0], width=2):
     import open3d as o3d
     o3d_points, o3d_lines, o3d_colors = [], [], []

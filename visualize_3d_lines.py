@@ -8,7 +8,7 @@ import limap.visualize as limapvis
 def parse_args():
     import argparse
     arg_parser = argparse.ArgumentParser(description='visualize 3d lines')
-    arg_parser.add_argument('-i', '--input_dir', type=str, default='obj', help='input line npy file')
+    arg_parser.add_argument('-i', '--input_dir', type=str, required=True, help='input line file. Format supported now: .obj, .npy, linetrack folder.')
     arg_parser.add_argument('-nv', '--n_visible_views', type=int, default=2, help='number of visible views')
     arg_parser.add_argument('--imagecols', type=str, default=None, help=".npy file for imagecols")
     arg_parser.add_argument('--mode', type=str, default="pyvista", help="[pyvista, open3d]")

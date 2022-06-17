@@ -210,10 +210,16 @@ def make_bigimage(imgs, pad=20):
     imgs_collections.append(imgs_now)
     return cat_to_bigimage(imgs_collections, (n_rows, n_cols), pad=pad)
 
-def test_line_inside_ranges(line, ranges):
-    if ~np.all(line[0] > ranges[0]) or ~np.all(line[0] < ranges[1]):
+def test_point_inside_ranges(point, ranges):
+    point = np.array(point)
+    if ~np.all(point > ranges[0]) or ~np.all(point < ranges[1]):
         return False
-    if ~np.all(line[1] > ranges[0]) or ~np.all(line[1] < ranges[1]):
+    return True
+
+def test_line_inside_ranges(line, ranges):
+    if not test_point_inside_ranges(line.start, ranges):
+        return False
+    if not test_point_inside_ranges(line.end, ranges):
         return False
     return True
 
