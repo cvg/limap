@@ -3,10 +3,6 @@
 # global config
 n_neighbors: 20
 max_image_dim: 800
-use_descriptor: False
-line2d:
-    detector:
-        method: "lsd"
 triangulation:
     add_halfpix: True
 

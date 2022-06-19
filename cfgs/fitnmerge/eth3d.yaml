@@ -6,6 +6,4 @@ reso_type: "dslr" # ["dslr", "lowres"]
 scene_id: "train/delivery_area"
 cam_id: 0 
 max_image_dim: 756
-line2d:
-    detector: 
-        method: "lsd"
+

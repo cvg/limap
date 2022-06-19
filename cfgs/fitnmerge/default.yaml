@@ -33,7 +33,7 @@ sfm:
 # line detection config
 line2d:
     detector: 
-        method: "sold2" # ["sold2", "lsd"]
+        method: "lsd" # ["lsd", "sold2"]
         skip_exists: False
     max_num_2d_segs: 3000
     visualize: False

@@ -40,7 +40,7 @@ line2d:
     save_l3dpp: False
     compute_descinfo: False
     detector: 
-        method: "sold2" # ["sold2", "lsd"]
+        method: "lsd" # ["lsd", "sold2"]
         skip_exists: False
     extractor: 
         method: "sold2"

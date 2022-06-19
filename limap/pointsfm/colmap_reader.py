@@ -1,30 +1,6 @@
 from _limap import _base
 from .read_write_model import *
 
-def ComputeNeighbors(model, n_neighbors, min_triangulation_angle=1.0, neighbor_type="iou"):
-    if neighbor_type == "iou":
-        neighbors = model.GetMaxIoUImages(n_neighbors, min_triangulation_angle)
-    elif neighbor_type == "overlap":
-        neighbors = model.GetMaxOverlappingImages(n_neighbors, min_triangulation_angle)
-    elif neighbor_type == "dice":
-        neighbors = model.GetMaxDiceCoeffImages(n_neighbors, min_triangulation_angle)
-    else:
-        raise NotImplementedError
-    return neighbors
-
-# compute neighborhood for a image list sorted as 'image{0:08d}.png'
-def ComputeNeighborsSorted(model, n_neighbors, min_triangulation_angle=1.0, neighbor_type="iou"):
-    # get neighbors
-    neighbors = ComputeNeighbors(model, n_neighbors, min_triangulation_angle=min_triangulation_angle, neighbor_type=neighbor_type)
-
-    # map indexes
-    image_names = model.GetImageNames()
-    image_id_list = [int(name[5:-4]) for name in image_names]
-    n1 = [neighbors[image_id_list.index(k)] for k in range(len(image_id_list))]
-    n2 = [[image_id_list[val] for val in neighbor] for neighbor in n1]
-    neighbors = n2
-    return neighbors
-
 def ReadInfos(model, colmap_path, model_path="sparse", image_path="images"):
     print("Start loading COLMAP sparse reconstruction.")
     image_names = model.GetImageNames()

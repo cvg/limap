@@ -495,7 +495,7 @@ void Triangulator::filterNodeByNumOuterEdges(const std::vector<std::vector<std::
 }
 
 void Triangulator::RunClustering() {
-    std::cout<<"Start building the line graph for clustering..."<<std::endl;
+    std::cout<<"Start building line graph for clustering..."<<std::endl;
     LineLinker linker_clustering = linker_;
     linker_clustering.linker_3d.config.set_to_spatial_merging();
 

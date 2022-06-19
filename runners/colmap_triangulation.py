@@ -1,24 +1,31 @@
 import os, sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import core.utils as utils
 
 import limap.base as _base
 import limap.pointsfm as _psfm
+import limap.util.io_utils as limapio
 import limap.runners
 
 def run_colmap_triangulation(cfg, colmap_path, model_path="sparse", image_path="images"):
     '''
     Run triangulation from COLMAP input
     '''
+    metainfos_filename = "infos_colmap.npy"
+    output_dir = "tmp" if cfg["output_dir"] is None else cfg["output_dir"]
+    limapio.check_makedirs(output_dir)
+    if cfg["skip_exists"] and os.path.exists(os.path.join(output_dir, metainfos_filename)):
+        cfg["info_path"] = os.path.join(output_dir, metainfos_filename)
     if cfg["info_path"] is None:
         imagecols, neighbors, ranges = _psfm.read_infos_colmap(cfg["sfm"], colmap_path, model_path=model_path, image_path=image_path, n_neighbors=cfg["n_neighbors"])
-        with open(os.path.join("tmp", "infos_colmap.npy"), 'wb') as f:
+        with open(os.path.join(output_dir, metainfos_filename), 'wb') as f:
             np.savez(f, imagecols_np=imagecols.as_dict(), neighbors=neighbors, ranges=ranges)
     else:
         with open(cfg["info_path"], 'rb') as f:
             data = np.load(f, allow_pickle=True)
-            imagecols_np, neighbors, ranges = data["imagecols_np"], data["neighbors"], data["ranges"]
+            imagecols_np, neighbors, ranges = data["imagecols_np"].item(), data["neighbors"], data["ranges"]
             imagecols = _base.ImageCollection(imagecols_np)
 
     # run triangulation
@@ -35,7 +42,6 @@ def parse_config():
     arg_parser.add_argument('-i', '--image_path', type=str, default='images', help='image path')
     arg_parser.add_argument('--npyfolder', type=str, default="tmp", help='folder to load precomputed results')
     arg_parser.add_argument('--max_image_dim', type=int, default=None, help='max image dim')
-    arg_parser.add_argument('--info_reuse', action='store_true', help="whether to use infonpy at tmp/infos_colmap.npy")
     arg_parser.add_argument('--info_path', type=str, default=None, help='load precomputed info')
 
     args, unknown = arg_parser.parse_known_args()
@@ -48,13 +54,9 @@ def parse_config():
     cfg["image_path"] = args.image_path
     cfg["model_path"] = args.model_path
     cfg["folder_to_load"] = args.npyfolder
-    if args.info_reuse:
-        cfg["info_path"] = "tmp/infos_colmap.npy"
     cfg["info_path"] = args.info_path
     if ("max_image_dim" not in cfg.keys()) or args.max_image_dim is not None:
         cfg["max_image_dim"] = args.max_image_dim
-    if not os.path.exists('tmp'):
-        os.makedirs('tmp')
     return cfg
 
 def main():
