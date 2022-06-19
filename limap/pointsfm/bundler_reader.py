@@ -2,6 +2,7 @@ from _limap import _base, _pointsfm, _undistortion
 
 import os
 import numpy as np
+import cv2
 from tqdm import tqdm
 
 def ReadModelBundler(bundler_path, list_path, model_path):
@@ -37,9 +38,7 @@ def ReadModelBundler(bundler_path, list_path, model_path):
         f, k1, k2 = float(line[0]), float(line[1]), float(line[2])
         counter += 1
         imname = imname_list[img_id]
-        bitmap = _undistortion.COLMAP_Bitmap()
-        bitmap.Read(imname)
-        img_hw = (bitmap.Height(), bitmap.Width())
+        img_hw = cv2.imread(imname).shape[:2]
         K = np.zeros((3, 3))
         cx = img_hw[1] / 2.0
         cy = img_hw[0] / 2.0
