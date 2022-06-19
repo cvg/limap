@@ -53,7 +53,7 @@ def undistort_images(imagecols, output_dir, fname="image_collection_undistorted.
         imagecols_undistorted.change_image_name(img_id, imname_out)
     for cam_id in cam_dict:
         imagecols_undistorted.change_camera(cam_id, cam_dict[cam_id])
-    limapio.save_txt_imname_list(output_dir, 'original_image_list.txt'), imagecols.get_image_list())
+    limapio.save_txt_imname_list(os.path.join(output_dir, 'original_image_list.txt'), imagecols.get_image_list())
     limapio.save_npy(os.path.join(output_dir, fname), imagecols_undistorted.as_dict())
     return imagecols_undistorted
 
