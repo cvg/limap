@@ -9,7 +9,7 @@ import limap.pointsfm as _psfm
 import limap.util.io as limapio
 import limap.runners
 
-def run_bundler_visualsfm(cfg, vsfm_path, nvm_file="reconstruction.nvm"):
+def run_visualsfm_triangulation(cfg, vsfm_path, nvm_file="reconstruction.nvm"):
     '''
     Run triangulation from VisualSfM input
     '''
@@ -57,7 +57,7 @@ def parse_config():
 
 def main():
     cfg = parse_config()
-    run_bundler_visualsfm(cfg, cfg["vsfm_path"], nvm_file=cfg["nvm_file"])
+    run_visualsfm_triangulation(cfg, cfg["vsfm_path"], nvm_file=cfg["nvm_file"])
 
 if __name__ == '__main__':
     main()
