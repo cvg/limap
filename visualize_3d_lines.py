@@ -2,7 +2,7 @@ import os, sys
 import numpy as np
 
 import limap.base as _base
-import limap.util.io_utils as limapio
+import limap.util.io as limapio
 import limap.visualize as limapvis
 
 def parse_args():

@@ -3,7 +3,7 @@ import numpy as np
 import warnings
 from tqdm import tqdm
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-import limap.util.io_utils as limapio
+import limap.util.io as limapio
 
 def setup(cfg):
     folder_save = cfg["output_dir"]

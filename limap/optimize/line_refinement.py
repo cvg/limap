@@ -8,7 +8,7 @@ import limap.base as _base
 import limap.features as _features
 import limap.refinement as _refinement
 import limap.evaluation as _eval
-import limap.util.io_utils as limapio
+import limap.util.io as limapio
 import limap.visualize as limapvis
 
 def line_refinement(cfg, tracks, imagecols, heatmap_dir=None, patch_dir=None, featuremap_dir=None, vpresults=None, n_visible_views=4):

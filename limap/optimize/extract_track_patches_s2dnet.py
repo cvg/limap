@@ -8,7 +8,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 import limap.line2d
 import limap.base as _base
 import limap.features as _features
-import limap.util.io_utils as limapio
+import limap.util.io as limapio
 
 def extract_feature_s2dnet(feature_extractor, camview):
     import torch

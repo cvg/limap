@@ -4,7 +4,7 @@ from tqdm import tqdm
 import joblib
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-import limap.util.io_utils as limapio
+import limap.util.io as limapio
 
 class BaseMatcher():
     def __init__(self, extractor, topk=10, n_neighbors=20, n_jobs=1):

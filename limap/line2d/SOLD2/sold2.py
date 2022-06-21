@@ -5,7 +5,7 @@ from base_detector import BaseDetector
 from base_matcher import BaseMatcher
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-import limap.util.io_utils as limapio
+import limap.util.io as limapio
 
 class SOLD2Detector(BaseDetector):
     def __init__(self, set_gray=True, max_num_2d_segs=3000):
@@ -31,7 +31,8 @@ class SOLD2Detector(BaseDetector):
         fname = self.get_descinfo_fname(descinfo_folder, img_id)
         descinfo = limapio.read_npy(fname)
         # special handling of None and same dimension
-        descinfo[1] = descinfo[1][0]
+        if len(descinfo) > 0:
+            descinfo[1] = descinfo[1][0]
         return descinfo
 
     def detect(self, camview):

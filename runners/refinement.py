@@ -5,7 +5,7 @@ import core.utils as utils
 
 import limap.base as _base
 import limap.vpdetection as _vpdet
-import limap.util.io_utils as limapio
+import limap.util.io as limapio
 import limap.optimize
 
 def main(cfg):

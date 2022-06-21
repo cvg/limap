@@ -6,7 +6,7 @@ import core.utils as utils
 
 import limap.base as _base
 import limap.pointsfm as _psfm
-import limap.util.io_utils as limapio
+import limap.util.io as limapio
 import limap.runners
 
 def run_colmap_triangulation(cfg, colmap_path, model_path="sparse", image_path="images"):

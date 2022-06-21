@@ -1,4 +1,4 @@
-from _limap import _base, _pointsfm, _undistortion
+from _limap import _base, _pointsfm
 
 import os
 import numpy as np
@@ -38,6 +38,8 @@ def ReadModelBundler(bundler_path, list_path, model_path):
         f, k1, k2 = float(line[0]), float(line[1]), float(line[2])
         counter += 1
         imname = imname_list[img_id]
+        if not os.path.exists(imname):
+            raise ValueError("Error! Image not found: {0}".format(imname))
         img_hw = cv2.imread(imname).shape[:2]
         K = np.zeros((3, 3))
         cx = img_hw[1] / 2.0

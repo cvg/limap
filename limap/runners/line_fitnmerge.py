@@ -10,7 +10,7 @@ import limap.fitting as _fit
 import limap.merging as _mrg
 import limap.lineBA as _lineBA
 import limap.runners as _runners
-import limap.util.io_utils as limapio
+import limap.util.io as limapio
 import limap.visualize as limapvis
 
 def fit_3d_segs(all_2d_segs, imagecols, depths, fitting_config):

@@ -5,7 +5,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 
 import limap.line2d
 import limap.base as _base
-import limap.util.io_utils as limapio
+import limap.util.io as limapio
 
 def extract_heatmaps_sold2(output_dir, imagecols, skip_exists=False):
     '''
