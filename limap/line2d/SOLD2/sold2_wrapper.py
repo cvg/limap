@@ -129,6 +129,8 @@ class SOLD2LineDetector():
         return matches_t
 
     def compute_descinfo(self, segs, desc):
+        if segs.shape[0] == 0:
+            return []
         segs_sold2 = self.segstosold2segs(segs[:, :4])
         if desc is None:
             return []
