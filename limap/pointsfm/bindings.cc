@@ -33,6 +33,8 @@ void bind_pointsfm(py::module &m) {
         .def("addPoint", &SfmModel::addPoint)
         .def("ReadFromCOLMAP", &SfmModel::ReadFromCOLMAP)
         .def("GetImageNames", &SfmModel::GetImageNames)
+        .def("ComputeNumPoints", &SfmModel::ComputeNumPoints)
+        .def("ComputeSharedPoints", &SfmModel::ComputeSharedPoints)
         .def("GetMaxOverlappingImages", &SfmModel::GetMaxOverlappingImages)
         .def("GetMaxIoUImages", &SfmModel::GetMaxIoUImages)
         .def("GetMaxDiceCoeffImages", &SfmModel::GetMaxDiceCoeffImages)
