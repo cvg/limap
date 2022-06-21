@@ -89,3 +89,15 @@ def read_infos_bundler(cfg, bundler_path, list_path, model_path, n_neighbors=20)
     neighbors, ranges = compute_metainfos(cfg, model, n_neighbors=n_neighbors)
     return imagecols, neighbors, ranges
 
+def read_infos_visualsfm(cfg, vsfm_path, nvm_file="reconstruction.nvm", n_neighbors=20):
+    '''
+    Read all infos from VisualSfM format including imagecols, neighbors, ranges
+    '''
+    from .visualsfm_reader import ReadModelVisualSfM
+    model, imagecols = ReadModelVisualSfM(vsfm_path, nvm_file=nvm_file)
+
+    # get metainfos
+    neighbors, ranges = compute_metainfos(cfg, model, n_neighbors=n_neighbors)
+    return imagecols, neighbors, ranges
+
+
