@@ -11,7 +11,7 @@ def parse_args():
     arg_parser.add_argument('-i', '--input_dir', type=str, required=True, help='input line file. Format supported now: .obj, .npy, linetrack folder.')
     arg_parser.add_argument('-nv', '--n_visible_views', type=int, default=2, help='number of visible views')
     arg_parser.add_argument('--imagecols', type=str, default=None, help=".npy file for imagecols")
-    arg_parser.add_argument('--mode', type=str, default="pyvista", help="[pyvista, open3d]")
+    arg_parser.add_argument('--mode', type=str, default="open3d", help="[pyvista, open3d]")
     args = arg_parser.parse_args()
     return args
 
@@ -23,7 +23,7 @@ def vis_3d_lines(lines, mode="pyvista"):
     else:
         raise NotImplementedError
 
-def vis_reconstruction(linetracks, imagecols, mode="pyvista", n_visible_views=4):
+def vis_reconstruction(linetracks, imagecols, mode="open3d", n_visible_views=4):
     if mode == "pyvista":
         VisTrack = limapvis.PyVistaTrackVisualizer(linetracks)
     elif mode == "open3d":
