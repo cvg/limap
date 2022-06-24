@@ -67,7 +67,7 @@ class SOLD2Detector(BaseDetector):
         limapio.check_makedirs(heatmap_folder)
         if not (skip_exists and os.path.exists(os.path.join(heatmap_folder, "imagecols.npy"))):
             limapio.save_npy(os.path.join(heatmap_folder, "imagecols.npy"), imagecols.as_dict())
-        for img_id in tqdm(range(imagecols.NumImages())):
+        for img_id in tqdm(imagecols.get_img_ids()):
             heatmap_fname = self.get_heatmap_fname(heatmap_folder, img_id)
             if skip_exists and os.path.exists(heatmap_fname):
                 continue

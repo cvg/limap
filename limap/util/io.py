@@ -64,8 +64,8 @@ def save_txt_metainfos(fname, neighbors, ranges):
         f.write("x-range, {0}, {1}\n".format(ranges[0][0], ranges[1][0]))
         f.write("y-range, {0}, {1}\n".format(ranges[0][1], ranges[1][1]))
         f.write("z-range, {0}, {1}\n".format(ranges[0][2], ranges[1][2]))
-        for idx, neighbor in enumerate(neighbors):
-            str_ = "image {0}".format(idx)
+        for img_id, neighbor in neighbors.items():
+            str_ = "image {0}".format(img_id)
             for ng_idx in neighbor:
                 str_ += ", {0}".format(ng_idx)
             f.write(str_ + '\n')
@@ -90,11 +90,12 @@ def read_txt_metainfos(fname):
     k = txt_lines[counter].strip().split(',')[1:]
     ranges[0][2], ranges[1][2] = float(k[0]), float(k[1])
     counter += 1
-    neighbors = []
-    for img_id in range(n_images):
-        k = txt_lines[counter].strip().split(',')[1:]
-        neighbor = [int(kk) for kk in k]
-        neighbors.append(neighbor)
+    neighbors = {}
+    for idx in range(n_images):
+        k = txt_lines[counter].strip().split(',')
+        img_id = int(k[0][6:])
+        neighbor = [int(kk) for kk in k[1:]]
+        neighbors[img_id] = neighbor
         counter += 1
     return neighbors, ranges
 
@@ -174,7 +175,7 @@ def save_l3dpp(folder, imagecols, all_2d_segs):
         mode = 'tnt'
         number_list = [int(os.path.basename(imname)[:-4]) for imname in image_names]
         index_list = np.argsort(number_list).tolist()
-    for idx in range(imagecols.NumImages()):
+    for idx in imagecols.get_img_ids():
         if mode == 'default':
             image_id = idx + 1
         elif mode == 'tnt':
@@ -373,11 +374,11 @@ def read_txt_segments(folder, img_id):
 
 def read_all_segments_from_folder(folder):
     flist = os.listdir(folder)
-    n_images = len(flist)
-    all_2d_segs = []
-    for img_id in range(n_images):
+    all_2d_segs = {}
+    for fname in flist:
+        img_id = int(fname[9:-4])
         segs = read_txt_segments(folder, img_id)
-        all_2d_segs.append(segs)
+        all_2d_segs[img_id] = segs
     return all_2d_segs
 
 

@@ -82,12 +82,13 @@ Line3d unprojection_line2d(const Line2d& line2d, const CameraView& view, const s
     return line3d;
 }
 
-void GetAllLines2D(const std::vector<Eigen::MatrixXd>& all_2d_segs,
-                   std::vector<std::vector<Line2d>>& all_lines) 
+void GetAllLines2D(const std::map<int, Eigen::MatrixXd>& all_2d_segs,
+                   std::map<int, std::vector<Line2d>>& all_lines) 
 {
     all_lines.clear();
     for (auto it = all_2d_segs.begin(); it != all_2d_segs.end(); ++it) {
-        Eigen::MatrixXd segs2d = *it;
+        all_lines.insert(std::make_pair(it->first, std::vector<Line2d>()));
+        Eigen::MatrixXd segs2d = it->second;
         if (segs2d.rows() != 0) {
             THROW_CHECK_GE(segs2d.cols(), 4);
         }
@@ -95,7 +96,7 @@ void GetAllLines2D(const std::vector<Eigen::MatrixXd>& all_2d_segs,
         for (int i = 0; i < segs2d.rows(); ++i) {
             lines.push_back(Line2d(V2D(segs2d(i, 0), segs2d(i, 1)), V2D(segs2d(i, 2), segs2d(i, 3))));
         }
-        all_lines.push_back(lines);
+        all_lines[it->first] = lines;
     }
 }
 

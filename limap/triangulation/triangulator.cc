@@ -14,7 +14,9 @@ namespace limap {
 namespace triangulation {
 
 void Triangulator::offsetHalfPixel() {
-    for (size_t img_id = 0; img_id < CountImages(); ++img_id) {
+    std::vector<int> image_ids = imagecols_.get_img_ids();
+    for (auto it = image_ids.begin(); it != image_ids.end(); ++it) {
+        int img_id = *it;
         for (size_t line_id = 0; line_id < CountLines(img_id); ++line_id) {
             auto& line = all_lines_2d_[img_id][line_id];
             line.start = line.start + V2D(0.5, 0.5); 
@@ -23,7 +25,7 @@ void Triangulator::offsetHalfPixel() {
     }
 }
 
-void Triangulator::Init(const std::vector<std::vector<Line2d>>& all_2d_segs,
+void Triangulator::Init(const std::map<int, std::vector<Line2d>>& all_2d_segs,
                         const ImageCollection& imagecols) 
 {
     all_lines_2d_ = all_2d_segs;
@@ -34,56 +36,55 @@ void Triangulator::Init(const std::vector<std::vector<Line2d>>& all_2d_segs,
     
     // compute vanishing points (optional)
     if (config_.use_vp) {
-        size_t n_images = all_2d_segs.size();
-        vpresults_.resize(n_images);
+        for (const int& img_id: imagecols.get_img_ids()) {
+            vpresults_.insert(std::make_pair(img_id, vpdetection::VPResult()));
+        }
         std::cout<<"Start vanishing point detection..."<<std::endl;
-        progressbar bar(n_images);
+        progressbar bar(imagecols.NumImages());
 #pragma omp parallel for
-        for (size_t img_id = 0; img_id < n_images; ++img_id) {
+        for (const int& img_id: imagecols.get_img_ids()) {
             bar.update();
-            vpresults_[img_id] = vpdetector_.AssociateVPs(all_2d_segs[img_id]);
+            vpresults_.at(img_id) = vpdetector_.AssociateVPs(all_2d_segs.at(img_id));
         }
     }
     
     // initialize empty containers
-    size_t n_images = all_2d_segs.size();
-    neighbors_.resize(n_images);
-    edges_.resize(n_images);
-    tris_.resize(n_images);
-    valid_tris_.resize(n_images);
-    valid_edges_.resize(n_images);
-    tris_best_.resize(n_images);
-    for (size_t img_id = 0; img_id < n_images; ++img_id) {
-        size_t n_lines = all_2d_segs[img_id].size();
-        edges_[img_id].resize(n_lines);
-        tris_[img_id].resize(n_lines);
-        valid_tris_[img_id].resize(n_lines);
-        valid_edges_[img_id].resize(n_lines);
-        tris_best_[img_id].resize(n_lines);
+    for (const int& img_id: imagecols.get_img_ids()) {
+        size_t n_lines = all_2d_segs.at(img_id).size();
+        neighbors_.insert(std::make_pair(img_id, std::vector<int>()));
+        edges_.insert(std::make_pair(img_id, std::vector<std::vector<LineNode>>()));
+        edges_.at(img_id).resize(n_lines);
+        valid_edges_.insert(std::make_pair(img_id, std::vector<std::vector<NeighborLineNode>>()));
+        valid_edges_.at(img_id).resize(n_lines);
+        tris_.insert(std::make_pair(img_id, std::vector<std::vector<TriTuple>>()));
+        tris_.at(img_id).resize(n_lines);
+        valid_tris_.insert(std::make_pair(img_id, std::vector<std::vector<TriTuple>>()));
+        valid_tris_.at(img_id).resize(n_lines);
+        tris_best_.insert(std::make_pair(img_id, std::vector<TriTuple>()));
+        tris_best_.at(img_id).resize(n_lines);
     }
 
     // flags for monitoring the scoring process
-    already_scored_.resize(n_images);
-    for (size_t img_id = 0; img_id < n_images; ++img_id) {
-        size_t n_lines = all_2d_segs[img_id].size();
-        already_scored_[img_id].resize(n_lines);
+    for (const int& img_id: imagecols.get_img_ids()) {
+        size_t n_lines = all_2d_segs.at(img_id).size();
+        already_scored_.insert(std::make_pair(img_id, std::vector<bool>()));
+        already_scored_.at(img_id).resize(n_lines);
         std::fill(already_scored_[img_id].begin(), already_scored_[img_id].end(), false);
     }
 }
 
-void Triangulator::InitMatches(const std::vector<std::vector<Eigen::MatrixXi>>& all_matches,
-                               const std::vector<std::vector<int>>& all_neighbors,
+void Triangulator::InitMatches(const std::map<int, std::vector<Eigen::MatrixXi>>& all_matches,
+                               const std::map<int, std::vector<int>>& all_neighbors,
                                bool use_triangulate,
                                bool use_scoring) 
 {
     // collect edges
-    int n_images = CountImages();
-    for (size_t img_id = 0; img_id < n_images; ++img_id) {
-        neighbors_[img_id].clear(); neighbors_[img_id] = all_neighbors[img_id];
-        size_t n_neighbors = all_neighbors[img_id].size();
+    for (const int& img_id: imagecols_.get_img_ids()) {
+        neighbors_[img_id].clear(); neighbors_[img_id] = all_neighbors.at(img_id);
+        size_t n_neighbors = all_neighbors.at(img_id).size();
         for (size_t neighbor_id = 0; neighbor_id < n_neighbors; ++neighbor_id) {
-            int ng_img_id = all_neighbors[img_id][neighbor_id];
-            const auto& match_info = all_matches[img_id][neighbor_id];
+            int ng_img_id = all_neighbors.at(img_id)[neighbor_id];
+            const auto& match_info = all_matches.at(img_id)[neighbor_id];
             if (match_info.rows() != 0) {
                 THROW_CHECK_EQ(match_info.cols(), 2);
             }
@@ -193,10 +194,10 @@ void Triangulator::InitExhaustiveMatchImage(const int img_id,
     }
 }
 
-void Triangulator::InitAll(const std::vector<std::vector<Line2d>>& all_2d_segs,
+void Triangulator::InitAll(const std::map<int, std::vector<Line2d>>& all_2d_segs,
                            const ImageCollection& imagecols,
-                           const std::vector<std::vector<Eigen::MatrixXi>>& all_matches,
-                           const std::vector<std::vector<int>>& all_neighbors,
+                           const std::map<int, std::vector<Eigen::MatrixXi>>& all_matches,
+                           const std::map<int, std::vector<int>>& all_neighbors,
                            bool use_triangulate,
                            bool use_scoring)
 {
@@ -209,7 +210,7 @@ void Triangulator::clearEdgesOneNode(const int img_id, const int line_id) {
 }
 
 void Triangulator::clearEdges() {
-    for (int img_id = 0; img_id < CountImages(); ++img_id) {
+    for (const int& img_id: imagecols_.get_img_ids()) {
         for (int line_id = 0; line_id < CountLines(img_id); ++line_id) {
             clearEdgesOneNode(img_id, line_id);
         }
@@ -218,25 +219,26 @@ void Triangulator::clearEdges() {
 
 int Triangulator::countEdges() const {
     int counter = 0;
-    for (int img_id = 0; img_id < CountImages(); ++img_id) {
+    for (const int& img_id: imagecols_.get_img_ids()) {
         for (int line_id = 0; line_id < CountLines(img_id); ++line_id) {
-            counter += edges_[img_id][line_id].size();
+            counter += edges_.at(img_id)[line_id].size();
         }
     }
     return counter;
 }
 
 void Triangulator::triangulateOneNode(const int img_id, const int line_id) {
+    THROW_CHECK_EQ(imagecols_.exist_image(img_id), true);
     auto& connections = edges_[img_id][line_id];
     const Line2d& l1 = all_lines_2d_[img_id][line_id];
     if (l1.length() < config_.min_length_2d)
         return;
     const CameraView& view1 = imagecols_.camview(img_id);
-    int n_conns = connections.size();
+    size_t n_conns = connections.size();
     std::vector<std::vector<TriTuple>> results(n_conns);
 
 #pragma omp parallel for
-    for (int conn_id = 0; conn_id < n_conns; ++conn_id) {
+    for (size_t conn_id = 0; conn_id < n_conns; ++conn_id) {
         int ng_img_id = connections[conn_id].first;
         int ng_line_id = connections[conn_id].second;
         const Line2d& l2 = all_lines_2d_[ng_img_id][ng_line_id];
@@ -313,7 +315,7 @@ void Triangulator::RunTriangulate() {
     size_t n_images = CountImages();
     progressbar bar(n_images);
 #pragma omp parallel for
-    for (size_t img_id = 0; img_id < n_images; ++img_id) {
+    for (const int& img_id: imagecols_.get_img_ids()) {
         bar.update();
         size_t n_lines = CountLines(img_id);
         for (size_t line_id = 0; line_id < n_lines; ++line_id) {
@@ -418,7 +420,7 @@ void Triangulator::RunScoring() {
     // scoring all tris
     size_t n_images = CountImages();
     progressbar bar(n_images);
-    for (size_t img_id = 0; img_id < n_images; ++img_id) {
+    for (const int& img_id: imagecols_.get_img_ids()) {
         bar.update();
         for (size_t line_id = 0; line_id < CountLines(img_id); ++line_id) {
             scoreOneNode(img_id, line_id, linker_scoring);
@@ -427,36 +429,34 @@ void Triangulator::RunScoring() {
 }
 
 const TriTuple& Triangulator::getBestTri(const int img_id, const int line_id) const {
-    return tris_best_[img_id][line_id];
+    return tris_best_.at(img_id)[line_id];
 }
 
-void Triangulator::filterNodeByNumOuterEdges(const std::vector<std::vector<std::vector<NeighborLineNode>>>& valid_edges, 
-                                             std::vector<std::vector<bool>>& flags) {
-    flags.clear();
-    size_t n_images = CountImages();
-    flags.resize(n_images);
-    for (size_t img_id = 0; img_id < n_images; ++img_id) {
+void Triangulator::filterNodeByNumOuterEdges(const std::map<int, std::vector<std::vector<NeighborLineNode>>>& valid_edges, 
+                                             std::map<int, std::vector<bool>>& flags) {
+    for (const int& img_id: imagecols_.get_img_ids()) {
         size_t n_lines = CountLines(img_id);
+        flags.insert(std::make_pair(img_id, std::vector<bool>()));
         flags[img_id].resize(n_lines);
         std::fill(flags[img_id].begin(), flags[img_id].end(), true);
     }
 
     // build checktable with all edges pointing to the node
-    std::vector<std::vector<std::vector<LineNode>>> parent_neighbors;
-    parent_neighbors.resize(n_images);
-    std::vector<std::vector<int>> counters;
-    counters.resize(n_images);
-    for (size_t img_id = 0; img_id < n_images; ++img_id) {
+    std::map<int, std::vector<std::vector<LineNode>>> parent_neighbors;
+    std::map<int, std::vector<int>> counters;
+    for (const int& img_id: imagecols_.get_img_ids()) {
+        parent_neighbors.insert(std::make_pair(img_id, std::vector<std::vector<LineNode>>()));
+        counters.insert(std::make_pair(img_id, std::vector<int>()));
         size_t n_lines = CountLines(img_id);
         parent_neighbors[img_id].resize(n_lines);
         counters[img_id].resize(n_lines);
         for (size_t line_id = 0; line_id < n_lines; ++line_id) {
-            counters[img_id][line_id] = valid_edges[img_id][line_id].size();
+            counters[img_id][line_id] = valid_edges.at(img_id)[line_id].size();
         }
     }
-    for (size_t img_id = 0; img_id < n_images; ++img_id) {
+    for (const int& img_id: imagecols_.get_img_ids()) {
         for (size_t line_id = 0; line_id < CountLines(img_id); ++line_id) {
-            auto& nodes = valid_edges[img_id][line_id];
+            auto& nodes = valid_edges.at(img_id)[line_id];
             for (auto it = nodes.begin(); it != nodes.end(); ++it) {
                 int ng_img_id = neighbors_[img_id][it->first];
                 int ng_line_id = it->second;
@@ -470,7 +470,7 @@ void Triangulator::filterNodeByNumOuterEdges(const std::vector<std::vector<std::
 
     // iteratively filter node
     std::queue<LineNode> q;
-    for (size_t img_id = 0; img_id < n_images; ++img_id) {
+    for (const int& img_id: imagecols_.get_img_ids()) {
         for (size_t line_id = 0; line_id < CountLines(img_id); line_id++) {
             if (flags[img_id][line_id])
                 continue;
@@ -504,7 +504,7 @@ void Triangulator::RunClustering() {
 
     // collect undirected edges
     std::set<std::pair<LineNode, LineNode>> edges;
-    for (size_t img_id = 0; img_id < CountImages(); ++img_id) {
+    for (const int& img_id: imagecols_.get_img_ids()) {
         for (size_t line_id = 0; line_id < CountLines(img_id); ++line_id) {
             auto& nodes = valid_edges_[img_id][line_id];
             for (auto it = nodes.begin(); it != nodes.end(); ++it) {
@@ -613,10 +613,10 @@ void Triangulator::Run() {
 int Triangulator::CountAllTris() const {
     int counter = 0;
     size_t n_images = CountImages();
-    for (size_t img_id = 0; img_id < n_images; ++img_id) {
+    for (const int& img_id: imagecols_.get_img_ids()) {
         size_t n_lines = CountLines(img_id);
         for (size_t line_id = 0; line_id < n_lines; ++line_id) {
-            int n_tris = tris_[img_id][line_id].size();
+            int n_tris = tris_.at(img_id)[line_id].size();
             counter += n_tris;
         }
     }
@@ -624,16 +624,16 @@ int Triangulator::CountAllTris() const {
 }
 
 std::vector<TriTuple> Triangulator::GetScoredTrisNode(const int& image_id, const int& line_id) const {
-    return tris_[image_id][line_id];
+    return tris_.at(image_id)[line_id];
 }
 
 std::vector<TriTuple> Triangulator::GetValidScoredTrisNode(const int& image_id, const int& line_id) const {
-    return valid_tris_[image_id][line_id];
+    return valid_tris_.at(image_id)[line_id];
 }
 
 std::vector<TriTuple> Triangulator::GetValidScoredTrisNodeSet(const int& img_id, const int& line_id) const {
     std::vector<TriTuple> res;
-    auto& tris = valid_tris_[img_id][line_id];
+    auto& tris = valid_tris_.at(img_id)[line_id];
     std::map<int, std::pair<int, double>> table; // (ng_img_id, (tri_id, score))
     int n_tris = tris.size();
     for (int tri_id = 0; tri_id < n_tris; ++tri_id) {
@@ -651,7 +651,7 @@ std::vector<TriTuple> Triangulator::GetValidScoredTrisNodeSet(const int& img_id,
     }
     for (auto it = table.begin(); it != table.end(); ++it) {
         int tri_id = it->second.first;
-        res.push_back(valid_tris_[img_id][line_id][tri_id]);
+        res.push_back(valid_tris_.at(img_id)[line_id][tri_id]);
     }
     return res;
 }
@@ -659,10 +659,10 @@ std::vector<TriTuple> Triangulator::GetValidScoredTrisNodeSet(const int& img_id,
 int Triangulator::CountAllValidTris() const {
     int counter = 0;
     size_t n_images = CountImages();
-    for (size_t img_id = 0; img_id < n_images; ++img_id) {
+    for (const int& img_id: imagecols_.get_img_ids()) {
         size_t n_lines = CountLines(img_id);
         for (size_t line_id = 0; line_id < n_lines; ++line_id) {
-            int n_tris = valid_tris_[img_id][line_id].size();
+            int n_tris = valid_tris_.at(img_id)[line_id].size();
             counter += n_tris;
         }
     }
@@ -672,10 +672,10 @@ int Triangulator::CountAllValidTris() const {
 std::vector<Line3d> Triangulator::GetAllValidTris() const {
     std::vector<Line3d> res;
     size_t n_images = CountImages();
-    for (size_t img_id = 0; img_id < n_images; ++img_id) {
+    for (const int& img_id: imagecols_.get_img_ids()) {
         size_t n_lines = CountLines(img_id);
         for (size_t line_id = 0; line_id < n_lines; ++line_id) {
-            auto& tris = valid_tris_[img_id][line_id];
+            auto& tris = valid_tris_.at(img_id)[line_id];
             for (auto it = tris.begin(); it != tris.end(); ++it) {
                 const auto& line = std::get<0>(*it);
                 res.push_back(line);
@@ -689,7 +689,7 @@ std::vector<Line3d> Triangulator::GetValidTrisImage(const int& img_id) const {
     std::vector<Line3d> res;
     size_t n_lines = CountLines(img_id);
     for (size_t line_id = 0; line_id < n_lines; ++line_id) {
-        auto& tris = valid_tris_[img_id][line_id];
+        auto& tris = valid_tris_.at(img_id)[line_id];
         for (auto it = tris.begin(); it != tris.end(); ++it) {
             const auto& line = std::get<0>(*it);
             res.push_back(line);
@@ -700,7 +700,7 @@ std::vector<Line3d> Triangulator::GetValidTrisImage(const int& img_id) const {
 
 std::vector<Line3d> Triangulator::GetValidTrisNode(const int& img_id, const int& line_id) const {
     std::vector<Line3d> res;
-    auto& tris = valid_tris_[img_id][line_id];
+    auto& tris = valid_tris_.at(img_id)[line_id];
     for (auto it = tris.begin(); it != tris.end(); ++it) {
         const auto& line = std::get<0>(*it);
         res.push_back(line);
@@ -710,7 +710,7 @@ std::vector<Line3d> Triangulator::GetValidTrisNode(const int& img_id, const int&
 
 std::vector<Line3d> Triangulator::GetValidTrisNodeSet(const int& img_id, const int& line_id) const {
     std::vector<Line3d> res;
-    auto& tris = valid_tris_[img_id][line_id];
+    auto& tris = valid_tris_.at(img_id)[line_id];
     std::map<int, std::pair<int, double>> table; // (ng_img_id, (tri_id, score))
     int n_tris = tris.size();
     for (int tri_id = 0; tri_id < n_tris; ++tri_id) {
@@ -738,7 +738,7 @@ std::vector<Line3d> Triangulator::GetValidTrisNodeSet(const int& img_id, const i
 std::vector<Line3d> Triangulator::GetAllBestTris() const {
     std::vector<Line3d> res;
     size_t n_images = CountImages();
-    for (size_t img_id = 0; img_id < n_images; ++img_id) {
+    for (const int& img_id: imagecols_.get_img_ids()) {
         size_t n_lines = CountLines(img_id);
         for (size_t line_id = 0; line_id < n_lines; ++line_id) {
             res.push_back(std::get<0>(getBestTri(img_id, line_id)));
@@ -750,10 +750,10 @@ std::vector<Line3d> Triangulator::GetAllBestTris() const {
 std::vector<Line3d> Triangulator::GetAllValidBestTris() const {
     std::vector<Line3d> res;
     size_t n_images = CountImages();
-    for (size_t img_id = 0; img_id < n_images; ++img_id) {
+    for (const int& img_id: imagecols_.get_img_ids()) {
         size_t n_lines = CountLines(img_id);
         for (size_t line_id = 0; line_id < n_lines; ++line_id) {
-            if (!valid_flags_[img_id][line_id])
+            if (!valid_flags_.at(img_id)[line_id])
                 continue;
             res.push_back(std::get<0>(getBestTri(img_id, line_id)));
         }

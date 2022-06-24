@@ -50,7 +50,7 @@ def open3d_add_cameras(w, imagecols, color=[1.0, 0.0, 0.0]):
     for cam_id in imagecols.get_cam_ids():
         cam = imagecols.cam(cam_id)
         camera_lines[cam_id] = o3d.geometry.LineSet.create_camera_visualization(cam.w(), cam.h(), cam.K(), np.eye(4), scale=0.1)
-    for img_id in range(imagecols.NumImages()):
+    for img_id in imagecols.get_img_ids():
         camimage = imagecols.camimage(img_id)
         T = np.eye(4)
         T[:3, :3] = camimage.R()

@@ -46,7 +46,8 @@ class BaseDetector():
         n_vis_images = min(first_k, imagecols.NumImages())
         vis_folder = os.path.join(output_folder, "visualize")
         limapio.check_makedirs(vis_folder)
-        for img_id in range(n_vis_images):
+        image_ids = imagecols.get_img_ids()[:n_vis_images]
+        for img_id in image_ids:
             img = imagecols.read_image(img_id)
             segs = limapio.read_txt_segments(seg_folder, img_id)
             img = limapvis.draw_segments(img, segs, (0, 255, 0))
@@ -58,7 +59,7 @@ class BaseDetector():
         if not skip_exists:
             limapio.delete_folder(seg_folder)
         limapio.check_makedirs(seg_folder)
-        for img_id in tqdm(range(imagecols.NumImages())):
+        for img_id in tqdm(imagecols.get_img_ids()):
             if skip_exists and limapio.exists_txt_segments(seg_folder, img_id):
                 continue
             segs = self.detect(imagecols.camview(img_id))
@@ -72,7 +73,7 @@ class BaseDetector():
         if not skip_exists:
             limapio.delete_folder(descinfo_folder)
         limapio.check_makedirs(descinfo_folder)
-        for img_id in tqdm(range(imagecols.NumImages())):
+        for img_id in tqdm(imagecols.get_img_ids()):
             if skip_exists and os.path.exists(self.get_descinfo_fname(descinfo_folder, img_id)):
                 continue
             descinfo = self.extract(imagecols.camview(img_id), all_2d_segs[img_id])
@@ -87,7 +88,7 @@ class BaseDetector():
             limapio.delete_folder(descinfo_folder)
         limapio.check_makedirs(seg_folder)
         limapio.check_makedirs(descinfo_folder)
-        for img_id in tqdm(range(imagecols.NumImages())):
+        for img_id in tqdm(imagecols.get_img_ids()):
             if skip_exists and os.path.exists(self.get_descinfo_fname(descinfo_folder, img_id)) and limapio.exists_txt_segments(seg_folder, img_id):
                 continue
             segs, descinfo = self.detect_and_extract(imagecols.camview(img_id))

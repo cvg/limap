@@ -38,7 +38,8 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     if neighbors is None:
         neighbors, ranges = _runners.compute_sfminfos(cfg, imagecols)
     else:
-        neighbors = [neighbor[:cfg["n_neighbors"]] for neighbor in neighbors]
+        for img_id, neighbor in neighbors.items():
+            neighbors[img_id] = neighbors[img_id][:cfg["n_neighbors"]]
 
     ##########################################################
     # [B] get 2D line segments and line heatmaps for each image
@@ -61,7 +62,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     Triangulator.SetRanges(ranges)
     all_2d_lines = _base.GetAllLines2D(all_2d_segs)
     Triangulator.Init(all_2d_lines, imagecols)
-    for img_id in range(imagecols.NumImages()):
+    for img_id in imagecols.get_img_ids():
         if cfg["triangulation"]["use_exhaustive_matcher"]:
             Triangulator.InitExhaustiveMatchImage(img_id, neighbors[img_id])
         else:

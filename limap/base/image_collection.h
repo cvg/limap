@@ -21,7 +21,9 @@ namespace limap {
 class ImageCollection {
 public:
     ImageCollection() {}
-    ImageCollection(const std::map<int, Camera>& input_cameras, const std::vector<CameraImage>& input_images): cameras(input_cameras), images(input_images) {}
+    ImageCollection(const std::map<int, Camera>& input_cameras, const std::map<int, CameraImage>& input_images): cameras(input_cameras), images(input_images) {}
+    ImageCollection(const std::map<int, Camera>& input_cameras, const std::vector<CameraImage>& input_images);
+    ImageCollection(const std::vector<Camera>& input_cameras, const std::map<int, CameraImage>& input_images);
     ImageCollection(const std::vector<Camera>& input_cameras, const std::vector<CameraImage>& input_images);
     ImageCollection(const std::vector<CameraView>& camviews);
     ImageCollection(py::dict dict);
@@ -32,13 +34,15 @@ public:
     size_t NumImages() const { return images.size(); }
     std::vector<Camera> get_cameras() const;
     std::vector<int> get_cam_ids() const;
-    std::vector<CameraImage> get_images() const { return images; }
+    std::vector<CameraImage> get_images() const;
+    std::vector<int> get_img_ids() const;
     std::vector<CameraView> get_camviews() const;
     bool IsUndistorted() const;
 
     Camera cam(const int cam_id) const;
     bool exist_cam(const int cam_id) const;
     CameraImage camimage(const int img_id) const;
+    bool exist_image(const int img_id) const;
     CameraPose campose(const int img_id) const;
     CameraView camview(const int img_id) const;
     std::string image_name(const int img_id) const;
@@ -52,7 +56,10 @@ public:
     
 private:
     std::map<int, Camera> cameras;
-    std::vector<CameraImage> images;
+    std::map<int, CameraImage> images;
+
+    void init_cameras_from_vector(const std::vector<Camera>& input_cameras);
+    void init_images_from_vector(const std::vector<CameraImage>& input_images);
 };
 
 } // namespace limap

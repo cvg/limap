@@ -38,10 +38,10 @@ def read_scene_scannet(cfg, dataset, scene_id, load_depth=False):
     # get depth
     if load_depth:
         print("Start loading depth maps...")
-        depths = []
-        for imname in tqdm(imname_list):
+        depths = {}
+        for img_id, imname in enumerate(tqdm(imname_list)):
             depth = dataset.get_depth(imname)
-            depths.append(depth)
+            depths[img_id] = depth
         return imagecols, neighbors, depths
     else:
         return imagecols, neighbors

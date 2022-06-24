@@ -3,13 +3,18 @@ from _limap import _base
 import numpy as np
 
 def get_all_lines_3d(seg3d_list):
-    all_lines_3d = [_mrg._GetLines(seg3d) for seg3d in seg3d_list]
+    all_lines_3d = {}
+    for img_id, segs3d in seg3d_list.items():
+        all_lines_3d[img_id] = _mrg._GetLines(segs3d)
     return all_lines_3d
 
 def merging(linker, all_2d_segs, imagecols, seg3d_list, neighbors, var2d=5.0):
     all_lines_2d = _base._GetAllLines2D(all_2d_segs)
-    all_lines_3d = [_mrg._GetLines(seg3d) for seg3d in seg3d_list]
-    all_lines_3d_with_uncertainty = [_mrg._SetUncertaintySegs3d(lines, imagecols.camview(idx), var2d) for (idx, lines) in enumerate(all_lines_3d)]
+    all_lines_3d = {}
+    all_lines_3d_with_uncertainty = {}
+    for img_id, segs3d in seg3d_list.items():
+        all_lines_3d[img_id] = _mrg._GetLines(segs3d)
+        all_lines_3d_with_uncertainty[img_id] = _mrg._SetUncertaintySegs3d(_mrg._GetLines(segs3d), imagecols.camview(img_id), var2d)
     graph = _base.Graph()
     linetracks = _mrg._MergeToLineTracks(graph, all_lines_2d, imagecols, all_lines_3d_with_uncertainty, neighbors, linker)
     return graph, linetracks

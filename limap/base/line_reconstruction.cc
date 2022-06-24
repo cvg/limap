@@ -11,23 +11,22 @@ LineReconstruction::LineReconstruction(const std::vector<LineTrack>& linetracks,
     }
 
     // initialize minimal cameras
-    int n_images = imagecols.NumImages();
-    for (int img_id = 0; img_id < n_images; ++img_id) {
+    for (const int& img_id: imagecols.get_img_ids()) {
         init_cameras_.insert(std::make_pair(img_id, imagecols.camview(img_id)));
-        cameras_.push_back(MinimalPinholeCamera(imagecols.camview(img_id)));
+        cameras_.insert(std::make_pair(img_id, MinimalPinholeCamera(imagecols.camview(img_id))));
     }
 }
 
-std::vector<CameraView> LineReconstruction::GetCameras() const {
-    std::vector<CameraView> cameras;
+std::map<int, CameraView> LineReconstruction::GetCameras() const {
+    std::map<int, CameraView> cameras;
     for (auto it = cameras_.begin(); it != cameras_.end(); ++it) {
-        cameras.push_back(it->GetCameraView());
+        cameras.insert(std::make_pair(it->first, it->second.GetCameraView()));
     }
     return cameras;
 }
 
 std::vector<Line3d> LineReconstruction::GetLines(const int num_outliers) const {
-    std::vector<CameraView> cameras = GetCameras();
+    std::map<int, CameraView> cameras = GetCameras();
     std::vector<Line3d> lines;
     int n_tracks = lines_.size();
     for (int track_id = 0; track_id < n_tracks; ++track_id) {

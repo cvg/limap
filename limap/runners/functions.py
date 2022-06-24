@@ -35,7 +35,7 @@ def undistort_images(imagecols, output_dir, fname="image_collection_undistorted.
     limapio.check_makedirs(output_dir)
     imagecols_undistorted = _base.ImageCollection(imagecols)
     cam_dict = {}
-    for img_id in tqdm(range(imagecols.NumImages())):
+    for img_id in tqdm(imagecols.get_img_ids()):
         cam_id = imagecols.camimage(img_id).cam_id
         cam = imagecols.cam(cam_id)
         imname_out = os.path.join(output_dir, "image_{0:08d}.png".format(img_id))
@@ -75,7 +75,8 @@ def compute_sfminfos(cfg, imagecols, fname="metainfos.txt"):
         limapio.check_path(cfg["dir_load"])
         fname_load = os.path.join(cfg["dir_load"], fname)
         neighbors, ranges = limapio.read_txt_metainfos(fname_load)
-        neighbors = [neighbor[:cfg["n_neighbors"]] for neighbor in neighbors]
+        for img_id, neighbor in neighbors.items():
+            neighbors[img_id] = neighbors[img_id][:cfg["n_neighbors"]]
     return neighbors, ranges
 
 def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
@@ -100,11 +101,10 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
     else:
         folder_load = os.path.join(cfg["dir_load"], basedir)
         all_2d_segs = limapio.read_all_segments_from_folder(detector.get_segments_folder(folder_load))
-        extractor = limap.line2d.get_extractor(cfg["line2d"]["extractor"])
+        descinfo_folder = None
         if compute_descinfo:
+            extractor = limap.line2d.get_extractor(cfg["line2d"]["extractor"])
             descinfo_folder = extractor.extract_all_images(folder_save, imagecols, all_2d_segs, skip_exists=se_ext)
-        else:
-            descinfo_folder = extractor.get_descinfo_folder(folder_load)
     if cfg["line2d"]["visualize"]:
         detector.visualize_segs(folder_save, imagecols, first_k=10)
     if cfg["line2d"]["save_l3dpp"]:

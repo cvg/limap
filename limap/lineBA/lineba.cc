@@ -369,7 +369,7 @@ std::vector<std::vector<V2D>> LineBAEngine<DTYPE, CHANNELS>::GetHeatmapIntersect
         std::vector<int> image_ids = reconstruction.GetInitTrack(track_id).GetSortedImageIds();
         for (auto it = image_ids.begin(); it != image_ids.end(); ++it) {
             int img_id = *it;
-            const auto& camera = reconstruction.cameras_[img_id];
+            const auto& camera = reconstruction.cameras_.at(img_id);
             const auto& ids = idmap.at(img_id);
             std::vector<V2D> out_samples_idx;
             for (auto it1 = ids.begin(); it1 != ids.end(); ++it1) {

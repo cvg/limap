@@ -313,10 +313,10 @@ std::vector<int> ComputeLineTrackLabelsAvg(const Graph& graph, const std::vector
 
 void MergeToLineTracks(Graph& graph,
                        std::vector<LineTrack>& linetracks,
-                       const std::vector<std::vector<Line2d>>& all_lines_2d,
+                       const std::map<int, std::vector<Line2d>>& all_lines_2d,
                        const ImageCollection& imagecols,
-                       const std::vector<std::vector<Line3d>>& all_lines_3d,
-                       const std::vector<std::vector<int>>& neighbors,
+                       const std::map<int, std::vector<Line3d>>& all_lines_3d,
+                       const std::map<int, std::vector<int>>& neighbors,
                        LineLinker linker)
 {
     // set the mode to spatial merging
@@ -324,15 +324,23 @@ void MergeToLineTracks(Graph& graph,
     THROW_CHECK_EQ(all_lines_2d.size(), all_lines_3d.size());
     THROW_CHECK_EQ(all_lines_2d.size(), neighbors.size());
 
+    // get image ids
+    std::vector<int> image_ids;
+    for (auto it = all_lines_2d.begin(); it != all_lines_2d.end(); ++it) {
+        image_ids.push_back(it->first);
+    }
+
     // insert nodes
     std::vector<Line3d> line3d_list_nodes;
-    size_t n_images = all_lines_2d.size();
-    std::vector<std::vector<double>> all_lengths_3d(n_images);
-    for (size_t image_id = 0; image_id < n_images; ++image_id) {
-        THROW_CHECK_EQ(all_lines_2d[image_id].size(), all_lines_3d[image_id].size());
-        size_t n_lines = all_lines_2d[image_id].size();
+    std::map<int, std::vector<double>> all_lengths_3d;
+    for (const int& image_id: image_ids) {
+        all_lengths_3d.insert(std::make_pair(image_id, std::vector<double>()));
+    }
+    for (const int& image_id: image_ids) {
+        THROW_CHECK_EQ(all_lines_2d.at(image_id).size(), all_lines_3d.at(image_id).size());
+        size_t n_lines = all_lines_2d.at(image_id).size();
         for (size_t line_id = 0; line_id < n_lines; ++line_id) {
-            const Line3d& line = all_lines_3d[image_id][line_id];
+            const Line3d& line = all_lines_3d.at(image_id)[line_id];
             all_lengths_3d[image_id].push_back(line.length());
             if (line.length() == 0)
                 continue;
@@ -344,47 +352,51 @@ void MergeToLineTracks(Graph& graph,
     // compute similarity and collect potential edges
     typedef std::pair<size_t, size_t> IntPair;
     typedef std::pair<IntPair, IntPair> IntQuad;
-    std::vector<std::vector<IntQuad>> quads(n_images);
+    std::map<int, std::vector<IntQuad>> quads;
+    for (const int& image_id: image_ids) {
+        quads.insert(std::make_pair(image_id, std::vector<IntQuad>()));
+    }
+
     // self similarity
 #pragma omp parallel for
-    for (size_t image_id = 0; image_id < n_images; ++image_id) {
-        THROW_CHECK_EQ(all_lines_2d[image_id].size(), all_lengths_3d[image_id].size());
-        size_t n_lines = all_lines_2d[image_id].size();
+    for (const int& image_id: image_ids) {
+        THROW_CHECK_EQ(all_lines_2d.at(image_id).size(), all_lengths_3d[image_id].size());
+        size_t n_lines = all_lines_2d.at(image_id).size();
         for (size_t i = 0; i < n_lines; ++i) {
             if (all_lengths_3d[image_id][i] == 0)
                 continue;
-            const Line3d& l1 = all_lines_3d[image_id][i];
+            const Line3d& l1 = all_lines_3d.at(image_id)[i];
             for (size_t j = i + 1; j < n_lines; ++j) {
                 if (all_lengths_3d[image_id][j] == 0)
                     continue;
-                const Line3d& l2 = all_lines_3d[image_id][j];
+                const Line3d& l2 = all_lines_3d.at(image_id)[j];
                 // check 3d
                 if (!linker.check_connection_3d(l1, l2))
                     continue;
                 // check 2d
-                if (!linker.check_connection_2d(all_lines_2d[image_id][i], all_lines_2d[image_id][j]))
+                if (!linker.check_connection_2d(all_lines_2d.at(image_id)[i], all_lines_2d.at(image_id)[j]))
                     continue;
                 quads[image_id].push_back(std::make_pair(std::make_pair(image_id, i), std::make_pair(image_id, j)));
             }
         }
     }
     // cross-image similarity
-    progressbar bar(n_images);
+    progressbar bar(image_ids.size());
 #pragma omp parallel for
-    for (size_t image_id = 0; image_id < n_images; ++image_id) {
+    for (const int& image_id: image_ids) {
         bar.update();
-        size_t n_neighbors = neighbors[image_id].size();
-        THROW_CHECK_EQ(all_lines_2d[image_id].size(), all_lengths_3d[image_id].size());
-        size_t n_lines = all_lines_2d[image_id].size();
+        size_t n_neighbors = neighbors.at(image_id).size();
+        THROW_CHECK_EQ(all_lines_2d.at(image_id).size(), all_lengths_3d[image_id].size());
+        size_t n_lines = all_lines_2d.at(image_id).size();
 
         for (size_t line_id = 0; line_id < n_lines; ++line_id) {
             // get l1
             if (all_lengths_3d[image_id][line_id] == 0)
                 continue;
-            const Line3d& l1 = all_lines_3d[image_id][line_id];
+            const Line3d& l1 = all_lines_3d.at(image_id)[line_id];
             for (size_t ng_id = 0; ng_id < n_neighbors; ++ng_id) {
-                size_t ng_image_id = neighbors[image_id][ng_id];
-                size_t ng_n_lines = all_lines_2d[ng_image_id].size();
+                size_t ng_image_id = neighbors.at(image_id)[ng_id];
+                size_t ng_n_lines = all_lines_2d.at(ng_image_id).size();
                 for (size_t ng_line_id = 0; ng_line_id < ng_n_lines; ++ng_line_id) {
                     // for openmp speed up
                     int key = image_id + line_id + ng_image_id + ng_line_id;
@@ -395,14 +407,14 @@ void MergeToLineTracks(Graph& graph,
                     // get l2
                     if (all_lengths_3d[ng_image_id][ng_line_id] == 0)
                         continue;
-                    const Line3d& l2 = all_lines_3d[ng_image_id][ng_line_id];
+                    const Line3d& l2 = all_lines_3d.at(ng_image_id)[ng_line_id];
                     // check 3d
                     if (!linker.check_connection_3d(l1, l2))
                         continue;
                     // check 2d
-                    if (!linker.check_connection_2d(l1.projection(imagecols.camview(ng_image_id)), all_lines_2d[ng_image_id][ng_line_id]))
+                    if (!linker.check_connection_2d(l1.projection(imagecols.camview(ng_image_id)), all_lines_2d.at(ng_image_id)[ng_line_id]))
                         continue;
-                    if (!linker.check_connection_2d(l2.projection(imagecols.camview(image_id)), all_lines_2d[image_id][line_id]))
+                    if (!linker.check_connection_2d(l2.projection(imagecols.camview(image_id)), all_lines_2d.at(image_id)[line_id]))
                         continue;
                     quads[image_id].push_back(std::make_pair(std::make_pair(image_id, line_id), std::make_pair(ng_image_id, ng_line_id)));
                 }
@@ -411,7 +423,7 @@ void MergeToLineTracks(Graph& graph,
     }
 
     // insert edges
-    for (size_t image_id = 0; image_id < n_images; ++image_id) {
+    for (const int& image_id: image_ids) {
         for (auto it = quads[image_id].begin(); it != quads[image_id].end(); ++it) {
             PatchNode* node1 = graph.FindOrCreateNode(it->first.first, it->first.second);
             PatchNode* node2 = graph.FindOrCreateNode(it->second.first, it->second.second);
@@ -430,8 +442,8 @@ void MergeToLineTracks(Graph& graph,
     // set all lines into tracks
     for (size_t node_id = 0; node_id < n_nodes; ++node_id) {
         PatchNode* node = graph.nodes[node_id];
-        Line2d line2d = all_lines_2d[node->image_idx][node->line_idx];
-        Line3d line3d = all_lines_3d[node->image_idx][node->line_idx];
+        Line2d line2d = all_lines_2d.at(node->image_idx)[node->line_idx];
+        Line3d line3d = all_lines_3d.at(node->image_idx)[node->line_idx];
         double score = line3d.length();
 
         size_t track_id = track_labels[node_id];

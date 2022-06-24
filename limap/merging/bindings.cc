@@ -21,10 +21,10 @@ void bind_merging_core(py::module &m) {
     using namespace merging;
     m.def("_MergeToLineTracks", 
         [] (Graph& graph,
-            const std::vector<std::vector<Line2d>>& all_lines_2d, 
+            const std::map<int, std::vector<Line2d>>& all_lines_2d, 
             const ImageCollection& imagecols,
-            const std::vector<std::vector<Line3d>>& all_lines_3d,
-            const std::vector<std::vector<int>>& neighbors,
+            const std::map<int, std::vector<Line3d>>& all_lines_3d,
+            const std::map<int, std::vector<int>>& neighbors,
             LineLinker linker) 
         {
             std::vector<LineTrack> linetracks;

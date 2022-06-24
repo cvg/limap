@@ -16,14 +16,14 @@ import limap.visualize as limapvis
 def fit_3d_segs(all_2d_segs, imagecols, depths, fitting_config):
     '''
     Args:
-    - all_2d_segs: list of 2d segs
+    - all_2d_segs: map<int, np.adarray>
     - imagecols: limap.base.ImageCollection
-    - depths: list of depth images
+    - depths: map<int, np.ndarray>
     '''
     n_images = len(all_2d_segs)
     seg3d_list = []
-    def process(all_2d_segs, camviews_np, depths, fitting_config, idx):
-        segs, cam, depth = all_2d_segs[idx], camviews_np[idx], depths[idx]
+    def process(all_2d_segs, camviews_np, depths, fitting_config, img_id):
+        segs, cam, depth = all_2d_segs[img_id], camviews_np[img_id], depths[img_id]
         img_hw = [cam[3], cam[4]]
         seg3d_list_idx = []
         for seg_id, s in enumerate(segs):
@@ -33,16 +33,22 @@ def fit_3d_segs(all_2d_segs, imagecols, depths, fitting_config):
             else:
                 seg3d_list_idx.append(seg3d)
         return seg3d_list_idx
-    camviews = [imagecols.camview(img_id) for img_id in range(imagecols.NumImages())]
-    camviews_np = [[view.K(), view.R(), view.T(), view.h(), view.w()] for view in camviews]
-    seg3d_list = joblib.Parallel(n_jobs=fitting_config["n_jobs"])(joblib.delayed(process)(all_2d_segs, camviews_np, depths, fitting_config, idx) for idx in tqdm(range(n_images)))
-    return seg3d_list
+    camviews_np = {}
+    for img_id in imagecols.get_img_ids():
+        view = imagecols.camview(img_id)
+        camviews_np[img_id] = [view.K(), view.R(), view.T(), view.h(), view.w()]
+    image_ids = imagecols.get_img_ids()
+    seg3d_list = joblib.Parallel(n_jobs=fitting_config["n_jobs"])(joblib.delayed(process)(all_2d_segs, camviews_np, depths, fitting_config, img_id) for img_id in tqdm(image_ids))
+    output = {}
+    for idx, seg3d_list_idx in enumerate(seg3d_list):
+        output[image_ids[idx]] = seg3d_list_idx
+    return output
 
 def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     '''
     Args:
     - imagecols: limap.base.ImageCollection
-    - depths: list of depth images
+    - depths: map<int, np.ndarray>
     '''
     # assertion check
     assert imagecols.IsUndistorted() == True
@@ -62,7 +68,8 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     if neighbors is None:
         neighbors, ranges = _runners.compute_sfminfos(cfg, imagecols)
     else:
-        neighbors = [neighbor[:cfg["n_neighbors"]] for neighbor in neighbors]
+        for img_id, neighbor in neighbors.items():
+            neighbors[img_id] = neighbors[img_id][:cfg["n_neighbors"]]
 
     ##########################################################
     # [B] get 2D line segments for each image
@@ -73,11 +80,11 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     # [C] fit 3d segments
     ##########################################################
     fname_fit_segs = '{0}_fit_segs.npy'.format(cfg["line2d"]["detector"]["method"])
-    if not cfg["load_fit"]:
+    if (not cfg["load_fit"]) and (not (cfg["skip_exists"] and os.path.exists(os.path.join(cfg["dir_load"], fname_fit_segs)))):
         seg3d_list = fit_3d_segs(all_2d_segs, imagecols, depths, cfg["fitting"])
         limapio.save_npy(os.path.join(cfg["dir_save"], fname_fit_segs), seg3d_list)
     else:
-        seg3d_list = limapio.read_npy(os.path.join(cfg["dir_load"], fname_fit_segs))
+        seg3d_list = limapio.read_npy(os.path.join(cfg["dir_load"], fname_fit_segs)).item()
 
     ##########################################################
     # [D] merge 3d segments

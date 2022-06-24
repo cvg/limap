@@ -31,7 +31,9 @@ def extract_track_patches_s2dnet(cfg, tracks, imagecols, output_dir, skip_exists
     limapio.check_makedirs(output_dir)
 
     # map supporting line from each track to images
-    line2d_collections = [[] for _ in range(imagecols.NumImages())]
+    line2d_collections = {}
+    for img_id in imagecols.get_img_ids():
+        line2d_collections[img_id] = []
     for track_id, track in enumerate(tqdm(tracks)):
         sorted_ids = track.GetSortedImageIds()
         for img_id in sorted_ids:
@@ -41,7 +43,7 @@ def extract_track_patches_s2dnet(cfg, tracks, imagecols, output_dir, skip_exists
         limapio.check_makedirs(os.path.join(output_dir, "track{0}".format(track_id)))
 
     # extract line patches for each image
-    for img_id in tqdm(range(imagecols.NumImages())):
+    for img_id in tqdm(imagecols.get_img_ids()):
         # extract s2dnet line patches
         feature = extract_feature_s2dnet(feature_extractor, imagecols.camview(img_id))
 

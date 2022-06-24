@@ -73,10 +73,10 @@ public:
     LineLinker linker_;
     const vpdetection::VPDetector vpdetector_;
 
-    void Init(const std::vector<std::vector<Line2d>>& all_2d_segs,
+    void Init(const std::map<int, std::vector<Line2d>>& all_2d_segs,
               const ImageCollection& imagecols);
-    void InitMatches(const std::vector<std::vector<Eigen::MatrixXi>>& all_matches,
-                     const std::vector<std::vector<int>>& all_neighbors,
+    void InitMatches(const std::map<int, std::vector<Eigen::MatrixXi>>& all_matches,
+                     const std::map<int, std::vector<int>>& all_neighbors,
                      bool use_triangulate=true,
                      bool use_scoring=false);
     void InitMatchImage(const int img_id,
@@ -87,10 +87,10 @@ public:
     void InitExhaustiveMatchImage(const int img_id, 
                                   const std::vector<int>& neighbors,
                                   bool use_scoring=true);
-    void InitAll(const std::vector<std::vector<Line2d>>& all_2d_segs,
+    void InitAll(const std::map<int, std::vector<Line2d>>& all_2d_segs,
                  const ImageCollection& imagecols,
-                 const std::vector<std::vector<Eigen::MatrixXi>>& all_matches,
-                 const std::vector<std::vector<int>>& all_neighbors,
+                 const std::map<int, std::vector<Eigen::MatrixXi>>& all_matches,
+                 const std::map<int, std::vector<int>>& all_neighbors,
                  bool use_triangulate=false,
                  bool use_scoring=false);
     void RunTriangulate();
@@ -104,12 +104,12 @@ public:
     void UnsetRanges() { ranges_flag_ = false; }
     LineLinker GetLinker() const { return linker_; }
     std::vector<LineTrack> GetTracks() const {return tracks_; };
-    vpdetection::VPResult GetVPResult(const int& image_id) const {return vpresults_[image_id]; }
-    std::vector<vpdetection::VPResult> GetVPResults() const {return vpresults_; }
+    vpdetection::VPResult GetVPResult(const int& image_id) const {return vpresults_.at(image_id); }
+    std::map<int, vpdetection::VPResult> GetVPResults() const {return vpresults_; }
 
     // infos
     size_t CountImages() const { return all_lines_2d_.size(); }
-    size_t CountLines(const int& img_id) const { return all_lines_2d_[img_id].size(); }
+    size_t CountLines(const int& img_id) const { return all_lines_2d_.at(img_id).size(); }
 
     // interface for visualization
     int CountAllTris() const;
@@ -135,15 +135,15 @@ private:
 
     // initialization
     void offsetHalfPixel();
-    std::vector<std::vector<Line2d>> all_lines_2d_;
+    std::map<int, std::vector<Line2d>> all_lines_2d_;
     ImageCollection imagecols_;
-    std::vector<std::vector<int>> neighbors_; // visual neighbors for each image, initialized with InitMatch interfaces
-    std::vector<vpdetection::VPResult> vpresults_; // vp results
+    std::map<int, std::vector<int>> neighbors_; // visual neighbors for each image, initialized with InitMatch interfaces
+    std::map<int, vpdetection::VPResult> vpresults_; // vp results
 
     // connections
-    std::vector<std::vector<std::vector<LineNode>>> edges_; // list of (img_id, line_id) for each node, cleared after triangulation
-    std::vector<std::vector<std::vector<NeighborLineNode>>> valid_edges_; // valid connections with survived triangulations
-    std::vector<std::vector<bool>> valid_flags_;
+    std::map<int, std::vector<std::vector<LineNode>>> edges_; // list of (img_id, line_id) for each node, cleared after triangulation
+    std::map<int, std::vector<std::vector<NeighborLineNode>>> valid_edges_; // valid connections with survived triangulations
+    std::map<int, std::vector<bool>> valid_flags_;
 
     // triangulation and scoring
     void clearEdgesOneNode(const int img_id, const int line_id);
@@ -153,17 +153,17 @@ private:
     // functions per node
     void triangulateOneNode(const int img_id, const int line_id);
     void scoreOneNode(const int img_id, const int line_id, const LineLinker& linker);
-    std::vector<std::vector<bool>> already_scored_; // monotoring the scoring process
+    std::map<int, std::vector<bool>> already_scored_; // monotoring the scoring process
 
     // only saved at debug mode
-    std::vector<std::vector<std::vector<TriTuple>>> tris_; // list of TriTuple for each node
-    std::vector<std::vector<std::vector<TriTuple>>> valid_tris_;
+    std::map<int, std::vector<std::vector<TriTuple>>> tris_; // list of TriTuple for each node
+    std::map<int, std::vector<std::vector<TriTuple>>> valid_tris_;
 
     // saved data 
-    std::vector<std::vector<TriTuple>> tris_best_; // the best TriTuple for each node
+    std::map<int, std::vector<TriTuple>> tris_best_; // the best TriTuple for each node
     Graph finalgraph_;
-    void filterNodeByNumOuterEdges(const std::vector<std::vector<std::vector<NeighborLineNode>>>& valid_edges, 
-                                   std::vector<std::vector<bool>>& flags);
+    void filterNodeByNumOuterEdges(const std::map<int, std::vector<std::vector<NeighborLineNode>>>& valid_edges, 
+                                   std::map<int, std::vector<bool>>& flags);
 
     // tracks
     std::vector<LineTrack> tracks_;

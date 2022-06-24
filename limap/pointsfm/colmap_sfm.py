@@ -66,7 +66,7 @@ def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap'
         os.makedirs(model_path)
 
     ### copy images to tmp folder
-    for img_id in range(imagecols.NumImages()):
+    for img_id in imagecols.get_img_ids():
         img = imagecols.read_image(img_id)
         fname_to_save = os.path.join(image_path, 'image{0:08d}.png'.format(img_id))
         cv2.imwrite(fname_to_save, img)
@@ -99,16 +99,16 @@ def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap'
     db = database.COLMAPDatabase(db_path)
     rows = db.execute("SELECT * from images")
     colmap_images = {}
-    for img_id in range(imagecols.NumImages()):
+    for idx, img_id in enumerate(imagecols.get_img_ids()):
         kk = next(rows)
-        assert (kk[0] == img_id + 1)
+        assert (kk[0] == idx + 1)
         imname = kk[1]
         img_id_orig = int(imname[5:-4])
         camimage = imagecols.camimage(img_id_orig)
         cam_id = camimage.cam_id
         qvec = camimage.pose.qvec
         tvec = camimage.pose.tvec
-        colmap_images[img_id+1] = colmap_utils.Image(id=img_id+1, qvec=qvec, tvec=tvec,
+        colmap_images[idx+1] = colmap_utils.Image(id=idx+1, qvec=qvec, tvec=tvec,
                                                   camera_id=cam_id, name=imname,
                                                   xys=[], point3D_ids=[])
     fname = os.path.join(model_path, 'images.txt')

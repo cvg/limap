@@ -53,8 +53,8 @@ Line2d projection_line3d(const Line3d& line3d, const CameraView& view);
 
 Line3d unprojection_line2d(const Line2d& line2d, const CameraView& view, const std::pair<double, double>& depths);
 
-void GetAllLines2D(const std::vector<Eigen::MatrixXd>& all_2d_segs,
-                 std::vector<std::vector<Line2d>>& all_lines);
+void GetAllLines2D(const std::map<int, Eigen::MatrixXd>& all_2d_segs,
+                 std::map<int, std::vector<Line2d>>& all_lines);
 
 } // namespace limap
 

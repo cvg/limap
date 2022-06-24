@@ -25,7 +25,7 @@ public:
 
     // minimal data
     std::vector<MinimalInfiniteLine3d> lines_; // minimal line for each track
-    std::vector<MinimalPinholeCamera> cameras_; // minimal camera for each image
+    std::map<int, MinimalPinholeCamera> cameras_; // minimal camera for each image
 
     // interface
     LineTrack GetInitTrack(const int track_id) const {return init_tracks_[track_id]; }
@@ -41,7 +41,7 @@ public:
     std::vector<Line3d> GetLine3ds(const int track_id) const {return init_tracks_[track_id].line3d_list; }
 
     std::vector<MinimalInfiniteLine3d> GetStates() const {return lines_;}
-    std::vector<CameraView> GetCameras() const;
+    std::map<int, CameraView> GetCameras() const;
     std::vector<Line3d> GetLines(const int num_outliers = 2) const;
     std::vector<LineTrack> GetTracks(const int num_outliers = 2) const;
 

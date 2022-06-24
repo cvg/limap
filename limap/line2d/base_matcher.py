@@ -39,7 +39,6 @@ class BaseMatcher():
         if not skip_exists:
             limapio.delete_folder(matches_folder)
         limapio.check_makedirs(matches_folder)
-        n_images = len(neighbors)
 
         # multiprocessing unit
         def process(self, matches_folder, descinfo_folder, img_id, ng_img_id_list, skip_exists):
@@ -53,6 +52,6 @@ class BaseMatcher():
                 matches = self.match_pair(descinfo1, descinfo2)
                 matches_idx.append(matches)
             self.save_match(matches_folder, img_id, matches_idx)
-        joblib.Parallel(n_jobs=self.n_jobs)(joblib.delayed(process)(self, matches_folder, descinfo_folder, img_id, neighbors[img_id], skip_exists) for img_id in tqdm(range(n_images)))
+        joblib.Parallel(n_jobs=self.n_jobs)(joblib.delayed(process)(self, matches_folder, descinfo_folder, img_id, neighbors[img_id], skip_exists) for img_id in tqdm(neighbors))
         return matches_folder
 

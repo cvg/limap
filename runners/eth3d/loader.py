@@ -30,10 +30,10 @@ def read_scene_eth3d(cfg, dataset, reso_type, scene_id, cam_id=0, load_depth=Fal
 
     # get depths
     if load_depth:
-        depths = []
-        for img_id in range(imagecols.NumImages()):
+        depths = {}
+        for img_id in imagecols.get_img_ids():
             depth = dataset.get_depth(imagecols.camview(img_id).image_name())
-            depths.append(depth)
+            depths[img_id] = depth
         return imagecols, neighbors, ranges, depths
     else:
         return imagecols, neighbors, ranges

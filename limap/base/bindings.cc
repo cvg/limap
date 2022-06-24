@@ -150,10 +150,9 @@ void bind_linebase(py::module& m) {
         .def("midpoint", &Line3d::midpoint)
         .def("direction", &Line3d::direction);
 
-    // build initial graph
     m.def("_GetAllLines2D", 
-        [](const std::vector<Eigen::MatrixXd>& all_lines_2d) {
-            std::vector<std::vector<Line2d>> all_lines;
+        [](const std::map<int, Eigen::MatrixXd>& all_lines_2d) {
+            std::map<int, std::vector<Line2d>> all_lines;
             GetAllLines2D(all_lines_2d, all_lines);
             return all_lines;
         }
@@ -380,8 +379,10 @@ void bind_camera(py::module& m) {
 
     py::class_<ImageCollection>(m, "ImageCollection")
         .def(py::init<>())
-        .def(py::init<const std::vector<Camera>&, const std::vector<CameraImage>&>())
+        .def(py::init<const std::map<int, Camera>&, const std::map<int, CameraImage>&>())
+        .def(py::init<const std::vector<Camera>&, const std::map<int, CameraImage>&>())
         .def(py::init<const std::map<int, Camera>&, const std::vector<CameraImage>&>())
+        .def(py::init<const std::vector<Camera>&, const std::vector<CameraImage>&>())
         .def(py::init<const std::vector<CameraView>&>())
         .def(py::init<py::dict>())
         .def(py::init<const ImageCollection&>())
@@ -389,9 +390,11 @@ void bind_camera(py::module& m) {
         .def("get_cameras", &ImageCollection::get_cameras)
         .def("get_cam_ids", &ImageCollection::get_cam_ids)
         .def("get_images", &ImageCollection::get_images)
+        .def("get_img_ids", &ImageCollection::get_img_ids)
         .def("get_camviews", &ImageCollection::get_camviews)
-        .def("cam", &ImageCollection::cam)
         .def("exist_cam", &ImageCollection::exist_cam)
+        .def("exist_image", &ImageCollection::exist_image)
+        .def("cam", &ImageCollection::cam)
         .def("camimage", &ImageCollection::camimage)
         .def("campose", &ImageCollection::campose)
         .def("camview", &ImageCollection::camview)

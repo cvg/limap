@@ -17,22 +17,21 @@ def read_scene_hypersim(cfg, dataset, scene_id, cam_id=0, load_depth=False):
     K = dataset.K.astype(np.float32)
     img_hw = [dataset.h, dataset.w]
     Ts, Rs = dataset.load_cameras(cam_id=cam_id)
-    cameras = {}
+    cameras, camimages = {}, {}
     cameras[0] = _base.Camera("SIMPLE_PINHOLE", K, cam_id=0, hw=img_hw)
-    camimages = []
     for image_id in index_list:
         pose = _base.CameraPose(Rs[image_id], Ts[image_id])
         imname = dataset.load_imname(image_id, cam_id=cam_id)
         camimage = _base.CameraImage(0, pose, image_name=imname)
-        camimages.append(camimage)
+        camimages[image_id] = camimage
     imagecols = _base.ImageCollection(cameras, camimages)
 
     if load_depth:
         # get depths
-        depths = []
+        depths = {}
         for image_id in index_list:
             depth = dataset.load_depth(image_id, cam_id=cam_id)
-            depths.append(depth)
+            depths[image_id] = depth
         return imagecols, depths
     else:
         return imagecols

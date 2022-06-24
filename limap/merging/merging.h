@@ -32,10 +32,10 @@ std::vector<int> ComputeLineTrackLabelsAvg(const Graph& graph,
 // for fitnmerge application
 void MergeToLineTracks(Graph& graph,
                        std::vector<LineTrack>& linetracks,
-                       const std::vector<std::vector<Line2d>>& all_lines_2d,
+                       const std::map<int, std::vector<Line2d>>& all_lines_2d,
                        const ImageCollection& imagecols,
-                       const std::vector<std::vector<Line3d>>& all_lines_3d,
-                       const std::vector<std::vector<int>>& neighbors,
+                       const std::map<int, std::vector<Line3d>>& all_lines_3d,
+                       const std::map<int, std::vector<int>>& neighbors,
                        LineLinker linker);
 
 // remerge line tracks
