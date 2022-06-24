@@ -12,26 +12,6 @@ namespace limap {
 
 namespace merging {
 
-void GetLines(const std::vector<Eigen::MatrixXd>& segs3d, std::vector<Line3d>& lines)
-{
-    size_t n_segs = segs3d.size();
-    lines.clear();
-    for (size_t seg_id = 0; seg_id < n_segs; ++seg_id) {
-        const Eigen::MatrixXd& seg = segs3d[seg_id];
-        lines.push_back(Line3d(seg));
-    }
-}
-
-void GetSegs3d(const std::vector<Line3d>& lines, std::vector<Eigen::MatrixXd>& segs3d) 
-{
-    size_t n_segs = lines.size();
-    segs3d.clear();
-    for (size_t seg_id = 0; seg_id < n_segs; ++seg_id) {
-        const Line3d& line = lines[seg_id];
-        segs3d.push_back(line.as_array());
-    }
-}
-
 std::vector<Line3d> SetUncertaintySegs3d(const std::vector<Line3d>& lines, const CameraView& view, const double var2d) {
     std::vector<Line3d> new_lines;
     for (size_t line_id = 0; line_id < lines.size(); ++line_id) {

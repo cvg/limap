@@ -42,21 +42,6 @@ void bind_merging_core(py::module &m) {
 
 void bind_merging_utils(py::module& m) {
     using namespace merging;
-    m.def("_GetLines", 
-        [] (const std::vector<Eigen::MatrixXd>& segs3d) {
-            std::vector<Line3d> lines;
-            GetLines(segs3d, lines);
-            return lines;
-        }
-    );
-
-    m.def("_GetSegs3d", 
-        [] (const std::vector<Line3d>& lines) {
-            std::vector<Eigen::MatrixXd> segs3d;
-            GetSegs3d(lines, segs3d);
-            return segs3d;
-        }
-    );
 
     m.def("_SetUncertaintySegs3d", &SetUncertaintySegs3d);
 

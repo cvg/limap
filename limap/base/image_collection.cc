@@ -170,12 +170,20 @@ std::string ImageCollection::image_name(const int img_id) const {
     return images.at(img_id).image_name();
 }
 
-std::vector<std::string> ImageCollection::get_image_list() const {
+std::vector<std::string> ImageCollection::get_image_name_list() const {
     std::vector<std::string> image_names;
     for (auto it = images.begin(); it != images.end(); ++it) {
         image_names.push_back(image_name(it->first));
     }
     return image_names;
+}
+
+std::map<int, std::string> ImageCollection::get_image_name_dict() const {
+    std::map<int, std::string> image_names_dict;
+    for (auto it = images.begin(); it != images.end(); ++it) {
+        image_names_dict.insert(std::make_pair(it->first, image_name(it->first)));
+    }
+    return image_names_dict;
 }
 
 py::array_t<uint8_t> ImageCollection::read_image(const int img_id, const bool set_gray) const {

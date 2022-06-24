@@ -29,7 +29,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     # resize cameras
     if cfg["max_image_dim"] != -1 and cfg["max_image_dim"] is not None:
         imagecols.set_max_image_dim(cfg["max_image_dim"])
-    limapio.save_txt_imname_list(os.path.join(cfg["dir_save"], 'image_list.txt'), imagecols.get_image_list())
+    limapio.save_txt_imname_dict(os.path.join(cfg["dir_save"], 'image_list.txt'), imagecols.get_image_name_dict())
     limapio.save_npy(os.path.join(cfg["dir_save"], 'imagecols.npy'), imagecols.as_dict())
 
     ##########################################################
@@ -60,7 +60,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     print('Start multi-view triangulation...')
     Triangulator = _tri.Triangulator(cfg["triangulation"])
     Triangulator.SetRanges(ranges)
-    all_2d_lines = _base.GetAllLines2D(all_2d_segs)
+    all_2d_lines = _base.get_all_lines_2d(all_2d_segs)
     Triangulator.Init(all_2d_lines, imagecols)
     for img_id in imagecols.get_img_ids():
         if cfg["triangulation"]["use_exhaustive_matcher"]:

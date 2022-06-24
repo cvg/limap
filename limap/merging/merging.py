@@ -2,21 +2,13 @@ from _limap import _merging as _mrg
 from _limap import _base
 import numpy as np
 
-def get_all_lines_3d(seg3d_list):
-    all_lines_3d = {}
-    for img_id, segs3d in seg3d_list.items():
-        all_lines_3d[img_id] = _mrg._GetLines(segs3d)
-    return all_lines_3d
-
 def merging(linker, all_2d_segs, imagecols, seg3d_list, neighbors, var2d=5.0):
-    all_lines_2d = _base._GetAllLines2D(all_2d_segs)
-    all_lines_3d = {}
-    all_lines_3d_with_uncertainty = {}
-    for img_id, segs3d in seg3d_list.items():
-        all_lines_3d[img_id] = _mrg._GetLines(segs3d)
-        all_lines_3d_with_uncertainty[img_id] = _mrg._SetUncertaintySegs3d(_mrg._GetLines(segs3d), imagecols.camview(img_id), var2d)
+    all_lines_2d, all_lines_3d = {}, {}
+    for img_id in imagecols.get_img_ids():
+        all_lines_2d[img_id] = _base._GetLine2dVectorFromArray(all_2d_segs[img_id])
+        all_lines_3d[img_id] = _mrg._SetUncertaintySegs3d(_base._GetLine3dVectorFromArray(seg3d_list[img_id]), imagecols.camview(img_id), var2d)
     graph = _base.Graph()
-    linetracks = _mrg._MergeToLineTracks(graph, all_lines_2d, imagecols, all_lines_3d_with_uncertainty, neighbors, linker)
+    linetracks = _mrg._MergeToLineTracks(graph, all_lines_2d, imagecols, all_lines_3d, neighbors, linker)
     return graph, linetracks
 
 def remerge(linker3d, linetracks, num_outliers=2):

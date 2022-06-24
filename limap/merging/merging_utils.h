@@ -17,10 +17,6 @@ namespace limap {
 
 namespace merging {
 
-void GetLines(const std::vector<Eigen::MatrixXd>& segs3d, std::vector<Line3d>& lines);
-
-void GetSegs3d(const std::vector<Line3d>& lines, std::vector<Eigen::MatrixXd>& segs3d);
-
 std::vector<Line3d> SetUncertaintySegs3d(const std::vector<Line3d>& lines, const CameraView& view, const double var2d=5.0);
 
 void CheckReprojection(std::vector<bool>& results,

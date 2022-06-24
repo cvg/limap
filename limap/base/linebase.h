@@ -49,12 +49,11 @@ public:
     double computeUncertainty(const CameraView& view, const double var2d=5.0) const;
 };
 
+std::vector<Line2d> GetLine2dVectorFromArray(const Eigen::MatrixXd& segs2d);
+std::vector<Line3d> GetLine3dVectorFromArray(const std::vector<Eigen::MatrixXd>& segs3d);
+
 Line2d projection_line3d(const Line3d& line3d, const CameraView& view);
-
 Line3d unprojection_line2d(const Line2d& line2d, const CameraView& view, const std::pair<double, double>& depths);
-
-void GetAllLines2D(const std::map<int, Eigen::MatrixXd>& all_2d_segs,
-                 std::map<int, std::vector<Line2d>>& all_lines);
 
 } // namespace limap
 

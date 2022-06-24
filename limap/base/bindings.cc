@@ -150,13 +150,8 @@ void bind_linebase(py::module& m) {
         .def("midpoint", &Line3d::midpoint)
         .def("direction", &Line3d::direction);
 
-    m.def("_GetAllLines2D", 
-        [](const std::map<int, Eigen::MatrixXd>& all_lines_2d) {
-            std::map<int, std::vector<Line2d>> all_lines;
-            GetAllLines2D(all_lines_2d, all_lines);
-            return all_lines;
-        }
-    );
+    m.def("_GetLine2dVectorFromArray", &GetLine2dVectorFromArray);
+    m.def("_GetLine3dVectorFromArray", &GetLine3dVectorFromArray);
 }
 
 void bind_linetrack(py::module& m) {
@@ -399,7 +394,8 @@ void bind_camera(py::module& m) {
         .def("campose", &ImageCollection::campose)
         .def("camview", &ImageCollection::camview)
         .def("image_name", &ImageCollection::image_name)
-        .def("get_image_list", &ImageCollection::get_image_list)
+        .def("get_image_name_list", &ImageCollection::get_image_name_list)
+        .def("get_image_name_dict", &ImageCollection::get_image_name_dict)
         .def("NumCameras", &ImageCollection::NumCameras)
         .def("NumImages", &ImageCollection::NumImages)
         .def("set_max_image_dim", &ImageCollection::set_max_image_dim)

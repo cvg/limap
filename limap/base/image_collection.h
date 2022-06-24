@@ -46,7 +46,8 @@ public:
     CameraPose campose(const int img_id) const;
     CameraView camview(const int img_id) const;
     std::string image_name(const int img_id) const;
-    std::vector<std::string> get_image_list() const;
+    std::vector<std::string> get_image_name_list() const;
+    std::map<int, std::string> get_image_name_dict() const;
 
     py::array_t<uint8_t> read_image(const int img_id, const bool set_gray) const;
     void set_max_image_dim(const int& val);

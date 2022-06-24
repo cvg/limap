@@ -120,6 +120,28 @@ def read_txt_imname_list(fname):
         counter += 1
     return imname_list
 
+def save_txt_imname_dict(fname, imname_dict):
+    check_directory(fname)
+    with open(fname, 'w') as f:
+        f.write('number of images, {0}\n'.format(len(imname_dict)))
+        for img_id, imname in imname_dict.items():
+            f.write("{0}, {1}\n".format(img_id, imname))
+
+def read_txt_imname_dict(fname):
+    check_path(fname)
+    with open(fname, 'r') as f:
+        txt_lines = f.readlines()
+    counter = 0
+    n_images = int(txt_lines[counter].strip().split(',')[1])
+    counter += 1
+    imname_dict = {}
+    for img_id in range(n_images):
+        line = txt_lines[counter].strip().split(",")
+        img_id, imname = int(line[0]), line[1][1:]
+        imname_dict[img_id] = imname
+        counter += 1
+    return imname_dict
+
 def save_obj(fname, lines):
     # save obj for CloudCompare visualization
     if type(lines) == list:
@@ -163,7 +185,7 @@ def save_l3dpp(folder, imagecols, all_2d_segs):
     os.makedirs(folder)
     n_images = len(all_2d_segs)
     assert imagecols.NumImages() == len(all_2d_segs)
-    image_names = imagecols.get_image_list()
+    image_names = imagecols.get_image_name_list()
 
     # TODO make this function general for different input resolution within the set
     first_cam = imagecols.cam(imagecols.get_cam_ids()[0])

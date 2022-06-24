@@ -82,22 +82,22 @@ Line3d unprojection_line2d(const Line2d& line2d, const CameraView& view, const s
     return line3d;
 }
 
-void GetAllLines2D(const std::map<int, Eigen::MatrixXd>& all_2d_segs,
-                   std::map<int, std::vector<Line2d>>& all_lines) 
-{
-    all_lines.clear();
-    for (auto it = all_2d_segs.begin(); it != all_2d_segs.end(); ++it) {
-        all_lines.insert(std::make_pair(it->first, std::vector<Line2d>()));
-        Eigen::MatrixXd segs2d = it->second;
-        if (segs2d.rows() != 0) {
-            THROW_CHECK_GE(segs2d.cols(), 4);
-        }
-        std::vector<Line2d> lines;
-        for (int i = 0; i < segs2d.rows(); ++i) {
-            lines.push_back(Line2d(V2D(segs2d(i, 0), segs2d(i, 1)), V2D(segs2d(i, 2), segs2d(i, 3))));
-        }
-        all_lines[it->first] = lines;
+std::vector<Line2d> GetLine2dVectorFromArray(const Eigen::MatrixXd& segs2d) {
+    if (segs2d.rows() != 0)
+        THROW_CHECK_GE(segs2d.cols(), 4);
+    std::vector<Line2d> lines;
+    for (int i = 0; i < segs2d.rows(); ++i)
+        lines.push_back(Line2d(V2D(segs2d(i, 0), segs2d(i, 1)), V2D(segs2d(i, 2), segs2d(i, 3))));
+    return lines;
+}
+
+std::vector<Line3d> GetLine3dVectorFromArray(const std::vector<Eigen::MatrixXd>& segs3d) {
+    std::vector<Line3d> lines;
+    for (size_t seg_id = 0; seg_id < segs3d.size(); ++seg_id) {
+        const Eigen::MatrixXd& seg = segs3d[seg_id];
+        lines.push_back(Line3d(seg));
     }
+    return lines;
 }
 
 } // namespace limap
