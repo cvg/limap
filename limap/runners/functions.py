@@ -23,6 +23,7 @@ def setup(cfg):
 def undistort_images(imagecols, output_dir, fname="image_collection_undistorted.npy", load_undistort=False, n_jobs=-1):
     import limap.base as _base
     if load_undistort:
+        print("[LOG] Loading undistorting images (n_images = {0})...".format(imagecols.NumImages()))
         fname_in = os.path.join(output_dir, fname)
         if os.path.isfile(fname_in):
             data = limapio.read_npy(fname_in).item()
@@ -31,7 +32,7 @@ def undistort_images(imagecols, output_dir, fname="image_collection_undistorted.
     # start undistortion
     if n_jobs == -1:
         n_jobs = os.cpu_count()
-    print("Start undistorting images (n_images = {0})...".format(imagecols.NumImages()))
+    print("[LOG] Start undistorting images (n_images = {0})...".format(imagecols.NumImages()))
     import limap.undistortion as _undist
     import cv2, imagesize
     import joblib
@@ -95,6 +96,7 @@ def compute_sfminfos(cfg, imagecols, fname="metainfos.txt"):
     return neighbors, ranges
 
 def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
+    print("[LOG] Start 2D line detection and description (detector = {0}, n_images = {1})...".format(cfg["line2d"]["detector"]["method"], imagecols.NumImages()))
     import limap.line2d
     if not imagecols.IsUndistorted():
         warnings.warn("The input images are distorted!")
@@ -127,6 +129,7 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
     return all_2d_segs, descinfo_folder
 
 def compute_matches(cfg, descinfo_folder, neighbors):
+    print("[LOG] Start matching 2D lines... (n_images = {0}, n_neighbors={1})".format(imagecols.NumImages(), cfg["n_neighbors"]))
     import limap.line2d
     basedir = os.path.join("line_matchings", cfg["line2d"]["detector"]["method"], "feats_{0}".format(cfg["line2d"]["extractor"]["method"]))
     extractor = limap.line2d.get_extractor(cfg["line2d"]["extractor"])
