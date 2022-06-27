@@ -137,6 +137,7 @@ py::dict ImageCollection::as_dict() const {
 }
 
 ImageCollection ImageCollection::subset_imagecols(const std::vector<int> valid_image_ids) const {
+    std::map<int, Camera> valid_cameras;
     std::map<int, CameraImage> valid_images;
     for (const int& img_id: valid_image_ids) {
         if (!exist_image(img_id)) {
@@ -144,8 +145,11 @@ ImageCollection ImageCollection::subset_imagecols(const std::vector<int> valid_i
             continue;
         }
         valid_images.insert(std::make_pair(img_id, images.at(img_id)));
+        int cam_id = images.at(img_id).cam_id;
+        if (valid_cameras.find(cam_id) == valid_cameras.end())
+            valid_cameras.insert(std::make_pair(cam_id, cameras.at(cam_id)));
     }
-    return ImageCollection(cameras, valid_images);
+    return ImageCollection(valid_cameras, valid_images);
 }
 
 Camera ImageCollection::cam(const int cam_id) const {

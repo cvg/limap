@@ -2,7 +2,7 @@ from _limap import _base, _pointsfm
 
 import os
 import numpy as np
-import cv2
+import imagesize
 from tqdm import tqdm
 
 def ReadModelBundler(bundler_path, list_path, model_path):
@@ -40,7 +40,8 @@ def ReadModelBundler(bundler_path, list_path, model_path):
         imname = imname_list[img_id]
         if not os.path.exists(imname):
             raise ValueError("Error! Image not found: {0}".format(imname))
-        img_hw = cv2.imread(imname).shape[:2]
+        width, height = imagesize.get(imname)
+        img_hw = [height, width]
         K = np.zeros((3, 3))
         cx = img_hw[1] / 2.0
         cy = img_hw[0] / 2.0

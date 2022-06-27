@@ -34,7 +34,7 @@ def run_rome16k_triangulation(cfg, bundler_path, list_path, model_path):
     if cfg["comp_id"] != -1:
         dataset = Rome(os.path.join(bundler_path, list_path), os.path.join(bundler_path, cfg["component_folder"]))
         valid_image_ids = []
-        for img_id, imname in enumerate(imname_list):
+        for img_id in imagecols.get_img_ids():
             comp_id = dataset.get_component_id_for_image_id(img_id)
             if comp_id == cfg["comp_id"]:
                 valid_image_ids.append(img_id)
@@ -44,31 +44,6 @@ def run_rome16k_triangulation(cfg, bundler_path, list_path, model_path):
     # run triangulation
     linetracks = limap.runners.line_triangulation(cfg, imagecols, neighbors=neighbors, ranges=ranges)
     return linetracks
-
-def run_rome16k_triangulation(cfg, bundler_path, list_path, model_path):
-    imname_list, camviews, neighbors, ranges = load_all_infos_bundler(cfg, bundler_path, list_path, model_path)
-
-    # components
-    valid_index_list = np.arange(0, len(imname_list)).tolist()
-    if cfg["comp_id"] != -1:
-        from core.dataset import Rome
-        dataset = Rome(os.path.join(bundler_path, list_path), os.path.join(bundler_path, cfg["component_folder"]))
-        valid_index_list = []
-        for img_id, imname in enumerate(imname_list):
-            comp_id = dataset.get_component_id_for_image_id(img_id)
-            if comp_id == cfg["comp_id"]:
-                valid_index_list.append(img_id)
-        new_imname_list, new_camviews, new_neighbors = [], [], []
-        for img_id in valid_index_list:
-            new_imname_list.append(imname_list[img_id])
-            new_camviews.append(camviews[img_id])
-            neighbor = neighbors[img_id]
-            new_neighbor = [valid_index_list.index(k) for k in neighbor if k in valid_index_list]
-            new_neighbors.append(new_neighbor)
-        imname_list, camviews, neighbors = new_imname_list, new_camviews, new_neighbors
-
-    # run triangulation
-    line_triangulation(cfg, imname_list, camviews, neighbors=neighbors, ranges=ranges, max_image_dim=cfg["max_image_dim"], valid_index_list=valid_index_list)
 
 def parse_config():
     import argparse

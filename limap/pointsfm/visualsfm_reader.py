@@ -2,7 +2,7 @@ from _limap import _base, _pointsfm
 
 import os, sys
 import numpy as np
-import cv2
+import imagesize
 from tqdm import tqdm
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -34,7 +34,8 @@ def ReadModelVisualSfM(vsfm_path, nvm_file="reconstruction.nvm"):
         # add camera
         if not os.path.exists(imname):
             raise ValueError("Error! Image not found: {0}".format(imname))
-        img_hw = cv2.imread(imname).shape[:2]
+        width, height = imagesize.get(imname)
+        img_hw = [height, width]
         cx = img_hw[1] / 2.0
         cy = img_hw[0] / 2.0
         params = [f, cx, cy, k1]

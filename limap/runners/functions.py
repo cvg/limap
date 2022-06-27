@@ -46,8 +46,8 @@ def undistort_images(imagecols, output_dir, fname="image_collection_undistorted.
         imname_in = imagecols.camimage(img_id).image_name()
         imname_out = os.path.join(output_dir, "image_{0:08d}.png".format(img_id))
         # save image if resizing is needed
-        img_h, img_w = imagesize.get(imname_in)
-        if img_h != cam.h() or img_w != cam.w():
+        width, height = imagesize.get(imname_in)
+        if height != cam.h() or width != cam.w():
             img = imagecols.read_image(img_id)
             cv2.imwrite(imname_out, img)
             imname_in = imname_out
