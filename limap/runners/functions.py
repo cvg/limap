@@ -128,8 +128,8 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
         limapio.save_l3dpp(os.path.join(folder_save, "l3dpp_format"), imagecols, all_2d_segs)
     return all_2d_segs, descinfo_folder
 
-def compute_matches(cfg, descinfo_folder, neighbors):
-    print("[LOG] Start matching 2D lines... (n_images = {0}, n_neighbors={1})".format(imagecols.NumImages(), cfg["n_neighbors"]))
+def compute_matches(cfg, descinfo_folder, image_ids, neighbors):
+    print("[LOG] Start matching 2D lines... (n_images = {0}, n_neighbors = {1})".format(len(image_ids), cfg["n_neighbors"]))
     import limap.line2d
     basedir = os.path.join("line_matchings", cfg["line2d"]["detector"]["method"], "feats_{0}".format(cfg["line2d"]["extractor"]["method"]))
     extractor = limap.line2d.get_extractor(cfg["line2d"]["extractor"])
@@ -137,7 +137,7 @@ def compute_matches(cfg, descinfo_folder, neighbors):
     matcher = limap.line2d.get_matcher(cfg["line2d"]["matcher"], extractor, n_neighbors=cfg["n_neighbors"])
     if not cfg["load_match"]:
         folder_save = os.path.join(cfg["dir_save"], basedir)
-        matches_folder = matcher.match_all_neighbors(folder_save, neighbors, descinfo_folder, skip_exists=se_match)
+        matches_folder = matcher.match_all_neighbors(folder_save, image_ids, neighbors, descinfo_folder, skip_exists=se_match)
     else:
         folder_load = os.path.join(cfg["dir_load"], basedir)
         matches_folder = matcher.get_matchings_folder(folder_load)

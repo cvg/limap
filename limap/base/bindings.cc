@@ -438,6 +438,7 @@ void bind_camera(py::module& m) {
             }
         ))
         .def("as_dict", &ImageCollection::as_dict)
+        .def("subset_imagecols", &ImageCollection::subset_imagecols)
         .def("get_cameras", &ImageCollection::get_cameras)
         .def("get_cam_ids", &ImageCollection::get_cam_ids)
         .def("get_images", &ImageCollection::get_images)

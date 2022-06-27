@@ -52,7 +52,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     # [C] get line matches
     ##########################################################
     if not cfg["triangulation"]["use_exhaustive_matcher"]:
-        matches_dir = _runners.compute_matches(cfg, descinfo_folder, neighbors)
+        matches_dir = _runners.compute_matches(cfg, descinfo_folder, imagecols.get_img_ids(), neighbors)
 
     ##########################################################
     # [D] multi-view triangulation
@@ -62,7 +62,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     Triangulator.SetRanges(ranges)
     all_2d_lines = _base.get_all_lines_2d(all_2d_segs)
     Triangulator.Init(all_2d_lines, imagecols)
-    for img_id in imagecols.get_img_ids():
+    for img_id in tqdm(imagecols.get_img_ids()):
         if cfg["triangulation"]["use_exhaustive_matcher"]:
             Triangulator.InitExhaustiveMatchImage(img_id, neighbors[img_id])
         else:

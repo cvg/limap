@@ -29,6 +29,7 @@ public:
     ImageCollection(py::dict dict);
     ImageCollection(const ImageCollection& imagecols);
     py::dict as_dict() const;
+    ImageCollection subset_imagecols(const std::vector<int> valid_image_ids) const;
 
     size_t NumCameras() const { return cameras.size(); }
     size_t NumImages() const { return images.size(); }

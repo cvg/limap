@@ -136,6 +136,18 @@ py::dict ImageCollection::as_dict() const {
     return output;
 }
 
+ImageCollection ImageCollection::subset_imagecols(const std::vector<int> valid_image_ids) const {
+    std::map<int, CameraImage> valid_images;
+    for (const int& img_id: valid_image_ids) {
+        if (!exist_image(img_id)) {
+            std::cout<<"Warning! Image "<<img_id<<" in the valid subset does not exist in the image collection."<<std::endl;
+            continue;
+        }
+        valid_images.insert(std::make_pair(img_id, images.at(img_id)));
+    }
+    return ImageCollection(cameras, valid_images);
+}
+
 Camera ImageCollection::cam(const int cam_id) const {
     THROW_CHECK_EQ(exist_cam(cam_id), true);
     return cameras.at(cam_id);

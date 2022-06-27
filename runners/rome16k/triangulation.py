@@ -1,10 +1,49 @@
 import os, sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+from core.dataset import Rome
 import core.utils as utils
 
-from bundler_triangulation import run_bundler_undistortion, load_all_infos_bundler
-from line_triangulation import line_triangulation
+import limap.base as _base
+import limap.pointsfm as _psfm
+import limap.util.io as limapio
+import limap.runners
+
+def run_rome16k_triangulation(cfg, bundler_path, list_path, model_path):
+    '''
+    Run triangulation from Rome16K input
+    '''
+    # read bundler information
+    metainfos_filename = "infos_bundler.npy"
+    output_dir = "tmp" if cfg["output_dir"] is None else cfg["output_dir"]
+    limapio.check_makedirs(output_dir)
+    if cfg["skip_exists"] and os.path.exists(os.path.join(output_dir, metainfos_filename)):
+        cfg["info_path"] = os.path.join(output_dir, metainfos_filename)
+    if cfg["info_path"] is None:
+        imagecols, neighbors, ranges = _psfm.read_infos_bundler(cfg["sfm"], bundler_path, list_path, model_path, n_neighbors=cfg["n_neighbors"])
+        with open(os.path.join(output_dir, metainfos_filename), 'wb') as f:
+            np.savez(f, imagecols_np=imagecols.as_dict(), neighbors=neighbors, ranges=ranges)
+    else:
+        with open(cfg["info_path"], 'rb') as f:
+            data = np.load(f, allow_pickle=True)
+            imagecols_np, neighbors, ranges = data["imagecols_np"].item(), data["neighbors"].item(), data["ranges"]
+            imagecols = _base.ImageCollection(imagecols_np)
+
+    # Rome16K components
+    if cfg["comp_id"] != -1:
+        dataset = Rome(os.path.join(bundler_path, list_path), os.path.join(bundler_path, cfg["component_folder"]))
+        valid_image_ids = []
+        for img_id, imname in enumerate(imname_list):
+            comp_id = dataset.get_component_id_for_image_id(img_id)
+            if comp_id == cfg["comp_id"]:
+                valid_image_ids.append(img_id)
+        print("[LOG] Get image subset from component {0}: n_images = {1}".format(cfg["comp_id"], len(valid_image_ids)))
+        imagecols = imagecols.subset_imagecols(valid_image_ids);
+
+    # run triangulation
+    linetracks = limap.runners.line_triangulation(cfg, imagecols, neighbors=neighbors, ranges=ranges)
+    return linetracks
 
 def run_rome16k_triangulation(cfg, bundler_path, list_path, model_path):
     imname_list, camviews, neighbors, ranges = load_all_infos_bundler(cfg, bundler_path, list_path, model_path)
@@ -39,13 +78,8 @@ def parse_config():
     arg_parser.add_argument('-a', '--bundler_path', type=str, required=True, help='bundler path')
     arg_parser.add_argument('-l', '--list_path', type=str, default='bundle/list.orig.txt', help='image list path')
     arg_parser.add_argument('-m', '--model_path', type=str, default='bundle/bundle.orig.out', help='model path')
-    arg_parser.add_argument('--npyfolder', type=str, default="tmp", help='folder to load precomputed results')
     arg_parser.add_argument('--max_image_dim', type=int, default=None, help='max image dim')
-    arg_parser.add_argument('--info_reuse', action='store_true', help="whether to use infonpy at tmp/infos_bundler.npy")
     arg_parser.add_argument('--info_path', type=str, default=None, help='load precomputed info')
-    arg_parser.add_argument('--undistortion', action='store_true', help="whether to perform undistortion")
-    arg_parser.add_argument('--undist_folder', type=str, default="undistorted", help='folder to save undistorted results')
-    arg_parser.add_argument('--use_undist', action='store_true', help="whether to load undistorted results")
     arg_parser.add_argument('--component_folder', type=str, default='bundle/components', help='component folder')
     arg_parser.add_argument('--comp_id', type=int, default=-1, help="component id")
 
@@ -58,13 +92,6 @@ def parse_config():
     cfg["bundler_path"] = args.bundler_path
     cfg["list_path"] = args.list_path
     cfg["model_path"] = args.model_path
-    cfg["folder_to_load"] = args.npyfolder
-    # undistortion
-    cfg["undistortion"] = args.undistortion
-    cfg["undist_folder"] = args.undist_folder
-    cfg["use_undist"] = args.use_undist
-    if args.info_reuse:
-        cfg["info_path"] = "tmp/infos_bundler.npy"
     cfg["info_path"] = args.info_path
     if ("max_image_dim" not in cfg.keys()) or args.max_image_dim is not None:
         cfg["max_image_dim"] = args.max_image_dim
@@ -75,10 +102,7 @@ def parse_config():
 
 def main():
     cfg = parse_config()
-    if cfg["undistortion"]:
-        run_bundler_undistortion(cfg, cfg["bundler_path"], cfg["list_path"], cfg["model_path"])
-    else:
-        run_rome16k_triangulation(cfg, cfg["bundler_path"], cfg["list_path"], cfg["model_path"])
+    run_rome16k_triangulation(cfg, cfg["bundler_path"], cfg["list_path"], cfg["model_path"])
 
 if __name__ == '__main__':
     main()
