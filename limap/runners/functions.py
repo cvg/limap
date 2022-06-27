@@ -59,7 +59,7 @@ def undistort_images(imagecols, output_dir, fname="image_collection_undistorted.
     imagecols_undistorted = _base.ImageCollection(imagecols)
     cam_dict = {}
     for idx, img_id in enumerate(imagecols.get_img_ids()):
-        imname_out = inputs[idx][2]
+        imname_out = os.path.join(output_dir, "image_{0:08d}.png".format(img_id))
         cam_undistorted = outputs[idx]
         cam_id = cam_undistorted.cam_id()
         if cam_id not in cam_dict:
