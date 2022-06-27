@@ -50,7 +50,7 @@ def ComputeNeighbors(model, n_neighbors, min_triangulation_angle=1.0, neighbor_t
     '''
     neighbors_vec = ComputeNeighborsVector(model, n_neighbors, min_triangulation_angle=min_triangulation_angle, neighbor_type=neighbor_type)
     neighbors = {}
-    for img_id in range(len(neighbors)):
+    for img_id in range(len(neighbors_vec)):
         neighbors[img_id] = neighbors_vec[img_id]
     return neighbors
 
