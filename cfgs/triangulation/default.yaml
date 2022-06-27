@@ -15,6 +15,7 @@ max_image_dim: 1600
 skip_exists: False
 output_dir: null 
 load_dir: null
+n_jobs: -1 # for undistortion
 undistortion_output_dir: "undistorted_images"
 
 ##############################

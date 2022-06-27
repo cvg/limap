@@ -25,7 +25,7 @@ def run_bundler_triangulation(cfg, bundler_path, list_path, model_path):
     else:
         with open(cfg["info_path"], 'rb') as f:
             data = np.load(f, allow_pickle=True)
-            imagecols_np, neighbors, ranges = data["imagecols_np"].item(), data["neighbors"], data["ranges"]
+            imagecols_np, neighbors, ranges = data["imagecols_np"].item(), data["neighbors"].item(), data["ranges"]
             imagecols = _base.ImageCollection(imagecols_np)
 
     # run triangulation

@@ -25,4 +25,5 @@ rtree
 plyfile
 pathlib
 open3d
+imagesize
 ./third-party/pytlsd

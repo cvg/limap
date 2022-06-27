@@ -25,7 +25,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
         cfg["triangulation"]["var2d"] = cfg["var2d"][detector_name]
     # undistort images
     if not imagecols.IsUndistorted():
-        imagecols = _runners.undistort_images(imagecols, os.path.join(cfg["dir_save"], cfg["undistortion_output_dir"]), load_undistort=cfg["load_undistort"] or cfg["skip_exists"])
+        imagecols = _runners.undistort_images(imagecols, os.path.join(cfg["dir_save"], cfg["undistortion_output_dir"]), load_undistort=cfg["load_undistort"] or cfg["skip_exists"], n_jobs=cfg["n_jobs"])
     # resize cameras
     if cfg["max_image_dim"] != -1 and cfg["max_image_dim"] is not None:
         imagecols.set_max_image_dim(cfg["max_image_dim"])

@@ -123,6 +123,14 @@ void bind_linebase(py::module& m) {
         .def(py::init<const Eigen::MatrixXd&>())
         .def(py::init<V2D, V2D>(), py::arg("start"), py::arg("end"))
         .def(py::init<V2D, V2D, double>(), py::arg("start"), py::arg("end"), py::kw_only(), py::arg("score"))
+        .def(py::pickle(
+            [](const Line2d& input) { // dump
+                return input.as_array();
+            },
+            [](const Eigen::MatrixXd& arr) { // load
+                return Line2d(arr);
+            }
+        ))
         .def_readonly("start", &Line2d::start)
         .def_readonly("end", &Line2d::end)
         .def_readonly("score", &Line2d::score)
@@ -136,6 +144,14 @@ void bind_linebase(py::module& m) {
         .def(py::init<const Eigen::MatrixXd&>())
         .def(py::init<V3D, V3D>(), py::arg("start"), py::arg("end"))
         .def(py::init<V3D, V3D, double, double, double, double>(), py::arg("start"), py::arg("end"), py::kw_only(), py::arg("score"), py::arg("depth_start"), py::arg("depth_end"), py::arg("uncertainty"))
+        .def(py::pickle(
+            [](const Line3d& input) { // dump
+                return input.as_array();
+            },
+            [](const Eigen::MatrixXd& arr) { // load
+                return Line3d(arr);
+            }
+        ))
         .def_readonly("start", &Line3d::start)
         .def_readonly("end", &Line3d::end)
         .def_readonly("score", &Line3d::score)
@@ -309,6 +325,14 @@ void bind_camera(py::module& m) {
         .def(py::init<const std::string&, M3D, int, std::pair<int, int>>(), py::arg("model_name"), py::arg("K"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1))
         .def(py::init<py::dict>())
         .def(py::init<const Camera&>())
+        .def(py::pickle(
+            [](const Camera& input) { // dump
+                return input.as_dict();
+            },
+            [](const py::dict& dict) { // load
+                return Camera(dict);
+            }
+        ))
         .def("as_dict", &Camera::as_dict)
         .def("h", &Camera::h)
         .def("w", &Camera::w)
@@ -329,6 +353,14 @@ void bind_camera(py::module& m) {
         .def(py::init<M3D, V3D>())
         .def(py::init<py::dict>())
         .def(py::init<const CameraPose&>())
+        .def(py::pickle(
+            [](const CameraPose& input) { // dump
+                return input.as_dict();
+            },
+            [](const py::dict& dict) { // load
+                return CameraPose(dict);
+            }
+        ))
         .def("as_dict", &CameraPose::as_dict)
         .def_readonly("qvec", &CameraPose::qvec)
         .def_readonly("tvec", &CameraPose::tvec)
@@ -343,6 +375,14 @@ void bind_camera(py::module& m) {
         .def(py::init<const Camera&, const CameraPose&, const std::string&>(), py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
         .def(py::init<py::dict>())
         .def(py::init<const CameraImage&>())
+        .def(py::pickle(
+            [](const CameraImage& input) { // dump
+                return input.as_dict();
+            },
+            [](const py::dict& dict) { // load
+                return CameraImage(dict);
+            }
+        ))
         .def("as_dict", &CameraImage::as_dict)
         .def_readonly("cam_id", &CameraImage::cam_id)
         .def_readonly("pose", &CameraImage::pose)
@@ -357,6 +397,14 @@ void bind_camera(py::module& m) {
         .def(py::init<const Camera&, const CameraPose&, const std::string&>(), py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
         .def(py::init<py::dict>())
         .def(py::init<const CameraView&>())
+        .def(py::pickle(
+            [](const CameraView& input) { // dump
+                return input.as_dict();
+            },
+            [](const py::dict& dict) { // load
+                return CameraView(dict);
+            }
+        ))
         .def_readonly("cam", &CameraView::cam)
         .def_readonly("pose", &CameraView::pose)
         .def("as_dict", &CameraView::as_dict)
@@ -381,6 +429,14 @@ void bind_camera(py::module& m) {
         .def(py::init<const std::vector<CameraView>&>())
         .def(py::init<py::dict>())
         .def(py::init<const ImageCollection&>())
+        .def(py::pickle(
+            [](const ImageCollection& input) { // dump
+                return input.as_dict();
+            },
+            [](const py::dict& dict) { // load
+                return ImageCollection(dict);
+            }
+        ))
         .def("as_dict", &ImageCollection::as_dict)
         .def("get_cameras", &ImageCollection::get_cameras)
         .def("get_cam_ids", &ImageCollection::get_cam_ids)

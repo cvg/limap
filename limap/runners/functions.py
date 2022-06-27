@@ -20,39 +20,54 @@ def setup(cfg):
     print("[LOG] Loading dir: {0}".format(cfg["dir_load"]))
     return cfg
 
-def undistort_images(imagecols, output_dir, fname="image_collection_undistorted.npy", load_undistort=False):
+def undistort_images(imagecols, output_dir, fname="image_collection_undistorted.npy", load_undistort=False, n_jobs=-1):
     import limap.base as _base
     if load_undistort:
         fname_in = os.path.join(output_dir, fname)
         if os.path.isfile(fname_in):
             data = limapio.read_npy(fname_in).item()
             return _base.ImageCollection(data)
+
     # start undistortion
+    if n_jobs == -1:
+        n_jobs = os.cpu_count()
     print("Start undistorting images (n_images = {0})...".format(imagecols.NumImages()))
     import limap.undistortion as _undist
-    import cv2
+    import cv2, imagesize
+    import joblib
     limapio.delete_folder(output_dir)
     limapio.check_makedirs(output_dir)
-    imagecols_undistorted = _base.ImageCollection(imagecols)
-    cam_dict = {}
-    for img_id in tqdm(imagecols.get_img_ids()):
+
+    # multi-process undistortion
+    def process(imagecols, img_id):
         cam_id = imagecols.camimage(img_id).cam_id
         cam = imagecols.cam(cam_id)
+        imname_in = imagecols.camimage(img_id).image_name()
         imname_out = os.path.join(output_dir, "image_{0:08d}.png".format(img_id))
         # save image if resizing is needed
-        img = imagecols.read_image(img_id)
-        imname_in = imagecols.camimage(img_id).image_name()
-        if img.shape[0] != cam.h() or img.shape[1] != cam.w():
+        img_h, img_w = imagesize.get(imname_in)
+        if img_h != cam.h() or img_w != cam.w():
+            img = imagecols.read_image(img_id)
             cv2.imwrite(imname_out, img)
             imname_in = imname_out
-        # undistortion and save the undistorted one
-        cam_undistorted = _undist.UndistortImageCamera(cam, imname_in, imname_out)
+        cam_undistorted =  _undist.UndistortImageCamera(cam, imname_in, imname_out)
         cam_undistorted.set_cam_id(cam_id)
+        return cam_undistorted
+    outputs = joblib.Parallel(n_jobs=n_jobs)(joblib.delayed(process)(imagecols, img_id) for img_id in tqdm(imagecols.get_img_ids()))
+
+    # update new imagecols
+    imagecols_undistorted = _base.ImageCollection(imagecols)
+    cam_dict = {}
+    for idx, img_id in enumerate(imagecols.get_img_ids()):
+        imname_out = inputs[idx][2]
+        cam_undistorted = outputs[idx]
+        cam_id = cam_undistorted.cam_id()
         if cam_id not in cam_dict:
             cam_dict[cam_id] = cam_undistorted
+            imagecols_undistorted.change_camera(cam_id, cam_undistorted)
         imagecols_undistorted.change_image_name(img_id, imname_out)
-    for cam_id in cam_dict:
-        imagecols_undistorted.change_camera(cam_id, cam_dict[cam_id])
+
+    # save info
     limapio.save_txt_imname_dict(os.path.join(output_dir, 'original_image_list.txt'), imagecols.get_image_name_dict())
     limapio.save_npy(os.path.join(output_dir, fname), imagecols_undistorted.as_dict())
     return imagecols_undistorted
