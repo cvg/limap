@@ -177,6 +177,14 @@ void bind_linetrack(py::module& m) {
         .def(py::init<const Line3d&, const std::vector<int>&, const std::vector<int>&, const std::vector<Line2d>&>())
         .def(py::init<py::dict>())
         .def("as_dict", &LineTrack::as_dict)
+        .def(py::pickle(
+            [](const LineTrack& input) { // dump
+                return input.as_dict();
+            },
+            [](const py::dict& dict) { // load
+                return LineTrack(dict);
+            }
+        ))
         .def_readwrite("line", &LineTrack::line)
         .def_readonly("node_id_list", &LineTrack::node_id_list)
         .def_readonly("image_id_list", &LineTrack::image_id_list)
