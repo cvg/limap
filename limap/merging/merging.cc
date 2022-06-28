@@ -473,22 +473,22 @@ std::vector<LineTrack> RemergeLineTracks(const std::vector<LineTrack>& linetrack
     // compute edges to remerge
     std::set<std::pair<size_t, size_t>> edges;
     std::vector<std::set<std::pair<size_t, size_t>>> edges_per_track(n_tracks);
-    std::vector<int> newmerge_ids;
+    std::vector<int> active_ids;
     for (size_t i = 0; i < n_tracks; ++i) {
-        if (linetracks[i].newmerge)
-            newmerge_ids.push_back(i);
+        if (linetracks[i].active)
+            active_ids.push_back(i);
     }
-    int n_newmerge_ids = newmerge_ids.size();
-    progressbar bar(n_newmerge_ids);
+    int n_active_ids = active_ids.size();
+    progressbar bar(n_active_ids);
 #pragma omp parallel for
-    for (size_t k = 0; k < n_newmerge_ids; ++k) {
-        int i = newmerge_ids[k];
+    for (size_t k = 0; k < n_active_ids; ++k) {
+        int i = active_ids[k];
         bar.update();
         const Line3d& l1 = linetracks[i].line;
         for (size_t j = 0; j < n_tracks; ++j) {
             if (i == j)
                 continue;
-            if (n_newmerge_ids == n_tracks) {
+            if (n_active_ids == n_tracks) {
                 if (i < j && (i + j) % 2 == 0)
                     continue;
                 if (i > j && (i + j) % 2 == 1)
@@ -575,7 +575,7 @@ std::vector<LineTrack> RemergeLineTracks(const std::vector<LineTrack>& linetrack
     for (size_t group_id = 0; group_id < n_groups; ++group_id) {
         new_linetracks[group_id].line = Aggregator::aggregate_line3d_list(new_linetracks[group_id].line3d_list, new_linetracks[group_id].score_list, num_outliers);
         if (counter_groups[group_id] == 1) {
-            new_linetracks[group_id].newmerge = false;
+            new_linetracks[group_id].active = false;
         }
     }
     return new_linetracks;

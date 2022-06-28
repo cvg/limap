@@ -23,6 +23,8 @@ public:
     LineTrack(const LineTrack& track);
     LineTrack(const Line3d& line_, const std::vector<int>& image_id_list_, const std::vector<int>& line_id_list_, const std::vector<Line2d>& line2d_list_): 
         line(line_), image_id_list(image_id_list_), line_id_list(line_id_list_), line2d_list(line2d_list_) {}
+    py::dict as_dict() const;
+    LineTrack(py::dict dict);
 
     // properties
     Line3d line;
@@ -35,7 +37,8 @@ public:
     std::vector<Line3d> line3d_list;
     std::vector<double> score_list;
 
-    bool newmerge = true; // for speed up remerging
+    // active status for recursive merging
+    bool active = true;
 
     size_t count_lines() const {return line2d_list.size();}
     std::vector<int> GetSortedImageIds() const;

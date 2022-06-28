@@ -53,6 +53,8 @@ ImageCollection::ImageCollection(py::dict dict) {
     std::map<int, py::dict> dictvec_cameras;
     if (dict.contains("cameras"))
         dictvec_cameras = dict["cameras"].cast<std::map<int, py::dict>>();
+    else
+        throw std::runtime_error("Error! Key \"cameras\" does not exist!");
     for (auto it = dictvec_cameras.begin(); it != dictvec_cameras.end(); ++it) {
         int cam_id = it->first;
         Camera cam = Camera(it->second);
@@ -63,6 +65,8 @@ ImageCollection::ImageCollection(py::dict dict) {
     std::map<int, py::dict> dictvec_images;
     if (dict.contains("images"))
         dictvec_images = dict["images"].cast<std::map<int, py::dict>>();
+    else
+        throw std::runtime_error("Error! Key \"images\" does not exist!");
     for (auto it = dictvec_images.begin(); it != dictvec_images.end(); ++it) {
         int img_id = it->first;
         CameraImage camimage = CameraImage(it->second);

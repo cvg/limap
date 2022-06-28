@@ -13,11 +13,55 @@ LineTrack::LineTrack(const LineTrack& track) {
     line = track.line;
     std::copy(track.image_id_list.begin(), track.image_id_list.end(), std::back_inserter(image_id_list));
     std::copy(track.line_id_list.begin(), track.line_id_list.end(), std::back_inserter(line_id_list));
+    std::copy(track.line2d_list.begin(), track.line2d_list.end(), std::back_inserter(line2d_list));
+
     std::copy(track.node_id_list.begin(), track.node_id_list.end(), std::back_inserter(node_id_list));
     std::copy(track.score_list.begin(), track.score_list.end(), std::back_inserter(score_list));
-    std::copy(track.line2d_list.begin(), track.line2d_list.end(), std::back_inserter(line2d_list));
     std::copy(track.line3d_list.begin(), track.line3d_list.end(), std::back_inserter(line3d_list));
-    newmerge = track.newmerge;
+    active = track.active;
+}
+
+py::dict LineTrack::as_dict() const {
+    py::dict output;
+    output["line"] = line.as_array();
+    output["image_id_list"] = image_id_list;
+    output["line_id_list"] = line_id_list;
+    output["node_id_list"] = node_id_list;
+    output["score_list"] = score_list;
+    std::vector<Eigen::MatrixXd> py_line2d_list, py_line3d_list;
+    for (auto it = line2d_list.begin(); it != line2d_list.end(); ++it)
+        py_line2d_list.push_back(it->as_array());
+    for (auto it = line3d_list.begin(); it != line3d_list.end(); ++it)
+        py_line3d_list.push_back(it->as_array());
+    output["line2d_list"] = py_line2d_list;
+    output["line3d_list"] = py_line3d_list;
+    output["active"] = active;
+    return output;
+}
+
+LineTrack::LineTrack(py::dict dict) {
+    Eigen::MatrixXd py_line;
+    if (dict.contains("line"))
+        py_line = dict["line"].cast<Eigen::MatrixXd>();
+    else
+        throw std::runtime_error("Error! Key \"line\" does not exist!");
+    line = Line3d(py_line);
+    ASSIGN_PYDICT_ITEM(dict, image_id_list, std::vector<int>)
+    ASSIGN_PYDICT_ITEM(dict, line_id_list, std::vector<int>)
+    ASSIGN_PYDICT_ITEM(dict, node_id_list, std::vector<int>)
+    ASSIGN_PYDICT_ITEM(dict, score_list, std::vector<double>)
+    std::vector<Eigen::MatrixXd> py_line2d_list, py_line3d_list;
+    if (dict.contains("line2d_list")) {
+        py_line2d_list = dict["line2d_list"].cast<std::vector<Eigen::MatrixXd>>();
+        for (auto it = py_line2d_list.begin(); it != py_line2d_list.end(); ++it)
+            line2d_list.push_back(Line2d(*it));
+    }
+    if (dict.contains("line3d_list")) {
+        py_line3d_list = dict["line3d_list"].cast<std::vector<Eigen::MatrixXd>>();
+        for (auto it = py_line3d_list.begin(); it != py_line3d_list.end(); ++it)
+            line3d_list.push_back(Line3d(*it));
+    }
+    ASSIGN_PYDICT_ITEM(dict, active, bool)
 }
 
 std::vector<int> LineTrack::GetSortedImageIds() const {
