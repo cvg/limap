@@ -39,7 +39,7 @@ def run_rome16k_triangulation(cfg, bundler_path, list_path, model_path):
             if comp_id == cfg["comp_id"]:
                 valid_image_ids.append(img_id)
         print("[LOG] Get image subset from component {0}: n_images = {1}".format(cfg["comp_id"], len(valid_image_ids)))
-        imagecols = imagecols.subset_imagecols(valid_image_ids);
+        imagecols = imagecols.subset_by_image_ids(valid_image_ids);
 
     # run triangulation
     linetracks = limap.runners.line_triangulation(cfg, imagecols, neighbors=neighbors, ranges=ranges)
