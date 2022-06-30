@@ -450,6 +450,7 @@ void bind_camera(py::module& m) {
         .def("as_dict", &ImageCollection::as_dict)
         .def("subset_by_camera_ids", &ImageCollection::subset_by_camera_ids)
         .def("subset_by_image_ids", &ImageCollection::subset_by_image_ids)
+        .def("update_neighbors", &ImageCollection::update_neighbors)
         .def("get_cameras", &ImageCollection::get_cameras)
         .def("get_cam_ids", &ImageCollection::get_cam_ids)
         .def("get_images", &ImageCollection::get_images)

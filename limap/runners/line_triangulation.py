@@ -39,6 +39,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     if neighbors is None:
         neighbors, ranges = _runners.compute_sfminfos(cfg, imagecols)
     else:
+        neighbors = imagecols.update_neighbors(neighbors)
         for img_id, neighbor in neighbors.items():
             neighbors[img_id] = neighbors[img_id][:cfg["n_neighbors"]]
 

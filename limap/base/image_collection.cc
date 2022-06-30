@@ -177,6 +177,24 @@ ImageCollection ImageCollection::subset_by_image_ids(const std::vector<int> vali
     return ImageCollection(valid_cameras, valid_images);
 }
 
+std::map<int, std::vector<int>> ImageCollection::update_neighbors(const std::map<int, std::vector<int>>& neighbors) const {
+    if (neighbors.size() == NumImages()) // full set
+        return neighbors;
+    std::map<int, std::vector<int>> output;
+    for (const int& img_id: get_img_ids()) {
+        if (neighbors.find(img_id) == neighbors.end())
+            throw std::runtime_error("Error! The image id is not found in the input neighbors.");
+        std::vector<int> neighbor;
+        for (auto it = neighbors.at(img_id).begin(); it != neighbors.at(img_id).end(); ++it) {
+            if (!exist_image(*it))
+                continue;
+            neighbor.push_back(*it);
+        }
+        output.insert(std::make_pair(img_id, neighbor));
+    }
+    return output;
+}
+
 Camera ImageCollection::cam(const int cam_id) const {
     THROW_CHECK_EQ(exist_cam(cam_id), true);
     return cameras.at(cam_id);
