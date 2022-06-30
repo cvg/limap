@@ -15,7 +15,7 @@ def parse_args():
     args = arg_parser.parse_args()
     return args
 
-def vis_3d_lines(lines, mode="pyvista"):
+def vis_3d_lines(lines, mode="open3d"):
     if mode == "pyvista":
         limapvis.pyvista_vis_3d_lines(lines)
     elif mode == "open3d":

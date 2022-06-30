@@ -9,6 +9,9 @@ project(LIMAP)
 ################################################################################
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1)
+    message(FATAL_ERROR "GCC version needs to be at least 9.1")
+endif()
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w -std=c++14")
 
