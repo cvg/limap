@@ -53,12 +53,16 @@ class ETH3D:
         ref_depth[ref_depth == 0] = np.inf
         return ref_depth
 
-    def get_depth(self, imname, use_inpainted=True):
+    def get_depth_fname(self, imname, use_inpainted=True):
         imname = os.path.basename(imname)
         if use_inpainted:
             fname_depth = os.path.join(self.scene_dir, "inpainted_depth", "{0}.png".format(imname))
         else:
             fname_depth = os.path.join(self.scene_dir, "ground_truth_depth", "{0}.png".format(imname))
+        return fname_depth
+
+    def get_depth(self, imname, use_inpainted=True):
+        fname_depth = self.get_depth_fname(imname, use_inpainted=use_inpainted)
         depth = self.read_depth(fname_depth)
         return depth
 

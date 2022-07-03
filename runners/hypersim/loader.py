@@ -1,8 +1,22 @@
 import os, sys
 import numpy as np
 
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from Hypersim import read_raydepth, raydepth2depth
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import limap.base as _base
+
+class HypersimDepthReader(_base.BaseDepthReader):
+    def __init__(self, filename, K, img_hw):
+        super(HypersimDepthReader, self).__init__(filename)
+        self.K = K
+        self.img_hw = img_hw
+
+    def read(self, filename):
+        raydepth = read_raydepth(filename, resize_hw=self.img_hw)
+        depth = raydepth2depth(raydepth, self.K, self.img_hw)
+        return depth
 
 def read_scene_hypersim(cfg, dataset, scene_id, cam_id=0, load_depth=False):
     # set scene id
@@ -30,7 +44,8 @@ def read_scene_hypersim(cfg, dataset, scene_id, cam_id=0, load_depth=False):
         # get depths
         depths = {}
         for image_id in index_list:
-            depth = dataset.load_depth(image_id, cam_id=cam_id)
+            depth_fname = dataset.load_raydepth_fname(image_id, cam_id=cam_id)
+            depth = HypersimDepthReader(depth_fname, K, img_hw)
             depths[image_id] = depth
         return imagecols, depths
     else:

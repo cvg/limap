@@ -1,9 +1,20 @@
 import os, sys
 import numpy as np
+import cv2
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import limap.base as _base
 import limap.pointsfm as _psfm
+
+class ETH3DDepthReader(_base.BaseDepthReader):
+    def __init__(self, filename):
+        super(ETH3DDepthReader, self).__init__(filename)
+
+    def read(self, filename):
+        ref_depth = cv2.imread(filename, cv2.IMREAD_ANYDEPTH)
+        ref_depth = ref_depth.astype(np.float32) / 256
+        ref_depth[ref_depth == 0] = np.inf
+        return ref_depth
 
 def read_scene_eth3d(cfg, dataset, reso_type, scene_id, cam_id=0, load_depth=False):
     # set scene id
@@ -32,7 +43,9 @@ def read_scene_eth3d(cfg, dataset, reso_type, scene_id, cam_id=0, load_depth=Fal
     if load_depth:
         depths = {}
         for img_id in imagecols.get_img_ids():
-            depth = dataset.get_depth(imagecols.camview(img_id).image_name())
+            depth_fname = dataset.get_depth_fname(imagecols.camview(img_id).image_name())
+            depth = ETH3DDepthReader(depth_fname)
+            # depth = dataset.get_depth(imagecols.camview(img_id).image_name())
             depths[img_id] = depth
         return imagecols, neighbors, ranges, depths
     else:

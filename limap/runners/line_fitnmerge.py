@@ -18,12 +18,13 @@ def fit_3d_segs(all_2d_segs, imagecols, depths, fitting_config):
     Args:
     - all_2d_segs: map<int, np.adarray>
     - imagecols: limap.base.ImageCollection
-    - depths: map<int, np.ndarray>
+    - depths: map<int, CustomizedDepthReader>, where CustomizedDepthReader inherits _base.BaseDepthReader
     '''
     n_images = len(all_2d_segs)
     seg3d_list = []
     def process(all_2d_segs, imagecols, depths, fitting_config, img_id):
-        segs, camview, depth = all_2d_segs[img_id], imagecols.camview(img_id), depths[img_id]
+        segs, camview = all_2d_segs[img_id], imagecols.camview(img_id)
+        depth = depths[img_id].read_depth(img_hw=[camview.h(), camview.w()])
         seg3d_list_idx = []
         for seg_id, s in enumerate(segs):
             seg3d = _fit.estimate_seg3d_from_depth(s, depth, camview, ransac_th=fitting_config["ransac_th"], min_percentage_inliers=fitting_config["min_percentage_inliers"], var2d=fitting_config["var2d"])

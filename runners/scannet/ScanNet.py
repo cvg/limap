@@ -120,10 +120,14 @@ class ScanNet:
             self.Rs.append(R)
             self.Ts.append(T)
 
-    def get_depth(self, imname):
+    def get_depth_fname(self, imname):
         depth_folder = os.path.join(self.scene_dir, "depth")
         img_id = int(os.path.basename(imname)[:-4])
         depth_fname = os.path.join(depth_folder, '{0}.png'.format(img_id))
+        return depth_fname
+
+    def get_depth(self, imname):
+        depth_fname = self.get_depth_fname(imname)
         depth = cv2.imread(depth_fname, cv2.IMREAD_UNCHANGED)
         depth = depth.astype(np.float32) / 1000.0
         return depth
