@@ -48,11 +48,11 @@ def parse_config():
     arg_parser.add_argument('--comp_id', type=int, default=-1, help="component id")
 
     args, unknown = arg_parser.parse_known_args()
-    cfg = utils.load_config(args.config_file, default_path=args.default_config_file)
+    cfg = cfgutils.load_config(args.config_file, default_path=args.default_config_file)
     shortcuts = dict()
     shortcuts['-nv'] = '--n_visible_views'
     shortcuts['-nn'] = '--n_neighbors'
-    cfg = utils.update_config(cfg, unknown, shortcuts)
+    cfg = cfgutils.update_config(cfg, unknown, shortcuts)
     cfg["bundler_path"] = args.bundler_path
     cfg["list_path"] = args.list_path
     cfg["model_path"] = args.model_path
