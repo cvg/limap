@@ -9,17 +9,14 @@ import limap.pointsfm as _psfm
 import limap.util.io as limapio
 import limap.runners
 
-def run_bundler_triangulation(cfg, bundler_path, list_path, model_path):
-    '''
-    Run triangulation from Bundler input
-    '''
+def read_scene_bundler(cfg, bundler_path, list_path, model_path, n_neighbors=20):
     metainfos_filename = "infos_bundler.npy"
     output_dir = "tmp" if cfg["output_dir"] is None else cfg["output_dir"]
     limapio.check_makedirs(output_dir)
     if cfg["skip_exists"] and os.path.exists(os.path.join(output_dir, metainfos_filename)):
         cfg["info_path"] = os.path.join(output_dir, metainfos_filename)
     if cfg["info_path"] is None:
-        imagecols, neighbors, ranges = _psfm.read_infos_bundler(cfg["sfm"], bundler_path, list_path, model_path, n_neighbors=cfg["n_neighbors"])
+        imagecols, neighbors, ranges = _psfm.read_infos_bundler(cfg["sfm"], bundler_path, list_path, model_path, n_neighbors=n_neighbors)
         with open(os.path.join(output_dir, metainfos_filename), 'wb') as f:
             np.savez(f, imagecols_np=imagecols.as_dict(), neighbors=neighbors, ranges=ranges)
     else:
@@ -27,6 +24,13 @@ def run_bundler_triangulation(cfg, bundler_path, list_path, model_path):
             data = np.load(f, allow_pickle=True)
             imagecols_np, neighbors, ranges = data["imagecols_np"].item(), data["neighbors"].item(), data["ranges"]
             imagecols = _base.ImageCollection(imagecols_np)
+    return imagecols, neighbors, ranges
+
+def run_bundler_triangulation(cfg, bundler_path, list_path, model_path):
+    '''
+    Run triangulation from Bundler input
+    '''
+    imagecols, neighbors, ranges = read_scene_bundler(cfg, bundler_path, list_path, model_path, n_neighbors=cfg["n_neighbors"])
 
     # run triangulation
     linetracks = limap.runners.line_triangulation(cfg, imagecols, neighbors=neighbors, ranges=ranges)

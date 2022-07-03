@@ -9,17 +9,14 @@ import limap.pointsfm as _psfm
 import limap.util.io as limapio
 import limap.runners
 
-def run_visualsfm_triangulation(cfg, vsfm_path, nvm_file="reconstruction.nvm"):
-    '''
-    Run triangulation from VisualSfM input
-    '''
+def read_scene_visualsfm(cfg, vsfm_path, nvm_file="reconstruction.nvm", n_neighbors=20):
     metainfos_filename = "infos_visualsfm.npy"
     output_dir = "tmp" if cfg["output_dir"] is None else cfg["output_dir"]
     limapio.check_makedirs(output_dir)
     if cfg["skip_exists"] and os.path.exists(os.path.join(output_dir, metainfos_filename)):
         cfg["info_path"] = os.path.join(output_dir, metainfos_filename)
     if cfg["info_path"] is None:
-        imagecols, neighbors, ranges = _psfm.read_infos_visualsfm(cfg["sfm"], vsfm_path, nvm_file=nvm_file, n_neighbors=cfg["n_neighbors"])
+        imagecols, neighbors, ranges = _psfm.read_infos_visualsfm(cfg["sfm"], vsfm_path, nvm_file=nvm_file, n_neighbors=n_neighbors)
         with open(os.path.join(output_dir, metainfos_filename), 'wb') as f:
             np.savez(f, imagecols_np=imagecols.as_dict(), neighbors=neighbors, ranges=ranges)
     else:
@@ -27,6 +24,13 @@ def run_visualsfm_triangulation(cfg, vsfm_path, nvm_file="reconstruction.nvm"):
             data = np.load(f, allow_pickle=True)
             imagecols_np, neighbors, ranges = data["imagecols_np"].item(), data["neighbors"].item(), data["ranges"]
             imagecols = _base.ImageCollection(imagecols_np)
+    return imagecols, neighbors, ranges
+
+def run_visualsfm_triangulation(cfg, vsfm_path, nvm_file="reconstruction.nvm"):
+    '''
+    Run triangulation from VisualSfM input
+    '''
+    imagecols, neighbors, ranges = read_scene_visualsfm(cfg, vsfm_path, nvm_file=nvm_file, n_neighbors=cfg["n_neighbors"])
 
     # run triangulation
     linetracks = limap.runners.line_triangulation(cfg, imagecols, neighbors=neighbors, ranges=ranges)

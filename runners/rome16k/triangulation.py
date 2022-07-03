@@ -10,25 +10,13 @@ import limap.pointsfm as _psfm
 import limap.util.io as limapio
 import limap.runners
 
+from runners.bundler_triangulation import read_scene_bundler
+
 def run_rome16k_triangulation(cfg, bundler_path, list_path, model_path):
     '''
     Run triangulation from Rome16K input
     '''
-    # read bundler information
-    metainfos_filename = "infos_bundler.npy"
-    output_dir = "tmp" if cfg["output_dir"] is None else cfg["output_dir"]
-    limapio.check_makedirs(output_dir)
-    if cfg["skip_exists"] and os.path.exists(os.path.join(output_dir, metainfos_filename)):
-        cfg["info_path"] = os.path.join(output_dir, metainfos_filename)
-    if cfg["info_path"] is None:
-        imagecols, neighbors, ranges = _psfm.read_infos_bundler(cfg["sfm"], bundler_path, list_path, model_path, n_neighbors=cfg["n_neighbors"])
-        with open(os.path.join(output_dir, metainfos_filename), 'wb') as f:
-            np.savez(f, imagecols_np=imagecols.as_dict(), neighbors=neighbors, ranges=ranges)
-    else:
-        with open(cfg["info_path"], 'rb') as f:
-            data = np.load(f, allow_pickle=True)
-            imagecols_np, neighbors, ranges = data["imagecols_np"].item(), data["neighbors"].item(), data["ranges"]
-            imagecols = _base.ImageCollection(imagecols_np)
+    imagecols, neighbors, ranges = read_scene_bundler(cfg, bundler_path, list_path, model_path, n_neighbors=cfg["n_neighbors"])
 
     # Rome16K components
     if cfg["comp_id"] != -1:
