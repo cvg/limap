@@ -5,9 +5,9 @@ import os, sys
 import numpy as np
 from bresenham import bresenham
 
-def estimate_seg3d_from_depth(seg2d, depth, cam, hw, ransac_th=0.75, min_percentage_inliers=0.6, var2d=5.0):
-    K, R, T = cam[0], cam[1], cam[2]
-    h, w = hw[0], hw[1]
+def estimate_seg3d_from_depth(seg2d, depth, camview, ransac_th=0.75, min_percentage_inliers=0.6, var2d=5.0):
+    K, R, T = camview.K(), camview.R(), camview.T()
+    h, w = camview.h(), camview.w()
 
     # get points and depths
     seg2d = seg2d.astype(int)

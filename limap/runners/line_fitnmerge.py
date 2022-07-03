@@ -22,23 +22,18 @@ def fit_3d_segs(all_2d_segs, imagecols, depths, fitting_config):
     '''
     n_images = len(all_2d_segs)
     seg3d_list = []
-    def process(all_2d_segs, camviews_np, depths, fitting_config, img_id):
-        segs, cam, depth = all_2d_segs[img_id], camviews_np[img_id], depths[img_id]
-        img_hw = [cam[3], cam[4]]
+    def process(all_2d_segs, imagecols, depths, fitting_config, img_id):
+        segs, camview, depth = all_2d_segs[img_id], imagecols.camview(img_id), depths[img_id]
         seg3d_list_idx = []
         for seg_id, s in enumerate(segs):
-            seg3d = _fit.estimate_seg3d_from_depth(s, depth, [cam[0], cam[1], cam[2]], [img_hw[0], img_hw[1]], ransac_th=fitting_config["ransac_th"], min_percentage_inliers=fitting_config["min_percentage_inliers"], var2d=fitting_config["var2d"])
+            seg3d = _fit.estimate_seg3d_from_depth(s, depth, camview, ransac_th=fitting_config["ransac_th"], min_percentage_inliers=fitting_config["min_percentage_inliers"], var2d=fitting_config["var2d"])
             if seg3d is None:
                 seg3d_list_idx.append((np.array([0., 0., 0.]), np.array([0., 0., 0.])))
             else:
                 seg3d_list_idx.append(seg3d)
         return seg3d_list_idx
-    camviews_np = {}
-    for img_id in imagecols.get_img_ids():
-        view = imagecols.camview(img_id)
-        camviews_np[img_id] = [view.K(), view.R(), view.T(), view.h(), view.w()]
     image_ids = imagecols.get_img_ids()
-    seg3d_list = joblib.Parallel(n_jobs=fitting_config["n_jobs"])(joblib.delayed(process)(all_2d_segs, camviews_np, depths, fitting_config, img_id) for img_id in tqdm(image_ids))
+    seg3d_list = joblib.Parallel(n_jobs=fitting_config["n_jobs"])(joblib.delayed(process)(all_2d_segs, imagecols, depths, fitting_config, img_id) for img_id in tqdm(image_ids))
     output = {}
     for idx, seg3d_list_idx in enumerate(seg3d_list):
         output[image_ids[idx]] = seg3d_list_idx
