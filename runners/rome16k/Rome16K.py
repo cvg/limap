@@ -1,8 +1,7 @@
 import os, sys
 import numpy as np
-import pdb
 
-class Rome:
+class Rome16K:
     def __init__(self, list_file, component_folder):
         self.image_list = self.load_image_list(list_file)
         self.components = {}

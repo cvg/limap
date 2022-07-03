@@ -80,26 +80,3 @@ def update_config(cfg, unknown, shortcuts):
             raise ValueError('number of levels are too high to handle!!')
     return cfg
 
-def rescale_cfg(cfg, ratio):
-    # update scale-sensitive parameters below
-    if cfg["cfg_type"] == "fitnmerge":
-        cfg["fitting"]["ransac_th"] *= ratio
-        cfg["merging"]["linker3d"]["th_perp"] *= ratio
-        cfg["merging"]["linker3d"]["th_innerseg"] *= ratio
-        cfg["remerging"]["linker3d"]["th_perp"] *= ratio
-        cfg["remerging"]["linker3d"]["th_innerseg"] *= ratio
-    elif cfg["cfg_type"] == "triangulation":
-        cfg["triangulation"]["linker3d_config"]["th_perp"] *= ratio
-        cfg["triangulation"]["linker3d_config"]["th_innerseg"] *= ratio
-        cfg["triangulation"]["remerging"]["linker3d"]["th_perp"] *= ratio
-        cfg["triangulation"]["remerging"]["linker3d"]["th_innerseg"] *= ratio
-    else:
-        raise NotImplementedError
-    return cfg
-
-def rescale_cfg_with_range(cfg, ranges):
-    rangescale = np.abs(ranges[0,:] - ranges[1,:]).max()
-    print("basescale = {0:.1f}, rangescale = {1:.1f}".format(cfg["basescale"], rangescale))
-    ratio = rangescale / cfg["basescale"]
-    return rescale_cfg(cfg, ratio)
-

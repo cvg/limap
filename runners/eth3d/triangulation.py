@@ -2,10 +2,11 @@ import os, sys
 import numpy as np
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from ETH3D import ETH3D
 from loader import read_scene_eth3d
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from core.dataset import ETH3D
-import core.utils as utils
+import limap.util.config as cfgutils
 import limap.runners
 
 def run_scene_eth3d(cfg, dataset, reso_type, scene_id, cam_id=0):
@@ -22,7 +23,7 @@ def parse_config():
     arg_parser.add_argument('--info_path', type=str, default=None, help='load precomputed info')
 
     args, unknown = arg_parser.parse_known_args()
-    cfg = utils.load_config(args.config_file, default_path=args.default_config_file)
+    cfg = cfgutils.load_config(args.config_file, default_path=args.default_config_file)
     shortcuts = dict()
     shortcuts['-nv'] = '--n_visible_views'
     shortcuts['-nn'] = '--n_neighbors'
@@ -30,7 +31,7 @@ def parse_config():
     if args.info_reuse:
         cfg["info_path"] = "tmp/infos_eth3d.npy"
     cfg["info_path"] = args.info_path
-    cfg = utils.update_config(cfg, unknown, shortcuts)
+    cfg = cfgutils.update_config(cfg, unknown, shortcuts)
     cfg["folder_to_load"] = os.path.join("precomputed", "eth3d", cfg["reso_type"], "{0}_cam{1}".format(cfg["scene_id"], cfg["cam_id"]))
     return cfg
 

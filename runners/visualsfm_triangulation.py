@@ -2,11 +2,10 @@ import os, sys
 import numpy as np
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import core.utils as utils
-
 import limap.base as _base
 import limap.pointsfm as _psfm
 import limap.util.io as limapio
+import limap.util.config as cfgutils
 import limap.runners
 
 def read_scene_visualsfm(cfg, vsfm_path, nvm_file="reconstruction.nvm", n_neighbors=20):
@@ -47,11 +46,11 @@ def parse_config():
     arg_parser.add_argument('--info_path', type=str, default=None, help='load precomputed info')
 
     args, unknown = arg_parser.parse_known_args()
-    cfg = utils.load_config(args.config_file, default_path=args.default_config_file)
+    cfg = cfgutils.load_config(args.config_file, default_path=args.default_config_file)
     shortcuts = dict()
     shortcuts['-nv'] = '--n_visible_views'
     shortcuts['-nn'] = '--n_neighbors'
-    cfg = utils.update_config(cfg, unknown, shortcuts)
+    cfg = cfgutils.update_config(cfg, unknown, shortcuts)
     cfg["vsfm_path"] = args.vsfm_path
     cfg["nvm_file"] = args.nvm_file
     cfg["info_path"] = args.info_path

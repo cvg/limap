@@ -2,10 +2,11 @@ import os, sys
 import numpy as np
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from ScanNet import ScanNet
 from loader import read_scene_scannet
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from core.dataset import ScanNet
-import core.utils as utils
+import limap.util.config as cfgutils
 import limap.runners
 
 def run_scene_scannet(cfg, dataset, scene_id):
@@ -20,12 +21,12 @@ def parse_config():
     arg_parser.add_argument('--default_config_file', type=str, default='cfgs/fitnmerge/default.yaml', help='default config file')
 
     args, unknown = arg_parser.parse_known_args()
-    cfg = utils.load_config(args.config_file, default_path=args.default_config_file)
+    cfg = cfgutils.load_config(args.config_file, default_path=args.default_config_file)
     shortcuts = dict()
     shortcuts['-nv'] = '--n_visible_views'
     shortcuts['-nn'] = '--n_neighbors'
     shortcuts['-sid'] = '--scene_id'
-    cfg = utils.update_config(cfg, unknown, shortcuts)
+    cfg = cfgutils.update_config(cfg, unknown, shortcuts)
     cfg["folder_to_load"] = os.path.join("precomputed", "scannet", cfg["scene_id"])
     return cfg
 

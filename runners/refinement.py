@@ -1,11 +1,11 @@
 import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
-import core.utils as utils
 
 import limap.base as _base
 import limap.vpdetection as _vpdet
 import limap.util.io as limapio
+import limap.util.config as cfgutils
 import limap.optimize
 
 def main(cfg):
@@ -44,10 +44,10 @@ def parse_config():
     arg_parser.add_argument('--output_folder', type=str, default='newtracks', help='output filename')
 
     args, unknown = arg_parser.parse_known_args()
-    cfg = utils.load_config(args.config_file, default_path=args.default_config_file)
+    cfg = cfgutils.load_config(args.config_file, default_path=args.default_config_file)
     shortcuts = dict()
     shortcuts['-nv'] = '--n_visible_views'
-    cfg = utils.update_config(cfg, unknown, shortcuts)
+    cfg = cfgutils.update_config(cfg, unknown, shortcuts)
     cfg["input_folder"] = args.input_folder.strip('/')
     cfg["output_dir"] = args.output_dir
     if cfg["output_dir"] is None:
