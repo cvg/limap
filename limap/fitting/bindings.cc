@@ -9,7 +9,7 @@
 
 #include <RansacLib/ransac.h>
 
-#include "fitting/line_estimator.h"
+#include "fitting/line3d_estimator.h"
 
 namespace py = pybind11;
 

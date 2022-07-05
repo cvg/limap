@@ -2,6 +2,6 @@ set(FOLDER_NAME "fitting")
 
 LIMAP_ADD_SOURCES(
     bindings.cc
-    line_estimator.h line_estimator.cc
+    line3d_estimator.h line3d_estimator.cc
 )
 
