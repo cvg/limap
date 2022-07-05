@@ -350,11 +350,10 @@ void MergeToLineTracks(Graph& graph,
     }
 
     // compute similarity and collect potential edges
-    typedef std::pair<size_t, size_t> IntPair;
-    typedef std::pair<IntPair, IntPair> IntQuad;
-    std::map<int, std::vector<IntQuad>> quads;
+    typedef std::pair<Node2d, Node2d> Node2dPair;
+    std::map<int, std::vector<Node2dPair>> pairs;
     for (const int& image_id: image_ids) {
-        quads.insert(std::make_pair(image_id, std::vector<IntQuad>()));
+        pairs.insert(std::make_pair(image_id, std::vector<Node2dPair>()));
     }
 
     // self similarity
@@ -376,7 +375,7 @@ void MergeToLineTracks(Graph& graph,
                 // check 2d
                 if (!linker.check_connection_2d(all_lines_2d.at(image_id)[i], all_lines_2d.at(image_id)[j]))
                     continue;
-                quads[image_id].push_back(std::make_pair(std::make_pair(image_id, i), std::make_pair(image_id, j)));
+                pairs[image_id].push_back(std::make_pair(std::make_pair(image_id, i), std::make_pair(image_id, j)));
             }
         }
     }
@@ -416,7 +415,7 @@ void MergeToLineTracks(Graph& graph,
                         continue;
                     if (!linker.check_connection_2d(l2.projection(imagecols.camview(image_id)), all_lines_2d.at(image_id)[line_id]))
                         continue;
-                    quads[image_id].push_back(std::make_pair(std::make_pair(image_id, line_id), std::make_pair(ng_image_id, ng_line_id)));
+                    pairs[image_id].push_back(std::make_pair(std::make_pair(image_id, line_id), std::make_pair(ng_image_id, ng_line_id)));
                 }
             }
         }
@@ -424,7 +423,7 @@ void MergeToLineTracks(Graph& graph,
 
     // insert edges
     for (const int& image_id: image_ids) {
-        for (auto it = quads[image_id].begin(); it != quads[image_id].end(); ++it) {
+        for (auto it = pairs[image_id].begin(); it != pairs[image_id].end(); ++it) {
             PatchNode* node1 = graph.FindOrCreateNode(it->first.first, it->first.second);
             PatchNode* node2 = graph.FindOrCreateNode(it->second.first, it->second.second);
             double score = all_lengths_3d[node1->image_idx][node1->line_idx] + all_lengths_3d[node2->image_idx][node2->line_idx];

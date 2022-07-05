@@ -16,7 +16,7 @@ namespace limap {
 namespace triangulation {
 
 typedef std::pair<uint8_t, uint16_t> NeighborLineNode; // (neighbor_id, line_id)
-typedef std::pair<uint16_t, uint16_t> LineNode; // (img_id, line_id)
+typedef Node2d LineNode; // (img_id, line_id)
 typedef std::tuple<Line3d, double, LineNode> TriTuple; // (line, score, (ng_img_id, ng_line_id))
 
 class TriangulatorConfig {

@@ -13,6 +13,8 @@ namespace py = pybind11;
 
 namespace limap {
 
+using Node2d = std::pair<uint16_t, uint16_t>; // (img_id, feature_id), change to int if there exists id > 65535
+
 using V2F = Eigen::Vector2f;
 using V3F = Eigen::Vector3f;
 using V2D = Eigen::Vector2d;
