@@ -119,6 +119,7 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
     else:
         folder_load = os.path.join(cfg["dir_load"], basedir)
         all_2d_segs = limapio.read_all_segments_from_folder(detector.get_segments_folder(folder_load))
+        all_2d_segs = {id: all_2d_segs[id] for id in imagecols.get_img_ids()}
         descinfo_folder = None
         if compute_descinfo:
             extractor = limap.line2d.get_extractor(cfg["line2d"]["extractor"])
