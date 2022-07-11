@@ -151,8 +151,6 @@ void bind_ceres(py::module& m) {
             &ceres::Solver::Options::sparse_linear_algebra_library_type)
         .def_readwrite("use_explicit_schur_complement",
             &ceres::Solver::Options::use_explicit_schur_complement)
-        .def_readwrite("use_postordering",
-            &ceres::Solver::Options::use_postordering)
         .def_readwrite("dynamic_sparsity",
             &ceres::Solver::Options::dynamic_sparsity)
         .def_readwrite("logging_type",
