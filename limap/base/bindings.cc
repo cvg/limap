@@ -381,7 +381,7 @@ void bind_camera(py::module& m) {
 
     py::class_<CameraImage>(m, "CameraImage")
         .def(py::init<>())
-        .def(py::init<const int&, const CameraPose&, const std::string&>(), py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
+        .def(py::init<const int&, const CameraPose&, const std::string&>(), py::arg("cam_id"), py::arg("pose"), py::arg("image_name") = "none")
         .def(py::init<const Camera&, const CameraPose&, const std::string&>(), py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
         .def(py::init<py::dict>())
         .def(py::init<const CameraImage&>())
