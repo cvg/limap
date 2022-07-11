@@ -66,6 +66,7 @@ class BaseDetector():
             segs = self.take_longest_k(segs, max_num_2d_segs=self.max_num_2d_segs)
             limapio.save_txt_segments(seg_folder, img_id, segs)
         all_2d_segs = limapio.read_all_segments_from_folder(seg_folder)
+        all_2d_segs = {id: all_2d_segs[id] for id in imagecols.get_img_ids()}
         return all_2d_segs
 
     def extract_all_images(self, output_folder, imagecols, all_2d_segs, skip_exists=False):
@@ -96,6 +97,7 @@ class BaseDetector():
             limapio.save_txt_segments(seg_folder, img_id, segs)
             self.save_descinfo(descinfo_folder, img_id, descinfo)
         all_2d_segs = limapio.read_all_segments_from_folder(seg_folder)
+        all_2d_segs = {id: all_2d_segs[id] for id in imagecols.get_img_ids()}
         return all_2d_segs, descinfo_folder
 
 

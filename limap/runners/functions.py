@@ -27,7 +27,8 @@ def undistort_images(imagecols, output_dir, fname="image_collection_undistorted.
         fname_in = os.path.join(output_dir, fname)
         if os.path.isfile(fname_in):
             data = limapio.read_npy(fname_in).item()
-            return _base.ImageCollection(data)
+            new_imagecols = _base.ImageCollection(data)
+            return new_imagecols.subset_by_image_ids(imagecols.get_img_ids())
 
     # start undistortion
     if n_jobs == -1:
@@ -118,6 +119,7 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
     else:
         folder_load = os.path.join(cfg["dir_load"], basedir)
         all_2d_segs = limapio.read_all_segments_from_folder(detector.get_segments_folder(folder_load))
+        all_2d_segs = {id: all_2d_segs[id] for id in imagecols.get_img_ids()}
         descinfo_folder = None
         if compute_descinfo:
             extractor = limap.line2d.get_extractor(cfg["line2d"]["extractor"])
