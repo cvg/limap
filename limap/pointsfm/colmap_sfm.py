@@ -46,7 +46,7 @@ def run_hloc_matches(cfg, image_path, db_path):
     reconstruction.import_matches(image_ids, db_path, sfm_pairs, match_path, None, None)
     triangulation.geometric_verification("colmap", db_path, sfm_pairs)
 
-def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap', use_cuda=False, skip_exists=False):
+def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap', use_cuda=False, skip_exists=False, map_to_original_image_names=False):
     ### initialize sparse folder
     if skip_exists and os.path.exists(output_path):
         return
@@ -126,4 +126,12 @@ def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap'
            '--input_path', model_path,
            '--output_path', point_triangulation_path]
     subprocess.run(cmd, check=True)
+
+    # map to original image names
+    if map_to_original_image_names:
+        fname_images_bin = os.path.join(point_triangulation_path, "images.bin")
+        colmap_images = colmap_utils.read_images_binary(fname_images_bin)
+        for idx, img_id in enumerate(imagecols.get_img_ids()):
+            colmap_images[idx + 1] = colmap_images[idx + 1]._replace(name = imagecols.image_name(img_id))
+        colmap_utils.write_images_binary(colmap_images, fname_images_bin)
 
