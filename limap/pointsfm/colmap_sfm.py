@@ -25,7 +25,7 @@ def run_colmap_sift_matches(image_path, db_path, use_cuda=False):
            '--SiftMatching.use_gpu', str(int(use_cuda))]
     subprocess.run(cmd, check=True)
 
-def run_hloc_matches(cfg, image_path, db_path):
+def run_hloc_matches(cfg, image_path, db_path, keypoints=None):
     image_path = Path(image_path)
     from hloc import extract_features, match_features, reconstruction, triangulation
     outputs = Path(os.path.join(os.path.dirname(db_path), 'hloc_outputs'))
@@ -35,7 +35,8 @@ def run_hloc_matches(cfg, image_path, db_path):
     matcher_conf = match_features.confs[cfg["matcher"]]
 
     # run superpoint
-    feature_path = extract_features.main(feature_conf, image_path, outputs)
+    from limap.point2d import run_superpoint
+    feature_path = run_superpoint(feature_conf, image_path, outputs, keypoints=keypoints)
     match_path = match_features.main(matcher_conf, sfm_pairs, feature_conf["output"], outputs, exhaustive=True)
 
     sfm_dir.mkdir(parents=True, exist_ok=True)
@@ -46,19 +47,21 @@ def run_hloc_matches(cfg, image_path, db_path):
     reconstruction.import_matches(image_ids, db_path, sfm_pairs, match_path, None, None)
     triangulation.geometric_verification("colmap", db_path, sfm_pairs)
 
-def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap', use_cuda=False, skip_exists=False, map_to_original_image_names=False):
+def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap', keypoints=None, use_cuda=False, skip_exists=False, map_to_original_image_names=False):
+    ### set up path
+    db_path = os.path.join(output_path, 'db.db')
+    image_path = os.path.join(output_path, 'images')
+    model_path = os.path.join(output_path, 'sparse', 'model')
+    point_triangulation_path = os.path.join(output_path, 'sparse')
+
     ### initialize sparse folder
-    if skip_exists and os.path.exists(output_path):
+    if skip_exists and os.path.exists(point_triangulation_path):
+        print("[COLMAP] Skipping point triangulation")
         return
     if os.path.exists(output_path):
         shutil.rmtree(output_path)
     if not os.path.exists(output_path):
         os.makedirs(output_path)
-
-    db_path = os.path.join(output_path, 'db.db')
-    image_path = os.path.join(output_path, 'images')
-    model_path = os.path.join(output_path, 'sparse', 'model')
-    point_triangulation_path = os.path.join(output_path, 'sparse')
 
     if not os.path.exists(image_path):
         os.makedirs(image_path)
@@ -66,17 +69,20 @@ def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap'
         os.makedirs(model_path)
 
     ### copy images to tmp folder
-    for img_id in imagecols.get_img_ids():
+    keypoints_in_order = []
+    for idx, img_id in enumerate(imagecols.get_img_ids()):
         img = imagecols.read_image(img_id)
         fname_to_save = os.path.join(image_path, 'image{0:08d}.png'.format(img_id))
         cv2.imwrite(fname_to_save, img)
+        if keypoints is not None:
+            keypoints_in_order.append(keypoints[img_id])
 
     # sift feature extraction and matching
     if cfg["fbase"] == "sift":
         run_colmap_sift_matches(image_path, db_path, use_cuda=use_cuda)
     elif cfg["fbase"] == "hloc":
         assert (use_cuda == True)
-        run_hloc_matches(cfg["hloc"], image_path, db_path)
+        run_hloc_matches(cfg["hloc"], image_path, db_path, keypoints=keypoints_in_order)
 
     ### write cameras.txt
     colmap_cameras = {}
