@@ -6,8 +6,9 @@
 namespace limap {
 
 InfiniteLine2d::InfiniteLine2d(const Line2d& line) {
+    CHECK_GT(line.length(), 0.0);
     p = line.start;
-    direc = line.end - line.start;
+    direc = (line.end - line.start).normalized();
 }
 
 V3D InfiniteLine2d::GetLineCoordinate() const {
@@ -19,8 +20,7 @@ V3D InfiniteLine2d::GetLineCoordinate() const {
 }
 
 V2D InfiniteLine2d::point_projection(const V2D& p2d) const {
-    V2D dir = direc.normalized();
-    return p + (p2d - p).dot(dir) * dir;
+    return p + (p2d - p).dot(direc) * direc;
 }
 
 double InfiniteLine2d::point_distance(const V2D& p2d) const {
@@ -42,13 +42,13 @@ std::pair<V2D, bool> Intersect_InfiniteLine2d(const InfiniteLine2d& l1, const In
 }
 
 InfiniteLine3d::InfiniteLine3d(const Line3d& line) {
+    CHECK_GT(line.length(), 0.0);
     p = line.start;
-    direc = line.end - line.start;
+    direc = (line.end - line.start).normalized();
 }
 
 V3D InfiniteLine3d::point_projection(const V3D& p3d) const {
-    V3D dir = direc.normalized();
-    return p + (p3d - p).dot(dir) * dir;
+    return p + (p3d - p).dot(direc) * direc;
 }
 
 double InfiniteLine3d::point_distance(const V3D& p) const {
