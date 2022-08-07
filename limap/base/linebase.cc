@@ -16,6 +16,17 @@ Line2d::Line2d(const Eigen::MatrixXd& seg) {
     end = V2D(seg(1, 0), seg(1, 1));
 }
 
+double Line2d::point_distance(const V2D& p) const {
+    double projection = (p - start).dot(direction());
+    if (projection < 0)
+        return (p - start).norm();
+    if (projection > length())
+        return (p - end).norm();
+    double dist_squared = (p - start).squaredNorm() - pow(projection, 2);
+    double dist = sqrt(std::max(dist_squared, 0.0));
+    return dist;
+}
+
 Eigen::MatrixXd Line2d::as_array() const {
     Eigen::MatrixXd arr(2, 2);
     arr(0, 0) = start[0]; arr(0, 1) = start[1];
@@ -36,6 +47,17 @@ Line3d::Line3d(const Eigen::MatrixXd& seg) {
     THROW_CHECK_EQ(seg.cols(), 3);
     start = V3D(seg(0, 0), seg(0, 1), seg(0, 2));
     end = V3D(seg(1, 0), seg(1, 1), seg(1, 2));
+}
+
+double Line3d::point_distance(const V3D& p) const {
+    double projection = (p - start).dot(direction());
+    if (projection < 0)
+        return (p - start).norm();
+    if (projection > length())
+        return (p - end).norm();
+    double dist_squared = (p - start).squaredNorm() - pow(projection, 2);
+    double dist = sqrt(std::max(dist_squared, 0.0));
+    return dist;
 }
 
 Eigen::MatrixXd Line3d::as_array() const {

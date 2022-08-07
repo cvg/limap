@@ -26,6 +26,7 @@ public:
     V2D midpoint() const {return 0.5 * (start + end);}
     V2D direction() const {return (end - start).normalized();}
     V2D perp_direction() const {V2D dir = direction(); return V2D(dir[1], -dir[0]); }
+    double point_distance(const V2D& p) const;
     Eigen::MatrixXd as_array() const;
 };
 
@@ -43,6 +44,7 @@ public:
     double length() const {return (start - end).norm();}
     V3D midpoint() const {return 0.5 * (start + end);}
     V3D direction() const {return (end - start).normalized();}
+    double point_distance(const V3D& p) const;
     Eigen::MatrixXd as_array() const;
     Line2d projection(const CameraView& view) const;
     double sensitivity(const CameraView& view) const; // in angle, 0 for perfect view, 90 for collapsing
