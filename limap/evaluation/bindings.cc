@@ -68,7 +68,8 @@ void bind_evaluator(py::module& m) {
             py::arg("lines"),
             py::arg("threshold"),
             py::arg("n_samples") = 1000
-        );
+        )
+        .def("ComputeDistsforEachPoint", &PointCloudEvaluator::ComputeDistsforEachPoint);
 
     py::class_<MeshEvaluator>(m, "MeshEvaluator")
         .def(py::init<>())

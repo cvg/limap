@@ -68,7 +68,7 @@ public:
 
     bool isInitialized();
     std::vector<Eigen::Vector3d> all_points() { return cloud.pts; }
-    Eigen::Vector3d point(const int &id) { if (id >= cloud.pts.size()) {throw std::runtime_error("query id is out of range");} else {return cloud.pts[id];} }
+    Eigen::Vector3d point(const int &id) const { if (id >= cloud.pts.size()) {throw std::runtime_error("query id is out of range");} else {return cloud.pts[id];} }
 
     void initialize(const std::vector<Eigen::Vector3d>& points, bool build_index=true);
     void initialize(const Eigen::MatrixXd& points, bool build_index=true);

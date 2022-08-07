@@ -38,6 +38,21 @@ def report_error_to_GT(evaluator, lines):
         print("{0:.0f}mm, {1:.2f}, {2:.2f}, {3:.2f}, {4:.2f}, {5:.2f}".format(int(threshold * 1000), list_survived[idx], list_survived_ratio[idx], list_fracs_05[idx], list_fracs_02[idx], list_fracs_00[idx]))
     return evaluator
 
+def report_pc_recall_for_GT(evaluator, lines):
+    '''
+    To compute invert point recall
+    '''
+    thresholds = np.array([0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0])
+    point_dists = evaluator.ComputeDistsforEachPoint(lines)
+    n_points = len(point_dists)
+    print("Compute point recall metrics.")
+    for threshold in thresholds.tolist():
+        num_inliers = (np.array(point_dists) < threshold).sum()
+        point_recall = 100 * num_inliers / n_points
+        print("{0:.0f}mm, inliers = {1}, point recall = {2:.2f}".format(int(threshold * 1000), num_inliers, point_recall))
+    import pdb
+    pdb.set_trace()
+
 def read_ply(fname):
     from plyfile import PlyData, PlyElement
     plydata = PlyData.read(fname)
@@ -66,7 +81,9 @@ def report_error_to_point_cloud(points, lines, kdtree_dir=None):
         evaluator.Save('tmp/kdtree.bin')
     else:
         evaluator.Load(kdtree_dir)
-    return report_error_to_GT(evaluator, lines)
+    evaluator = report_pc_recall_for_GT(evaluator, lines)
+    evaluator = report_error_to_GT(evaluator, lines)
+    return evaluator
 
 def eval_tnt(cfg, lines, ref_lines=None):
     # eval w.r.t psuedo gt lines

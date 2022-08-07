@@ -22,6 +22,7 @@ public:
     InfiniteLine2d(const V2D& p_, const V2D& direc_): p(p_), direc(direc_) {};
     InfiniteLine2d(const Line2d& line);
     V2D point_projection(const V2D& p2d) const;
+    double point_distance(const V2D& p) const;
     V3D GetLineCoordinate() const; // get homogenous line coordinate
 
     V2D p;
@@ -36,6 +37,7 @@ public:
     InfiniteLine3d(const V3D& p_, const V3D& direc_): p(p_), direc(direc_) {};
     InfiniteLine3d(const Line3d& line);
     V3D point_projection(const V3D& p3d) const;
+    double point_distance(const V3D& p) const;
     InfiniteLine2d projection(const CameraView& view) const;
     V3D unprojection(const V2D& p2d, const CameraView& view) const;
 

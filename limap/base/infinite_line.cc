@@ -23,6 +23,10 @@ V2D InfiniteLine2d::point_projection(const V2D& p2d) const {
     return p + (p2d - p).dot(dir) * dir;
 }
 
+double InfiniteLine2d::point_distance(const V2D& p2d) const {
+    return (p2d - point_projection(p2d)).norm();
+}
+
 std::pair<V2D, bool> Intersect_InfiniteLine2d(const InfiniteLine2d& l1, const InfiniteLine2d& l2) {
     V3D coor1 = l1.GetLineCoordinate();
     V3D coor2 = l2.GetLineCoordinate();
@@ -47,12 +51,17 @@ V3D InfiniteLine3d::point_projection(const V3D& p3d) const {
     return p + (p3d - p).dot(dir) * dir;
 }
 
+double InfiniteLine3d::point_distance(const V3D& p) const {
+    return (p - point_projection(p)).norm();
+}
+
 InfiniteLine2d InfiniteLine3d::projection(const CameraView& view) const {
     InfiniteLine2d inf_line2d;
-    V2D p2d  = view.projection(p);
+    V2D p2d = view.projection(p);
     V2D p2d_prime = view.projection(p + direc * 1.0);
     inf_line2d.p = p2d;
     inf_line2d.direc = (p2d_prime - p2d).normalized();
+    return inf_line2d;
 }
 
 V3D InfiniteLine3d::unprojection(const V2D& p2d, const CameraView& view) const {
