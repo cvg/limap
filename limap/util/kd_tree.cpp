@@ -36,13 +36,13 @@ void KDTree::buildIndex() {
     std::cout<<"KD-tree initialized ("<<cloud.pts.size()<<" points)"<<std::endl;
 }
 
-Eigen::Vector3d KDTree::query_nearest(const Eigen::Vector3d& query_pt) {
+Eigen::Vector3d KDTree::query_nearest(const Eigen::Vector3d& query_pt) const {
     std::vector<int> indexes;
     query_knn(query_pt, indexes, 1);
     return point(indexes[0]);
 }
 
-void KDTree::query_knn(const Eigen::Vector3d& query_pt, std::vector<int>& nearestVerticesIdx, size_t num_results) {
+void KDTree::query_knn(const Eigen::Vector3d& query_pt, std::vector<int>& nearestVerticesIdx, size_t num_results) const {
     // ----------------------------------------------------------------
     // knnSearch():  Perform a search for the N closest points
     // ----------------------------------------------------------------
@@ -70,7 +70,7 @@ void KDTree::query_knn(const Eigen::Vector3d& query_pt, std::vector<int>& neares
     }
 }
 
-void KDTree::query_radius_search(const Eigen::Vector3d& query_pt, std::vector<int>& nearestVerticesIdx, double search_radius) {
+void KDTree::query_radius_search(const Eigen::Vector3d& query_pt, std::vector<int>& nearestVerticesIdx, double search_radius) const {
     // ----------------------------------------------------------------
     // radiusSearch(): Perform a search for the points within search_radius
     // ----------------------------------------------------------------
@@ -97,7 +97,7 @@ void KDTree::query_radius_search(const Eigen::Vector3d& query_pt, std::vector<in
     }
 }
 
-void KDTree::save(const std::string& filename) {
+void KDTree::save(const std::string& filename) const {
     std::ofstream f(filename, std::ofstream::binary);
     if (f.bad()) throw std::runtime_error("Error writing index file!");
     index->saveIndex(f);

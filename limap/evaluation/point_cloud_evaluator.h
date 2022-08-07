@@ -30,8 +30,9 @@ public:
     double ComputeDistPoint(const V3D& point) override;
 
     // inverse recall computed on the reference point cloud
-    // TODO: speed up needed!!
     std::vector<double> ComputeDistsforEachPoint(const std::vector<Line3d>& lines) const;
+    // approximation
+    std::vector<double> ComputeDistsforEachPoint_KDTree(const std::vector<Line3d>& lines) const;
 
 private:
     KDTree tree_;

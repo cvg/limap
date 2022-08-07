@@ -44,10 +44,12 @@ def report_pc_recall_for_GT(evaluator, lines):
     '''
     thresholds = np.array([0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0])
     point_dists = evaluator.ComputeDistsforEachPoint(lines)
-    n_points = len(point_dists)
+    # point_dists = evaluator.ComputeDistsforEachPoint_KDTree(lines)
+    point_dists = np.array(point_dists)
+    n_points = point_dists.shape[0]
     print("Compute point recall metrics.")
     for threshold in thresholds.tolist():
-        num_inliers = (np.array(point_dists) < threshold).sum()
+        num_inliers = (point_dists < threshold).sum()
         point_recall = 100 * num_inliers / n_points
         print("{0:.0f}mm, inliers = {1}, point recall = {2:.2f}".format(int(threshold * 1000), num_inliers, point_recall))
     import pdb

@@ -73,11 +73,11 @@ public:
     void initialize(const std::vector<Eigen::Vector3d>& points, bool build_index=true);
     void initialize(const Eigen::MatrixXd& points, bool build_index=true);
     void buildIndex();
-    Eigen::Vector3d query_nearest(const Eigen::Vector3d& query_pt);
-    void query_knn(const Eigen::Vector3d& query_pt, std::vector<int>& nearestVerticesIdx, size_t num_results=5);
-    void query_radius_search(const Eigen::Vector3d& query_pt, std::vector<int>& nearestVerticesIdx, double search_radius=0.62);
+    Eigen::Vector3d query_nearest(const Eigen::Vector3d& query_pt) const;
+    void query_knn(const Eigen::Vector3d& query_pt, std::vector<int>& nearestVerticesIdx, size_t num_results=5) const;
+    void query_radius_search(const Eigen::Vector3d& query_pt, std::vector<int>& nearestVerticesIdx, double search_radius=0.62) const;
 
-    void save(const std::string& filename);
+    void save(const std::string& filename) const;
     void load(const std::string& filename);
 };
 
