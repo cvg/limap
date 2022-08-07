@@ -2,17 +2,15 @@ import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 from tqdm import tqdm
-import core.utils as utils
-import core.visualize as vis
-from core.dataset import Hypersim
 
 import limap.base as _base
 import limap.evaluation as _eval
+import limap.util.config as cfgutils
+import limap.util.io as limapio
+import limap.visualize as limapvis
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-
-from eval_hypersim import read_lines_from_input
 
 def plot_curve(fname, thresholds, data):
     plt.plot(thresholds, data)
@@ -82,7 +80,7 @@ def eval_tnt(cfg, lines, ref_lines=None):
         if cfg["use_ranges"]:
             n_lines = len(lines)
             ranges = [points.min(0) - 0.1, points.max(0) + 0.1]
-            lines = [line for line in lines if vis.test_line_inside_ranges(line.as_array(), ranges)]
+            lines = [line for line in lines if limapvis.test_line_inside_ranges(line, ranges)]
             print("Filtering by range: {0} / {1}".format(len(lines), n_lines))
         evaluator = report_error_to_point_cloud(points, lines, kdtree_dir=cfg["kdtree_dir"])
     else:
@@ -92,10 +90,10 @@ def eval_tnt(cfg, lines, ref_lines=None):
         for threshold in tqdm(thresholds.tolist()):
             inlier_lines = evaluator.ComputeInlierSegs(lines, threshold)
             inlier_lines_np = np.array([line.as_array() for line in inlier_lines])
-            vis.save_obj("tmp/inliers_th_{0:.4f}.obj".format(threshold), inlier_lines_np)
+            limapio.save_obj("tmp/inliers_th_{0:.4f}.obj".format(threshold), inlier_lines_np)
             outlier_lines = evaluator.ComputeOutlierSegs(lines, threshold)
             outlier_lines_np = np.array([line.as_array() for line in outlier_lines])
-            vis.save_obj("tmp/outliers_th_{0:.4f}.obj".format(threshold), outlier_lines_np)
+            limapio.save_obj("tmp/outliers_th_{0:.4f}.obj".format(threshold), outlier_lines_np)
 
 def parse_config():
     import argparse
@@ -112,10 +110,10 @@ def parse_config():
     arg_parser.add_argument('--use_ranges', action='store_true', help='use ranges for testing')
 
     args, unknown = arg_parser.parse_known_args()
-    cfg = utils.load_config(args.config_file, default_path=args.default_config_file)
+    cfg = cfgutils.load_config(args.config_file, default_path=args.default_config_file)
     shortcuts = dict()
     shortcuts['-nv'] = '--n_visible_views'
-    cfg = utils.update_config(cfg, unknown, shortcuts)
+    cfg = cfgutils.update_config(cfg, unknown, shortcuts)
     cfg["input_dir"] =  args.input_dir
     cfg["reference_dir"] = args.reference_dir
     cfg["mesh_dir"] = args.mesh_dir
@@ -152,10 +150,14 @@ def main():
     init_workspace()
 
     # read lines
-    lines, linetracks, mergemat = read_lines_from_input(cfg["input_dir"], n_visible_views=cfg["n_visible_views"])
+    lines, linetracks = limapio.read_lines_from_input(cfg["input_dir"])
+    if linetracks is not None:
+        lines = [track.line for track in linetracks if track.count_images() >= cfg["n_visible_views"]]
+        linetracks = [track for track in linetracks if track.count_images() >= cfg["n_visible_views"]]
+
     if cfg["transform_txt"]:
         lines = transform_lines(cfg["transform_txt"], lines)
-        vis.save_obj('tmp/lines_transform.obj', lines)
+        limapio.save_obj('tmp/lines_transform.obj', lines)
     if cfg["noeval"]:
         return
     ref_lines = None

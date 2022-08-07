@@ -3,7 +3,8 @@ import numpy as np
 import pdb
 
 MAX_ERROR = 0.01
-colmap_output_path = os.path.expanduser('~/data/TanksTemple/colmap/train')
+colmap_output_path = os.path.expanduser('~/data/TanksTemples/colmap/training')
+input_meta_path = os.path.expanduser('~/data/TanksTemples/meta_train')
 
 def get_imname_list(scene_id):
     image_path = os.path.join(colmap_output_path, scene_id, 'dense/images')
@@ -51,16 +52,16 @@ def write_geoinfo_txt(fname, imname_list, positions):
             f.write('{0} {1} {2} {3}\n'.format(imname, pos[0], pos[1], pos[2]))
 
 def main():
-    scene_id_list = os.listdir('meta_train')
+    scene_id_list = os.listdir(input_meta_path)
     for scene_id in scene_id_list:
         # get geo txt
         imname_list = get_imname_list(scene_id)
-        log_file = os.path.join('meta_train', scene_id, '{0}_COLMAP_SfM.log'.format(scene_id))
+        log_file = os.path.join(input_meta_path, scene_id, '{0}_COLMAP_SfM.log'.format(scene_id))
         positions = read_positions(log_file)
-        trans_file = os.path.join('meta_train', scene_id, '{0}_trans.txt'.format(scene_id))
+        trans_file = os.path.join(input_meta_path, scene_id, '{0}_trans.txt'.format(scene_id))
         trans_mat = read_trans(trans_file)
         new_positions = [trans_mat[:3, :3] @ k + trans_mat[:3, 3] for k in positions]
-        output_fname = os.path.join('meta_train', scene_id, 'geo_positions.txt')
+        output_fname = os.path.join(input_meta_path, scene_id, 'geo_positions.txt')
         write_geoinfo_txt(output_fname, imname_list, new_positions)
 
         # colmap align
@@ -68,7 +69,7 @@ def main():
         basepath = os.path.join(colmap_output_path, scene_id, 'dense')
         cmd = 'mkdir -p {0}'.format(os.path.join(basepath, 'aligned'))
         cmd_list.append(cmd)
-        cmd = 'colmap model_aligner --input_path {0} --output_path {1} --ref_images_path {2} --robust_alignment 1 --robust_alignment_max_error {3} --transform_path {4}'.format(os.path.join(basepath, 'sparse'), os.path.join(basepath, 'aligned'), os.path.join('meta_train', scene_id, 'geo_positions.txt'), MAX_ERROR, os.path.join(basepath, 'transform.txt'))
+        cmd = 'colmap model_aligner --input_path {0} --output_path {1} --ref_images_path {2} --robust_alignment 1 --robust_alignment_max_error {3} --transform_path {4} --ref_is_gps false'.format(os.path.join(basepath, 'sparse'), os.path.join(basepath, 'aligned'), os.path.join(input_meta_path, scene_id, 'geo_positions.txt'), MAX_ERROR, os.path.join(basepath, 'transform.txt'))
         cmd_list.append(cmd)
         cmd = 'colmap model_converter --input_path {0} --output_path {1} --output_type PLY'.format(os.path.join(basepath, 'aligned'), os.path.join(basepath, 'aligned/points.ply'))
         cmd_list.append(cmd)
