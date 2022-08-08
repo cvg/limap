@@ -35,6 +35,7 @@ void bind_triangulator(py::module &m) {
         .def(py::init<py::dict>())
         .def_readwrite("add_halfpix", &TriangulatorConfig::add_halfpix)
         .def_readwrite("use_vp", &TriangulatorConfig::use_vp)
+        .def_readwrite("min_length_2d", &TriangulatorConfig::min_length_2d)
         .def_readwrite("var2d", &TriangulatorConfig::var2d)
         .def_readwrite("plane_angle_threshold", &TriangulatorConfig::plane_angle_threshold)
         .def_readwrite("IoU_threshold", &TriangulatorConfig::IoU_threshold)

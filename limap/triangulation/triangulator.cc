@@ -231,7 +231,7 @@ void Triangulator::triangulateOneNode(const int img_id, const int line_id) {
     THROW_CHECK_EQ(imagecols_.exist_image(img_id), true);
     auto& connections = edges_[img_id][line_id];
     const Line2d& l1 = all_lines_2d_[img_id][line_id];
-    if (l1.length() < config_.min_length_2d)
+    if (l1.length() <= config_.min_length_2d)
         return;
     const CameraView& view1 = imagecols_.camview(img_id);
     size_t n_conns = connections.size();
@@ -242,7 +242,7 @@ void Triangulator::triangulateOneNode(const int img_id, const int line_id) {
         int ng_img_id = connections[conn_id].first;
         int ng_line_id = connections[conn_id].second;
         const Line2d& l2 = all_lines_2d_[ng_img_id][ng_line_id];
-        if (l2.length() < config_.min_length_2d)
+        if (l2.length() <= config_.min_length_2d)
             continue;
         const CameraView& view2 = imagecols_.camview(ng_img_id);
 
