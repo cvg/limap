@@ -1,11 +1,10 @@
-import os, sys
-import shutil
-import copy
-import random
+import os
 import cv2
-import math
 import numpy as np
-from tqdm import tqdm
+import matplotlib
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 
 def random_color():
     r = int(255 * np.random.rand())
@@ -13,12 +12,14 @@ def random_color():
     b = 255 - r
     return b, g, r
 
+
 def draw_points(image, points, color=None, thickness=1):
     for p in points:
         c = random_color() if color is None else color
         pos_x, pos_y = int(round(p[0])), int(round(p[1]))
         cv2.circle(image, (pos_x, pos_y), thickness * 2, c, -1)
     return image
+
 
 def draw_segments(image, segments, color=None, thickness=1, endpoints=True):
     for s in segments:
@@ -30,6 +31,7 @@ def draw_segments(image, segments, color=None, thickness=1, endpoints=True):
             cv2.circle(image, p1, thickness * 2, c, -1)
             cv2.circle(image, p2, thickness * 2, c, -1)
     return image
+
 
 def draw_salient_segments(image, segments, saliency, color1=(0, 255, 0), color2=(0, 0, 255), thickness=1,
                           endpoints=True):
@@ -48,6 +50,7 @@ def draw_salient_segments(image, segments, saliency, color1=(0, 255, 0), color2=
             cv2.circle(image, p2, thickness * 2, c, -1)
     return image
 
+
 def draw_multiscale_segments(img, segs, color=None, endpoints=True, thickness=2):
     for s in segs:
         mycolor = random_color() if color is None else color
@@ -58,6 +61,7 @@ def draw_multiscale_segments(img, segs, color=None, endpoints=True, thickness=2)
             cv2.circle(img, (int(l[0]), int(l[1])), int(thickness * 1.5), mycolor, -1)
             cv2.circle(img, (int(l[2]), int(l[3])), int(thickness * 1.5), mycolor, -1)
     return img
+
 
 def draw_multiscale_matches(img_left, img_right, segs_left, segs_right, matches):
     assert img_left.ndim == 2
@@ -99,6 +103,7 @@ def draw_multiscale_matches(img_left, img_right, segs_left, segs_right, matches)
     result_img = cv2.addWeighted(result_img, 0.5, result_img_tmp, 0.5, 0.0)
     return result_img
 
+
 def draw_singlescale_matches(img_left, img_right, matched_segs, mask=None):
     assert img_left.ndim == 2
     h, w = img_left.shape
@@ -137,6 +142,7 @@ def draw_singlescale_matches(img_left, img_right, matched_segs, mask=None):
     result_img = cv2.addWeighted(result_img, 0.5, result_img_tmp, 0.5, 0.0)
     return result_img
 
+
 def crop_to_patch(img, center, patch_size=50):
     img_h, img_w = img.shape[0], img.shape[1]
     if img_h < patch_size or img_w < patch_size:
@@ -167,6 +173,7 @@ def crop_to_patch(img, center, patch_size=50):
     else:
         raise NotImplementedError
 
+
 def cat_to_bigimage(imgs, shape, pad=20):
     '''
     make a big image with 2d image collections
@@ -190,6 +197,7 @@ def cat_to_bigimage(imgs, shape, pad=20):
             bigimg[row_start:row_end, col_start:col_end,:] = img
     return bigimg
 
+
 def make_bigimage(imgs, pad=20):
     n_images = len(imgs)
     if n_images <= 5:
@@ -210,11 +218,13 @@ def make_bigimage(imgs, pad=20):
     imgs_collections.append(imgs_now)
     return cat_to_bigimage(imgs_collections, (n_rows, n_cols), pad=pad)
 
+
 def test_point_inside_ranges(point, ranges):
     point = np.array(point)
     if ~np.all(point > ranges[0]) or ~np.all(point < ranges[1]):
         return False
     return True
+
 
 def test_line_inside_ranges(line, ranges):
     if not test_point_inside_ranges(line.start, ranges):
@@ -223,6 +233,7 @@ def test_line_inside_ranges(line, ranges):
         return False
     return True
 
+
 def filter_ranges(lines_np, counts_np, ranges):
     new_lines_np, new_counts_np = [], []
     for idx in range(lines_np.shape[0]):
@@ -230,6 +241,7 @@ def filter_ranges(lines_np, counts_np, ranges):
             new_lines_np.append(lines_np[idx])
             new_counts_np.append(counts_np[idx])
     return np.array(new_lines_np), np.array(new_counts_np)
+
 
 def report_dist_reprojection(line3d, line2d, camview, prefix=None):
     import limap.base as _base
@@ -243,10 +255,12 @@ def report_dist_reprojection(line3d, line2d, camview, prefix=None):
     else:
         print("{4}: angle = {0:.4f}, perp = {1:.4f}, overlap = {2:.4f}, sensi = {3:.4f}".format(angle, perp_dist, overlap, sensitivity, prefix))
 
+
 def visualize_2d_line(fname, imagecols, all_lines_2d, img_id, line_id):
     img = imagecols.read_image(img_id)
     img = draw_segments(img, [all_lines_2d[img_id][line_id].as_array().reshape(-1)], (0, 255, 0))
     cv2.imwrite(fname, img)
+
 
 def visualize_line_track(imagecols, linetrack, prefix='linetrack', report=False):
     print("[VISUALIZE]: line length: {0}, num_supporting_lines: {1}".format(linetrack.line.length(), len(linetrack.image_id_list)))
@@ -260,6 +274,7 @@ def visualize_line_track(imagecols, linetrack, prefix='linetrack', report=False)
         img = draw_segments(img, [line2d.as_array().reshape(-1)], (0, 0, 255), thickness=1)
         fname = os.path.join('tmp', '{0}.{1}.{2}.png'.format(prefix, idx, os.path.basename(imagecols.camimage(img_id).image_name())[:-4]))
         cv2.imwrite(fname, img)
+
 
 def vis_vpresult(img, lines, vpres, show_original=False):
     import seaborn as sns
@@ -278,6 +293,7 @@ def vis_vpresult(img, lines, vpres, show_original=False):
             c = colors[vpres.labels[line_id]]
         cv2.line(img, (int(line.start[0]), int(line.start[1])), (int(line.end[0]), int(line.end[1])), c, 2)
     return img
+
 
 def features_to_RGB(*Fs, skip=1):
     """Copied from pixloc repo. [LINK] https://github.com/cvg/pixloc/blob/master/pixloc/visualization/viz_2d.py"""
@@ -312,3 +328,199 @@ def features_to_RGB(*Fs, skip=1):
     assert flatten.shape[0] == 0
     return Fs
 
+
+def plot_images(imgs, titles=None, cmaps='gray', dpi=100, size=6, pad=.5):
+    """Plot a set of images horizontally.
+    Args:
+        imgs: a list of NumPy or PyTorch images, RGB (H, W, 3) or mono (H, W).
+        titles: a list of strings, as titles for each image.
+        cmaps: colormaps for monochrome images.
+    """
+    n = len(imgs)
+    if not isinstance(cmaps, (list, tuple)):
+        cmaps = [cmaps] * n
+    figsize = (size*n, size*3/4) if size is not None else None
+    fig, ax = plt.subplots(1, n, figsize=figsize, dpi=dpi)
+    if n == 1:
+        ax = [ax]
+    for i in range(n):
+        ax[i].imshow(imgs[i], cmap=plt.get_cmap(cmaps[i]))
+        ax[i].get_yaxis().set_ticks([])
+        ax[i].get_xaxis().set_ticks([])
+        ax[i].set_axis_off()
+        for spine in ax[i].spines.values():  # remove frame
+            spine.set_visible(False)
+        if titles:
+            ax[i].set_title(titles[i])
+    fig.tight_layout(pad=pad)
+
+
+def plot_keypoints(kpts, colors='lime', ps=2):
+    """Plot keypoints for existing images.
+    Args:
+        kpts: list of ndarrays of size (N, 2).
+        colors: string, or list of list of tuples (one for each keypoints).
+        ps: size of the keypoints as float.
+    """
+    if not isinstance(colors, list):
+        colors = [colors] * len(kpts)
+    axes = plt.gcf().axes
+    for a, k, c in zip(axes, kpts, colors):
+        a.scatter(k[:, 0], k[:, 1], c=c, s=ps)
+
+
+def plot_matches(kpts0, kpts1, color=None, lw=1.5, ps=4, indices=(0, 1)):
+    """Plot matches for a pair of existing images.
+    Args:
+        kpts0, kpts1: corresponding keypoints of size (N, 2).
+        color: color of each match, string or RGB tuple. Random if not given.
+        lw: width of the lines.
+        ps: size of the end points (no endpoint if ps=0)
+        indices: indices of the images to draw the matches on.
+    """
+    fig = plt.gcf()
+    ax = fig.axes
+    assert len(ax) > max(indices)
+    ax0, ax1 = ax[indices[0]], ax[indices[1]]
+    fig.canvas.draw()
+
+    assert len(kpts0) == len(kpts1)
+    if color is None:
+        color = matplotlib.cm.hsv(np.random.rand(len(kpts0))).tolist()
+    elif not isinstance(color[0], (tuple, list)):
+        color = [color] * len(kpts0)
+
+    # transform the points into the figure coordinate system
+    transFigure = fig.transFigure.inverted()
+    fkpts0 = transFigure.transform(ax0.transData.transform(kpts0))
+    fkpts1 = transFigure.transform(ax1.transData.transform(kpts1))
+    fig.lines += [matplotlib.lines.Line2D(
+        (fkpts0[i, 0], fkpts1[i, 0]), (fkpts0[i, 1], fkpts1[i, 1]), zorder=1,
+        transform=fig.transFigure, c=color[i], linewidth=lw)
+        for i in range(len(kpts0))]
+
+    # freeze the axes to prevent the transform to change
+    ax0.autoscale(enable=False)
+    ax1.autoscale(enable=False)
+
+    if ps > 0:
+        ax0.scatter(kpts0[:, 0], kpts0[:, 1], c=color, s=ps)
+        ax1.scatter(kpts1[:, 0], kpts1[:, 1], c=color, s=ps)
+        
+        
+def plot_lines(lines, line_colors='orange', point_color='cyan',
+               ps=4, lw=2, indices=(0, 1), alpha=1):
+    """ Plot lines and endpoints for existing images.
+    Args:
+        lines: list of ndarrays of size (N, 2, 2).
+        line_colors: string, or list of list of tuples (one for per line).
+        point_color: unique color for all endpoints.
+        ps: size of the keypoints as float pixels.
+        lw: line width as float pixels.
+        indices: indices of the images to draw the matches on.
+        alpha: alpha transparency.
+    """
+    if not isinstance(line_colors, list):
+        line_colors = [[line_colors] * len(l) for l in lines]
+    for i in range(len(lines)):
+        if ((not isinstance(line_colors[i], list))
+            and (not isinstance(line_colors[i], np.ndarray))):
+            line_colors[i] = [line_colors[i]] * len(lines[i])
+
+    fig = plt.gcf()
+    ax = fig.axes
+    assert len(ax) > max(indices)
+    axes = [ax[i] for i in indices]
+    fig.canvas.draw()
+
+    # Plot the lines and junctions
+    for a, l, lc in zip(axes, lines, line_colors):
+        for i in range(len(l)):
+            line = matplotlib.lines.Line2D(
+                (l[i, 0, 0], l[i, 1, 0]), (l[i, 0, 1], l[i, 1, 1]),
+                zorder=1, c=lc[i], linewidth=lw, alpha=alpha)
+            a.add_line(line)
+        pts = l.reshape(-1, 2)
+        a.scatter(pts[:, 0], pts[:, 1], c=point_color, s=ps,
+                  linewidths=0, zorder=2, alpha=alpha)
+
+
+def plot_color_line_matches(lines, correct_matches=None,
+                            lw=2, indices=(0, 1)):
+    """Plot line matches for existing images with multiple colors.
+    Args:
+        lines: list of ndarrays of size (N, 2, 2).
+        correct_matches: bool array of size (N,) indicating correct matches.
+        lw: line width as float pixels.
+        indices: indices of the images to draw the matches on.
+    """
+    n_lines = len(lines[0])
+    colors = sns.color_palette('husl', n_colors=n_lines)
+    np.random.shuffle(colors)
+    alphas = np.ones(n_lines)
+    # If correct_matches is not None, display wrong matches with a low alpha
+    if correct_matches is not None:
+        alphas[~np.array(correct_matches)] = 0.2
+
+    fig = plt.gcf()
+    ax = fig.axes
+    assert len(ax) > max(indices)
+    axes = [ax[i] for i in indices]
+    fig.canvas.draw()
+
+    # Plot the lines
+    for a, l in zip(axes, lines):
+        # Transform the points into the figure coordinate system
+        transFigure = fig.transFigure.inverted()
+        endpoint0 = transFigure.transform(a.transData.transform(l[:, 0]))
+        endpoint1 = transFigure.transform(a.transData.transform(l[:, 1]))
+        fig.lines += [matplotlib.lines.Line2D(
+            (endpoint0[i, 0], endpoint1[i, 0]),
+            (endpoint0[i, 1], endpoint1[i, 1]),
+            zorder=1, transform=fig.transFigure, c=colors[i],
+            alpha=alphas[i], linewidth=lw) for i in range(n_lines)]
+
+
+def plot_color_lines(lines, correct_matches, wrong_matches,
+                     lw=2, indices=(0, 1)):
+    """Plot line matches for existing images with multiple colors:
+    green for correct matches, red for wrong ones, and blue for the rest.
+    Args:
+        lines: list of ndarrays of size (N, 2, 2).
+        correct_matches: list of bool arrays of size N with correct matches.
+        wrong_matches: list of bool arrays of size (N,) with correct matches.
+        lw: line width as float pixels.
+        indices: indices of the images to draw the matches on.
+    """
+    # palette = sns.color_palette()
+    palette = sns.color_palette("hls", 8)
+    blue = palette[5]  # palette[0]
+    red = palette[0]  # palette[3]
+    green = palette[2]  # palette[2]
+    colors = [np.array([blue] * len(l)) for l in lines]
+    for i, c in enumerate(colors):
+        c[np.array(correct_matches[i])] = green
+        c[np.array(wrong_matches[i])] = red
+
+    fig = plt.gcf()
+    ax = fig.axes
+    assert len(ax) > max(indices)
+    axes = [ax[i] for i in indices]
+    fig.canvas.draw()
+
+    # Plot the lines
+    for a, l, c in zip(axes, lines, colors):
+        # Transform the points into the figure coordinate system
+        transFigure = fig.transFigure.inverted()
+        endpoint0 = transFigure.transform(a.transData.transform(l[:, 0]))
+        endpoint1 = transFigure.transform(a.transData.transform(l[:, 1]))
+        fig.lines += [matplotlib.lines.Line2D(
+            (endpoint0[i, 0], endpoint1[i, 0]),
+            (endpoint0[i, 1], endpoint1[i, 1]),
+            zorder=1, transform=fig.transFigure, c=c[i],
+            linewidth=lw) for i in range(len(l))]
+
+
+def save_plot(path, **kw):
+    """Save the current figure without any white margin."""
+    plt.savefig(path, bbox_inches='tight', pad_inches=0)

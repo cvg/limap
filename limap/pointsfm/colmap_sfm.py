@@ -41,11 +41,11 @@ def run_hloc_matches(cfg, image_path, db_path, keypoints=None):
 
     sfm_dir.mkdir(parents=True, exist_ok=True)
     reconstruction.create_empty_db(db_path)
-    reconstruction.import_images("colmap", sfm_dir, image_path, db_path, False)
+    reconstruction.import_images(image_dir=image_path, database_path=db_path)
     image_ids = reconstruction.get_image_ids(db_path)
     reconstruction.import_features(image_ids, db_path, feature_path)
     reconstruction.import_matches(image_ids, db_path, sfm_pairs, match_path, None, None)
-    triangulation.geometric_verification("colmap", db_path, sfm_pairs)
+    triangulation.estimation_and_geometric_verification(db_path, sfm_pairs)
 
 def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap', keypoints=None, use_cuda=False, skip_exists=False, map_to_original_image_names=False):
     ### set up path
@@ -82,7 +82,7 @@ def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap'
         run_colmap_sift_matches(image_path, db_path, use_cuda=use_cuda)
     elif cfg["fbase"] == "hloc":
         assert (use_cuda == True)
-        run_hloc_matches(cfg["hloc"], image_path, db_path, keypoints=keypoints_in_order)
+        run_hloc_matches(cfg["hloc"], image_path, Path(db_path), keypoints=keypoints_in_order)
 
     ### write cameras.txt
     colmap_cameras = {}

@@ -36,6 +36,14 @@ def read_npy(fname):
         nparray = np.load(f, allow_pickle=True)
     return nparray
 
+def save_npz(fname, dic):
+    check_directory(fname)
+    np.savez(fname, **dic)
+
+def read_npz(fname):
+    check_path(fname)
+    return np.load(fname, allow_pickle=True)
+
 def save_ply(fname, points):
     from plyfile import PlyData, PlyElement
     points = np.array(points)
