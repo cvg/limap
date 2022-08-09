@@ -8,7 +8,7 @@ import limap.evaluation as _eval
 import limap.util.config as cfgutils
 import limap.util.io as limapio
 import limap.visualize as limapvis
-from runners.hypersim import Hypersim
+from runners.hypersim.Hypersim import Hypersim
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt

@@ -52,8 +52,7 @@ def report_pc_recall_for_GT(evaluator, lines):
         num_inliers = (point_dists < threshold).sum()
         point_recall = 100 * num_inliers / n_points
         print("{0:.0f}mm, inliers = {1}, point recall = {2:.2f}".format(int(threshold * 1000), num_inliers, point_recall))
-    import pdb
-    pdb.set_trace()
+    return evaluator
 
 def read_ply(fname):
     from plyfile import PlyData, PlyElement
@@ -83,7 +82,7 @@ def report_error_to_point_cloud(points, lines, kdtree_dir=None):
         evaluator.Save('tmp/kdtree.bin')
     else:
         evaluator.Load(kdtree_dir)
-    evaluator = report_pc_recall_for_GT(evaluator, lines)
+    # evaluator = report_pc_recall_for_GT(evaluator, lines)
     evaluator = report_error_to_GT(evaluator, lines)
     return evaluator
 
