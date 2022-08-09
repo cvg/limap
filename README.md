@@ -15,7 +15,7 @@ python -m pip install -r requirements.txt
 cd third-party/Hierarchical-Localization && python -m pip install -e . && cd ../..
 ```
 
-Pretrained models for [SOLD2](https://github.com/cvg/SOLD2), [S2DNet](https://github.com/germain-hug/S2DNet-Minimal) and [SuperPoint](https://github.com/magicleap/SuperGluePretrainedNetwork) need to be downloaded:
+Pretrained models for [SOLD2](https://github.com/cvg/SOLD2), [S2DNet](https://github.com/germain-hug/S2DNet-Minimal), [SuperPoint](https://github.com/magicleap/SuperGluePretrainedNetwork) and [SuperGlue](https://github.com/magicleap/SuperGluePretrainedNetwork) need to be downloaded:
 ```
 bash download_pretrained_models.sh
 ```
