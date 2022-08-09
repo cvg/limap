@@ -44,11 +44,11 @@ line2d:
         method: "lsd" # ["lsd", "sold2"]
         skip_exists: False
     extractor: 
-        method: "sold2"
+        method: "sold2" # ["sold2", "superglue_endpoints"]
         skip_exists: False
     matcher:
-        method: "sold2"
-        weights: "outdoor"
+        method: "sold2" # ["sold2", "superglue_endpoints"]
+        weights: "outdoor" # ["indoor", "outdoor"] for selecting superglue models
         n_jobs: 1
         topk: 10
         skip_exists: False
