@@ -45,9 +45,13 @@ class EndpointsExtractor(BaseDetector):
         """ A desc_info is composed of the following tuple / np arrays:
             - the original image shape (h, w)
             - the 2D endpoints of the lines in shape [N*2, 2] (xy convention)
+            - the line score of shape [N] (NFA * sqrt(line_length))
             - the descriptor of each endpoints of shape [256, N*2]
         """
         lines = segs[:, :4].reshape(-1, 2)
+        scores = segs[:, -1] * np.sqrt(np.linalg.norm(segs[:, :2]
+                                                      - segs[:, 2:4], axis=1))
+        scores /= np.amax(scores) + 1e-8
         torch_img = {'image': torch.tensor(img.astype(np.float32) / 255,
                                            dtype=torch.float,
                                            device=self.device)[None, None]}
@@ -57,7 +61,7 @@ class EndpointsExtractor(BaseDetector):
             endpoint_descs = self.sp.sample_descriptors(
                 torch_img, torch_endpoints)['descriptors'][0].cpu().numpy()
         return {'image_shape': img.shape, 'lines': lines,
-                'endpoints_desc': endpoint_descs}
+                'lines_score': scores, 'endpoints_desc': endpoint_descs}
 
 
 class SuperGlueEndpointsMatcher(BaseMatcher):
@@ -89,11 +93,11 @@ class SuperGlueEndpointsMatcher(BaseMatcher):
             'keypoints1': torch.tensor(
                 descinfo2['lines'][None], dtype=torch.float,
                 device=self.device),
-            'scores0': torch.ones(
-                1, len(descinfo1['lines']), dtype=torch.float,
+            'scores0': torch.tensor(
+                descinfo1['lines_score'].repeat(2)[None], dtype=torch.float,
                 device=self.device),
-            'scores1': torch.ones(
-                1, len(descinfo2['lines']), dtype=torch.float,
+            'scores1': torch.tensor(
+                descinfo2['lines_score'].repeat(2)[None], dtype=torch.float,
                 device=self.device),
             'descriptors0': torch.tensor(
                 descinfo1['endpoints_desc'][None], dtype=torch.float,
@@ -136,11 +140,11 @@ class SuperGlueEndpointsMatcher(BaseMatcher):
             'keypoints1': torch.tensor(
                 descinfo2['lines'][None], dtype=torch.float,
                 device=self.device),
-            'scores0': torch.ones(
-                1, len(descinfo1['lines']), dtype=torch.float,
+            'scores0': torch.tensor(
+                descinfo1['lines_score'].repeat(2)[None], dtype=torch.float,
                 device=self.device),
-            'scores1': torch.ones(
-                1, len(descinfo2['lines']), dtype=torch.float,
+            'scores1': torch.tensor(
+                descinfo2['lines_score'].repeat(2)[None], dtype=torch.float,
                 device=self.device),
             'descriptors0': torch.tensor(
                 descinfo1['endpoints_desc'][None], dtype=torch.float,
