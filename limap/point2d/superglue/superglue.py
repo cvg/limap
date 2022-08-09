@@ -236,12 +236,16 @@ class SuperGlue(nn.Module):
         m0, m1, mscores0, mscores1 = self._get_matches(scores)
 
         return {
-            'matches0': m0, # use -1 for invalid match
-            'matches1': m1, # use -1 for invalid match
+            'matches0': m0,  # use -1 for invalid match
+            'matches1': m1,  # use -1 for invalid match
             'matching_scores0': mscores0,
             'matching_scores1': mscores1,
             'scores': raw_scores,
         }
+
+    def _solve_optimal_transport(self, scores):
+        return self.log_optimal_transport(
+            scores, self.bin_score, iters=self.config['sinkhorn_iterations'])
 
     def log_sinkhorn_iterations(self, Z: torch.Tensor, log_mu: torch.Tensor, log_nu: torch.Tensor, iters: int) -> torch.Tensor:
         """ Perform Sinkhorn Normalization in Log-space for stability"""
@@ -250,7 +254,6 @@ class SuperGlue(nn.Module):
             u = log_mu - torch.logsumexp(Z + v.unsqueeze(1), dim=2)
             v = log_nu - torch.logsumexp(Z + u.unsqueeze(2), dim=1)
         return Z + u.unsqueeze(2) + v.unsqueeze(1)
-
 
     def log_optimal_transport(self, scores: torch.Tensor, alpha: torch.Tensor, iters: int) -> torch.Tensor:
         """ Perform Differentiable Optimal Transport in Log-space for stability"""

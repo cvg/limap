@@ -45,11 +45,9 @@ class EndpointsExtractor(BaseDetector):
         """ A desc_info is composed of the following tuple / np arrays:
             - the original image shape (h, w)
             - the 2D endpoints of the lines in shape [N*2, 2] (xy convention)
-            - the line score of shape [N]
             - the descriptor of each endpoints of shape [256, N*2]
         """
         lines = segs[:, :4].reshape(-1, 2)
-        scores = segs[:, -1]
         torch_img = {'image': torch.tensor(img.astype(np.float32) / 255,
                                            dtype=torch.float,
                                            device=self.device)[None, None]}
@@ -59,7 +57,7 @@ class EndpointsExtractor(BaseDetector):
             endpoint_descs = self.sp.sample_descriptors(
                 torch_img, torch_endpoints)['descriptors'][0].cpu().numpy()
         return {'image_shape': img.shape, 'lines': lines,
-                'lines_score': scores, 'endpoints_desc': endpoint_descs}
+                'endpoints_desc': endpoint_descs}
 
 
 class SuperGlueEndpointsMatcher(BaseMatcher):
@@ -91,11 +89,11 @@ class SuperGlueEndpointsMatcher(BaseMatcher):
             'keypoints1': torch.tensor(
                 descinfo2['lines'][None], dtype=torch.float,
                 device=self.device),
-            'scores0': torch.tensor(
-                descinfo1['lines_score'].repeat(2)[None], dtype=torch.float,
+            'scores0': torch.ones(
+                1, len(descinfo1['lines']), dtype=torch.float,
                 device=self.device),
-            'scores1': torch.tensor(
-                descinfo2['lines_score'].repeat(2)[None], dtype=torch.float,
+            'scores1': torch.ones(
+                1, len(descinfo2['lines']), dtype=torch.float,
                 device=self.device),
             'descriptors0': torch.tensor(
                 descinfo1['endpoints_desc'][None], dtype=torch.float,
@@ -112,13 +110,13 @@ class SuperGlueEndpointsMatcher(BaseMatcher):
             # Retrieve the best matching score of the line endpoints
             n_lines1 = len(descinfo1['lines']) // 2
             n_lines2 = len(descinfo2['lines']) // 2
-            scores = out['scores'].reshape(nlines1, 2, nlines2, 2)
+            scores = out['scores'].reshape(n_lines1, 2, n_lines2, 2)
             scores = 0.5 * torch.maximum(
                 scores[:, 0, :, 0] + scores[:, 1, :, 1],
                 scores[:, 0, :, 1] + scores[:, 1, :, 0])
             
             # Run the Sinkhorn algorithm and get the line matches
-            scores = self.sg._solve_optimal_transport(scores)
+            scores = self.sg._solve_optimal_transport(scores[None])
             matches = self.sg._get_matches(scores)[0].cpu().numpy()[0]
             
         # Transform matches to [n_matches, 2]
@@ -138,11 +136,11 @@ class SuperGlueEndpointsMatcher(BaseMatcher):
             'keypoints1': torch.tensor(
                 descinfo2['lines'][None], dtype=torch.float,
                 device=self.device),
-            'scores0': torch.tensor(
-                descinfo1['lines_score'].repeat(2)[None], dtype=torch.float,
+            'scores0': torch.ones(
+                1, len(descinfo1['lines']), dtype=torch.float,
                 device=self.device),
-            'scores1': torch.tensor(
-                descinfo2['lines_score'].repeat(2)[None], dtype=torch.float,
+            'scores1': torch.ones(
+                1, len(descinfo2['lines']), dtype=torch.float,
                 device=self.device),
             'descriptors0': torch.tensor(
                 descinfo1['endpoints_desc'][None], dtype=torch.float,
