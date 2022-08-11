@@ -63,16 +63,7 @@ void bind_refinement(py::module &m) {
         .def_readwrite("fconsis_loss_function", &RefinementConfig::fconsis_loss_function)
         .def_readwrite("print_summary", &RefinementConfig::print_summary);
 
-#define REGISTER_CHANNEL(CHANNELS) \
-    bind_refinement_engine<float16, CHANNELS>(m, "_f16_c" + std::to_string(CHANNELS)); \
-    bind_refinement_engine<float, CHANNELS>(m, "_f32_c" + std::to_string(CHANNELS)); \
-    bind_refinement_engine<double, CHANNELS>(m, "_f64_c" + std::to_string(CHANNELS)); 
-
-    REGISTER_CHANNEL(1);
-    REGISTER_CHANNEL(3);
-    REGISTER_CHANNEL(128);
-
-#undef REGISTER_CHANNEL
+    bind_refinement_engine<float16, 128>(m, "_f16_c128");
 }
 
 } // namespace limap

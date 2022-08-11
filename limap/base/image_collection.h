@@ -40,6 +40,7 @@ public:
     std::vector<CameraImage> get_images() const;
     std::vector<int> get_img_ids() const;
     std::vector<CameraView> get_camviews() const;
+    std::map<int, CameraView> get_map_camviews() const;
     bool IsUndistorted() const;
 
     Camera cam(const int cam_id) const;
@@ -57,7 +58,11 @@ public:
     void change_camera(const int cam_id, const Camera cam);
     void change_image(const int img_id, const CameraImage camimage);
     void change_image_name(const int img_id, const std::string new_name);
-    
+
+    double* params_data(const int img_id);
+    double* qvec_data(const int img_id);
+    double* tvec_data(const int img_id);
+
 private:
     std::map<int, Camera> cameras;
     std::map<int, CameraImage> images;

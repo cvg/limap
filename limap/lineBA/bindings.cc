@@ -67,14 +67,16 @@ void bind_lineBA(py::module &m) {
         .def_readwrite("constant_pose", &LineBAConfig::constant_pose)
         .def_readwrite("constant_line", &LineBAConfig::constant_line);
 
-#define REGISTER_CHANNEL(CHANNELS) \
-    bind_lineba_engine<float16, CHANNELS>(m, "_f16_c" + std::to_string(CHANNELS)); \
+    bind_lineba_engine<float16, 128>(m, "_f16_c128");
 
-    REGISTER_CHANNEL(1);
-    REGISTER_CHANNEL(3);
-    REGISTER_CHANNEL(128);
-
-#undef REGISTER_CHANNEL
+// #define REGISTER_CHANNEL(CHANNELS) \
+//     bind_lineba_engine<float16, CHANNELS>(m, "_f16_c" + std::to_string(CHANNELS)); \
+// 
+//     REGISTER_CHANNEL(1);
+//     REGISTER_CHANNEL(3);
+//     REGISTER_CHANNEL(128);
+// 
+// #undef REGISTER_CHANNEL
 
 }
 

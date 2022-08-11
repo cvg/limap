@@ -125,6 +125,14 @@ std::vector<CameraView> ImageCollection::get_camviews() const {
     return camviews;
 }
 
+std::map<int, CameraView> ImageCollection::get_map_camviews() const {
+    std::map<int, CameraView> m_camviews;
+    for (auto it = images.begin(); it != images.end(); ++it) {
+        m_camviews.insert(std::make_pair(it->first, camview(it->first)));
+    }
+    return m_camviews;
+}
+
 py::dict ImageCollection::as_dict() const {
     py::dict output;
     std::map<int, py::dict> dictvec_cameras;
@@ -276,6 +284,22 @@ bool ImageCollection::IsUndistorted() const {
             return false;
     }
     return true;
+}
+
+double* ImageCollection::params_data(const int img_id) {
+    THROW_CHECK_EQ(exist_image(img_id), true);
+    int cam_id = camimage(img_id).cam_id;
+    return cameras.at(cam_id).Params().data();
+}
+
+double* ImageCollection::qvec_data(const int img_id) {
+    THROW_CHECK_EQ(exist_image(img_id), true);
+    return images.at(img_id).pose.qvec.data();
+}
+
+double* ImageCollection::tvec_data(const int img_id) {
+    THROW_CHECK_EQ(exist_image(img_id), true);
+    return images.at(img_id).pose.tvec.data();
 }
 
 } // namespace limap

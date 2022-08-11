@@ -142,7 +142,7 @@ void RefinementEngine<DTYPE, CHANNELS>::AddGeometricResiduals() {
     case CameraModel::kModelId:        \
         cost_function = GeometricRefinementFunctor<CameraModel>::Create(line, view.cam.Params().data(), view.pose.qvec.data(), view.pose.tvec.data(), config_.geometric_alpha); \
         break;
-            LIMAP_CAMERA_MODEL_SWITCH_CASES
+            LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
 #undef CAMERA_MODEL_CASE
             }
 
@@ -179,7 +179,7 @@ void RefinementEngine<DTYPE, CHANNELS>::AddVPResiduals() {
     case CameraModel::kModelId:        \
         cost_function = VPConstraintsFunctor<CameraModel>::Create(vp, view.cam.Params().data(), view.pose.qvec.data());
         break;
-            LIMAP_CAMERA_MODEL_SWITCH_CASES
+            LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
 #undef CAMERA_MODEL_CASE
                 }
 
@@ -222,7 +222,7 @@ void RefinementEngine<DTYPE, CHANNELS>::AddHeatmapResiduals() {
     case CameraModel::kModelId:        \
         cost_function = MaxHeatmapFunctor<CameraModel, DTYPE>::Create(p_heatmaps_itp_[i], samples, view.cam.Params().data(), view.pose.qvec.data(), view.pose.tvec.data());
         break;
-            LIMAP_CAMERA_MODEL_SWITCH_CASES
+            LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
 #undef CAMERA_MODEL_CASE
             }
 
@@ -296,7 +296,7 @@ void RefinementEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals() {
                                                                                                               view_ref.cam.Params().data(), view_ref.pose.qvec.data(), view_ref.pose.tvec.data()); \
         } \
         break;
-            LIMAP_CAMERA_MODEL_SWITCH_CASES
+            LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
 #undef CAMERA_MODEL_CASE
             }
 
@@ -330,7 +330,7 @@ void RefinementEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals() {
                                                                                                          view_tgt.cam.Params().data(), view_tgt.pose.qvec.data(), view_tgt.pose.tvec.data()); \
         } \
         break;
-            LIMAP_CAMERA_MODEL_SWITCH_CASES
+            LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
 #undef CAMERA_MODEL_CASE
 
                     }
@@ -351,7 +351,7 @@ void RefinementEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals() {
                                                                                                          view_tgt.cam.Params().data(), view_tgt.pose.qvec.data(), view_tgt.pose.tvec.data()); \
         } \
         break;
-            LIMAP_CAMERA_MODEL_SWITCH_CASES
+            LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
 #undef CAMERA_MODEL_CASE
 
                     }
@@ -559,16 +559,8 @@ std::vector<std::vector<std::pair<int, V2D>>> RefinementEngine<DTYPE, CHANNELS>:
     return out_samples;
 }
 
-#define REGISTER_CHANNEL(CHANNELS) \
-    template class RefinementEngine<float16, CHANNELS>; \
-    template class RefinementEngine<float, CHANNELS>; \
-    template class RefinementEngine<double, CHANNELS>;
-
-REGISTER_CHANNEL(1);
-REGISTER_CHANNEL(3);
-REGISTER_CHANNEL(128);
-
-#undef REGISTER_CHANNEL
+// Register
+template class RefinementEngine<float16, 128>;
 
 } // namespace refinement
 

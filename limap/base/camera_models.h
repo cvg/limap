@@ -7,15 +7,15 @@ namespace limap {
 
 // modified from COLMAP
 // [Link] https://github.com/colmap/colmap/blob/dev/src/base/camera_models.h
-#ifndef LIMAP_CAMERA_MODEL_CASES
-#define LIMAP_CAMERA_MODEL_CASES                    \
+#ifndef LIMAP_UNDISTORTED_CAMERA_MODEL_CASES
+#define LIMAP_UNDISTORTED_CAMERA_MODEL_CASES                    \
   CAMERA_MODEL_CASE(colmap::SimplePinholeCameraModel)       \
   CAMERA_MODEL_CASE(colmap::PinholeCameraModel) 
 #endif
 
-#ifndef LIMAP_CAMERA_MODEL_SWITCH_CASES
-#define LIMAP_CAMERA_MODEL_SWITCH_CASES         \
-  LIMAP_CAMERA_MODEL_CASES                      \
+#ifndef LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
+#define LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES         \
+  LIMAP_UNDISTORTED_CAMERA_MODEL_CASES                      \
   default:                                \
     LIMAP_CAMERA_MODEL_DOES_NOT_EXIST_EXCEPTION \
     break;

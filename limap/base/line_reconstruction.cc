@@ -15,16 +15,20 @@ LineReconstruction::LineReconstruction(const std::vector<LineTrack>& linetracks,
     imagecols_ = ImageCollection(imagecols);
 }
 
+std::map<int, CameraView> LineReconstruction::GetInitCameraMap() const {
+    return init_imagecols_.get_map_camviews();
+}
+
 std::vector<Line3d> LineReconstruction::GetLines(const int num_outliers) const {
-    std::map<int, CameraView> cameras = GetCameras();
+    std::map<int, CameraView> cameras = imagecols_.get_map_camviews();
     std::vector<Line3d> lines;
     int n_tracks = lines_.size();
     for (int track_id = 0; track_id < n_tracks; ++track_id) {
-        std::vector<int> image_ids = GetImageIds(track_id);
-        std::vector<CameraView> p_cameras;
-        for (auto it = image_ids.begin(); it != image_ids.end(); ++it) {
-            p_cameras.push_back(cameras[*it]);
-        }
+        // std::vector<int> image_ids = GetImageIds(track_id);
+        // std::vector<CameraView> p_cameras;
+        // for (auto it = image_ids.begin(); it != image_ids.end(); ++it) {
+        //     p_cameras.push_back(imagecols_.camview(*it));
+        // }
         Line3d line = GetLineSegmentFromInfiniteLine3d(lines_[track_id].GetInfiniteLine(), GetLine3ds(track_id), num_outliers);
         lines.push_back(line);
     }

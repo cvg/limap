@@ -7,19 +7,49 @@ import limap.vpdetection as _vpdet
 import limap.util.io as limapio
 import limap.util.config as cfgutils
 import limap.optimize
+import limap.lineBA as _lineBA
 
-def main(cfg):
+def one_by_one_refinement(cfg):
+    '''
+    One by one refinement
+    '''
     linetracks, cfg_info, imagecols, all_2d_segs = limapio.read_folder_linetracks_with_info(cfg["input_folder"])
     cfg_info = cfg_info.item()
 
     # vp
     vpresults = None
     if cfg["refinement"]["use_vp"]:
-        all_2d_lines = _base.GetAllLines2D(all_2d_segs)
+        all_2d_lines = _base.get_all_lines_2d(all_2d_segs)
         vpresults = _vpdet.AssociateVPsParallel(all_2d_lines)
 
-    # refine
+    # one-by-one refinement
     newtracks = limap.optimize.line_refinement(cfg["refinement"], linetracks, imagecols, cfg["heatmap_folder"], cfg["patch_folder"], cfg["featuremap_folder"], vpresults=vpresults)
+
+    # write
+    newlines = np.array([track.line.as_array() for track in newtracks if track.count_images() >= cfg_info["n_visible_views"]])
+    limapio.save_obj(os.path.join(cfg["output_dir"], "lines_refined.obj"), newlines)
+    final_output_dir = os.path.join(cfg["output_dir"], cfg["output_folder"])
+    limapio.delete_folder(final_output_dir)
+    limapio.save_folder_linetracks_with_info(final_output_dir, newtracks, config=cfg_info, imagecols=imagecols, all_2d_segs=all_2d_segs)
+
+def joint_refinement(cfg):
+    '''
+    Joint refinement
+    '''
+    linetracks, cfg_info, imagecols, all_2d_segs = limapio.read_folder_linetracks_with_info(cfg["input_folder"])
+    cfg_info = cfg_info.item()
+
+    # vp
+    vpresults = None
+    if cfg["refinement"]["use_vp"]:
+        all_2d_lines = _base.get_all_lines_2d(all_2d_segs)
+        vpresults = _vpdet.AssociateVPsParallel(all_2d_lines)
+
+    # joint refinement
+    reconstruction = _base.LineReconstruction(linetracks, imagecols)
+    lineba_engine = _lineBA.solve(cfg["refinement"], reconstruction, vpresults=vpresults, max_num_iterations=200)
+    new_reconstruction = lineba_engine.GetOutputReconstruction()
+    newtracks = new_reconstruction.GetTracks(num_outliers=cfg["refinement"]["num_outliers_aggregator"])
 
     # write
     newlines = np.array([track.line.as_array() for track in newtracks if track.count_images() >= cfg_info["n_visible_views"]])
@@ -43,6 +73,8 @@ def parse_config():
     arg_parser.add_argument('--output_dir', type=str, default=None, help='folder to save')
     arg_parser.add_argument('--output_folder', type=str, default='newtracks', help='output filename')
 
+    arg_parser.add_argument('--method', type=str, default='one-by-one', help='["one-by-one", "joint"]')
+
     args, unknown = arg_parser.parse_known_args()
     cfg = cfgutils.load_config(args.config_file, default_path=args.default_config_file)
     shortcuts = dict()
@@ -58,6 +90,7 @@ def parse_config():
     cfg["featuremap_folder"] = args.featuremap_folder
     cfg["refinement"]["visualize"] = args.visualize
     cfg["refinement"]["mesh_dir"] = args.mesh_dir
+    cfg["method"] = args.method
 
     # check
     if cfg["refinement"]["use_heatmap"] and cfg["heatmap_folder"] is None:
@@ -68,5 +101,10 @@ def parse_config():
 
 if __name__ == '__main__':
     cfg = parse_config()
-    main(cfg)
+    if cfg["method"] == "one-by-one":
+        one_by_one_refinement(cfg)
+    elif cfg["method"] == "joint":
+        joint_refinement(cfg)
+    else:
+        raise NotImplementedError
 

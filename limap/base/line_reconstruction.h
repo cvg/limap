@@ -28,9 +28,10 @@ public:
     // some interfaces for the initial data
     LineTrack GetInitTrack(const int track_id) const {return init_tracks_[track_id]; }
     std::vector<LineTrack> GetInitTracks() const { return init_tracks_; }
-    ImageCollection GetInitImagecols() const { return init_imagecols_; };
+    ImageCollection GetInitImagecols() const { return init_imagecols_; }
+    std::map<int, CameraView> GetInitCameraMap() const;
     size_t NumTracks() const {return lines_.size(); }
-    size_t NumCameras() const {return cameras_.size(); }
+    size_t NumImages() const {return imagecols_.NumImages(); }
     size_t NumSupportingLines(const int track_id) const {return init_tracks_[track_id].count_lines(); }
     size_t NumSupportingImages(const int track_id) const {return init_tracks_[track_id].count_images(); }
     std::vector<int> GetImageIds(const int track_id) const {return init_tracks_[track_id].image_id_list; }
