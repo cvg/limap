@@ -67,7 +67,7 @@ public:
     bool Solve();
 
     // output
-    std::map<int, CameraView> GetOutputCameras() const {return reconstruction_.GetCameras(); }
+    ImageCollection GetOutputCameras() const {return reconstruction_.GetImagecols(); }
     std::vector<Line3d> GetOutputLines() const {return reconstruction_.GetLines(); }
     std::vector<LineTrack> GetOutputTracks() const {return reconstruction_.GetTracks(); }
     LineReconstruction GetOutputReconstruction() const {return reconstruction_; }

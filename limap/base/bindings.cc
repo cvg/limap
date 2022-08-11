@@ -315,12 +315,13 @@ void bind_line_reconstruction(py::module& m) {
         .def("NumTracks", &LineReconstruction::NumTracks)
         .def("NumCameras", &LineReconstruction::NumCameras)
         .def("GetInitTrack", &LineReconstruction::GetInitTrack)
-        .def("GetCameraMap", &LineReconstruction::GetCameraMap)
+        .def("GetInitTracks", &LineReconstruction::GetInitTracks)
+        .def("GetInitImagecols", &LineReconstruction::GetInitImagecols)
         .def("NumSupportingLines", &LineReconstruction::NumSupportingLines)
         .def("NumSupportingImages", &LineReconstruction::NumSupportingImages)
         .def("GetImageIds", &LineReconstruction::GetImageIds)
         .def("GetLine2ds", &LineReconstruction::GetLine2ds)
-        .def("GetCameras", &LineReconstruction::GetCameras)
+        .def("GetImagecols", &LineReconstruction::GetImagecols)
         .def("GetLines", &LineReconstruction::GetLines, py::arg("num_outliers") = 2)
         .def("GetTracks", &LineReconstruction::GetTracks, py::arg("num_outliers") = 2);
 }
