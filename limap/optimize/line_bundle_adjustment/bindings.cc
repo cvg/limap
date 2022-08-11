@@ -64,6 +64,7 @@ void bind_line_bundle_adjustment(py::module &m) {
         .def_readwrite("fconsis_loss_function", &LineBAConfig::fconsis_loss_function)
 
         .def_readwrite("print_summary", &LineBAConfig::print_summary)
+        .def_readwrite("constant_intrinsics", &LineBAConfig::constant_intrinsics)
         .def_readwrite("constant_pose", &LineBAConfig::constant_pose)
         .def_readwrite("constant_line", &LineBAConfig::constant_line);
 

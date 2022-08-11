@@ -2,6 +2,7 @@ refinement:
     dtype: "float16"
     min_num_images: 4
     print_summary: False 
+    constant_intrinsics: True 
     constant_pose: True 
     constant_line: False
     

@@ -80,8 +80,8 @@ void LineBAEngine<DTYPE, CHANNELS>::ParameterizeCameras() {
         if (!problem_->HasParameterBlock(params_data))
             continue;
 
-        // We do not optimize for intrinsics
-        problem_->SetParameterBlockConstant(params_data);
+        if (config_.constant_intrinsics)
+            problem_->SetParameterBlockConstant(params_data);
 
         if (config_.constant_pose) {
             problem_->SetParameterBlockConstant(qvec_data);

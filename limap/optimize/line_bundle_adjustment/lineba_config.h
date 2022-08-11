@@ -19,8 +19,11 @@ class LineBAConfig: public refinement::RefinementConfig {
 public:
     LineBAConfig(): refinement::RefinementConfig() {}
     LineBAConfig(py::dict dict): refinement::RefinementConfig(dict) {
+        ASSIGN_PYDICT_ITEM(dict, constant_intrinsics, bool);
         ASSIGN_PYDICT_ITEM(dict, constant_pose, bool);
+        ASSIGN_PYDICT_ITEM(dict, constant_line, bool);
     }
+    bool constant_intrinsics = true;
     bool constant_pose = false;
     bool constant_line = false;
 };

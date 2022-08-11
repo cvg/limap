@@ -86,6 +86,7 @@ filtering2d:
 # geometric refinement config
 refinement:
     disable: True 
+    constant_intrinsics: True
     constant_pose: True
     constant_line: False
     min_num_images: 4
