@@ -7,8 +7,8 @@
 #include <Eigen/Core>
 #include "_limap/helpers.h"
 
-#include "refinement/refine.h"
-#include "refinement/refinement_config.h"
+#include "optimize/refinement/refine.h"
+#include "optimize/refinement/refinement_config.h"
 
 namespace py = pybind11;
 
@@ -16,7 +16,7 @@ namespace limap {
 
 template <typename DTYPE, int CHANNELS>
 void bind_refinement_engine(py::module& m, std::string type_suffix) {
-    using namespace refinement;
+    using namespace optimize::refinement;
 
     using RFEngine = RefinementEngine<DTYPE, CHANNELS>;
 
@@ -37,7 +37,7 @@ void bind_refinement_engine(py::module& m, std::string type_suffix) {
 }
 
 void bind_refinement(py::module &m) {
-    using namespace refinement;
+    using namespace optimize::refinement;
 
     py::class_<RefinementConfig>(m, "RefinementConfig")
         .def(py::init<>())
@@ -63,16 +63,7 @@ void bind_refinement(py::module &m) {
         .def_readwrite("fconsis_loss_function", &RefinementConfig::fconsis_loss_function)
         .def_readwrite("print_summary", &RefinementConfig::print_summary);
 
-#define REGISTER_CHANNEL(CHANNELS) \
-    bind_refinement_engine<float16, CHANNELS>(m, "_f16_c" + std::to_string(CHANNELS)); \
-    bind_refinement_engine<float, CHANNELS>(m, "_f32_c" + std::to_string(CHANNELS)); \
-    bind_refinement_engine<double, CHANNELS>(m, "_f64_c" + std::to_string(CHANNELS)); 
-
-    REGISTER_CHANNEL(1);
-    REGISTER_CHANNEL(3);
-    REGISTER_CHANNEL(128);
-
-#undef REGISTER_CHANNEL
+    bind_refinement_engine<float16, 128>(m, "_f16_c128");
 }
 
 } // namespace limap

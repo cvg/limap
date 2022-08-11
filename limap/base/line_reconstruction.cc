@@ -11,30 +11,24 @@ LineReconstruction::LineReconstruction(const std::vector<LineTrack>& linetracks,
     }
 
     // initialize minimal cameras
-    for (const int& img_id: imagecols.get_img_ids()) {
-        init_cameras_.insert(std::make_pair(img_id, imagecols.camview(img_id)));
-        cameras_.insert(std::make_pair(img_id, MinimalPinholeCamera(imagecols.camview(img_id))));
-    }
+    init_imagecols_ = imagecols;
+    imagecols_ = ImageCollection(imagecols);
 }
 
-std::map<int, CameraView> LineReconstruction::GetCameras() const {
-    std::map<int, CameraView> cameras;
-    for (auto it = cameras_.begin(); it != cameras_.end(); ++it) {
-        cameras.insert(std::make_pair(it->first, it->second.GetCameraView()));
-    }
-    return cameras;
+std::map<int, CameraView> LineReconstruction::GetInitCameraMap() const {
+    return init_imagecols_.get_map_camviews();
 }
 
 std::vector<Line3d> LineReconstruction::GetLines(const int num_outliers) const {
-    std::map<int, CameraView> cameras = GetCameras();
+    std::map<int, CameraView> cameras = imagecols_.get_map_camviews();
     std::vector<Line3d> lines;
     int n_tracks = lines_.size();
     for (int track_id = 0; track_id < n_tracks; ++track_id) {
-        std::vector<int> image_ids = GetImageIds(track_id);
-        std::vector<CameraView> p_cameras;
-        for (auto it = image_ids.begin(); it != image_ids.end(); ++it) {
-            p_cameras.push_back(cameras[*it]);
-        }
+        // std::vector<int> image_ids = GetImageIds(track_id);
+        // std::vector<CameraView> p_cameras;
+        // for (auto it = image_ids.begin(); it != image_ids.end(); ++it) {
+        //     p_cameras.push_back(imagecols_.camview(*it));
+        // }
         Line3d line = GetLineSegmentFromInfiniteLine3d(lines_[track_id].GetInfiniteLine(), GetLine3ds(track_id), num_outliers);
         lines.push_back(line);
     }

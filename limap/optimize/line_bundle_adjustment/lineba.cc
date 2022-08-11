@@ -1,5 +1,5 @@
-#include "lineBA/lineba.h"
-#include "refinement/cost_functions.h"
+#include "optimize/line_bundle_adjustment/lineba.h"
+#include "optimize/refinement/cost_functions.h"
 
 #include <colmap/util/logging.h>
 #include <colmap/util/threading.h>
@@ -8,11 +8,13 @@
 
 namespace limap {
 
+namespace optimize {
+
 namespace lineBA {
 
 template <typename DTYPE, int CHANNELS>
 void LineBAEngine<DTYPE, CHANNELS>::InitializeVPs(const std::vector<vpdetection::VPResult>& vpresults) {
-    THROW_CHECK_EQ(reconstruction_.NumCameras(), vpresults.size());
+    THROW_CHECK_EQ(reconstruction_.NumImages(), vpresults.size());
     enable_vp = true;
     vpresults_ = vpresults;
 }
@@ -20,7 +22,7 @@ void LineBAEngine<DTYPE, CHANNELS>::InitializeVPs(const std::vector<vpdetection:
 template <typename DTYPE, int CHANNELS>
 void LineBAEngine<DTYPE, CHANNELS>::InitializeHeatmaps(const std::vector<Eigen::MatrixXd>& heatmaps) {
     enable_heatmap = true;
-    THROW_CHECK_EQ(reconstruction_.NumCameras(), heatmaps.size());
+    THROW_CHECK_EQ(reconstruction_.NumImages(), heatmaps.size());
     auto& interp_cfg = config_.heatmap_interpolation_config;
 
     int n_images = heatmaps.size();
@@ -69,18 +71,17 @@ void LineBAEngine<DTYPE, CHANNELS>::InitializePatches(const std::vector<std::vec
 
 template <typename DTYPE, int CHANNELS>
 void LineBAEngine<DTYPE, CHANNELS>::ParameterizeCameras() {
-    size_t n_images = reconstruction_.NumCameras();
-    for (size_t img_id = 0; img_id < n_images; ++img_id) {
-        double* kvec_data = reconstruction_.cameras_[img_id].kvec.data();
-        double* qvec_data = reconstruction_.cameras_[img_id].qvec.data();
-        double* tvec_data = reconstruction_.cameras_[img_id].tvec.data();
+    for (const int& img_id: reconstruction_.imagecols_.get_img_ids()) {
+        double* params_data = reconstruction_.imagecols_.params_data(img_id);
+        double* qvec_data = reconstruction_.imagecols_.qvec_data(img_id);
+        double* tvec_data = reconstruction_.imagecols_.tvec_data(img_id);
 
         // check if the image is in the problem
-        if (!problem_->HasParameterBlock(kvec_data))
+        if (!problem_->HasParameterBlock(params_data))
             continue;
 
-        // We do not optimize for intrinsics
-        problem_->SetParameterBlockConstant(kvec_data);
+        if (config_.constant_intrinsics)
+            problem_->SetParameterBlockConstant(params_data);
 
         if (config_.constant_pose) {
             problem_->SetParameterBlockConstant(qvec_data);
@@ -136,16 +137,26 @@ void LineBAEngine<DTYPE, CHANNELS>::AddGeometricResiduals(const int track_id) {
     ceres::LossFunction* loss_function = config_.geometric_loss_function.get();
     for (auto it1 = image_ids.begin(); it1 != image_ids.end(); ++it1) {
         int img_id = *it1;
-        auto& camera = reconstruction_.cameras_[img_id];
+        int model_id = reconstruction_.imagecols_.camview(img_id).cam.ModelId();
         const auto& ids = idmap.at(img_id);
         for (auto it2 = ids.begin(); it2 != ids.end(); ++it2) {
             const Line2d& line = track.line2d_list[*it2];
             double weight = weights[*it2];
-            ceres::CostFunction* cost_function = refinement::GeometricRefinementFunctor::Create(line, NULL, NULL, NULL, config_.geometric_alpha);
+            ceres::CostFunction* cost_function = nullptr;
+
+            switch (model_id) {
+#define CAMERA_MODEL_CASE(CameraModel) \
+    case CameraModel::kModelId:        \
+        cost_function = refinement::GeometricRefinementFunctor<CameraModel>::Create(line, NULL, NULL, NULL, config_.geometric_alpha); \
+        break;
+            LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
+#undef CAMERA_MODEL_CASE
+            }
+
             ceres::LossFunction* scaled_loss_function = new ceres::ScaledLoss(loss_function, weight, ceres::DO_NOT_TAKE_OWNERSHIP);
             ceres::ResidualBlockId block_id = problem_->AddResidualBlock(cost_function, scaled_loss_function, 
                                                                          inf_line.uvec.data(), inf_line.wvec.data(),
-                                                                         camera.kvec.data(), camera.qvec.data(), camera.tvec.data());
+                                                                         reconstruction_.imagecols_.params_data(img_id), reconstruction_.imagecols_.qvec_data(img_id), reconstruction_.imagecols_.tvec_data(img_id));
         }
     }
 }
@@ -165,18 +176,28 @@ void LineBAEngine<DTYPE, CHANNELS>::AddVPResiduals(const int track_id) {
     ceres::LossFunction* loss_function = config_.vp_loss_function.get();
     for (auto it1 = image_ids.begin(); it1 != image_ids.end(); ++it1) {
         int img_id = *it1;
-        auto& camera = reconstruction_.cameras_[img_id];
+        int model_id = reconstruction_.imagecols_.camview(img_id).cam.ModelId();
         const auto& ids = idmap.at(img_id);
         for (auto it2 = ids.begin(); it2 != ids.end(); ++it2) {
             int line_id = track.line_id_list[*it2];
             if (vpresults_[img_id].HasVP(line_id)) {
                 const V3D& vp = vpresults_[img_id].GetVP(line_id);
                 double weight = weights[*it2] * config_.vp_multiplier;
-                ceres::CostFunction* cost_function = refinement::VPConstraintsFunctor::Create(vp);
+                ceres::CostFunction* cost_function = nullptr;
+                
+                switch (model_id) {
+#define CAMERA_MODEL_CASE(CameraModel) \
+    case CameraModel::kModelId:        \
+        cost_function = refinement::VPConstraintsFunctor<CameraModel>::Create(vp); \
+        break;
+            LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
+#undef CAMERA_MODEL_CASE
+                }
+
                 ceres::LossFunction* scaled_loss_function = new ceres::ScaledLoss(loss_function, weight, ceres::DO_NOT_TAKE_OWNERSHIP);
                 ceres::ResidualBlockId block_id = problem_->AddResidualBlock(cost_function, scaled_loss_function, 
                                                                              inf_line.uvec.data(), inf_line.wvec.data(),
-                                                                             camera.kvec.data(), camera.qvec.data());
+                                                                             reconstruction_.imagecols_.params_data(img_id), reconstruction_.imagecols_.qvec_data(img_id));
             }
         }
     }
@@ -204,17 +225,26 @@ void LineBAEngine<DTYPE, CHANNELS>::AddHeatmapResiduals(const int track_id) {
     ceres::LossFunction* loss_function = config_.heatmap_loss_function.get();
     for (auto it1 = image_ids.begin(); it1 != image_ids.end(); ++it1) {
         int img_id = *it1;
-        auto& camera = reconstruction_.cameras_[img_id];
+        int model_id = reconstruction_.imagecols_.camview(img_id).cam.ModelId();
         const auto& ids = idmap.at(img_id);
         for (auto it2 = ids.begin(); it2 != ids.end(); ++it2) {
             const auto& samples = heatmap_samples.at(*it2);
             double weight = weights[*it2] * config_.heatmap_multiplier / double(config_.n_samples_heatmap / 10.0);
-            ceres::CostFunction* cost_function = refinement::MaxHeatmapFunctor<DTYPE>::Create(p_heatmaps_itp_[img_id], samples);
+            ceres::CostFunction* cost_function = nullptr;
+
+            switch (model_id) {
+#define CAMERA_MODEL_CASE(CameraModel) \
+    case CameraModel::kModelId:        \
+        cost_function = refinement::MaxHeatmapFunctor<CameraModel, DTYPE>::Create(p_heatmaps_itp_[img_id], samples); \
+        break;
+            LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
+#undef CAMERA_MODEL_CASE
+            }
+
             ceres::LossFunction* scaled_loss_function = new ceres::ScaledLoss(loss_function, weight, ceres::DO_NOT_TAKE_OWNERSHIP);
             ceres::ResidualBlockId block_id = problem_->AddResidualBlock(cost_function, loss_function, 
                                                                          inf_line.uvec.data(), inf_line.wvec.data(),
-                                                                         camera.kvec.data(), camera.qvec.data(), camera.tvec.data());
-       
+                                                                         reconstruction_.imagecols_.params_data(img_id), reconstruction_.imagecols_.qvec_data(img_id), reconstruction_.imagecols_.tvec_data(img_id));
         }
     }
 }
@@ -224,7 +254,7 @@ void LineBAEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals(const int tra
     // compute fconsis samples
     std::vector<std::tuple<int, InfiniteLine2d, std::vector<int>>> fconsis_samples; // [referenece_image_id, infiniteline2d, {target_image_ids}]
     ComputeFConsistencySamples(reconstruction_.GetInitTrack(track_id),
-                               reconstruction_.GetCameraMap(),
+                               reconstruction_.GetInitCameraMap(),
                                fconsis_samples,
                                std::make_pair(config_.sample_range_min, config_.sample_range_max),
                                config_.n_samples_feature);
@@ -239,7 +269,7 @@ void LineBAEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals(const int tra
         const auto& sample_tp = fconsis_samples[i];
         int ref_image_id = std::get<0>(sample_tp);
         int ref_index = idmap.at(ref_image_id);
-        auto& cam_ref = reconstruction_.cameras_[ref_image_id]; 
+        CameraView view_ref = reconstruction_.imagecols_.camview(ref_image_id);
         const auto& sample = std::get<1>(sample_tp);
         std::vector<int> tgt_image_ids = std::get<2>(sample_tp);
 
@@ -251,28 +281,69 @@ void LineBAEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals(const int tra
             ref_descriptor = new double[CHANNELS];
             V2D ref_intersection;
             GetIntersection2d<double>(inf_line.uvec.data(), inf_line.wvec.data(),
-                                      cam_ref.kvec.data(), cam_ref.qvec.data(), cam_ref.tvec.data(),
+                                      view_ref.cam.Params().data(), view_ref.pose.qvec.data(), view_ref.pose.tvec.data(),
                                       sample.p.data(), sample.direc.data(),
                                       ref_intersection.data());
             p_patches_itp_[track_id][ref_index]->Evaluate(ref_intersection.data(), ref_descriptor);
 
             // source residuals
-            ceres::CostFunction* cost_function = refinement::FeatureConsisSrcFunctor<PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[track_id][ref_index], sample, ref_descriptor);
+            ceres::CostFunction* cost_function = nullptr;
+
+            switch (view_ref.cam.ModelId()) {
+#define CAMERA_MODEL_CASE(CameraModel) \
+    case CameraModel::kModelId:        \
+        cost_function = refinement::FeatureConsisSrcFunctor<CameraModel, PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[track_id][ref_index], sample, ref_descriptor);
+        break;
+            LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
+#undef CAMERA_MODEL_CASE
+            }
+
             ceres::LossFunction* ref_scaled_loss_function = new ceres::ScaledLoss(scaled_loss_function, config_.ref_multiplier, ceres::DO_NOT_TAKE_OWNERSHIP);
             ceres::ResidualBlockId block_id = problem_->AddResidualBlock(cost_function, ref_scaled_loss_function, 
                     inf_line.uvec.data(), inf_line.wvec.data(), 
-                    cam_ref.kvec.data(), cam_ref.qvec.data(), cam_ref.tvec.data());
+                    reconstruction_.imagecols_.params_data(ref_image_id), reconstruction_.imagecols_.qvec_data(ref_image_id), reconstruction_.imagecols_.tvec_data(ref_image_id));
         }
 
         // compute tgt residuals
         for (const int& tgt_image_id: tgt_image_ids) {
             int tgt_index = idmap.at(tgt_image_id);
-            auto& cam_tgt = reconstruction_.cameras_[tgt_image_id];
-            ceres::CostFunction* cost_function = refinement::FeatureConsisTgtFunctor<PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[track_id][ref_index], p_patches_itp_[track_id][tgt_index], sample, ref_descriptor);
+            CameraView view_tgt = reconstruction_.imagecols_.camview(tgt_image_id);
+
+            // switch 2x2 = 4 camera model configurations
+            ceres::CostFunction* cost_function = nullptr;
+            switch (view_ref.cam.ModelId()) {
+                // reference camera model == colmap::SimplePinholeCameraModel
+                case colmap::SimplePinholeCameraModel::kModelId:
+                    switch (view_tgt.cam.ModelId()) {
+
+#define CAMERA_MODEL_CASE(CameraModel) \
+    case CameraModel::kModelId:        \
+        cost_function = refinement::FeatureConsisTgtFunctor<colmap::SimplePinholeCameraModel, CameraModel, PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[track_id][ref_index], p_patches_itp_[track_id][tgt_index], sample, ref_descriptor);  \
+        break;
+            LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
+#undef CAMERA_MODEL_CASE
+
+                    }
+                // reference camera model == colmap::PinholeCameraModel
+                case colmap::PinholeCameraModel::kModelId:
+                    switch (view_tgt.cam.ModelId()) {
+
+#define CAMERA_MODEL_CASE(CameraModel) \
+    case CameraModel::kModelId:        \
+        cost_function = refinement::FeatureConsisTgtFunctor<colmap::PinholeCameraModel, CameraModel, PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[track_id][ref_index], p_patches_itp_[track_id][tgt_index], sample, ref_descriptor);  \
+        break;
+            LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
+#undef CAMERA_MODEL_CASE
+
+                    }
+                default:
+                    LIMAP_CAMERA_MODEL_DOES_NOT_EXIST_EXCEPTION
+            }
+
             ceres::ResidualBlockId block_id = problem_->AddResidualBlock(cost_function, scaled_loss_function, 
                                                                          inf_line.uvec.data(), inf_line.wvec.data(), 
-                                                                         cam_ref.kvec.data(), cam_ref.qvec.data(), cam_ref.tvec.data(),
-                                                                         cam_tgt.kvec.data(), cam_tgt.qvec.data(), cam_tgt.tvec.data());
+                                                                         reconstruction_.imagecols_.params_data(ref_image_id), reconstruction_.imagecols_.qvec_data(ref_image_id), reconstruction_.imagecols_.tvec_data(ref_image_id),
+                                                                         reconstruction_.imagecols_.params_data(tgt_image_id), reconstruction_.imagecols_.qvec_data(tgt_image_id), reconstruction_.imagecols_.tvec_data(tgt_image_id));
         }
         if (config_.use_ref_descriptor)
             delete ref_descriptor;
@@ -316,7 +387,7 @@ bool LineBAEngine<DTYPE, CHANNELS>::Solve() {
     // Empirical choice.
     const size_t kMaxNumImagesDirectDenseSolver = 50;
     const size_t kMaxNumImagesDirectSparseSolver = 900;
-    const size_t num_images = reconstruction_.NumCameras();
+    const size_t num_images = reconstruction_.NumImages();
     if (num_images <= kMaxNumImagesDirectDenseSolver) {
         solver_options.linear_solver_type = ceres::DENSE_SCHUR;
     } else if (num_images <= kMaxNumImagesDirectSparseSolver) {
@@ -352,7 +423,7 @@ template <typename DTYPE, int CHANNELS>
 std::vector<std::vector<V2D>> LineBAEngine<DTYPE, CHANNELS>::GetHeatmapIntersections(const LineReconstruction& reconstruction) const
 {
     size_t n_tracks = reconstruction.NumTracks();
-    size_t n_images = reconstruction.NumCameras();
+    size_t n_images = reconstruction.NumImages();
     
     std::vector<std::vector<V2D>> out_samples;
     out_samples.resize(n_images);
@@ -369,7 +440,7 @@ std::vector<std::vector<V2D>> LineBAEngine<DTYPE, CHANNELS>::GetHeatmapIntersect
         std::vector<int> image_ids = reconstruction.GetInitTrack(track_id).GetSortedImageIds();
         for (auto it = image_ids.begin(); it != image_ids.end(); ++it) {
             int img_id = *it;
-            const auto& camera = reconstruction.cameras_.at(img_id);
+            const auto& view = reconstruction.imagecols_.camview(img_id);
             const auto& ids = idmap.at(img_id);
             std::vector<V2D> out_samples_idx;
             for (auto it1 = ids.begin(); it1 != ids.end(); ++it1) {
@@ -377,7 +448,7 @@ std::vector<std::vector<V2D>> LineBAEngine<DTYPE, CHANNELS>::GetHeatmapIntersect
                 for (auto it2 = samples.begin(); it2 != samples.end(); ++it2) {
                     V2D intersection;
                     GetIntersection2d<double>(inf_line.uvec.data(), inf_line.wvec.data(), 
-                                              camera.kvec.data(), camera.qvec.data(), camera.tvec.data(),
+                                              view.cam.Params().data(), view.pose.qvec.data(), view.pose.tvec.data(),
                                               it2->p.data(), it2->direc.data(),
                                               intersection.data());
                     out_samples_idx.push_back(intersection);
@@ -389,17 +460,13 @@ std::vector<std::vector<V2D>> LineBAEngine<DTYPE, CHANNELS>::GetHeatmapIntersect
     return out_samples;
 }
 
+// Register
 // Only float16 can be supported (due to limited memory) for the full bundle adjustment
-#define REGISTER_CHANNEL(CHANNELS) \
-    template class LineBAEngine<float16, CHANNELS>; \
-
-REGISTER_CHANNEL(1);
-REGISTER_CHANNEL(3);
-REGISTER_CHANNEL(128);
-
-#undef REGISTER_CHANNEL
+template class LineBAEngine<float16, 128>;
 
 } // namespace lineBA 
+
+} // namespace optimize 
 
 } // namespace limap
 

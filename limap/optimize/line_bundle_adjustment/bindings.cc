@@ -7,8 +7,8 @@
 #include <Eigen/Core>
 #include "_limap/helpers.h"
 
-#include "lineBA/lineba.h"
-#include "lineBA/lineba_config.h"
+#include "optimize/line_bundle_adjustment/lineba.h"
+#include "optimize/line_bundle_adjustment/lineba_config.h"
 
 namespace py = pybind11;
 
@@ -16,7 +16,7 @@ namespace limap {
 
 template <typename DTYPE, int CHANNELS>
 void bind_lineba_engine(py::module& m, std::string type_suffix) {
-    using namespace lineBA;
+    using namespace optimize::lineBA;
 
     using BAEngine = LineBAEngine<DTYPE, CHANNELS>;
 
@@ -37,8 +37,8 @@ void bind_lineba_engine(py::module& m, std::string type_suffix) {
         .def("GetHeatmapIntersections", &BAEngine::GetHeatmapIntersections);
 }
 
-void bind_lineBA(py::module &m) {
-    using namespace lineBA;
+void bind_line_bundle_adjustment(py::module &m) {
+    using namespace optimize::lineBA;
 
     py::class_<LineBAConfig>(m, "LineBAConfig")
         .def(py::init<>())
@@ -64,17 +64,20 @@ void bind_lineBA(py::module &m) {
         .def_readwrite("fconsis_loss_function", &LineBAConfig::fconsis_loss_function)
 
         .def_readwrite("print_summary", &LineBAConfig::print_summary)
+        .def_readwrite("constant_intrinsics", &LineBAConfig::constant_intrinsics)
         .def_readwrite("constant_pose", &LineBAConfig::constant_pose)
         .def_readwrite("constant_line", &LineBAConfig::constant_line);
 
-#define REGISTER_CHANNEL(CHANNELS) \
-    bind_lineba_engine<float16, CHANNELS>(m, "_f16_c" + std::to_string(CHANNELS)); \
+    bind_lineba_engine<float16, 128>(m, "_f16_c128");
 
-    REGISTER_CHANNEL(1);
-    REGISTER_CHANNEL(3);
-    REGISTER_CHANNEL(128);
-
-#undef REGISTER_CHANNEL
+// #define REGISTER_CHANNEL(CHANNELS) \
+//     bind_lineba_engine<float16, CHANNELS>(m, "_f16_c" + std::to_string(CHANNELS)); \
+// 
+//     REGISTER_CHANNEL(1);
+//     REGISTER_CHANNEL(3);
+//     REGISTER_CHANNEL(128);
+// 
+// #undef REGISTER_CHANNEL
 
 }
 

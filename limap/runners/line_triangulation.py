@@ -8,7 +8,7 @@ import limap.base as _base
 import limap.merging as _mrg
 import limap.triangulation as _tri
 import limap.vpdetection as _vpdet
-import limap.lineBA as _lineBA
+import limap.optimize as _optim
 import limap.runners as _runners
 import limap.util.io as limapio
 import limap.visualize as limapvis
@@ -93,7 +93,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
         vpresults = None
         if cfg["refinement"]["use_vp"]:
             vpresults = _vpdet.AssociateVPsParallel(all_2d_lines)
-        lineba_engine = _lineBA.solve(cfg["refinement"], reconstruction, vpresults=vpresults, max_num_iterations=200)
+        lineba_engine = _optim.solve_line_bundle_adjustment(cfg["refinement"], reconstruction, vpresults=vpresults, max_num_iterations=200)
         new_reconstruction = lineba_engine.GetOutputReconstruction()
         linetracks = new_reconstruction.GetTracks(num_outliers=cfg["refinement"]["num_outliers_aggregator"])
 

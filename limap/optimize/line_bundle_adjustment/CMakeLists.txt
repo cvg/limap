@@ -1,4 +1,4 @@
-set(FOLDER_NAME "lineBA")
+set(FOLDER_NAME "line_bundle_adjustment")
 
 LIMAP_ADD_SOURCES(
     lineba.h lineba.cc

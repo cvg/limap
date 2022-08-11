@@ -1,5 +1,5 @@
-#ifndef LIMAP_REFINEMENT_REFINEMENT_CONFIG_H_
-#define LIMAP_REFINEMENT_REFINEMENT_CONFIG_H_
+#ifndef LIMAP_OPTIMIZE_REFINEMENT_REFINEMENT_CONFIG_H_
+#define LIMAP_OPTIMIZE_REFINEMENT_REFINEMENT_CONFIG_H_
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
@@ -11,6 +11,8 @@
 namespace py = pybind11;
 
 namespace limap {
+
+namespace optimize {
 
 namespace refinement {
 
@@ -86,6 +88,8 @@ public:
 };
 
 } // namespace refinement
+
+} // namespace optimize
 
 } // namespace limap
 

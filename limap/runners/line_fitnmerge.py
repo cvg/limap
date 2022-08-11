@@ -8,7 +8,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 import limap.base as _base
 import limap.fitting as _fit
 import limap.merging as _mrg
-import limap.lineBA as _lineBA
+import limap.optimize as _optim
 import limap.runners as _runners
 import limap.util.io as limapio
 import limap.visualize as limapvis
@@ -99,7 +99,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     ##########################################################
     if not cfg["refinement"]["disable"]:
         reconstruction = _base.LineReconstruction(linetracks, imagecols)
-        lineba_engine = _lineBA.solve(cfg["refinement"], reconstruction)
+        lineba_engine = _optim.solve(cfg["refinement"], reconstruction)
         new_reconstruction = lineba_engine.GetOutputReconstruction()
         linetracks = new_reconstruction.GetTracks()
 

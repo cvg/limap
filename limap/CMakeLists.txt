@@ -7,10 +7,9 @@ add_subdirectory(triangulation)
 add_subdirectory(merging)
 add_subdirectory(undistortion)
 add_subdirectory(features)
-add_subdirectory(refinement)
-add_subdirectory(lineBA)
 add_subdirectory(evaluation)
 add_subdirectory(fitting)
+add_subdirectory(optimize)
 
 add_subdirectory(_limap)
 

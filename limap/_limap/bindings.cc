@@ -14,12 +14,11 @@ namespace py = pybind11;
 #include "triangulation/bindings.cc"
 #include "merging/bindings.cc"
 #include "undistortion/bindings.cc"
-#include "refinement/bindings.cc"
 #include "features/bindings.cc"
-#include "lineBA/bindings.cc"
 #include "vpdetection/bindings.cc"
 #include "evaluation/bindings.cc"
 #include "fitting/bindings.cc"
+#include "optimize/bindings.cc"
 
 #include "_limap/helpers.h"
 
@@ -29,12 +28,11 @@ void bind_pointsfm(py::module &);
 void bind_triangulation(py::module &);
 void bind_merging(py::module &);
 void bind_undistortion(py::module &);
-void bind_refinement(py::module &);
 void bind_features(py::module &);
-void bind_lineBA(py::module &);
 void bind_vpdetection(py::module &);
 void bind_evaluation(py::module &);
 void bind_fitting(py::module &);
+void bind_optimize(py::module &);
 
 namespace limap {
 
@@ -49,12 +47,11 @@ PYBIND11_MODULE(_limap, m) {
     pybind11::module_ _tri = m.def_submodule("_triangulation");
     pybind11::module_ _mrg = m.def_submodule("_merging");
     pybind11::module_ _undist = m.def_submodule("_undistortion");
-    pybind11::module_ _trf = m.def_submodule("_refinement");
     pybind11::module_ _f = m.def_submodule("_features");
-    pybind11::module_ _lineba = m.def_submodule("_lineBA");
     pybind11::module_ _vpdet = m.def_submodule("_vpdet");
     pybind11::module_ _eval = m.def_submodule("_evaluation");
     pybind11::module_ _fitting = m.def_submodule("_fitting");
+    pybind11::module_ _optim = m.def_submodule("_optimize");
 
     // bind modules
     bind_base(_b);
@@ -63,12 +60,11 @@ PYBIND11_MODULE(_limap, m) {
     bind_triangulation(_tri);
     bind_merging(_mrg);
     bind_undistortion(_undist);
-    bind_refinement(_trf);
     bind_features(_f);
-    bind_lineBA(_lineba);
     bind_vpdetection(_vpdet);
     bind_evaluation(_eval);
     bind_fitting(_fitting);
+    bind_optimize(_optim);
 }
 
 }

@@ -60,24 +60,6 @@ public:
     V3D ray_direction(const V2D& p2d) const;
 };
 
-// used for optimization
-class MinimalPinholeCamera {
-public:
-    MinimalPinholeCamera() {}
-    MinimalPinholeCamera(const CameraView& view);
-    CameraView GetCameraView() const;
-
-    V4D kvec; // [f1, f2, c1, c2]
-    V4D qvec;
-    V3D tvec;
-    int height, width;
-};
-
-// interchanging between CameraView and MinimalPinholeCamera
-MinimalPinholeCamera cam2minimalcam(const CameraView& view);
-
-CameraView minimalcam2cam(const MinimalPinholeCamera& camera);
-
 } // namespace limap
 
 #endif

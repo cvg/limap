@@ -1,5 +1,5 @@
-#ifndef LIMAP_REFINEMENT_REFINE_H_
-#define LIMAP_REFINEMENT_REFINE_H_
+#ifndef LIMAP_OPTIMIZE_REFINEMENT_REFINE_H_
+#define LIMAP_OPTIMIZE_REFINEMENT_REFINE_H_
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
@@ -16,11 +16,14 @@
 
 #include <ceres/ceres.h>
 #include <tuple>
-#include "refinement/refinement_config.h"
+
+#include "optimize/refinement/refinement_config.h"
 
 namespace py = pybind11;
 
 namespace limap {
+
+namespace optimize {
 
 namespace refinement {
 
@@ -56,8 +59,7 @@ private:
     RefinementConfig config_;
     LineTrack track_;
     // cameras are with the same order as track_.GetSortedImageIds()
-    std::vector<CameraView> p_camviews_matrixform_; // original input, with matrices as attributes
-    std::vector<MinimalPinholeCamera> p_camviews_; 
+    std::vector<CameraView> p_camviews_; 
 
     // optimized line
     MinimalInfiniteLine3d inf_line_;
@@ -116,6 +118,8 @@ public:
 };
 
 } // namespace refinement
+
+} // namespace optimize
 
 } // namespace limap
 
