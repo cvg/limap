@@ -1,5 +1,5 @@
-#include "lineBA/lineba.h"
-#include "refinement/cost_functions.h"
+#include "optimize/line_bundle_adjustment/lineba.h"
+#include "optimize/refinement/cost_functions.h"
 
 #include <colmap/util/logging.h>
 #include <colmap/util/threading.h>
@@ -7,6 +7,8 @@
 #include <colmap/optim/bundle_adjustment.h>
 
 namespace limap {
+
+namespace optimize {
 
 namespace lineBA {
 
@@ -463,6 +465,8 @@ std::vector<std::vector<V2D>> LineBAEngine<DTYPE, CHANNELS>::GetHeatmapIntersect
 template class LineBAEngine<float16, 128>;
 
 } // namespace lineBA 
+
+} // namespace optimize 
 
 } // namespace limap
 

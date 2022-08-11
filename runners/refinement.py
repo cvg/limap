@@ -7,7 +7,6 @@ import limap.vpdetection as _vpdet
 import limap.util.io as limapio
 import limap.util.config as cfgutils
 import limap.optimize
-import limap.lineBA as _lineBA
 
 def one_by_one_refinement(cfg):
     '''
@@ -47,7 +46,7 @@ def joint_refinement(cfg):
 
     # joint refinement
     reconstruction = _base.LineReconstruction(linetracks, imagecols)
-    lineba_engine = _lineBA.solve(cfg["refinement"], reconstruction, vpresults=vpresults, max_num_iterations=200)
+    lineba_engine = limap.optimize.solve_line_bundle_adjustment(cfg["refinement"], reconstruction, vpresults=vpresults, max_num_iterations=200)
     new_reconstruction = lineba_engine.GetOutputReconstruction()
     newtracks = new_reconstruction.GetTracks(num_outliers=cfg["refinement"]["num_outliers_aggregator"])
 

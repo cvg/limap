@@ -7,8 +7,8 @@
 #include <Eigen/Core>
 #include "_limap/helpers.h"
 
-#include "refinement/refine.h"
-#include "refinement/refinement_config.h"
+#include "optimize/refinement/refine.h"
+#include "optimize/refinement/refinement_config.h"
 
 namespace py = pybind11;
 
@@ -16,7 +16,7 @@ namespace limap {
 
 template <typename DTYPE, int CHANNELS>
 void bind_refinement_engine(py::module& m, std::string type_suffix) {
-    using namespace refinement;
+    using namespace optimize::refinement;
 
     using RFEngine = RefinementEngine<DTYPE, CHANNELS>;
 
@@ -37,7 +37,7 @@ void bind_refinement_engine(py::module& m, std::string type_suffix) {
 }
 
 void bind_refinement(py::module &m) {
-    using namespace refinement;
+    using namespace optimize::refinement;
 
     py::class_<RefinementConfig>(m, "RefinementConfig")
         .def(py::init<>())

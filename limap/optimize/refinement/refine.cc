@@ -1,5 +1,5 @@
-#include "refinement/refine.h"
-#include "refinement/cost_functions.h"
+#include "optimize/refinement/refine.h"
+#include "optimize/refinement/cost_functions.h"
 #include "base/camera_models.h"
 
 #include <colmap/util/logging.h>
@@ -8,6 +8,8 @@
 #include <colmap/optim/bundle_adjustment.h>
 
 namespace limap {
+
+namespace optimize {
 
 namespace refinement {
 
@@ -563,6 +565,8 @@ std::vector<std::vector<std::pair<int, V2D>>> RefinementEngine<DTYPE, CHANNELS>:
 template class RefinementEngine<float16, 128>;
 
 } // namespace refinement
+
+} // namespace optimize
 
 } // namespace limap
 

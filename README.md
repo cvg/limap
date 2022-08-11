@@ -1,9 +1,5 @@
 # LIMAP 
 
-## TODO
-
-* [ ] CameraRig optimization.
-
 ## Dependencies
 * CMake >= 3.17
 * Python 3.9

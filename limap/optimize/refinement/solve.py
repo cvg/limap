@@ -1,11 +1,11 @@
-from _limap import _base, _ceresbase, _refinement
+from _limap import _base, _ceresbase, _optimize
 import numpy as np
 
-def solve(cfg, track, p_camviews, p_vpresults=None, p_heatmaps=None, p_patches=None, p_features=None, dtype="float16"):
+def solve_refinement(cfg, track, p_camviews, p_vpresults=None, p_heatmaps=None, p_patches=None, p_features=None, dtype="float16"):
     '''
     p_patches: list of PatchInfo_f objects
     '''
-    rf_config = _refinement.RefinementConfig(cfg)
+    rf_config = _optimize.RefinementConfig(cfg)
     rf_config.solver_options.logging_type = _ceresbase.LoggingType.SILENT
 
     # initialize refinement engine
@@ -19,7 +19,7 @@ def solve(cfg, track, p_camviews, p_vpresults=None, p_heatmaps=None, p_patches=N
         channels = 128
     rf_engine_name = "RefinementEngine_f{0}_c{1}".format(dtype[-2:], channels)
     # print("Refinement type: ", rf_engine_name)
-    rf_engine = getattr(_refinement, rf_engine_name)(rf_config)
+    rf_engine = getattr(_optimize, rf_engine_name)(rf_config)
 
     # initialize track and camview
     rf_engine.Initialize(track, p_camviews)

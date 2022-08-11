@@ -7,8 +7,8 @@
 #include <Eigen/Core>
 #include "_limap/helpers.h"
 
-#include "lineBA/lineba.h"
-#include "lineBA/lineba_config.h"
+#include "optimize/line_bundle_adjustment/lineba.h"
+#include "optimize/line_bundle_adjustment/lineba_config.h"
 
 namespace py = pybind11;
 
@@ -16,7 +16,7 @@ namespace limap {
 
 template <typename DTYPE, int CHANNELS>
 void bind_lineba_engine(py::module& m, std::string type_suffix) {
-    using namespace lineBA;
+    using namespace optimize::lineBA;
 
     using BAEngine = LineBAEngine<DTYPE, CHANNELS>;
 
@@ -37,8 +37,8 @@ void bind_lineba_engine(py::module& m, std::string type_suffix) {
         .def("GetHeatmapIntersections", &BAEngine::GetHeatmapIntersections);
 }
 
-void bind_lineBA(py::module &m) {
-    using namespace lineBA;
+void bind_line_bundle_adjustment(py::module &m) {
+    using namespace optimize::lineBA;
 
     py::class_<LineBAConfig>(m, "LineBAConfig")
         .def(py::init<>())

@@ -1,9 +1,12 @@
-#ifndef LIMAP_REFINEMENT_COST_FUNCTIONS_H_
-#define LIMAP_REFINEMENT_COST_FUNCTIONS_H_
+#ifndef LIMAP_OPTIMIZE_REFINEMENT_COST_FUNCTIONS_H_
+#define LIMAP_OPTIMIZE_REFINEMENT_COST_FUNCTIONS_H_
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include "_limap/helpers.h"
+
+#include <colmap/base/camera_models.h>
+#include <ceres/ceres.h>
 
 #include "base/camera_models.h"
 #include "base/linebase.h"
@@ -12,15 +15,15 @@
 #include "base/featuremap.h"
 #include "base/featurepatch.h"
 #include "util/types.h"
-#include <colmap/base/camera_models.h>
 
-#include <ceres/ceres.h>
 #include "ceresbase/line_projection.h"
 #include "ceresbase/line_dists.h"
 
 namespace py = pybind11;
 
 namespace limap {
+
+namespace optimize {
 
 namespace refinement {
 
@@ -482,6 +485,8 @@ protected:
 };
 
 } // namespace refinement
+
+} // namespace optimize
 
 } // namespace limap
 

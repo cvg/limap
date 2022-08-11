@@ -1,15 +1,17 @@
-#ifndef LIMAP_LINEBA_LINEBA_CONFIG_H_
-#define LIMAP_LINEBA_LINEBA_CONFIG_H_
+#ifndef LIMAP_OPTIMIZE_LINEBA_LINEBA_CONFIG_H_
+#define LIMAP_OPTIMIZE_LINEBA_LINEBA_CONFIG_H_
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include "_limap/helpers.h"
 
-#include "refinement/refinement_config.h"
+#include "optimize/refinement/refinement_config.h"
 
 namespace py = pybind11;
 
 namespace limap {
+
+namespace optimize {
 
 namespace lineBA {
 
@@ -24,6 +26,8 @@ public:
 };
 
 } // namespace lineBA 
+
+} // namespace optimize 
 
 } // namespace limap
 

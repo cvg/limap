@@ -1,5 +1,5 @@
-#ifndef LIMAP_LINEBA_LINEBA_H_
-#define LIMAP_LINEBA_LINEBA_H_
+#ifndef LIMAP_OPTIMIZE_LINEBA_LINEBA_H_
+#define LIMAP_OPTIMIZE_LINEBA_LINEBA_H_
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
@@ -12,11 +12,13 @@
 
 #include <ceres/ceres.h>
 #include "base/line_reconstruction.h"
-#include "lineBA/lineba_config.h"
+#include "optimize/line_bundle_adjustment/lineba_config.h"
 
 namespace py = pybind11;
 
 namespace limap {
+
+namespace optimize {
 
 namespace lineBA {
 
@@ -81,6 +83,8 @@ public:
 };
 
 } // namespace lineBA 
+
+} // namespace optimize 
 
 } // namespace limap
 

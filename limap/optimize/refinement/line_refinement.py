@@ -6,8 +6,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 
 import limap.base as _base
 import limap.features as _features
-import limap.refinement as _refinement
 import limap.evaluation as _eval
+import limap.optimize as _optim
 import limap.util.io as limapio
 import limap.visualize as limapvis
 
@@ -54,7 +54,7 @@ def line_refinement(cfg, tracks, imagecols, heatmap_dir=None, patch_dir=None, fe
                     p_features.append(featuremap.transpose(1,2,0))
 
         # refine
-        rf_engine = _refinement.solve(cfg, track, p_cameras, p_vpresults=p_vpresults, p_heatmaps=p_heatmaps, p_patches=p_patches, p_features=p_features, dtype=cfg["dtype"])
+        rf_engine = _optim.solve_refinement(cfg, track, p_cameras, p_vpresults=p_vpresults, p_heatmaps=p_heatmaps, p_patches=p_patches, p_features=p_features, dtype=cfg["dtype"])
         newtrack = _base.LineTrack(track)
         if rf_engine is None:
             opttracks.append(newtrack)
