@@ -8,6 +8,8 @@
 
 namespace limap {
 
+// All the kvec is a 4-dim array: [fx, fy, cx, cy]
+
 template <typename T>
 void Lines_WorldToImage(const T* kvec, const T* p3d, const T* dir3d, T* p2d, T* dir2d) {
     T u = p3d[0] / p3d[2];

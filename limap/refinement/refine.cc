@@ -1,5 +1,6 @@
 #include "refinement/refine.h"
 #include "refinement/cost_functions.h"
+#include "base/camera_models.h"
 
 #include <colmap/util/logging.h>
 #include <colmap/util/threading.h>
@@ -16,11 +17,7 @@ void RefinementEngine<DTYPE, CHANNELS>::Initialize(const LineTrack& track,
 {
     // validity check
     track_ = track;
-    p_camviews_.clear();
-    for (auto it = p_camviews.begin(); it != p_camviews.end(); ++it) {
-        p_camviews_matrixform_.push_back(*it);
-        p_camviews_.push_back(cam2minimalcam(*it));
-    }
+    p_camviews_ = p_camviews;
 
     // initialize optimized line
     inf_line_ = MinimalInfiniteLine3d(track_.line);
@@ -38,8 +35,8 @@ void RefinementEngine<DTYPE, CHANNELS>::InitializeHeatmaps(const std::vector<Eig
     int n_images = track_.count_images();
     THROW_CHECK_EQ(p_heatmaps.size(), n_images);
     for (int i = 0; i < n_images; ++i) {
-        THROW_CHECK_EQ(p_camviews_[i].height, p_heatmaps[i].rows());
-        THROW_CHECK_EQ(p_camviews_[i].width, p_heatmaps[i].cols());
+        THROW_CHECK_EQ(p_camviews_[i].h(), p_heatmaps[i].rows());
+        THROW_CHECK_EQ(p_camviews_[i].w(), p_heatmaps[i].cols());
     }
     
     auto& interp_cfg = config_.heatmap_interpolation_config;
@@ -132,13 +129,23 @@ void RefinementEngine<DTYPE, CHANNELS>::AddGeometricResiduals() {
     for (int i = 0; i < n_images; ++i) {
         ceres::LossFunction* loss_function = config_.geometric_loss_function.get();
 
-        auto& camera = p_camviews_[i];
+        auto& view = p_camviews_[i];
         int img_id = image_ids[i];
         const auto& ids = idmap.at(img_id);
         for (auto it = ids.begin(); it != ids.end(); ++it) {
             const Line2d& line = track_.line2d_list[*it];
             double weight = weights[*it];
-            ceres::CostFunction* cost_function = GeometricRefinementFunctor::Create(line, camera.kvec.data(), camera.qvec.data(), camera.tvec.data(), config_.geometric_alpha);
+            ceres::CostFunction* cost_function = nullptr;
+
+            switch (view.cam.ModelId()) {
+#define CAMERA_MODEL_CASE(CameraModel) \
+    case CameraModel::kModelId:        \
+        cost_function = GeometricRefinementFunctor<CameraModel>::Create(line, view.cam.Params().data(), view.pose.qvec.data(), view.pose.tvec.data(), config_.geometric_alpha); \
+        break;
+            LIMAP_CAMERA_MODEL_SWITCH_CASES
+#undef CAMERA_MODEL_CASE
+            }
+
             ceres::LossFunction* scaled_loss_function = new ceres::ScaledLoss(loss_function, weight, ceres::DO_NOT_TAKE_OWNERSHIP);
             ceres::ResidualBlockId block_id = problem_->AddResidualBlock(cost_function, scaled_loss_function, inf_line_.uvec.data(), inf_line_.wvec.data());
         }
@@ -157,7 +164,7 @@ void RefinementEngine<DTYPE, CHANNELS>::AddVPResiduals() {
     std::vector<int> image_ids = track_.GetSortedImageIds();
     ceres::LossFunction* loss_function = config_.vp_loss_function.get();
     for (int i = 0; i < n_images; ++i) {
-        auto& camera = p_camviews_[i];
+        auto& view = p_camviews_[i];
         int img_id = image_ids[i];
         const auto& ids = idmap.at(img_id);
         for (auto it = ids.begin(); it != ids.end(); ++it) {
@@ -165,7 +172,17 @@ void RefinementEngine<DTYPE, CHANNELS>::AddVPResiduals() {
             if (p_vpresults_[i].HasVP(line_id)) {
                 const V3D& vp = p_vpresults_[i].GetVP(line_id);
                 double weight = weights[*it] * config_.vp_multiplier;
-                ceres::CostFunction* cost_function = VPConstraintsFunctor::Create(vp, camera.kvec.data(), camera.qvec.data());
+                ceres::CostFunction* cost_function = nullptr;
+
+                switch (view.cam.ModelId()) {
+#define CAMERA_MODEL_CASE(CameraModel) \
+    case CameraModel::kModelId:        \
+        cost_function = VPConstraintsFunctor<CameraModel>::Create(vp, view.cam.Params().data(), view.pose.qvec.data());
+        break;
+            LIMAP_CAMERA_MODEL_SWITCH_CASES
+#undef CAMERA_MODEL_CASE
+                }
+
                 ceres::LossFunction* scaled_loss_function = new ceres::ScaledLoss(loss_function, weight, ceres::DO_NOT_TAKE_OWNERSHIP);
                 ceres::ResidualBlockId block_id = problem_->AddResidualBlock(cost_function, scaled_loss_function, inf_line_.uvec.data(), inf_line_.wvec.data());
             }
@@ -192,13 +209,23 @@ void RefinementEngine<DTYPE, CHANNELS>::AddHeatmapResiduals() {
     std::vector<int> image_ids = track_.GetSortedImageIds();
     for (int i = 0; i < n_images; ++i) {
         ceres::LossFunction* loss_function = config_.heatmap_loss_function.get();
-        auto& camera = p_camviews_[i];
+        auto& view = p_camviews_[i];
         int img_id = image_ids[i];
         const auto& ids = idmap.at(img_id);
         for (auto it = ids.begin(); it != ids.end(); ++it) {
             const auto& samples = heatmap_samples.at(*it);
             double weight = weights[*it] * config_.heatmap_multiplier / double(config_.n_samples_heatmap / 10.0);
-            ceres::CostFunction* cost_function = MaxHeatmapFunctor<DTYPE>::Create(p_heatmaps_itp_[i], samples, camera.kvec.data(), camera.qvec.data(), camera.tvec.data());
+            ceres::CostFunction* cost_function = nullptr;
+
+            switch (view.cam.ModelId()) {
+#define CAMERA_MODEL_CASE(CameraModel) \
+    case CameraModel::kModelId:        \
+        cost_function = MaxHeatmapFunctor<CameraModel, DTYPE>::Create(p_heatmaps_itp_[i], samples, view.cam.Params().data(), view.pose.qvec.data(), view.pose.tvec.data());
+        break;
+            LIMAP_CAMERA_MODEL_SWITCH_CASES
+#undef CAMERA_MODEL_CASE
+            }
+
             ceres::LossFunction* scaled_loss_function = new ceres::ScaledLoss(loss_function, weight, ceres::DO_NOT_TAKE_OWNERSHIP);
             ceres::ResidualBlockId block_id = problem_->AddResidualBlock(cost_function, loss_function, inf_line_.uvec.data(), inf_line_.wvec.data());
         }
@@ -213,7 +240,7 @@ void RefinementEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals() {
     std::vector<int> image_ids = track_.GetSortedImageIds();
     std::map<int, CameraView> cameramap;
     for (int i = 0; i < n_images; ++i) {
-        cameramap.insert(std::make_pair(image_ids[i], p_camviews_matrixform_[i]));
+        cameramap.insert(std::make_pair(image_ids[i], p_camviews_[i]));
     }
 
     ComputeFConsistencySamples(track_,
@@ -233,7 +260,7 @@ void RefinementEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals() {
         int ref_index = idmap.at(ref_image_id);
         const auto& sample = std::get<1>(sample_tp);
         std::vector<int> tgt_image_ids = std::get<2>(sample_tp);
-        auto& cam_ref = p_camviews_[ref_index];
+        auto& view_ref = p_camviews_[ref_index];
 
         // get reference descriptor and compute ref residuals
         double weight = config_.fconsis_multiplier / (double(n_samples / 100.0) * double(tgt_image_ids.size() / 5.0));
@@ -242,10 +269,13 @@ void RefinementEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals() {
         if (config_.use_ref_descriptor) {
             ref_descriptor = new double[CHANNELS];
             V2D ref_intersection;
-            GetIntersection2d<double>(inf_line_.uvec.data(), inf_line_.wvec.data(),
-                                      cam_ref.kvec.data(), cam_ref.qvec.data(), cam_ref.tvec.data(),
+            double kvec_ref[4];
+            ParamsToKvec<double>(view_ref.cam.ModelId(), view_ref.cam.Params().data(), kvec_ref);
+            GetIntersection2d<double>(inf_line_.uvec.data(), inf_line_.wvec.data(), 
+                                      kvec_ref, view_ref.pose.qvec.data(), view_ref.pose.tvec.data(),
                                       sample.p.data(), sample.direc.data(),
                                       ref_intersection.data());
+
             if (use_patches)
                 p_patches_itp_[ref_index]->Evaluate(ref_intersection.data(), ref_descriptor);
             else
@@ -253,14 +283,23 @@ void RefinementEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals() {
 
             // source residuals
             ceres::CostFunction* cost_function = nullptr;
-            if (use_patches) {
-                cost_function = FeatureConsisSrcFunctor<PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[ref_index], sample, ref_descriptor, 
-                                                                                                              cam_ref.kvec.data(), cam_ref.qvec.data(), cam_ref.tvec.data());
+
+            switch (view_ref.cam.ModelId()) {
+#define CAMERA_MODEL_CASE(CameraModel) \
+    case CameraModel::kModelId:        \
+        if (use_patches) {             \
+            cost_function = FeatureConsisSrcFunctor<CameraModel, PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[ref_index], sample, ref_descriptor, \
+                                                                                                              view_ref.cam.Params().data(), view_ref.pose.qvec.data(), view_ref.pose.tvec.data()); \
+        } \
+        else { \
+            cost_function = FeatureConsisSrcFunctor<CameraModel, FeatureInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_features_itp_[ref_index], sample, ref_descriptor, \
+                                                                                                              view_ref.cam.Params().data(), view_ref.pose.qvec.data(), view_ref.pose.tvec.data()); \
+        } \
+        break;
+            LIMAP_CAMERA_MODEL_SWITCH_CASES
+#undef CAMERA_MODEL_CASE
             }
-            else {
-                cost_function = FeatureConsisSrcFunctor<FeatureInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_features_itp_[ref_index], sample, ref_descriptor, 
-                                                                                                                cam_ref.kvec.data(), cam_ref.qvec.data(), cam_ref.tvec.data());
-            }
+
             ceres::LossFunction* src_scaled_loss_function = new ceres::ScaledLoss(scaled_loss_function, config_.ref_multiplier, ceres::DO_NOT_TAKE_OWNERSHIP);
             ceres::ResidualBlockId block_id = problem_->AddResidualBlock(cost_function, src_scaled_loss_function, inf_line_.uvec.data(), inf_line_.wvec.data());
         }
@@ -268,19 +307,58 @@ void RefinementEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals() {
         // compute tgt residuals
         for (const int& tgt_image_id: tgt_image_ids) {
             int tgt_index = idmap.at(tgt_image_id);
-            auto& cam_tgt = p_camviews_[tgt_index];
+            auto& view_tgt = p_camviews_[tgt_index];
             // tgt residuals
             ceres::CostFunction* cost_function = nullptr;
-            if (use_patches) {
-                cost_function = FeatureConsisTgtFunctor<PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[ref_index], p_patches_itp_[tgt_index], sample, ref_descriptor, 
-                                                                                                              cam_ref.kvec.data(), cam_ref.qvec.data(), cam_ref.tvec.data(),
-                                                                                                              cam_tgt.kvec.data(), cam_tgt.qvec.data(), cam_tgt.tvec.data());
+
+            // switch 2x2 = 4 camera model configurations
+            switch (view_ref.cam.ModelId()) {
+                // reference camera model == colmap::SimplePinholeCameraModel
+                case colmap::SimplePinholeCameraModel::kModelId:
+                    switch (view_tgt.cam.ModelId()) {
+
+#define CAMERA_MODEL_CASE(CameraModel) \
+    case CameraModel::kModelId:        \
+        if (use_patches) {             \
+           cost_function = FeatureConsisTgtFunctor<colmap::SimplePinholeCameraModel, CameraModel, PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[ref_index], p_patches_itp_[tgt_index], sample, ref_descriptor,  \
+                                                                                                         view_ref.cam.Params().data(), view_ref.pose.qvec.data(), view_ref.pose.tvec.data(),  \
+                                                                                                         view_tgt.cam.Params().data(), view_tgt.pose.qvec.data(), view_tgt.pose.tvec.data()); \
+        } \
+        else { \
+           cost_function = FeatureConsisTgtFunctor<colmap::SimplePinholeCameraModel, CameraModel, FeatureInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_features_itp_[ref_index], p_features_itp_[tgt_index], sample, ref_descriptor,  \
+                                                                                                         view_ref.cam.Params().data(), view_ref.pose.qvec.data(), view_ref.pose.tvec.data(), \
+                                                                                                         view_tgt.cam.Params().data(), view_tgt.pose.qvec.data(), view_tgt.pose.tvec.data()); \
+        } \
+        break;
+            LIMAP_CAMERA_MODEL_SWITCH_CASES
+#undef CAMERA_MODEL_CASE
+
+                    }
+                // reference camera model == colmap::PinholeCameraModel
+                case colmap::PinholeCameraModel::kModelId:
+                    switch (view_tgt.cam.ModelId()) {
+
+#define CAMERA_MODEL_CASE(CameraModel) \
+    case CameraModel::kModelId:        \
+        if (use_patches) {             \
+           cost_function = FeatureConsisTgtFunctor<colmap::PinholeCameraModel, CameraModel, PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[ref_index], p_patches_itp_[tgt_index], sample, ref_descriptor,  \
+                                                                                                         view_ref.cam.Params().data(), view_ref.pose.qvec.data(), view_ref.pose.tvec.data(),  \
+                                                                                                         view_tgt.cam.Params().data(), view_tgt.pose.qvec.data(), view_tgt.pose.tvec.data()); \
+        } \
+        else { \
+           cost_function = FeatureConsisTgtFunctor<colmap::PinholeCameraModel, CameraModel, FeatureInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_features_itp_[ref_index], p_features_itp_[tgt_index], sample, ref_descriptor,  \
+                                                                                                         view_ref.cam.Params().data(), view_ref.pose.qvec.data(), view_ref.pose.tvec.data(), \
+                                                                                                         view_tgt.cam.Params().data(), view_tgt.pose.qvec.data(), view_tgt.pose.tvec.data()); \
+        } \
+        break;
+            LIMAP_CAMERA_MODEL_SWITCH_CASES
+#undef CAMERA_MODEL_CASE
+
+                    }
+                default:
+                    LIMAP_CAMERA_MODEL_DOES_NOT_EXIST_EXCEPTION
             }
-            else {
-                cost_function = FeatureConsisTgtFunctor<FeatureInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_features_itp_[ref_index], p_features_itp_[tgt_index], sample, ref_descriptor,
-                                                                                                                cam_ref.kvec.data(), cam_ref.qvec.data(), cam_ref.tvec.data(),
-                                                                                                                cam_tgt.kvec.data(), cam_tgt.qvec.data(), cam_tgt.tvec.data());
-            }
+
             ceres::ResidualBlockId block_id_tgt = problem_->AddResidualBlock(cost_function, scaled_loss_function, inf_line_.uvec.data(), inf_line_.wvec.data());
         }
         if (config_.use_ref_descriptor)
@@ -348,7 +426,7 @@ Line3d RefinementEngine<DTYPE, CHANNELS>::GetLine3d() const {
     int n_lines = track_.count_lines();
     for (int i = 0; i < n_lines; ++i) {
         int index = p_image_ids[i];
-        cameras.push_back(p_camviews_matrixform_[index]);
+        cameras.push_back(p_camviews_[index]);
     }
 
     // get line segment
@@ -365,7 +443,7 @@ std::vector<Line3d> RefinementEngine<DTYPE, CHANNELS>::GetAllStates() const {
     int n_lines = track_.count_lines();
     for (int i = 0; i < n_lines; ++i) {
         int index = p_image_ids[i];
-        cameras.push_back(p_camviews_matrixform_[index]);
+        cameras.push_back(p_camviews_[index]);
     }
     
     // get line segment for each state
@@ -396,7 +474,7 @@ std::vector<std::vector<V2D>> RefinementEngine<DTYPE, CHANNELS>::GetHeatmapInter
     // compute intersections for each supporting image
     std::vector<std::vector<V2D>> out_samples;
     for (int i = 0; i < n_images; ++i) {
-        const auto& camera = p_camviews_[i];
+        const auto& view = p_camviews_[i];
         int img_id = image_ids[i];
         const auto& ids = idmap.at(img_id);
 
@@ -405,8 +483,10 @@ std::vector<std::vector<V2D>> RefinementEngine<DTYPE, CHANNELS>::GetHeatmapInter
             const auto& samples = heatmap_samples.at(*it1);
             for (auto it2 = samples.begin(); it2 != samples.end(); ++it2) {
                 V2D intersection;
+                double kvec[4];
+                ParamsToKvec<double>(view.cam.ModelId(), view.cam.Params().data(), kvec);
                 GetIntersection2d<double>(inf_line.uvec.data(), inf_line.wvec.data(), 
-                                          camera.kvec.data(), camera.qvec.data(), camera.tvec.data(),
+                                          kvec, view.pose.qvec.data(), view.pose.tvec.data(),
                                           it2->p.data(), it2->direc.data(),
                                           intersection.data());
                 out_samples_idx.push_back(intersection);
@@ -427,7 +507,7 @@ std::vector<std::vector<std::pair<int, V2D>>> RefinementEngine<DTYPE, CHANNELS>:
     std::vector<int> image_ids = track_.GetSortedImageIds();
     std::map<int, CameraView> cameramap;
     for (int i = 0; i < n_images; ++i) {
-        cameramap.insert(std::make_pair(image_ids[i], p_camviews_matrixform_[i]));
+        cameramap.insert(std::make_pair(image_ids[i], p_camviews_[i]));
     }
 
     ComputeFConsistencySamples(track_,
@@ -444,13 +524,15 @@ std::vector<std::vector<std::pair<int, V2D>>> RefinementEngine<DTYPE, CHANNELS>:
         int ref_index = idmap.at(ref_image_id);
         const InfiniteLine2d& sample = std::get<1>(sample_tp);
         std::vector<int> tgt_image_ids = std::get<2>(sample_tp);
-        const auto& cam_ref = p_camviews_[ref_index];
+        const auto& view_ref = p_camviews_[ref_index];
 
         // get ref_intersection
         std::vector<std::pair<int, V2D>> out_samples_idx;
         V2D ref_intersection;
+        double kvec_ref[4];
+        ParamsToKvec<double>(view_ref.cam.ModelId(), view_ref.cam.Params().data(), kvec_ref);
         GetIntersection2d<double>(inf_line.uvec.data(), inf_line.wvec.data(),
-                                  cam_ref.kvec.data(), cam_ref.qvec.data(), cam_ref.tvec.data(),
+                                  kvec_ref, view_ref.pose.qvec.data(), view_ref.pose.tvec.data(),
                                   sample.p.data(), sample.direc.data(),
                                   ref_intersection.data());
         out_samples_idx.push_back(std::make_pair(ref_index, ref_intersection));
@@ -458,14 +540,17 @@ std::vector<std::vector<std::pair<int, V2D>>> RefinementEngine<DTYPE, CHANNELS>:
         // get tgt_intersection for each target image
         for (const int& tgt_image_id: tgt_image_ids) {
             int tgt_index = idmap.at(tgt_image_id);
-            const auto& cam_tgt = p_camviews_[tgt_index];
+            const auto& view_tgt = p_camviews_[tgt_index];
             V3D epiline_coord;
             V2D tgt_intersection;
-            GetEpipolarLineCoordinate<double>(cam_ref.kvec.data(), cam_ref.qvec.data(), cam_ref.tvec.data(),
-                                              cam_tgt.kvec.data(), cam_tgt.qvec.data(), cam_tgt.tvec.data(),
+            double kvec_ref[4], kvec_tgt[4];
+            ParamsToKvec<double>(view_ref.cam.ModelId(), view_ref.cam.Params().data(), kvec_ref);
+            ParamsToKvec<double>(view_tgt.cam.ModelId(), view_tgt.cam.Params().data(), kvec_tgt);
+            GetEpipolarLineCoordinate<double>(kvec_ref, view_ref.pose.qvec.data(), view_ref.pose.tvec.data(),
+                                              kvec_tgt, view_ref.pose.qvec.data(), view_tgt.pose.tvec.data(),
                                               ref_intersection.data(), epiline_coord.data());
             GetIntersection2d_line_coordinate<double>(inf_line.uvec.data(), inf_line.wvec.data(),
-                                                      cam_tgt.kvec.data(), cam_tgt.qvec.data(), cam_tgt.tvec.data(),
+                                                      kvec_tgt, view_tgt.pose.qvec.data(), view_tgt.pose.tvec.data(),
                                                       epiline_coord.data(), tgt_intersection.data());
             out_samples_idx.push_back(std::make_pair(tgt_index, tgt_intersection));
         }

@@ -56,8 +56,7 @@ private:
     RefinementConfig config_;
     LineTrack track_;
     // cameras are with the same order as track_.GetSortedImageIds()
-    std::vector<CameraView> p_camviews_matrixform_; // original input, with matrices as attributes
-    std::vector<MinimalPinholeCamera> p_camviews_; 
+    std::vector<CameraView> p_camviews_; 
 
     // optimized line
     MinimalInfiniteLine3d inf_line_;
