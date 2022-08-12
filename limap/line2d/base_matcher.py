@@ -33,7 +33,6 @@ class BaseMatcher():
         fname = self.get_match_filename(matches_folder, idx)
         return limapio.read_npy(fname)
 
-    # TODO: multiprocessing does not give linear speed up for now!!
     def match_all_neighbors(self, output_folder, image_ids, neighbors, descinfo_folder, skip_exists=False):
         matches_folder = self.get_matches_folder(output_folder)
         if not skip_exists:

@@ -50,6 +50,7 @@ def umeyama_alignment(x, y, with_scale=True):
     return r, t, c
 
 def align_imagecols(imagecols_src, imagecols_dst):
+    # TODO: robust alignment
     # assertion check
     assert imagecols_src.NumImages() == imagecols_dst.NumImages()
     assert np.all(imagecols_src.get_img_ids() == imagecols_dst.get_img_ids()) == True
