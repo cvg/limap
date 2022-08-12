@@ -79,6 +79,10 @@ void LineBAEngine<DTYPE, CHANNELS>::ParameterizeCameras() {
         // check if the image is in the problem
         if (!problem_->HasParameterBlock(params_data))
             continue;
+        if (!problem_->HasParameterBlock(qvec_data))
+            continue;
+        if (!problem_->HasParameterBlock(tvec_data))
+            continue;
 
         if (config_.constant_intrinsics)
             problem_->SetParameterBlockConstant(params_data);
@@ -105,6 +109,8 @@ void LineBAEngine<DTYPE, CHANNELS>::ParameterizeLines() {
 
         // check if the track is in the problem
         if (!problem_->HasParameterBlock(uvec_data))
+            continue;
+        if (!problem_->HasParameterBlock(wvec_data))
             continue;
 
         if (config_.constant_line || n_images < config_.min_num_images) {
