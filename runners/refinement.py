@@ -31,13 +31,31 @@ def one_by_one_refinement(cfg):
     limapio.delete_folder(final_output_dir)
     limapio.save_folder_linetracks_with_info(final_output_dir, newtracks, config=cfg_info, imagecols=imagecols, all_2d_segs=all_2d_segs)
 
+def report_error(imagecols_pred, imagecols):
+    # cameras
+    camera_errors = []
+    for cam_id in imagecols.get_cam_ids():
+        error = np.array(imagecols_pred.cam(cam_id).params()) - np.array(imagecols.cam(cam_id).params())
+        error = np.abs(error)
+        camera_errors.append(error)
+    print("camera_errors", np.array(camera_errors).mean(0))
+
+    # images
+    pose_errors = []
+    for img_id in imagecols.get_img_ids():
+        R_error = imagecols_pred.camimage(img_id).R() - imagecols.camimage(img_id).R()
+        R_error = np.sqrt(np.sum(R_error ** 2))
+        T_error = imagecols_pred.camimage(img_id).T() - imagecols.camimage(img_id).T()
+        T_error = np.sqrt(np.sum(T_error ** 2))
+        pose_errors.append(np.array([R_error, T_error]))
+    print("pose_error: (R, T)", np.array(pose_errors).mean(0))
+
 def joint_refinement(cfg):
     '''
     Joint refinement
     '''
     linetracks, cfg_info, imagecols, all_2d_segs = limapio.read_folder_linetracks_with_info(cfg["input_folder"])
     cfg_info = cfg_info.item()
-
     # vp
     vpresults = None
     if cfg["refinement"]["use_vp"]:
@@ -45,10 +63,19 @@ def joint_refinement(cfg):
         vpresults = _vpdet.AssociateVPsParallel(all_2d_lines)
 
     # joint refinement
-    reconstruction = _base.LineReconstruction(linetracks, imagecols)
+    imagecols_input = _base.ImageCollection(imagecols)
+    # imagecols_input = _base.unit_test_add_noise(imagecols)
+    # report_error(imagecols_input, imagecols)
+
+    reconstruction = _base.LineReconstruction(linetracks, imagecols_input)
     lineba_engine = limap.optimize.solve_line_bundle_adjustment(cfg["refinement"], reconstruction, vpresults=vpresults, max_num_iterations=200)
     new_reconstruction = lineba_engine.GetOutputReconstruction()
     newtracks = new_reconstruction.GetTracks(num_outliers=cfg["refinement"]["num_outliers_aggregator"])
+    imagecols_output = new_reconstruction.GetImagecols()
+
+    # report_error(imagecols_output, imagecols)
+    # transform, imagecols_aligned = _base.align_imagecols(imagecols_output, imagecols)
+    # report_error(imagecols_aligned, imagecols)
 
     # write
     newlines = np.array([track.line.as_array() for track in newtracks if track.count_images() >= cfg_info["n_visible_views"]])
