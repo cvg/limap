@@ -133,6 +133,22 @@ std::map<int, CameraView> ImageCollection::get_map_camviews() const {
     return m_camviews;
 }
 
+std::vector<V3D> ImageCollection::get_locations() const {
+    std::vector<V3D> locations;
+    for (auto it = images.begin(); it != images.end(); ++it) {
+        locations.push_back(campose(it->first).center());
+    }
+    return locations;
+}
+
+std::map<int, V3D> ImageCollection::get_map_locations() const {
+    std::map<int, V3D> m_locations;
+    for (auto it = images.begin(); it != images.end(); ++it) {
+        m_locations.insert(std::make_pair(it->first, campose(it->first).center()));
+    }
+    return m_locations;
+}
+
 py::dict ImageCollection::as_dict() const {
     py::dict output;
     std::map<int, py::dict> dictvec_cameras;
@@ -300,6 +316,14 @@ double* ImageCollection::qvec_data(const int img_id) {
 double* ImageCollection::tvec_data(const int img_id) {
     THROW_CHECK_EQ(exist_image(img_id), true);
     return images.at(img_id).pose.tvec.data();
+}
+
+ImageCollection ImageCollection::apply_similarity_transform(const SimilarityTransform3& transform) const {
+    ImageCollection imagecols = ImageCollection(cameras, images);
+    for (auto it = imagecols.images.begin(); it != imagecols.images.end(); ++it) {
+        it->second.pose = pose_similarity_transform(it->second.pose, transform);
+    }
+    return imagecols;
 }
 
 } // namespace limap

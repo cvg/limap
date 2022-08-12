@@ -117,6 +117,16 @@ void bind_graph(py::module& m) {
     m.def("count_track_edges", &CountTrackEdges);
 }
 
+void bind_transforms(py::module& m) {
+    py::class_<SimilarityTransform3>(m, "SimilarityTransform3")
+        .def(py::init<>())
+        .def(py::init<V4D, V3D, double>(), py::arg("qvec"), py::arg("tvec"), py::arg("scale") = 1.0)
+        .def(py::init<M3D, V3D, double>(), py::arg("R"), py::arg("T"), py::arg("scale") = 1.0)
+        .def("R", &SimilarityTransform3::R)
+        .def("T", &SimilarityTransform3::T)
+        .def("s", &SimilarityTransform3::s);
+}
+
 void bind_linebase(py::module& m) {
     py::class_<Line2d>(m, "Line2d")
         .def(py::init<>())
@@ -458,6 +468,8 @@ void bind_camera(py::module& m) {
         .def("get_img_ids", &ImageCollection::get_img_ids)
         .def("get_camviews", &ImageCollection::get_camviews)
         .def("get_map_camviews", &ImageCollection::get_map_camviews)
+        .def("get_locations", &ImageCollection::get_locations)
+        .def("get_map_locations", &ImageCollection::get_map_locations)
         .def("exist_cam", &ImageCollection::exist_cam)
         .def("exist_image", &ImageCollection::exist_image)
         .def("cam", &ImageCollection::cam)
@@ -474,7 +486,8 @@ void bind_camera(py::module& m) {
         .def("change_image", &ImageCollection::change_image)
         .def("change_image_name", &ImageCollection::change_image_name)
         .def("IsUndistorted", &ImageCollection::IsUndistorted)
-        .def("read_image", &ImageCollection::read_image, py::arg("img_id"), py::arg("set_gray")=false);
+        .def("read_image", &ImageCollection::read_image, py::arg("img_id"), py::arg("set_gray")=false)
+        .def("apply_similarity_transform", &ImageCollection::apply_similarity_transform);
 }
 
 template <typename DTYPE>
@@ -491,6 +504,7 @@ void bind_patchinfo(py::module& m, std::string type_suffix) {
 
 void bind_base(py::module& m) {
     bind_graph(m);
+    bind_transforms(m);
     bind_linebase(m);
     bind_linetrack(m);
     bind_line_dists(m);

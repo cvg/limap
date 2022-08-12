@@ -13,6 +13,7 @@ namespace py = pybind11;
 #include "util/types.h"
 #include "_limap/helpers.h"
 
+#include "base/transforms.h"
 #include "base/camera.h"
 #include "base/camera_view.h"
 
@@ -41,6 +42,8 @@ public:
     std::vector<int> get_img_ids() const;
     std::vector<CameraView> get_camviews() const;
     std::map<int, CameraView> get_map_camviews() const;
+    std::vector<V3D> get_locations() const;
+    std::map<int, V3D> get_map_locations() const;
     bool IsUndistorted() const;
 
     Camera cam(const int cam_id) const;
@@ -62,6 +65,8 @@ public:
     double* params_data(const int img_id);
     double* qvec_data(const int img_id);
     double* tvec_data(const int img_id);
+    
+    ImageCollection apply_similarity_transform(const SimilarityTransform3& transform) const;
 
 private:
     std::map<int, Camera> cameras;
