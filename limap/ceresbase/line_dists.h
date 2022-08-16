@@ -45,7 +45,8 @@ T CeresComputeDist3D_sine(const T dir1[3], const T dir2[3]) {
         dir1_normalized[i] = dir1[i] / dir1_norm;
         dir2_normalized[i] = dir2[i] / dir2_norm;
     }
-    T res = ceres::CrossProduct(dir1_normalized, dir2_normalized);
+    T res[3];
+    ceres::CrossProduct(dir1_normalized, dir2_normalized, res);
     T sine = res[0] * res[0] + res[1] * res[1] + res[2] * res[2];
     sine = ceres::abs(sine);
     if (sine > T(1.0))
