@@ -1,5 +1,5 @@
-#ifndef LIMAP_OPTIMIZE_REFINEMENT_COST_FUNCTIONS_H_
-#define LIMAP_OPTIMIZE_REFINEMENT_COST_FUNCTIONS_H_
+#ifndef LIMAP_OPTIMIZE_LINE_REFINEMENT_COST_FUNCTIONS_H_
+#define LIMAP_OPTIMIZE_LINE_REFINEMENT_COST_FUNCTIONS_H_
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
@@ -25,7 +25,7 @@ namespace limap {
 
 namespace optimize {
 
-namespace refinement {
+namespace line_refinement {
 
 ////////////////////////////////////////////////////////////
 // VP Constraints 
@@ -498,7 +498,7 @@ protected:
     const double* tvec_tgt_;
 };
 
-} // namespace refinement
+} // namespace line_refinement
 
 } // namespace optimize
 

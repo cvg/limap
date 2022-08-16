@@ -1,5 +1,5 @@
-#include "optimize/refinement/refine.h"
-#include "optimize/refinement/cost_functions.h"
+#include "optimize/line_refinement/refine.h"
+#include "optimize/line_refinement/cost_functions.h"
 #include "base/camera_models.h"
 
 #include <colmap/util/logging.h>
@@ -11,7 +11,7 @@ namespace limap {
 
 namespace optimize {
 
-namespace refinement {
+namespace line_refinement {
 
 template <typename DTYPE, int CHANNELS>
 void RefinementEngine<DTYPE, CHANNELS>::Initialize(const LineTrack& track,
@@ -564,7 +564,7 @@ std::vector<std::vector<std::pair<int, V2D>>> RefinementEngine<DTYPE, CHANNELS>:
 // Register
 template class RefinementEngine<float16, 128>;
 
-} // namespace refinement
+} // namespace line_refinement
 
 } // namespace optimize
 

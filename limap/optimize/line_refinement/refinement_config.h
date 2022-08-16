@@ -1,5 +1,5 @@
-#ifndef LIMAP_OPTIMIZE_REFINEMENT_REFINEMENT_CONFIG_H_
-#define LIMAP_OPTIMIZE_REFINEMENT_REFINEMENT_CONFIG_H_
+#ifndef LIMAP_OPTIMIZE_LINE_REFINEMENT_REFINEMENT_CONFIG_H_
+#define LIMAP_OPTIMIZE_LINE_REFINEMENT_REFINEMENT_CONFIG_H_
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
@@ -14,7 +14,7 @@ namespace limap {
 
 namespace optimize {
 
-namespace refinement {
+namespace line_refinement {
 
 class RefinementConfig {
 public:
@@ -87,7 +87,7 @@ public:
     bool print_summary = true;
 };
 
-} // namespace refinement
+} // namespace line_refinement
 
 } // namespace optimize
 

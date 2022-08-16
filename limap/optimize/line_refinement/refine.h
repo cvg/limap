@@ -1,5 +1,5 @@
-#ifndef LIMAP_OPTIMIZE_REFINEMENT_REFINE_H_
-#define LIMAP_OPTIMIZE_REFINEMENT_REFINE_H_
+#ifndef LIMAP_OPTIMIZE_LINE_REFINEMENT_REFINE_H_
+#define LIMAP_OPTIMIZE_LINE_REFINEMENT_REFINE_H_
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
@@ -17,7 +17,7 @@
 #include <ceres/ceres.h>
 #include <tuple>
 
-#include "optimize/refinement/refinement_config.h"
+#include "optimize/line_refinement/refinement_config.h"
 
 namespace py = pybind11;
 
@@ -25,7 +25,7 @@ namespace limap {
 
 namespace optimize {
 
-namespace refinement {
+namespace line_refinement {
 
 class RefinementCallback: public ceres::IterationCallback {
 public:
@@ -117,7 +117,7 @@ public:
     RefinementCallback state_collector_;
 };
 
-} // namespace refinement
+} // namespace line_refinement
 
 } // namespace optimize
 

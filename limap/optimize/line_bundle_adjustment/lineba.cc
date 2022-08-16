@@ -1,5 +1,5 @@
 #include "optimize/line_bundle_adjustment/lineba.h"
-#include "optimize/refinement/cost_functions.h"
+#include "optimize/line_refinement/cost_functions.h"
 
 #include <colmap/util/logging.h>
 #include <colmap/util/threading.h>
@@ -10,7 +10,7 @@ namespace limap {
 
 namespace optimize {
 
-namespace lineBA {
+namespace line_bundle_adjustment {
 
 template <typename DTYPE, int CHANNELS>
 void LineBAEngine<DTYPE, CHANNELS>::InitializeVPs(const std::vector<vpdetection::VPResult>& vpresults) {
@@ -153,7 +153,7 @@ void LineBAEngine<DTYPE, CHANNELS>::AddGeometricResiduals(const int track_id) {
             switch (model_id) {
 #define CAMERA_MODEL_CASE(CameraModel) \
     case CameraModel::kModelId:        \
-        cost_function = refinement::GeometricRefinementFunctor<CameraModel>::Create(line, NULL, NULL, NULL, config_.geometric_alpha); \
+        cost_function = line_refinement::GeometricRefinementFunctor<CameraModel>::Create(line, NULL, NULL, NULL, config_.geometric_alpha); \
         break;
             LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
 #undef CAMERA_MODEL_CASE
@@ -194,7 +194,7 @@ void LineBAEngine<DTYPE, CHANNELS>::AddVPResiduals(const int track_id) {
                 switch (model_id) {
 #define CAMERA_MODEL_CASE(CameraModel) \
     case CameraModel::kModelId:        \
-        cost_function = refinement::VPConstraintsFunctor<CameraModel>::Create(vp); \
+        cost_function = line_refinement::VPConstraintsFunctor<CameraModel>::Create(vp); \
         break;
             LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
 #undef CAMERA_MODEL_CASE
@@ -241,7 +241,7 @@ void LineBAEngine<DTYPE, CHANNELS>::AddHeatmapResiduals(const int track_id) {
             switch (model_id) {
 #define CAMERA_MODEL_CASE(CameraModel) \
     case CameraModel::kModelId:        \
-        cost_function = refinement::MaxHeatmapFunctor<CameraModel, DTYPE>::Create(p_heatmaps_itp_[img_id], samples); \
+        cost_function = line_refinement::MaxHeatmapFunctor<CameraModel, DTYPE>::Create(p_heatmaps_itp_[img_id], samples); \
         break;
             LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
 #undef CAMERA_MODEL_CASE
@@ -298,7 +298,7 @@ void LineBAEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals(const int tra
             switch (view_ref.cam.ModelId()) {
 #define CAMERA_MODEL_CASE(CameraModel) \
     case CameraModel::kModelId:        \
-        cost_function = refinement::FeatureConsisSrcFunctor<CameraModel, PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[track_id][ref_index], sample, ref_descriptor);
+        cost_function = line_refinement::FeatureConsisSrcFunctor<CameraModel, PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[track_id][ref_index], sample, ref_descriptor);
         break;
             LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
 #undef CAMERA_MODEL_CASE
@@ -324,7 +324,7 @@ void LineBAEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals(const int tra
 
 #define CAMERA_MODEL_CASE(CameraModel) \
     case CameraModel::kModelId:        \
-        cost_function = refinement::FeatureConsisTgtFunctor<colmap::SimplePinholeCameraModel, CameraModel, PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[track_id][ref_index], p_patches_itp_[track_id][tgt_index], sample, ref_descriptor);  \
+        cost_function = line_refinement::FeatureConsisTgtFunctor<colmap::SimplePinholeCameraModel, CameraModel, PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[track_id][ref_index], p_patches_itp_[track_id][tgt_index], sample, ref_descriptor);  \
         break;
             LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
 #undef CAMERA_MODEL_CASE
@@ -336,7 +336,7 @@ void LineBAEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals(const int tra
 
 #define CAMERA_MODEL_CASE(CameraModel) \
     case CameraModel::kModelId:        \
-        cost_function = refinement::FeatureConsisTgtFunctor<colmap::PinholeCameraModel, CameraModel, PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[track_id][ref_index], p_patches_itp_[track_id][tgt_index], sample, ref_descriptor);  \
+        cost_function = line_refinement::FeatureConsisTgtFunctor<colmap::PinholeCameraModel, CameraModel, PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[track_id][ref_index], p_patches_itp_[track_id][tgt_index], sample, ref_descriptor);  \
         break;
             LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
 #undef CAMERA_MODEL_CASE
@@ -470,7 +470,7 @@ std::vector<std::vector<V2D>> LineBAEngine<DTYPE, CHANNELS>::GetHeatmapIntersect
 // Only float16 can be supported (due to limited memory) for the full bundle adjustment
 template class LineBAEngine<float16, 128>;
 
-} // namespace lineBA 
+} // namespace line_bundle_adjustment 
 
 } // namespace optimize 
 

@@ -1,4 +1,4 @@
-set(FOLDER_NAME "refinement")
+set(FOLDER_NAME "line_refinement")
 
 LIMAP_ADD_SOURCES(
     bindings.cc

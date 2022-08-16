@@ -5,7 +5,7 @@
 #include <pybind11/numpy.h>
 #include "_limap/helpers.h"
 
-#include "optimize/refinement/refinement_config.h"
+#include "optimize/line_refinement/refinement_config.h"
 
 namespace py = pybind11;
 
@@ -13,12 +13,12 @@ namespace limap {
 
 namespace optimize {
 
-namespace lineBA {
+namespace line_bundle_adjustment {
 
-class LineBAConfig: public refinement::RefinementConfig {
+class LineBAConfig: public line_refinement::RefinementConfig {
 public:
-    LineBAConfig(): refinement::RefinementConfig() {}
-    LineBAConfig(py::dict dict): refinement::RefinementConfig(dict) {
+    LineBAConfig(): line_refinement::RefinementConfig() {}
+    LineBAConfig(py::dict dict): line_refinement::RefinementConfig(dict) {
         ASSIGN_PYDICT_ITEM(dict, constant_intrinsics, bool);
         ASSIGN_PYDICT_ITEM(dict, constant_pose, bool);
         ASSIGN_PYDICT_ITEM(dict, constant_line, bool);
@@ -28,7 +28,7 @@ public:
     bool constant_line = false;
 };
 
-} // namespace lineBA 
+} // namespace line_bundle_adjustment
 
 } // namespace optimize 
 

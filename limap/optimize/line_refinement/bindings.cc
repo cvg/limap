@@ -7,8 +7,8 @@
 #include <Eigen/Core>
 #include "_limap/helpers.h"
 
-#include "optimize/refinement/refine.h"
-#include "optimize/refinement/refinement_config.h"
+#include "optimize/line_refinement/refine.h"
+#include "optimize/line_refinement/refinement_config.h"
 
 namespace py = pybind11;
 
@@ -16,7 +16,7 @@ namespace limap {
 
 template <typename DTYPE, int CHANNELS>
 void bind_refinement_engine(py::module& m, std::string type_suffix) {
-    using namespace optimize::refinement;
+    using namespace optimize::line_refinement;
 
     using RFEngine = RefinementEngine<DTYPE, CHANNELS>;
 
@@ -36,8 +36,8 @@ void bind_refinement_engine(py::module& m, std::string type_suffix) {
         .def("GetFConsistencyIntersections", &RFEngine::GetFConsistencyIntersections);
 }
 
-void bind_refinement(py::module &m) {
-    using namespace optimize::refinement;
+void bind_line_refinement(py::module &m) {
+    using namespace optimize::line_refinement;
 
     py::class_<RefinementConfig>(m, "RefinementConfig")
         .def(py::init<>())
