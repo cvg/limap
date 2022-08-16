@@ -86,41 +86,30 @@ protected:
 ////////////////////////////////////////////////////////////
 
 template <typename T>
-T CeresComputeDist_sine(const T dir1[2], const T dir2[2]) {
-    T dir1_norm = ceres::sqrt(dir1[0] * dir1[0] + dir1[1] * dir1[1] + EPS);
-    T dir2_norm = ceres::sqrt(dir2[0] * dir2[0] + dir2[1] * dir2[1] + EPS);
-    T sine = (dir1[0] * dir2[1] - dir1[1] * dir2[0]) / (dir1_norm * dir2_norm);
-    sine = ceres::abs(sine);
-    if (sine > T(1.0))
-        sine = T(1.0);
-    return sine;
-}
-
-template <typename T>
-void Ceres_PerpendicularDist1D(const T p2d[2], const T dir2d[2], const T p1[2], const T p2[2], T* res) {
+void Ceres_PerpendicularDist2D(const T p2d[2], const T dir2d[2], const T p1[2], const T p2[2], T* res) {
     T disp1[2], disp2[2];
     disp1[0] = p1[0] - p2d[0];
     disp1[1] = p1[1] - p2d[1];
     disp2[0] = p2[0] - p2d[0];
     disp2[1] = p2[1] - p2d[1];
-    T sine1 = CeresComputeDist_sine(dir2d, disp1);
+    T sine1 = CeresComputeDist2D_sine(dir2d, disp1);
     T dist1 = ceres::sqrt(disp1[0] * disp1[0] + disp1[1] * disp1[1] + EPS) * sine1;
-    T sine2 = CeresComputeDist_sine(dir2d, disp2);
+    T sine2 = CeresComputeDist2D_sine(dir2d, disp2);
     T dist2 = ceres::sqrt(disp2[0] * disp2[0] + disp2[1] * disp2[1] + EPS) * sine2;
 
     res[0] = dist1; res[1] = dist2;
 }
 
 template <typename T>
-void Ceres_CosineWeightedPerpendicularDist1D(const T p2d[2], const T dir2d[2], const T p1[2], const T p2[2], T* res, const double alpha=10.0) {
+void Ceres_CosineWeightedPerpendicularDist2D_1D(const T p2d[2], const T dir2d[2], const T p1[2], const T p2[2], T* res, const double alpha=10.0) {
     const T alpha_t = T(alpha);
     T direc[2];
     direc[0] = p2[0] - p1[0];
     direc[1] = p2[1] - p1[1];
-    T cosine = CeresComputeDist_cosine(dir2d, direc);
+    T cosine = CeresComputeDist2D_cosine(dir2d, direc);
     T weight = ceres::exp(alpha_t * (T(1.0) - cosine));
 
-    Ceres_PerpendicularDist1D(p2d, dir2d, p1, p2, res);
+    Ceres_PerpendicularDist2D(p2d, dir2d, p1, p2, res);
     res[0] *= weight; res[1] *= weight;
 }
 
@@ -167,7 +156,7 @@ public:
         const Line2d& line = line2d_;
         T p1[2] = {T(line.start(0)), T(line.start(1))};
         T p2[2] = {T(line.end(0)), T(line.end(1))};
-        Ceres_CosineWeightedPerpendicularDist1D(p2d, dir2d, p1, p2, residuals, alpha_);
+        Ceres_CosineWeightedPerpendicularDist2D_1D(p2d, dir2d, p1, p2, residuals, alpha_);
         return true;
     }
 
