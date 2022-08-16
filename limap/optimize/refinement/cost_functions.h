@@ -86,17 +86,42 @@ protected:
 ////////////////////////////////////////////////////////////
 
 template <typename T>
-T Ceres_GeometricRefinementResidual(const T p2d[2], const T dir2d[2], const T p1[2], const T p2[2], const double& alpha) {
-    // (dist1 + dist2) * exp(alpha * (1 - cosine))
+T CeresComputeDist_sine(const T dir1[2], const T dir2[2]) {
+    T dir1_norm = ceres::sqrt(dir1[0] * dir1[0] + dir1[1] * dir1[1] + EPS);
+    T dir2_norm = ceres::sqrt(dir2[0] * dir2[0] + dir2[1] * dir2[1] + EPS);
+    T sine = (dir1[0] * dir2[1] - dir1[1] * dir2[0]) / (dir1_norm * dir2_norm);
+    sine = ceres::abs(sine);
+    if (sine > T(1.0))
+        sine = T(1.0);
+    return sine;
+}
+
+template <typename T>
+void Ceres_PerpendicularDist1D(const T p2d[2], const T dir2d[2], const T p1[2], const T p2[2], T* res) {
+    T disp1[2], disp2[2];
+    disp1[0] = p1[0] - p2d[0];
+    disp1[1] = p1[1] - p2d[1];
+    disp2[0] = p2[0] - p2d[0];
+    disp2[1] = p2[1] - p2d[1];
+    T sine1 = CeresComputeDist_sine(dir2d, disp1);
+    T dist1 = ceres::sqrt(disp1[0] * disp1[0] + disp1[1] * disp1[1] + EPS) * sine1;
+    T sine2 = CeresComputeDist_sine(dir2d, disp2);
+    T dist2 = ceres::sqrt(disp2[0] * disp2[0] + disp2[1] * disp2[1] + EPS) * sine2;
+
+    res[0] = dist1; res[1] = dist2;
+}
+
+template <typename T>
+void Ceres_CosineWeightedPerpendicularDist1D(const T p2d[2], const T dir2d[2], const T p1[2], const T p2[2], T* res, const double alpha=10.0) {
     const T alpha_t = T(alpha);
     T direc[2];
     direc[0] = p2[0] - p1[0];
     direc[1] = p2[1] - p1[1];
     T cosine = CeresComputeDist_cosine(dir2d, direc);
-    T dist1 = CeresComputeDist_squaredperp(p2d, dir2d, p1);
-    T dist2 = CeresComputeDist_squaredperp(p2d, dir2d, p2);
-    T res = (dist1 + dist2) * ceres::exp(alpha_t * (T(1.0) - cosine));
-    return res;
+    T weight = ceres::exp(alpha_t * (T(1.0) - cosine));
+
+    Ceres_PerpendicularDist1D(p2d, dir2d, p1, p2, res);
+    res[0] *= weight; res[1] *= weight;
 }
 
 template <typename CameraModel>
@@ -107,9 +132,9 @@ public:
     
     static ceres::CostFunction* Create(const Line2d& line2d, const double* params = NULL, const double* qvec = NULL, const double* tvec = NULL, const double alpha = 10.0) {
         if (!params && !qvec && !tvec)
-            return new ceres::AutoDiffCostFunction<GeometricRefinementFunctor, 1, 4, 2, CameraModel::kNumParams, 4, 3>(new GeometricRefinementFunctor(line2d, NULL, NULL, NULL, alpha));
+            return new ceres::AutoDiffCostFunction<GeometricRefinementFunctor, 2, 4, 2, CameraModel::kNumParams, 4, 3>(new GeometricRefinementFunctor(line2d, NULL, NULL, NULL, alpha));
         else
-            return new ceres::AutoDiffCostFunction<GeometricRefinementFunctor, 1, 4, 2>(new GeometricRefinementFunctor(line2d, params, qvec, tvec, alpha));
+            return new ceres::AutoDiffCostFunction<GeometricRefinementFunctor, 2, 4, 2>(new GeometricRefinementFunctor(line2d, params, qvec, tvec, alpha));
     }
 
     template <typename T>
@@ -142,7 +167,7 @@ public:
         const Line2d& line = line2d_;
         T p1[2] = {T(line.start(0)), T(line.start(1))};
         T p2[2] = {T(line.end(0)), T(line.end(1))};
-        residuals[0] = Ceres_GeometricRefinementResidual(p2d, dir2d, p1, p2, alpha_);
+        Ceres_CosineWeightedPerpendicularDist1D(p2d, dir2d, p1, p2, residuals, alpha_);
         return true;
     }
 

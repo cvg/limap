@@ -19,7 +19,7 @@ namespace refinement {
 class RefinementConfig {
 public:
     RefinementConfig() {
-        geometric_loss_function.reset(new ceres::CauchyLoss(0.1));
+        geometric_loss_function.reset(new ceres::CauchyLoss(0.25));
         vp_loss_function.reset(new ceres::CauchyLoss(0.2));
         heatmap_loss_function.reset(new ceres::HuberLoss(0.001));
         fconsis_loss_function.reset(new ceres::CauchyLoss(0.25));
