@@ -60,6 +60,9 @@ public:
 void ComputeLineWeights(const LineTrack& track,
                         std::vector<double>& weights); // weights.size() == track.count_lines()
 
+void ComputeLineWeightsNormalized(const LineTrack& track,
+                                  std::vector<double>& weights); // weights.size() == track.count_lines()
+
 void ComputeHeatmapSamples(const LineTrack& track, 
                            std::vector<std::vector<InfiniteLine2d>>& heatmap_samples, // samples for each line
                            const std::pair<double, double> sample_range,

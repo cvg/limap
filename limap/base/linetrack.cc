@@ -222,8 +222,8 @@ std::map<int, std::vector<int>> LineTrack::GetIdMap() const {
     return m;
 }
 
-void ComputeLineWeights(const LineTrack& track,
-                        std::vector<double>& weights)
+void ComputeLineWeightsNormalized(const LineTrack& track,
+                                  std::vector<double>& weights)
 {
     int n_lines = track.count_lines();
     int n_images = track.count_images();
@@ -250,6 +250,17 @@ void ComputeLineWeights(const LineTrack& track,
         double length = track.line2d_list[i].length();
         double weight = 100.0 * length / sum_lengths.at(image_id);
         weight = weight * sum_lengths.at(image_id) / all_length;
+        weights.push_back(weight);
+    }
+}
+
+void ComputeLineWeights(const LineTrack& track,
+                        std::vector<double>& weights)
+{
+    weights.clear();
+    for (size_t i = 0; i < track.count_lines(); ++i) {
+        double length = track.line2d_list[i].length();
+        double weight = length / 30.0;
         weights.push_back(weight);
     }
 }
