@@ -107,6 +107,6 @@ LIMAP_ADD_SOURCE_DIR(limap/features BASE_SRCS *.h *.cc)
 LIMAP_ADD_SOURCE_DIR(limap/evaluation BASE_SRCS *.h *.cc)
 LIMAP_ADD_SOURCE_DIR(limap/fitting BASE_SRCS *.h *.cc)
 LIMAP_ADD_SOURCE_DIR(limap/optimize BASE_SRCS *.h *.cc)
-LIMAP_ADD_SOURCE_DIR(limap/optimize/refinement BASE_SRCS *.h *.cc)
+LIMAP_ADD_SOURCE_DIR(limap/optimize/line_refinement BASE_SRCS *.h *.cc)
 LIMAP_ADD_SOURCE_DIR(limap/optimize/line_bundle_adjustment BASE_SRCS *.h *.cc)
 
