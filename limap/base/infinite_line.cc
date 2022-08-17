@@ -156,7 +156,6 @@ InfiniteLine3d MinimalInfiniteLine3d::GetInfiniteLine() const {
 }
 
 Line3d GetLineSegmentFromInfiniteLine3d(const InfiniteLine3d& inf_line, const std::vector<CameraView>& views, const std::vector<Line2d>& line2ds, const int num_outliers) {
-    // TODO: not sure this function is working.
     THROW_CHECK_EQ(views.size(), line2ds.size());
     int n_lines = line2ds.size();
     V3D dir = inf_line.direc.normalized();
