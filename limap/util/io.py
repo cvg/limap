@@ -290,7 +290,7 @@ def read_folder_linetracks_with_info(folder):
         imagecols = _base.ImageCollection(read_npy(os.path.join(folder, "imagecols.npy")).item())
     if os.path.isfile(os.path.join(folder, "all_2d_segs.npy")):
         all_2d_segs = read_npy(os.path.join(folder, "all_2d_segs.npy"))
-    return linetracks, cfg, imagecols, all_2d_segs
+    return linetracks, cfg.item(), imagecols, all_2d_segs.item()
 
 def read_txt_Line3Dpp(fname):
     linetracks = []

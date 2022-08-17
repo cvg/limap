@@ -179,7 +179,7 @@ void RefinementEngine<DTYPE, CHANNELS>::AddVPResiduals() {
                 switch (view.cam.ModelId()) {
 #define CAMERA_MODEL_CASE(CameraModel) \
     case CameraModel::kModelId:        \
-        cost_function = VPConstraintsFunctor<CameraModel>::Create(vp, view.cam.Params().data(), view.pose.qvec.data());
+        cost_function = VPConstraintsFunctor<CameraModel>::Create(vp, view.cam.Params().data(), view.pose.qvec.data()); \
         break;
             LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
 #undef CAMERA_MODEL_CASE
@@ -222,7 +222,7 @@ void RefinementEngine<DTYPE, CHANNELS>::AddHeatmapResiduals() {
             switch (view.cam.ModelId()) {
 #define CAMERA_MODEL_CASE(CameraModel) \
     case CameraModel::kModelId:        \
-        cost_function = MaxHeatmapFunctor<CameraModel, DTYPE>::Create(p_heatmaps_itp_[i], samples, view.cam.Params().data(), view.pose.qvec.data(), view.pose.tvec.data());
+        cost_function = MaxHeatmapFunctor<CameraModel, DTYPE>::Create(p_heatmaps_itp_[i], samples, view.cam.Params().data(), view.pose.qvec.data(), view.pose.tvec.data()); \
         break;
             LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
 #undef CAMERA_MODEL_CASE

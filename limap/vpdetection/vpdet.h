@@ -23,6 +23,7 @@ class VPResult {
 public:
     VPResult() {}
     VPResult(const std::vector<int>& labels_, const std::vector<V3D>& vps_): labels(labels_), vps(vps_) {}
+    VPResult(const VPResult& input): labels(input.labels), vps(input.vps) {}
 
     std::vector<int> labels;
     std::vector<V3D> vps;
@@ -58,7 +59,7 @@ public:
 
     std::vector<int> ComputeVPLabels(const std::vector<Line2d>& lines) const; // cluster id for each line, -1 for no associated vp
     VPResult AssociateVPs(const std::vector<Line2d>& lines) const;
-    std::vector<VPResult> AssociateVPsParallel(const std::vector<std::vector<Line2d>>& all_lines) const;
+    std::map<int, VPResult> AssociateVPsParallel(const std::map<int, std::vector<Line2d>>& all_lines) const;
 
 private:
     V3D fitVP(const std::vector<Line2d>& lines) const;

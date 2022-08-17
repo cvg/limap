@@ -13,7 +13,6 @@ def one_by_one_refinement(cfg):
     One by one refinement
     '''
     linetracks, cfg_info, imagecols, all_2d_segs = limapio.read_folder_linetracks_with_info(cfg["input_folder"])
-    cfg_info = cfg_info.item()
 
     # vp
     vpresults = None
@@ -36,7 +35,6 @@ def joint_refinement(cfg):
     Joint refinement
     '''
     linetracks, cfg_info, imagecols, all_2d_segs = limapio.read_folder_linetracks_with_info(cfg["input_folder"])
-    cfg_info = cfg_info.item()
 
     # vp
     vpresults = None

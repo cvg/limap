@@ -17,6 +17,7 @@ void bind_vpdetection(py::module &m) {
     py::class_<VPResult>(m, "VPResult")
         .def(py::init<>())
         .def(py::init<const std::vector<int>&, const std::vector<V3D>&>())
+        .def(py::init<const VPResult&>())
         .def_readonly("labels", &VPResult::labels)
         .def_readonly("vps", &VPResult::vps)
         .def("count_lines", &VPResult::count_lines)

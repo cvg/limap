@@ -107,15 +107,18 @@ VPResult VPDetector::AssociateVPs(const std::vector<Line2d>& lines) const
     return VPResult(labels, vps);
 }
 
-std::vector<VPResult> VPDetector::AssociateVPsParallel(const std::vector<std::vector<Line2d>>& all_lines) const {
-    size_t n_images = all_lines.size();
-    std::vector<VPResult> vpresults(n_images);
+std::map<int, VPResult> VPDetector::AssociateVPsParallel(const std::map<int, std::vector<Line2d>>& all_lines) const {
+    std::vector<int> image_ids;
+    for (std::map<int, std::vector<Line2d>>::const_iterator it = all_lines.begin(); it != all_lines.end(); ++it) {
+        image_ids.push_back(it->first);
+    }
     
-    progressbar bar(n_images);
+    std::map<int, VPResult> vpresults;
+    progressbar bar(image_ids.size());
 #pragma omp parallel for
-    for (size_t img_id = 0; img_id < n_images; ++img_id) {
+    for (const int& img_id: image_ids) {
         bar.update();
-        vpresults[img_id] = AssociateVPs(all_lines[img_id]);
+        vpresults.insert(std::make_pair(img_id, AssociateVPs(all_lines.at(img_id))));
     }
     return vpresults;
 }
