@@ -150,7 +150,7 @@ InfiniteLine3d MinimalInfiniteLine3d::GetInfiniteLine() const {
 
     // transform plucker coordniate
     InfiniteLine3d inf_line;
-    inf_line.direc = a;
+    inf_line.direc = a.normalized();
     inf_line.p = a.cross(b) / (a.squaredNorm());
     return inf_line;
 }
