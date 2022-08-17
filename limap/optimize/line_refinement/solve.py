@@ -1,7 +1,7 @@
 from _limap import _base, _ceresbase, _optimize
 import numpy as np
 
-def solve_refinement(cfg, track, p_camviews, p_vpresults=None, p_heatmaps=None, p_patches=None, p_features=None, dtype="float16"):
+def solve_line_refinement(cfg, track, p_camviews, p_vpresults=None, p_heatmaps=None, p_patches=None, p_features=None, dtype="float16"):
     '''
     p_patches: list of PatchInfo_f objects
     '''

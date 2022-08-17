@@ -7,18 +7,18 @@
 #include <Eigen/Core>
 #include "_limap/helpers.h"
 
-#include "optimize/refinement/bindings.cc"
+#include "optimize/line_refinement/bindings.cc"
 #include "optimize/line_bundle_adjustment/bindings.cc"
 
 namespace py = pybind11;
 
 namespace limap {
 
-void bind_refinement(py::module& m);
+void bind_line_refinement(py::module& m);
 void bind_line_bundle_adjustment(py::module& m);
 
 void bind_optimize(py::module &m) {
-    bind_refinement(m);
+    bind_line_refinement(m);
     bind_line_bundle_adjustment(m);
 }
 

@@ -20,7 +20,7 @@ namespace limap {
 
 namespace optimize {
 
-namespace lineBA {
+namespace line_bundle_adjustment {
 
 template <typename DTYPE, int CHANNELS>
 class LineBAEngine {
@@ -82,7 +82,7 @@ public:
     ceres::Solver::Summary summary_;
 };
 
-} // namespace lineBA 
+} // namespace line_bundle_adjustment 
 
 } // namespace optimize 
 

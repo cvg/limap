@@ -16,7 +16,7 @@ namespace limap {
 
 template <typename DTYPE, int CHANNELS>
 void bind_lineba_engine(py::module& m, std::string type_suffix) {
-    using namespace optimize::lineBA;
+    using namespace optimize::line_bundle_adjustment;
 
     using BAEngine = LineBAEngine<DTYPE, CHANNELS>;
 
@@ -38,7 +38,7 @@ void bind_lineba_engine(py::module& m, std::string type_suffix) {
 }
 
 void bind_line_bundle_adjustment(py::module &m) {
-    using namespace optimize::lineBA;
+    using namespace optimize::line_bundle_adjustment;
 
     py::class_<LineBAConfig>(m, "LineBAConfig")
         .def(py::init<>())
