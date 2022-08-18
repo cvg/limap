@@ -31,7 +31,8 @@ void bind_vplib(py::module &m) {
         .def(py::init<py::dict>())
         .def_readwrite("min_length", &JLinkageConfig::min_length)
         .def_readwrite("inlier_threshold", &JLinkageConfig::inlier_threshold)
-        .def_readwrite("min_num_supports", &JLinkageConfig::min_num_supports);
+        .def_readwrite("min_num_supports", &JLinkageConfig::min_num_supports)
+        .def_readwrite("th_perp_supports", &JLinkageConfig::th_perp_supports);
 
     py::class_<JLinkage>(m, "JLinkage")
         .def(py::init<>())

@@ -2,11 +2,12 @@ import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 
-import limap.base as _base
-import limap.vplib as _vplib
 import limap.util.io as limapio
 import limap.util.config as cfgutils
-import limap.optimize
+
+import limap.base as _base
+import limap.vplib as _vplib
+import limap.optimize as _optim
 
 def one_by_one_refinement(cfg):
     '''
@@ -21,7 +22,7 @@ def one_by_one_refinement(cfg):
         vpresults = _vplib.AssociateVPsParallel(all_2d_lines)
 
     # one-by-one refinement
-    newtracks = limap.optimize.line_refinement(cfg["refinement"], linetracks, imagecols, cfg["heatmap_folder"], cfg["patch_folder"], cfg["featuremap_folder"], vpresults=vpresults)
+    newtracks = _optim.line_refinement(cfg["refinement"], linetracks, imagecols, cfg["heatmap_folder"], cfg["patch_folder"], cfg["featuremap_folder"], vpresults=vpresults)
 
     # write
     newlines = np.array([track.line.as_array() for track in newtracks if track.count_images() >= cfg_info["n_visible_views"]])
@@ -44,7 +45,7 @@ def joint_refinement(cfg):
 
     # joint refinement
     reconstruction = _base.LineReconstruction(linetracks, imagecols)
-    lineba_engine = limap.optimize.solve_line_bundle_adjustment(cfg["refinement"], reconstruction, vpresults=vpresults, max_num_iterations=200)
+    lineba_engine = _optim.solve_line_bundle_adjustment(cfg["refinement"], reconstruction, vpresults=vpresults, max_num_iterations=200)
     new_reconstruction = lineba_engine.GetOutputReconstruction()
     newtracks = new_reconstruction.GetTracks(num_outliers=cfg["refinement"]["num_outliers_aggregator"])
     imagecols_output = new_reconstruction.GetImagecols()

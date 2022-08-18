@@ -50,18 +50,32 @@ std::vector<int> JLinkage::ComputeVPLabels(const std::vector<Line2d>& lines) con
         delete pts[i];
 
     // determine valid labels
-    int counter = 0;
-    while (counter < LabelCount.size()) {
-        if (LabelCount[counter] < config_.min_num_supports)
-            break;
-        counter++;
+    std::vector<std::vector<Line2d>> all_supports(LabelCount.size());
+    for (size_t i = 0; i < n_valid_lines; ++i) {
+        int label = Labels[i];
+        if (label < 0)
+            continue;
+        all_supports[label].push_back(lines[valid_ids[i]]);
     }
-    int n_vps = counter;
+    std::vector<int> vp_ids(LabelCount.size(), -1);
+    int counter = 0;
+    for (size_t i = 0; i < LabelCount.size(); ++i) {
+        const auto& supports = all_supports[i];
+        if (supports.size() < config_.min_num_supports)
+            continue;
+        int num_valid_supports = count_valid_supports_2d(supports);
+        if (num_valid_supports < config_.min_num_supports)
+            continue;
+        vp_ids[i] = counter++;
+    }
+
     for (int i = 0; i < n_valid_lines; ++i) {
         int label = Labels[i];
-        if (label >= n_vps) 
+        if (label < 0)
             continue;
-        final_labels[valid_ids[i]] = label;
+        if (vp_ids[label] < 0) 
+            continue;
+        final_labels[valid_ids[i]] = vp_ids[label];
     }
     return final_labels;
 }

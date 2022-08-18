@@ -25,11 +25,13 @@ public:
         ASSIGN_PYDICT_ITEM(dict, min_length, double)
         ASSIGN_PYDICT_ITEM(dict, inlier_threshold, double)
         ASSIGN_PYDICT_ITEM(dict, min_num_supports, int)
+        ASSIGN_PYDICT_ITEM(dict, th_perp_supports, double)
     }
 
     double min_length = 40; // in pixel
-    double inlier_threshold = 1.0;
-    int min_num_supports = 10;
+    double inlier_threshold = 1.0; // in pixel
+    int min_num_supports = 5;
+    double th_perp_supports = 3.0; // in pixel. separate different supports
 };
 
 class BaseVPDetector {
@@ -41,6 +43,8 @@ public:
 
     virtual VPResult AssociateVPs(const std::vector<Line2d>& lines) const = 0;
     std::map<int, VPResult> AssociateVPsParallel(const std::map<int, std::vector<Line2d>>& all_lines) const;
+protected:
+    int count_valid_supports_2d(const std::vector<Line2d>& lines) const; // count supports that lie on the different infinite 2d lines
 };
 
 } // namespace vplib
