@@ -8,7 +8,7 @@
 #include "base/featuremap.h"
 #include "base/featurepatch.h"
 #include "util/types.h"
-#include "vplib/vpdet.h"
+#include "vplib/vpbase.h"
 
 #include <ceres/ceres.h>
 #include "base/line_reconstruction.h"

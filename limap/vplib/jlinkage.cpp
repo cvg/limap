@@ -1,4 +1,4 @@
-#include "vplib/vpdet.h"
+#include "vplib/jlinkage.h"
 #include "base/infinite_line.h"
 
 #include <third-party/progressbar.hpp>
@@ -7,7 +7,7 @@ namespace limap {
 
 namespace vplib {
 
-std::vector<int> VPDetector::ComputeVPLabels(const std::vector<Line2d>& lines) const {
+std::vector<int> JLinkage::ComputeVPLabels(const std::vector<Line2d>& lines) const {
     // filter line
     size_t n_lines = lines.size();
     std::vector<int> final_labels(n_lines, -1);
@@ -64,7 +64,7 @@ std::vector<int> VPDetector::ComputeVPLabels(const std::vector<Line2d>& lines) c
     return final_labels;
 }
 
-V3D VPDetector::fitVP(const std::vector<Line2d>& lines) const {
+V3D JLinkage::fitVP(const std::vector<Line2d>& lines) const {
     int n_lines = lines.size();
     Eigen::MatrixXd A(lines.size(), 3);
     for (int i = 0; i < n_lines; ++i) {
@@ -79,7 +79,7 @@ V3D VPDetector::fitVP(const std::vector<Line2d>& lines) const {
     return p_homo;
 }
 
-VPResult VPDetector::AssociateVPs(const std::vector<Line2d>& lines) const
+VPResult JLinkage::AssociateVPs(const std::vector<Line2d>& lines) const
 {
     std::vector<int> labels;
     std::vector<V3D> vps;
@@ -105,22 +105,6 @@ VPResult VPDetector::AssociateVPs(const std::vector<Line2d>& lines) const
         vps[i] = fitVP(supports[i]);
     }
     return VPResult(labels, vps);
-}
-
-std::map<int, VPResult> VPDetector::AssociateVPsParallel(const std::map<int, std::vector<Line2d>>& all_lines) const {
-    std::vector<int> image_ids;
-    for (std::map<int, std::vector<Line2d>>::const_iterator it = all_lines.begin(); it != all_lines.end(); ++it) {
-        image_ids.push_back(it->first);
-    }
-    
-    std::map<int, VPResult> vpresults;
-    progressbar bar(image_ids.size());
-#pragma omp parallel for
-    for (const int& img_id: image_ids) {
-        bar.update();
-        vpresults.insert(std::make_pair(img_id, AssociateVPs(all_lines.at(img_id))));
-    }
-    return vpresults;
 }
 
 } // namespace vplib

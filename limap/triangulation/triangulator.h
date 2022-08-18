@@ -7,7 +7,7 @@
 #include "base/line_linker.h"
 #include "base/image_collection.h"
 #include "base/graph.h"
-#include "vplib/vpdet.h"
+#include "vplib/jlinkage.h"
 
 #include <tuple>
 
@@ -37,7 +37,7 @@ public:
         ASSIGN_PYDICT_ITEM(dict, num_outliers_aggregator, int)
         ASSIGN_PYDICT_ITEM(dict, debug_mode, bool)
         if (dict.contains("vpdet_config"))
-            vpdet_config = vplib::VPDetectorConfig(dict["vpdet_config"]);
+            vpdet_config = vplib::JLinkageConfig(dict["vpdet_config"]);
         if (dict.contains("linker2d_config"))
             linker2d_config = LineLinker2dConfig(dict["linker2d_config"]);
         if (dict.contains("linker3d_config"))
@@ -46,7 +46,7 @@ public:
 
     bool add_halfpix = false; // offset half pixel for each line
     bool use_vp = true;
-    vplib::VPDetectorConfig vpdet_config;
+    vplib::JLinkageConfig vpdet_config;
 
     double min_length_2d = 20.0;
     double var2d = 2.0;
@@ -71,7 +71,7 @@ public:
     Triangulator(py::dict dict): Triangulator(TriangulatorConfig(dict)) {};
     TriangulatorConfig config_;
     LineLinker linker_;
-    const vplib::VPDetector vpdetector_;
+    const vplib::JLinkage vpdetector_;
 
     void Init(const std::map<int, std::vector<Line2d>>& all_2d_segs,
               const ImageCollection& imagecols);

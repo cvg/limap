@@ -7,7 +7,8 @@
 #include <Eigen/Core>
 #include "_limap/helpers.h"
 
-#include "vplib/vpdet.h"
+#include "vplib/vpbase.h"
+#include "vplib/jlinkage.h"
 
 namespace limap {
 
@@ -25,20 +26,20 @@ void bind_vplib(py::module &m) {
         .def("HasVP", &VPResult::HasVP)
         .def("GetVP", &VPResult::GetVP);
     
-    py::class_<VPDetectorConfig>(m, "VPDetectorConfig")
+    py::class_<JLinkageConfig>(m, "JLinkageConfig")
         .def(py::init<>())
         .def(py::init<py::dict>())
-        .def_readwrite("min_length", &VPDetectorConfig::min_length)
-        .def_readwrite("inlier_threshold", &VPDetectorConfig::inlier_threshold)
-        .def_readwrite("min_num_supports", &VPDetectorConfig::min_num_supports);
+        .def_readwrite("min_length", &JLinkageConfig::min_length)
+        .def_readwrite("inlier_threshold", &JLinkageConfig::inlier_threshold)
+        .def_readwrite("min_num_supports", &JLinkageConfig::min_num_supports);
 
-    py::class_<VPDetector>(m, "VPDetector")
+    py::class_<JLinkage>(m, "JLinkage")
         .def(py::init<>())
-        .def(py::init<const VPDetectorConfig&>())
+        .def(py::init<const JLinkageConfig&>())
         .def(py::init<py::dict>())
-        .def("ComputeVPLabels", &VPDetector::ComputeVPLabels)
-        .def("AssociateVPs", &VPDetector::AssociateVPs)
-        .def("AssociateVPsParallel", &VPDetector::AssociateVPsParallel); 
+        .def("ComputeVPLabels", &JLinkage::ComputeVPLabels)
+        .def("AssociateVPs", &JLinkage::AssociateVPs)
+        .def("AssociateVPsParallel", &JLinkage::AssociateVPsParallel); 
 }
 
 } // namespace limap
