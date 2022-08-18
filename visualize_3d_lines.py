@@ -30,6 +30,7 @@ def vis_reconstruction(linetracks, imagecols, mode="open3d", n_visible_views=4):
         VisTrack = limapvis.Open3DTrackVisualizer(linetracks)
     else:
         raise NotImplementedError
+    VisTrack.report()
     VisTrack.vis_reconstruction(imagecols, n_visible_views=n_visible_views)
 
 def main(args):
