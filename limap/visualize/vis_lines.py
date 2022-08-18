@@ -11,7 +11,9 @@ def pyvista_vis_3d_lines(lines, img_hw=(600, 800), width=2):
         plotter.add_lines(line.as_array(), '#ff0000', width=width)
     plotter.show()
 
-def open3d_add_points(w, points, color=[0.0, 0.0, 0.0]):
+def open3d_add_points(w, points, color=[0.0, 0.0, 0.0], psize=1.0, name="pcd"):
+    if np.array(points).shape[0] == 0:
+        return w
     import open3d as o3d
     o3d_points, o3d_colors = [], []
     for idx in range(np.array(points).shape[0]):
@@ -22,10 +24,11 @@ def open3d_add_points(w, points, color=[0.0, 0.0, 0.0]):
     pcd.colors = o3d.utility.Vector3dVector(np.stack(o3d_colors))
     mat = o3d.visualization.rendering.MaterialRecord()
     mat.shader = "defaultUnlit"
-    w.add_geometry("pcd", pcd, mat)
+    mat.point_size = psize
+    w.add_geometry(name, pcd, mat)
     return w
 
-def open3d_add_line_set(w, lines, color=[0.0, 0.0, 0.0], width=2):
+def open3d_add_line_set(w, lines, color=[0.0, 0.0, 0.0], width=2, name="lineset"):
     import open3d as o3d
     o3d_points, o3d_lines, o3d_colors = [], [], []
     for idx, line in enumerate(lines):
@@ -40,7 +43,7 @@ def open3d_add_line_set(w, lines, color=[0.0, 0.0, 0.0], width=2):
     mat = o3d.visualization.rendering.MaterialRecord()
     mat.shader = "unlitLine"
     mat.line_width = width
-    w.add_geometry("lineset", line_set, mat)
+    w.add_geometry(name, line_set, mat)
     return w
 
 def open3d_add_cameras(w, imagecols, color=[1.0, 0.0, 0.0]):
