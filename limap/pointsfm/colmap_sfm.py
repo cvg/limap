@@ -11,20 +11,6 @@ from tqdm import tqdm
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-def run_colmap_sift_matches(image_path, db_path, use_cuda=False):
-    ### [COLMAP] feature extraction and matching
-    # feature extraction
-    cmd = ['colmap', 'feature_extractor',
-            '--database_path', db_path,
-            '--image_path', image_path,
-            '--SiftExtraction.use_gpu', str(int(use_cuda))]
-    subprocess.run(cmd, check=True)
-    # matching
-    cmd = ['colmap', 'exhaustive_matcher',
-           '--database_path', db_path,
-           '--SiftMatching.use_gpu', str(int(use_cuda))]
-    subprocess.run(cmd, check=True)
-
 def import_images_with_known_cameras(image_dir, database_path, imagecols):
     if imagecols is None:
         return reconstruction.import_images(image_dir=image_path, database_path=db_path)
@@ -46,14 +32,43 @@ def import_images_with_known_cameras(image_dir, database_path, imagecols):
         db.add_image(img_name, cam_id, image_id=img_id)
     db.commit()
 
-def run_hloc_matches(cfg, image_path, db_path, keypoints=None, imagecols=None):
+def write_pairs_from_neighbors(output_path, image_path, neighbors, image_ids):
+    image_names = sorted(os.listdir(image_path))
+    assert len(image_names) == len(image_ids)
+
+    m_img_id_to_img_name = {}
+    for img_name, img_id in zip(image_names, image_ids):
+        m_img_id_to_img_name[img_id] = img_name
+
+    # insert each pair only once
+    m_pairs = {}
+    for img_id in image_ids:
+        m_pairs[img_id] = []
+    with open(output_path, "w") as f:
+        for img_id1, neighbor in neighbors.items():
+            name1 = m_img_id_to_img_name[img_id1]
+            for img_id2 in neighbor:
+                name2 = m_img_id_to_img_name[img_id2]
+                if img_id1 < img_id2:
+                    id1 = img_id1
+                    id2 = img_id2
+                else:
+                    id1 = img_id2
+                    id2 = img_id1
+                if id2 in m_pairs[id1]:
+                    continue
+                m_pairs[id1].append(id2)
+                f.write("{0} {1}\n".format(name1, name2))
+
+def run_hloc_matches(cfg, image_path, db_path, keypoints=None, neighbors=None, imagecols=None):
     '''
-    use the id mapping from _base.ImageCollection to do the match
+    Inputs:
+    - neighbors: map<int, std::vector<int>> to avoid exhaustive matches
+    - imagecols: optionally use the id mapping from _base.ImageCollection to do the match
     '''
     image_path = Path(image_path)
     from hloc import extract_features, match_features, reconstruction, triangulation
     outputs = Path(os.path.join(os.path.dirname(db_path), 'hloc_outputs'))
-    sfm_pairs = Path(os.path.join(outputs, "pairs-exhaustive.txt"))
     sfm_dir = Path(os.path.join(outputs, "sfm"))
     feature_conf = extract_features.confs[cfg["descriptor"]]
     matcher_conf = match_features.confs[cfg["matcher"]]
@@ -61,20 +76,28 @@ def run_hloc_matches(cfg, image_path, db_path, keypoints=None, imagecols=None):
     # run superpoint
     from limap.point2d import run_superpoint
     feature_path = run_superpoint(feature_conf, image_path, outputs, keypoints=keypoints)
-    match_path = match_features.main(matcher_conf, sfm_pairs, feature_conf["output"], outputs, exhaustive=True)
-
+    if neighbors is None or imagecols is None:
+        # run exhaustive matches
+        sfm_pairs = Path(os.path.join(outputs, "pairs-exhaustive.txt"))
+        match_path = match_features.main(matcher_conf, sfm_pairs, feature_conf["output"], outputs, exhaustive=True)
+    else:
+        # run matches on neighbors
+        sfm_pairs = Path(os.path.join(outputs, "pairs-from-neighbors.txt"))
+        write_pairs_from_neighbors(sfm_pairs, image_path, neighbors, imagecols.get_img_ids())
+        match_path = match_features.main(matcher_conf, sfm_pairs, feature_conf["output"], outputs, exhaustive=False)
     sfm_dir.mkdir(parents=True, exist_ok=True)
     reconstruction.create_empty_db(db_path)
     if imagecols is None:
         reconstruction.import_images(image_dir=image_path, database_path=db_path)
     else:
+        # use the id mapping from imagecols
         import_images_with_known_cameras(image_path, db_path, imagecols) # use cameras and id mapping
     image_ids = reconstruction.get_image_ids(db_path)
     reconstruction.import_features(image_ids, db_path, feature_path)
     reconstruction.import_matches(image_ids, db_path, sfm_pairs, match_path, None, None)
     triangulation.estimation_and_geometric_verification(db_path, sfm_pairs)
 
-def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap', keypoints=None, skip_exists=False, map_to_original_image_names=True):
+def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap', keypoints=None, skip_exists=False, map_to_original_image_names=True, neighbors=None):
     ### set up path
     db_path = os.path.join(output_path, 'db.db')
     image_path = os.path.join(output_path, 'images')
@@ -105,7 +128,7 @@ def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap'
             keypoints_in_order.append(keypoints[img_id])
 
     # sift feature extraction and matching
-    run_hloc_matches(cfg["hloc"], image_path, Path(db_path), keypoints=keypoints_in_order, imagecols=imagecols)
+    run_hloc_matches(cfg["hloc"], image_path, Path(db_path), keypoints=keypoints_in_order, neighbors=neighbors, imagecols=imagecols)
 
     ### write cameras.txt
     colmap_cameras = {}
