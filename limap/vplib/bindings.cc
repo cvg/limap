@@ -7,12 +7,12 @@
 #include <Eigen/Core>
 #include "_limap/helpers.h"
 
-#include "vpdetection/vpdet.h"
+#include "vplib/vpdet.h"
 
 namespace limap {
 
-void bind_vpdetection(py::module &m) {
-    using namespace vpdetection;
+void bind_vplib(py::module &m) {
+    using namespace vplib;
 
     py::class_<VPResult>(m, "VPResult")
         .def(py::init<>())

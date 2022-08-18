@@ -98,7 +98,9 @@ add_subdirectory(limap)
 ################################################################################
 # Generate source groups for Visual Studio, XCode, etc.
 ################################################################################
-LIMAP_ADD_SOURCE_DIR(limap/vpdetection BASE_SRCS *.h *.cc)
+LIMAP_ADD_SOURCE_DIR(limap/base BASE_SRCS *.h *.cc)
+LIMAP_ADD_SOURCE_DIR(limap/ceresbase BASE_SRCS *.h *.cc)
+LIMAP_ADD_SOURCE_DIR(limap/vplib BASE_SRCS *.h *.cc)
 LIMAP_ADD_SOURCE_DIR(limap/pointsfm BASE_SRCS *.h *.cc)
 LIMAP_ADD_SOURCE_DIR(limap/triangulation BASE_SRCS *.h *.cc)
 LIMAP_ADD_SOURCE_DIR(limap/merging BASE_SRCS *.h *.cc)

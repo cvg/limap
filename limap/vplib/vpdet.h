@@ -1,5 +1,5 @@
-#ifndef LIMAP_VPDETECTION_VPDET_H_
-#define LIMAP_VPDETECTION_VPDET_H_
+#ifndef LIMAP_VPLIB_VPDET_H_
+#define LIMAP_VPLIB_VPDET_H_
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -17,7 +17,7 @@ namespace py = pybind11;
 
 namespace limap {
 
-namespace vpdetection {
+namespace vplib {
 
 class VPResult {
 public:
@@ -65,7 +65,7 @@ private:
     V3D fitVP(const std::vector<Line2d>& lines) const;
 };
 
-} // namespace vpdetection
+} // namespace vplib
 
 } // namespace limap
 

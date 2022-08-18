@@ -26,7 +26,7 @@ void RefinementEngine<DTYPE, CHANNELS>::Initialize(const LineTrack& track,
 }
 
 template <typename DTYPE, int CHANNELS>
-void RefinementEngine<DTYPE, CHANNELS>::InitializeVPs(const std::vector<vpdetection::VPResult>& p_vpresults) {
+void RefinementEngine<DTYPE, CHANNELS>::InitializeVPs(const std::vector<vplib::VPResult>& p_vpresults) {
     enable_vp = true;
     p_vpresults_ = p_vpresults;
 }

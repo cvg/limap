@@ -1,6 +1,6 @@
 add_subdirectory(base)
 add_subdirectory(ceresbase)
-add_subdirectory(vpdetection)
+add_subdirectory(vplib)
 add_subdirectory(util)
 add_subdirectory(pointsfm)
 add_subdirectory(triangulation)

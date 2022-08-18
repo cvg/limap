@@ -13,7 +13,7 @@ namespace optimize {
 namespace line_bundle_adjustment {
 
 template <typename DTYPE, int CHANNELS>
-void LineBAEngine<DTYPE, CHANNELS>::InitializeVPs(const std::vector<vpdetection::VPResult>& vpresults) {
+void LineBAEngine<DTYPE, CHANNELS>::InitializeVPs(const std::map<int, vplib::VPResult>& vpresults) {
     THROW_CHECK_EQ(reconstruction_.NumImages(), vpresults.size());
     enable_vp = true;
     vpresults_ = vpresults;

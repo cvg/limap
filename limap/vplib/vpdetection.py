@@ -1,4 +1,4 @@
-from _limap import _vpdet
+from _limap import _vplib
 
 def AssociateVPs(lines, config=None):
     '''
@@ -6,8 +6,8 @@ def AssociateVPs(lines, config=None):
     - lines: list of _base.Line2d
     '''
     if config is None:
-        config = _vpdet.VPDetectorConfig()
-    detector = _vpdet.VPDetector(config)
+        config = _vplib.VPDetectorConfig()
+    detector = _vplib.VPDetector(config)
     vpresult = detector.AssociateVPs(lines)
     return vpresult
 
@@ -17,8 +17,8 @@ def AssociateVPsParallel(all_lines, config=None):
     - lines: (n_images) list of (list of _base.Line2d)
     '''
     if config is None:
-        config = _vpdet.VPDetectorConfig()
-    detector = _vpdet.VPDetector(config)
+        config = _vplib.VPDetectorConfig()
+    detector = _vplib.VPDetector(config)
     vpresults = detector.AssociateVPsParallel(all_lines)
     return vpresults
 

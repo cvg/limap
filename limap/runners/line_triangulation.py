@@ -7,7 +7,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 import limap.base as _base
 import limap.merging as _mrg
 import limap.triangulation as _tri
-import limap.vpdetection as _vpdet
+import limap.vplib as _vplib
 import limap.optimize as _optim
 import limap.runners as _runners
 import limap.util.io as limapio
@@ -92,7 +92,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
         reconstruction = _base.LineReconstruction(linetracks, imagecols)
         vpresults = None
         if cfg["refinement"]["use_vp"]:
-            vpresults = _vpdet.AssociateVPsParallel(all_2d_lines)
+            vpresults = _vplib.AssociateVPsParallel(all_2d_lines)
         lineba_engine = _optim.solve_line_bundle_adjustment(cfg["refinement"], reconstruction, vpresults=vpresults, max_num_iterations=200)
         new_reconstruction = lineba_engine.GetOutputReconstruction()
         linetracks = new_reconstruction.GetTracks(num_outliers=cfg["refinement"]["num_outliers_aggregator"])

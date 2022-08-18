@@ -7,7 +7,7 @@
 #include "base/line_linker.h"
 #include "base/image_collection.h"
 #include "base/graph.h"
-#include "vpdetection/vpdet.h"
+#include "vplib/vpdet.h"
 
 #include <tuple>
 
@@ -37,7 +37,7 @@ public:
         ASSIGN_PYDICT_ITEM(dict, num_outliers_aggregator, int)
         ASSIGN_PYDICT_ITEM(dict, debug_mode, bool)
         if (dict.contains("vpdet_config"))
-            vpdet_config = vpdetection::VPDetectorConfig(dict["vpdet_config"]);
+            vpdet_config = vplib::VPDetectorConfig(dict["vpdet_config"]);
         if (dict.contains("linker2d_config"))
             linker2d_config = LineLinker2dConfig(dict["linker2d_config"]);
         if (dict.contains("linker3d_config"))
@@ -46,7 +46,7 @@ public:
 
     bool add_halfpix = false; // offset half pixel for each line
     bool use_vp = true;
-    vpdetection::VPDetectorConfig vpdet_config;
+    vplib::VPDetectorConfig vpdet_config;
 
     double min_length_2d = 20.0;
     double var2d = 2.0;
@@ -71,7 +71,7 @@ public:
     Triangulator(py::dict dict): Triangulator(TriangulatorConfig(dict)) {};
     TriangulatorConfig config_;
     LineLinker linker_;
-    const vpdetection::VPDetector vpdetector_;
+    const vplib::VPDetector vpdetector_;
 
     void Init(const std::map<int, std::vector<Line2d>>& all_2d_segs,
               const ImageCollection& imagecols);
@@ -104,8 +104,8 @@ public:
     void UnsetRanges() { ranges_flag_ = false; }
     LineLinker GetLinker() const { return linker_; }
     std::vector<LineTrack> GetTracks() const {return tracks_; };
-    vpdetection::VPResult GetVPResult(const int& image_id) const {return vpresults_.at(image_id); }
-    std::map<int, vpdetection::VPResult> GetVPResults() const {return vpresults_; }
+    vplib::VPResult GetVPResult(const int& image_id) const {return vpresults_.at(image_id); }
+    std::map<int, vplib::VPResult> GetVPResults() const {return vpresults_; }
 
     // infos
     size_t CountImages() const { return all_lines_2d_.size(); }
@@ -138,7 +138,7 @@ private:
     std::map<int, std::vector<Line2d>> all_lines_2d_;
     ImageCollection imagecols_;
     std::map<int, std::vector<int>> neighbors_; // visual neighbors for each image, initialized with InitMatch interfaces
-    std::map<int, vpdetection::VPResult> vpresults_; // vp results
+    std::map<int, vplib::VPResult> vpresults_; // vp results
 
     // connections
     std::map<int, std::vector<std::vector<LineNode>>> edges_; // list of (img_id, line_id) for each node, cleared after triangulation

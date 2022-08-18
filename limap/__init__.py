@@ -5,7 +5,7 @@ from _limap import *
 from . import base
 from . import point2d
 from . import line2d
-from . import vpdetection
+from . import vplib
 from . import pointsfm
 from . import undistortion
 

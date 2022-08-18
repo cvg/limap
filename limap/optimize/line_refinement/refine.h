@@ -12,7 +12,7 @@
 #include "base/featuremap.h"
 #include "base/featurepatch.h"
 #include "util/types.h"
-#include "vpdetection/vpdet.h"
+#include "vplib/vpdet.h"
 
 #include <ceres/ceres.h>
 #include <tuple>
@@ -66,7 +66,7 @@ private:
 
     // VPs
     bool enable_vp = false;
-    std::vector<vpdetection::VPResult> p_vpresults_;
+    std::vector<vplib::VPResult> p_vpresults_;
 
     // heatmaps
     bool enable_heatmap = false; // set to true when calling InitializeHeatmaps()
@@ -97,7 +97,7 @@ public:
 
     void Initialize(const LineTrack& track,
                     const std::vector<CameraView>& p_views); // the order of p_camviews conform that of track.GetSortedImageIds()
-    void InitializeVPs(const std::vector<vpdetection::VPResult>& p_vpresults);
+    void InitializeVPs(const std::vector<vplib::VPResult>& p_vpresults);
     void InitializeHeatmaps(const std::vector<Eigen::MatrixXd>& p_heatmaps);
     void InitializeFeatures(const std::vector<py::array_t<DTYPE, py::array::c_style>>& p_featuremaps);
     void InitializeFeaturesAsPatches(const std::vector<PatchInfo<DTYPE>>& patchinfos);

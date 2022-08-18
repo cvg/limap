@@ -1,11 +1,11 @@
-#include "vpdetection/vpdet.h"
+#include "vplib/vpdet.h"
 #include "base/infinite_line.h"
 
 #include <third-party/progressbar.hpp>
 
 namespace limap {
 
-namespace vpdetection {
+namespace vplib {
 
 std::vector<int> VPDetector::ComputeVPLabels(const std::vector<Line2d>& lines) const {
     // filter line
@@ -123,7 +123,7 @@ std::map<int, VPResult> VPDetector::AssociateVPsParallel(const std::map<int, std
     return vpresults;
 }
 
-} // namespace vpdetection
+} // namespace vplib
 
 } // namespace limap
 

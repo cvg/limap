@@ -3,7 +3,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 
 import limap.base as _base
-import limap.vpdetection as _vpdet
+import limap.vplib as _vplib
 import limap.util.io as limapio
 import limap.util.config as cfgutils
 import limap.optimize
@@ -18,7 +18,7 @@ def one_by_one_refinement(cfg):
     vpresults = None
     if cfg["refinement"]["use_vp"]:
         all_2d_lines = _base.get_all_lines_2d(all_2d_segs)
-        vpresults = _vpdet.AssociateVPsParallel(all_2d_lines)
+        vpresults = _vplib.AssociateVPsParallel(all_2d_lines)
 
     # one-by-one refinement
     newtracks = limap.optimize.line_refinement(cfg["refinement"], linetracks, imagecols, cfg["heatmap_folder"], cfg["patch_folder"], cfg["featuremap_folder"], vpresults=vpresults)
@@ -40,7 +40,7 @@ def joint_refinement(cfg):
     vpresults = None
     if cfg["refinement"]["use_vp"]:
         all_2d_lines = _base.get_all_lines_2d(all_2d_segs)
-        vpresults = _vpdet.AssociateVPsParallel(all_2d_lines)
+        vpresults = _vplib.AssociateVPsParallel(all_2d_lines)
 
     # joint refinement
     reconstruction = _base.LineReconstruction(linetracks, imagecols)

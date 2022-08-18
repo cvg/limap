@@ -8,7 +8,7 @@
 #include "base/featuremap.h"
 #include "base/featurepatch.h"
 #include "util/types.h"
-#include "vpdetection/vpdet.h"
+#include "vplib/vpdet.h"
 
 #include <ceres/ceres.h>
 #include "base/line_reconstruction.h"
@@ -30,7 +30,7 @@ private:
 
     // VPs
     bool enable_vp = false;
-    std::vector<vpdetection::VPResult> vpresults_;
+    std::map<int, vplib::VPResult> vpresults_;
     
     // heatmaps (for each image)
     bool enable_heatmap = false; // set to true when calling InitializeHeatmaps()
@@ -62,7 +62,7 @@ public:
     void InitializeReconstruction(const LineReconstruction& reconstruction) {
         reconstruction_ = reconstruction;
     }
-    void InitializeVPs(const std::vector<vpdetection::VPResult>& vpresults);
+    void InitializeVPs(const std::map<int, vplib::VPResult>& vpresults);
     void InitializeHeatmaps(const std::vector<Eigen::MatrixXd>& heatmaps);
     void InitializePatches(const std::vector<std::vector<PatchInfo<DTYPE>>>& patchinfos);
     void SetUp();
