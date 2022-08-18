@@ -12,8 +12,6 @@ from tqdm import tqdm
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 def import_images_with_known_cameras(image_dir, database_path, imagecols):
-    if imagecols is None:
-        return reconstruction.import_images(image_dir=image_path, database_path=db_path)
     image_ids = imagecols.get_img_ids()
     image_name_list = sorted(os.listdir(image_dir))
     assert len(image_name_list) == len(image_ids)
