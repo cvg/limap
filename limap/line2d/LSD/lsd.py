@@ -1,13 +1,13 @@
 import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from base_detector import BaseDetector
+from base_detector import BaseDetector, BaseDetectorOptions
 
 import pytlsd
 import numpy as np
 
 class LSDDetector(BaseDetector):
-    def __init__(self, set_gray=True, max_num_2d_segs=3000):
-        super(LSDDetector, self).__init__(set_gray=set_gray, max_num_2d_segs=max_num_2d_segs)
+    def __init__(self, options = BaseDetectorOptions()):
+        super(LSDDetector, self).__init__(options)
 
     def get_module_name(self):
         return "lsd"

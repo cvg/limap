@@ -31,10 +31,11 @@ sfm:
 ##############################
 # line detection config
 line2d:
+    max_num_2d_segs: 3000
+    do_merge_lines: False
     detector: 
         method: "lsd" # ["lsd", "sold2"]
         skip_exists: False
-    max_num_2d_segs: 3000
     visualize: False
     save_l3dpp: False
     compute_descinfo: False

@@ -36,6 +36,7 @@ sfm:
 # line detection and matching config
 line2d:
     max_num_2d_segs: 3000
+    do_merge_lines: False 
     visualize: False
     save_l3dpp: False
     compute_descinfo: False

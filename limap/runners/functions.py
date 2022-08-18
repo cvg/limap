@@ -106,9 +106,9 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
     se_det = cfg["skip_exists"] or cfg["line2d"]["detector"]["skip_exists"]
     if compute_descinfo:
         se_ext = cfg["skip_exists"] or cfg["line2d"]["extractor"]["skip_exists"]
-    detector = limap.line2d.get_detector(cfg["line2d"]["detector"], max_num_2d_segs=cfg["line2d"]["max_num_2d_segs"])
+    detector = limap.line2d.get_detector(cfg["line2d"]["detector"], max_num_2d_segs=cfg["line2d"]["max_num_2d_segs"], do_merge_lines=cfg["line2d"]["do_merge_lines"])
     if not cfg["load_det"]:
-        if compute_descinfo and cfg["line2d"]["detector"]["method"] == cfg["line2d"]["extractor"]["method"]:
+        if compute_descinfo and cfg["line2d"]["detector"]["method"] == cfg["line2d"]["extractor"]["method"] and (not cfg["line2d"]["do_merge_lines"]):
             all_2d_segs, descinfo_folder = detector.detect_and_extract_all_images(folder_save, imagecols, skip_exists=(se_det and se_ext))
         else:
             all_2d_segs = detector.detect_all_images(folder_save, imagecols, skip_exists=se_det)

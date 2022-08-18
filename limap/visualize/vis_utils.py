@@ -276,7 +276,7 @@ def visualize_line_track(imagecols, linetrack, prefix='linetrack', report=False)
         cv2.imwrite(fname, img)
 
 
-def vis_vpresult(img, lines, vpres, show_original=False):
+def vis_vpresult(img, lines, vpres, show_original=False, endpoints=False):
     import seaborn as sns
     import cv2
     n_vps = vpres.count_vps()
@@ -292,6 +292,9 @@ def vis_vpresult(img, lines, vpres, show_original=False):
         else:
             c = colors[vpres.labels[line_id]]
         cv2.line(img, (int(line.start[0]), int(line.start[1])), (int(line.end[0]), int(line.end[1])), c, 2)
+        if endpoints:
+            cv2.circle(img, (int(line.start[0]), int(line.start[1])), 3, [0, 0, 0], -1)
+            cv2.circle(img, (int(line.end[0]), int(line.end[1])), 3, [0, 0, 0], -1)
     return img
 
 
@@ -406,8 +409,8 @@ def plot_matches(kpts0, kpts1, color=None, lw=1.5, ps=4, indices=(0, 1)):
     if ps > 0:
         ax0.scatter(kpts0[:, 0], kpts0[:, 1], c=color, s=ps)
         ax1.scatter(kpts1[:, 0], kpts1[:, 1], c=color, s=ps)
-        
-        
+
+
 def plot_lines(lines, line_colors='orange', point_color='cyan',
                ps=4, lw=2, indices=(0, 1), alpha=1):
     """ Plot lines and endpoints for existing images.

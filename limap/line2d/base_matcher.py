@@ -6,12 +6,17 @@ import joblib
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import limap.util.io as limapio
 
+from collections import namedtuple
+BaseMatcherOptions = namedtuple("BaseMatcherOptions",
+                                ["topk", "n_neighbors", "n_jobs"],
+                                defaults=[10, 20, 1])
+
 class BaseMatcher():
-    def __init__(self, extractor, topk=10, n_neighbors=20, n_jobs=1):
+    def __init__(self, extractor, options = BaseMatcherOptions()):
         self.extractor = extractor
-        self.topk = topk
-        self.n_neighbors = n_neighbors
-        self.n_jobs = n_jobs
+        self.topk = options.topk
+        self.n_neighbors = options.n_neighbors
+        self.n_jobs = options.n_jobs
 
     # The functions below are required for matchers
     def get_module_name(self):

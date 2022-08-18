@@ -1,15 +1,18 @@
 import os, sys
+import copy
+
 from .sold2_wrapper import SOLD2LineDetector
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from base_detector import BaseDetector
-from base_matcher import BaseMatcher
+from base_detector import BaseDetector, BaseDetectorOptions
+from base_matcher import BaseMatcher, BaseMatcherOptions
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import limap.util.io as limapio
 
 class SOLD2Detector(BaseDetector):
-    def __init__(self, set_gray=True, max_num_2d_segs=3000):
-        super(SOLD2Detector, self).__init__(set_gray=set_gray, max_num_2d_segs=max_num_2d_segs)
+    def __init__(self, options = BaseDetectorOptions()):
+        super(SOLD2Detector, self).__init__(options)
         self.detector = SOLD2LineDetector()
 
     def get_module_name(self):
@@ -51,6 +54,12 @@ class SOLD2Detector(BaseDetector):
         segs, descriptor, heatmap, descinfo = self.detector.detect(img)
         return segs, descinfo
 
+    def sample_descinfo_by_indexes(self, descinfo, indexes):
+        descinfo = copy.deepcopy(descinfo)
+        descinfo[0] = descinfo[0].reshape(128, -1, 5)[:, indexes, :].reshape(128, -1)
+        descinfo[1] = descinfo[1][indexes, :]
+        return descinfo
+
     def get_heatmap_fname(self, folder, img_id):
         return os.path.join(folder, "heatmap_{0}.npy".format(img_id))
 
@@ -76,8 +85,8 @@ class SOLD2Detector(BaseDetector):
         return heatmap_folder
 
 class SOLD2Matcher(BaseMatcher):
-    def __init__(self, extractor, n_neighbors=20, topk=10, n_jobs=1):
-        super(SOLD2Matcher, self).__init__(extractor, n_neighbors=n_neighbors, topk=topk, n_jobs=n_jobs)
+    def __init__(self, extractor, options = BaseMatcherOptions()):
+        super(SOLD2Matcher, self).__init__(extractor, options)
         self.detector = SOLD2LineDetector()
 
     def get_module_name(self):

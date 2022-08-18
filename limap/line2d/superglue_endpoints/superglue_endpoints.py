@@ -5,17 +5,16 @@ import torch
 from ...point2d.superpoint.superpoint import SuperPoint
 from ...point2d.superglue.superglue import SuperGlue
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from base_detector import BaseDetector
-from base_matcher import BaseMatcher
+from base_detector import BaseDetector, BaseDetectorOptions
+from base_matcher import BaseMatcher, BaseMatcherOptions
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import limap.util.io as limapio
 
 
 class EndpointsExtractor(BaseDetector):
-    def __init__(self, set_gray=True, max_num_2d_segs=3000, device=None):
-        super(EndpointsExtractor, self).__init__(
-            set_gray=set_gray, max_num_2d_segs=max_num_2d_segs)
+    def __init__(self, options = BaseDetectorOptions(), device=None):
+        super(EndpointsExtractor, self).__init__(options)
         self.device = "cuda" if device is None else device
         self.sp = SuperPoint({}).eval().to(self.device)
 
@@ -40,7 +39,7 @@ class EndpointsExtractor(BaseDetector):
         img = camview.read_image(set_gray=self.set_gray)
         descinfo = self.compute_descinfo(img, segs)
         return descinfo
-    
+
     def compute_descinfo(self, img, segs):
         """ A desc_info is composed of the following tuple / np arrays:
             - the original image shape (h, w)
@@ -65,10 +64,9 @@ class EndpointsExtractor(BaseDetector):
 
 
 class SuperGlueEndpointsMatcher(BaseMatcher):
-    def __init__(self, extractor, weights='outdoor', n_neighbors=20,
-                 topk=10, n_jobs=1, device=None):
-        super(SuperGlueEndpointsMatcher, self).__init__(
-            extractor, n_neighbors=n_neighbors, topk=topk, n_jobs=n_jobs)
+    def __init__(self, extractor, options = BaseMatcherOptions(),
+                 weights='outdoor', device=None):
+        super(SuperGlueEndpointsMatcher, self).__init__(extractor, options)
         self.device = "cuda" if device is None else device
         self.sg = SuperGlue({'weights': weights}).eval().to(self.device)
 
@@ -106,11 +104,11 @@ class SuperGlueEndpointsMatcher(BaseMatcher):
                 descinfo2['endpoints_desc'][None], dtype=torch.float,
                 device=self.device),
         }
-        
+
         with torch.no_grad():
             # Run the point matching
             out = self.sg(inputs)
-            
+
             # Retrieve the best matching score of the line endpoints
             n_lines1 = len(descinfo1['lines']) // 2
             n_lines2 = len(descinfo2['lines']) // 2
@@ -118,11 +116,11 @@ class SuperGlueEndpointsMatcher(BaseMatcher):
             scores = 0.5 * torch.maximum(
                 scores[:, 0, :, 0] + scores[:, 1, :, 1],
                 scores[:, 0, :, 1] + scores[:, 1, :, 0])
-            
+
             # Run the Sinkhorn algorithm and get the line matches
             scores = self.sg._solve_optimal_transport(scores[None])
             matches = self.sg._get_matches(scores)[0].cpu().numpy()[0]
-            
+
         # Transform matches to [n_matches, 2]
         id_list_1 = np.arange(0, matches.shape[0])[matches != -1]
         id_list_2 = matches[matches != -1]
@@ -153,11 +151,11 @@ class SuperGlueEndpointsMatcher(BaseMatcher):
                 descinfo2['endpoints_desc'][None], dtype=torch.float,
                 device=self.device),
         }
-        
+
         with torch.no_grad():
             # Run the point matching
             out = self.sg(inputs)
-            
+
             # Retrieve the best matching score of the line endpoints
             n_lines1 = len(descinfo1['lines']) // 2
             n_lines2 = len(descinfo2['lines']) // 2
@@ -165,10 +163,10 @@ class SuperGlueEndpointsMatcher(BaseMatcher):
             scores = 0.5 * torch.maximum(
                 scores[:, 0, :, 0] + scores[:, 1, :, 1],
                 scores[:, 0, :, 1] + scores[:, 1, :, 0])
-            
+
             # For each line in img1, retrieve the topk matches in img2
             matches = torch.argsort(scores, dim=1)[:, -topk:].cpu().numpy()
-            
+
         # Transform matches to [n_matches, 2]
         n_lines = matches.shape[0]
         topk = matches.shape[1]
