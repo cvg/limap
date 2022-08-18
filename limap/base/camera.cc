@@ -10,6 +10,14 @@ Camera::Camera(const colmap::Camera& cam) {
     SetWidth(cam.Width());
 }
 
+// empty camera
+Camera::Camera(int model_id, int cam_id, std::pair<int, int> hw) {
+    SetModelId(model_id);
+    SetCameraId(cam_id);
+    SetHeight(hw.first);
+    SetWidth(hw.second);
+}
+
 Camera::Camera(int model_id, const std::vector<double>& params, int cam_id, std::pair<int, int> hw) {
     SetModelId(model_id);
     THROW_CHECK_EQ(params.size(), NumParams());

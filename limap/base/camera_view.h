@@ -24,6 +24,7 @@ public:
     CameraImage(const Camera& input_cam, const CameraPose& input_pose, const std::string& image_name = "none"): cam_id(input_cam.CameraId()), pose(input_pose), image_name_(image_name) {}
     CameraImage(py::dict dict);
     CameraImage(const CameraImage& camimage): cam_id(camimage.cam_id), pose(camimage.pose) {SetImageName(camimage.image_name());}
+    CameraImage(const int& input_cam_id, const std::string& image_name = "none"): cam_id(input_cam_id), image_name_(image_name) {} // empty image
 
     int cam_id;
     CameraPose pose;

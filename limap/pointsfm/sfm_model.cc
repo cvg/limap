@@ -1,6 +1,9 @@
 #include "pointsfm/sfm_model.h"
+#include "util/log_exceptions.h"
 
 #include <colmap/util/math.h>
+#include <colmap/base/reconstruction.h>
+#include <colmap/util/misc.h>
 
 namespace limap {
 
@@ -25,8 +28,28 @@ void SfmModel::addPoint(double x, double y, double z, const std::vector<int>& im
     points.push_back(p);
 }
 
-void SfmModel::addImage(const colmap::mvs::Image& image) {
+void SfmModel::ReadFromCOLMAP(const std::string& path,
+                              const std::string& sparse_path,
+                              const std::string& images_path) {
+    colmap::mvs::Model::ReadFromCOLMAP(path, sparse_path, images_path);
+
+    // store image ids
+    colmap::Reconstruction reconstruction;
+    reconstruction.Read(colmap::JoinPaths(path, sparse_path));
+    for (size_t i = 0; i < reconstruction.NumRegImages(); ++i) {
+        reg_image_ids.push_back(reconstruction.RegImageIds()[i]);
+    }
+}
+
+void SfmModel::addImage(const colmap::mvs::Image& image, const int img_id) {
     images.push_back(image);
+    if (img_id == -1) {
+        if (!reg_image_ids.empty())
+            THROW_CHECK_EQ(reg_image_ids.back(), reg_image_ids.size() - 1);
+        reg_image_ids.push_back(reg_image_ids.size());
+    }
+    else
+        reg_image_ids.push_back(img_id);
 }
 
 std::vector<int> SfmModel::ComputeNumPoints() const {
@@ -48,8 +71,26 @@ std::vector<std::string> SfmModel::GetImageNames() const {
     return image_names;
 }
 
+std::map<int, std::vector<int>> SfmModel::neighbors_vec_to_map(const std::vector<std::vector<int>>& neighbors) const {
+    std::map<int, std::vector<int>> m_neighbors;
+    for (size_t i = 0; i < reg_image_ids.size(); ++i) {
+        int img_id = reg_image_ids[i];
+        m_neighbors.insert(std::make_pair(img_id, std::vector<int>()));
+        for (auto it = neighbors[i].begin(); it != neighbors[i].end(); ++it) {
+            m_neighbors.at(img_id).push_back(reg_image_ids[*it]);
+        }
+    }
+    return m_neighbors;
+}
+
+std::map<int, std::vector<int>> SfmModel::GetMaxOverlapImages(
+        const size_t num_images, const double min_triangulation_angle) const {
+    std::vector<std::vector<int>> overlapping_images = colmap::mvs::Model::GetMaxOverlappingImages(num_images, min_triangulation_angle);
+    return neighbors_vec_to_map(overlapping_images);
+}
+
 // The original SfmModel::GetMaxOverlappingImages in COLMAP uses the number of intersection rather than IoU
-std::vector<std::vector<int>> SfmModel::GetMaxIoUImages(
+std::map<int, std::vector<int>> SfmModel::GetMaxIoUImages(
     const size_t num_images, const double min_triangulation_angle) const {
   std::vector<std::vector<int>> overlapping_images(images.size());
 
@@ -105,10 +146,10 @@ std::vector<std::vector<int>> SfmModel::GetMaxIoUImages(
     }
   }
 
-  return overlapping_images;
+  return neighbors_vec_to_map(overlapping_images);
 }
 
-std::vector<std::vector<int>> SfmModel::GetMaxDiceCoeffImages(
+std::map<int, std::vector<int>> SfmModel::GetMaxDiceCoeffImages(
     const size_t num_images, const double min_triangulation_angle) const {
   std::vector<std::vector<int>> overlapping_images(images.size());
 
@@ -164,7 +205,7 @@ std::vector<std::vector<int>> SfmModel::GetMaxDiceCoeffImages(
     }
   }
 
-  return overlapping_images;
+  return neighbors_vec_to_map(overlapping_images);
 }
 
 std::pair<float, float> SfmModel::get_robust_range(std::vector<float>& data, const std::pair<double, double>& range_robust, const double& kstretch) const {

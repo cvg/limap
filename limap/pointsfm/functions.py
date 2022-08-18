@@ -14,44 +14,18 @@ def filter_by_cam_id(cam_id, prev_imagecols, prev_neighbors):
     neighbors = imagecols.update_neighbors(prev_neighbors)
     return imagecols, neighbors
 
-def ComputeNeighborsVector(model, n_neighbors, min_triangulation_angle=1.0, neighbor_type="iou"):
-    '''
-    Returns: vector<vector<int>>
-    '''
-    if neighbor_type == "iou":
-        neighbors_vec = model.GetMaxIoUImages(n_neighbors, min_triangulation_angle)
-    elif neighbor_type == "overlap":
-        neighbors_vec = model.GetMaxOverlappingImages(n_neighbors, min_triangulation_angle)
-    elif neighbor_type == "dice":
-        neighbors_vec = model.GetMaxDiceCoeffImages(n_neighbors, min_triangulation_angle)
-    else:
-        raise NotImplementedError
-    return neighbors_vec
-
 def ComputeNeighbors(model, n_neighbors, min_triangulation_angle=1.0, neighbor_type="iou"):
     '''
     Returns: map<int, vector<int>>
     '''
-    neighbors_vec = ComputeNeighborsVector(model, n_neighbors, min_triangulation_angle=min_triangulation_angle, neighbor_type=neighbor_type)
-    neighbors = {}
-    for img_id in range(len(neighbors_vec)):
-        neighbors[img_id] = neighbors_vec[img_id]
-    return neighbors
-
-# compute neighborhood for a image list sorted as 'image{0:08d}.png'
-def ComputeNeighborsSorted(model, n_neighbors, min_triangulation_angle=1.0, neighbor_type="iou"):
-    '''
-    Returns: map<int, vector<int>>
-    '''
-    # get neighbors
-    neighbors_vec = ComputeNeighborsVector(model, n_neighbors, min_triangulation_angle=min_triangulation_angle, neighbor_type=neighbor_type)
-
-    # map indexes
-    image_names = model.GetImageNames()
-    image_id_list = [int(name[5:-4]) for name in image_names]
-    neighbors = {}
-    for idx, img_id in enumerate(image_id_list):
-        neighbors[img_id] = [image_id_list[k] for k in neighbors_vec[idx]]
+    if neighbor_type == "iou":
+        neighbors = model.GetMaxIoUImages(n_neighbors, min_triangulation_angle)
+    elif neighbor_type == "overlap":
+        neighbors = model.GetMaxOverlapImages(n_neighbors, min_triangulation_angle)
+    elif neighbor_type == "dice":
+        neighbors = model.GetMaxDiceCoeffImages(n_neighbors, min_triangulation_angle)
+    else:
+        raise NotImplementedError
     return neighbors
 
 def compute_metainfos(cfg, model, n_neighbors=20):

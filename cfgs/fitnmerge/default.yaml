@@ -24,7 +24,6 @@ sfm:
     ranges:
         range_robust: [0.05, 0.95]
         k_stretch: 1.25
-    fbase: "sift" # ["sift", "hloc"]
     hloc:
         descriptor: "superpoint_aachen"
         matcher: "NN-superpoint"

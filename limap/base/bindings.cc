@@ -346,6 +346,7 @@ void bind_camera(py::module& m) {
         .def(py::init<const std::string&, M3D, int, std::pair<int, int>>(), py::arg("model_name"), py::arg("K"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1))
         .def(py::init<py::dict>())
         .def(py::init<const Camera&>())
+        .def(py::init<int, int, std::pair<int, int>>(), py::arg("model_id"), py::arg("cam_id"), py::arg("hw")=std::make_pair<int, int>(-1, -1)) // empty camera
         .def(py::pickle(
             [](const Camera& input) { // dump
                 return input.as_dict();
@@ -396,6 +397,7 @@ void bind_camera(py::module& m) {
         .def(py::init<const Camera&, const CameraPose&, const std::string&>(), py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
         .def(py::init<py::dict>())
         .def(py::init<const CameraImage&>())
+        .def(py::init<const int&, const std::string&>(), py::arg("cam_id"), py::arg("image_name") = "none") // empty image
         .def(py::pickle(
             [](const CameraImage& input) { // dump
                 return input.as_dict();

@@ -28,7 +28,7 @@ def read_scene_eth3d(cfg, dataset, reso_type, scene_id, cam_id=0, load_depth=Fal
     else:
         with open(cfg["info_path"], 'rb') as f:
             data = np.load(f, allow_pickle=True)
-            imagecols_np, neighbors, ranges = data["imagecols_np"], data["neighbors"], data["ranges"]
+            imagecols_np, neighbors, ranges = data["imagecols_np"].item(), data["neighbors"].item(), data["ranges"]
             imagecols = _base.ImageCollection(imagecols_np)
 
     # filter by camera ids for eth3d

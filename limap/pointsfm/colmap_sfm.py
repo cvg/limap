@@ -25,7 +25,31 @@ def run_colmap_sift_matches(image_path, db_path, use_cuda=False):
            '--SiftMatching.use_gpu', str(int(use_cuda))]
     subprocess.run(cmd, check=True)
 
-def run_hloc_matches(cfg, image_path, db_path, keypoints=None):
+def import_images_with_known_cameras(image_dir, database_path, imagecols):
+    if imagecols is None:
+        return reconstruction.import_images(image_dir=image_path, database_path=db_path)
+    image_ids = imagecols.get_img_ids()
+    image_name_list = sorted(os.listdir(image_dir))
+    assert len(image_name_list) == len(image_ids)
+
+    # connect to the database
+    db = database.COLMAPDatabase(database_path)
+    db.create_tables()
+    # add camera
+    for cam_id in imagecols.get_cam_ids():
+        cam = imagecols.cam(cam_id)
+        import pdb
+        db.add_camera(cam.model_id(), cam.w(), cam.h(), cam.params(), camera_id=cam_id)
+    # add image
+    for img_name, img_id in zip(image_name_list, image_ids):
+        cam_id = imagecols.camimage(img_id).cam_id
+        db.add_image(img_name, cam_id, image_id=img_id)
+    db.commit()
+
+def run_hloc_matches(cfg, image_path, db_path, keypoints=None, imagecols=None):
+    '''
+    use the id mapping from _base.ImageCollection to do the match
+    '''
     image_path = Path(image_path)
     from hloc import extract_features, match_features, reconstruction, triangulation
     outputs = Path(os.path.join(os.path.dirname(db_path), 'hloc_outputs'))
@@ -41,17 +65,20 @@ def run_hloc_matches(cfg, image_path, db_path, keypoints=None):
 
     sfm_dir.mkdir(parents=True, exist_ok=True)
     reconstruction.create_empty_db(db_path)
-    reconstruction.import_images(image_dir=image_path, database_path=db_path)
+    if imagecols is None:
+        reconstruction.import_images(image_dir=image_path, database_path=db_path)
+    else:
+        import_images_with_known_cameras(image_path, db_path, imagecols) # use cameras and id mapping
     image_ids = reconstruction.get_image_ids(db_path)
     reconstruction.import_features(image_ids, db_path, feature_path)
     reconstruction.import_matches(image_ids, db_path, sfm_pairs, match_path, None, None)
     triangulation.estimation_and_geometric_verification(db_path, sfm_pairs)
 
-def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap', keypoints=None, use_cuda=False, skip_exists=False, map_to_original_image_names=False):
+def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap', keypoints=None, skip_exists=False, map_to_original_image_names=True):
     ### set up path
     db_path = os.path.join(output_path, 'db.db')
     image_path = os.path.join(output_path, 'images')
-    model_path = os.path.join(output_path, 'sparse', 'model')
+    model_path = os.path.join(output_path, 'sparse', 'reference_model')
     point_triangulation_path = os.path.join(output_path, 'sparse')
 
     ### initialize sparse folder
@@ -78,11 +105,7 @@ def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap'
             keypoints_in_order.append(keypoints[img_id])
 
     # sift feature extraction and matching
-    if cfg["fbase"] == "sift":
-        run_colmap_sift_matches(image_path, db_path, use_cuda=use_cuda)
-    elif cfg["fbase"] == "hloc":
-        assert (use_cuda == True)
-        run_hloc_matches(cfg["hloc"], image_path, Path(db_path), keypoints=keypoints_in_order)
+    run_hloc_matches(cfg["hloc"], image_path, Path(db_path), keypoints=keypoints_in_order, imagecols=imagecols)
 
     ### write cameras.txt
     colmap_cameras = {}
@@ -105,18 +128,17 @@ def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap'
     db = database.COLMAPDatabase(db_path)
     rows = db.execute("SELECT * from images")
     colmap_images = {}
-    for idx, img_id in enumerate(imagecols.get_img_ids()):
+    for img_id in imagecols.get_img_ids():
         kk = next(rows)
-        assert (kk[0] == idx + 1)
+        assert (kk[0] == img_id)
         imname = kk[1]
-        img_id_orig = int(imname[5:-4])
-        camimage = imagecols.camimage(img_id_orig)
+        camimage = imagecols.camimage(img_id)
         cam_id = camimage.cam_id
         qvec = camimage.pose.qvec
         tvec = camimage.pose.tvec
-        colmap_images[idx+1] = colmap_utils.Image(id=idx+1, qvec=qvec, tvec=tvec,
-                                                  camera_id=cam_id, name=imname,
-                                                  xys=[], point3D_ids=[])
+        colmap_images[img_id] = colmap_utils.Image(id=img_id, qvec=qvec, tvec=tvec,
+                                                   camera_id=cam_id, name=imname,
+                                                   xys=[], point3D_ids=[])
     fname = os.path.join(model_path, 'images.txt')
     colmap_utils.write_images_text(colmap_images, fname)
 
@@ -137,7 +159,7 @@ def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap'
     if map_to_original_image_names:
         fname_images_bin = os.path.join(point_triangulation_path, "images.bin")
         colmap_images = colmap_utils.read_images_binary(fname_images_bin)
-        for idx, img_id in enumerate(imagecols.get_img_ids()):
-            colmap_images[idx + 1] = colmap_images[idx + 1]._replace(name = imagecols.image_name(img_id))
+        for img_id in imagecols.get_img_ids():
+            colmap_images[img_id] = colmap_images[img_id]._replace(name = imagecols.image_name(img_id))
         colmap_utils.write_images_binary(colmap_images, fname_images_bin)
 
