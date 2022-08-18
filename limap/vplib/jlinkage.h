@@ -6,9 +6,6 @@
 #include <pybind11/eigen.h>
 #include <pybind11/stl_bind.h>
 
-#include <VPCluster.h>
-#include <VPSample.h>
-
 #include "vplib/base_vp_detector.h"
 
 namespace py = pybind11;

@@ -1,6 +1,8 @@
 #include "vplib/jlinkage.h"
 #include "base/infinite_line.h"
 
+#include <VPCluster.h>
+#include <VPSample.h>
 #include <third-party/progressbar.hpp>
 
 namespace limap {
