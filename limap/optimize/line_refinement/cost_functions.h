@@ -70,8 +70,7 @@ public:
         T vpvec[3] = {T(vp[0]), T(vp[1]), T(vp[2])};
         T direc[3];
         GetDirectionFromVP<T>(vpvec, kvec, direc);
-        T innerp = dir3d_rotated[0] * direc[0] + dir3d_rotated[1] * direc[1] + dir3d_rotated[2] * direc[2];
-        residuals[0] = T(1.0) - innerp;
+        residuals[0] = CeresComputeDist3D_sine(dir3d_rotated, direc);
         return true;
     }
 

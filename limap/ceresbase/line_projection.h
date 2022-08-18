@@ -50,10 +50,10 @@ void Lines_WorldToPixel(const T* kvec, const T* qvec, const T* tvec, const T* p3
 // get direction from vp
 template <typename T>
 void GetDirectionFromVP(const T vp[3], const T kvec[4], T direc[3]) {
-    direc[0] = T(1.0) / kvec[0] * vp[0] - kvec[2] / kvec[0] * vp[2];
-    direc[1] = T(1.0) / kvec[1] * vp[1] - kvec[3] / kvec[1] * vp[2];
+    direc[0] = vp[0] / kvec[0] - kvec[2] / kvec[0] * vp[2];
+    direc[1] = vp[1] / kvec[1] - kvec[3] / kvec[1] * vp[2];
     direc[2] = vp[2];
-    T norm = ceres::sqrt(direc[0] * direc[0] + direc[1] * direc[1] + direc[2] * direc[2]);
+    T norm = ceres::sqrt(direc[0] * direc[0] + direc[1] * direc[1] + direc[2] * direc[2] + EPS);
     direc[0] /= norm;
     direc[1] /= norm;
     direc[2] /= norm;

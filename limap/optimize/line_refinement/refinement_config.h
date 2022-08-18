@@ -20,7 +20,7 @@ class RefinementConfig {
 public:
     RefinementConfig() {
         geometric_loss_function.reset(new ceres::CauchyLoss(0.25));
-        vp_loss_function.reset(new ceres::CauchyLoss(0.2));
+        vp_loss_function.reset(new ceres::TrivialLoss());
         heatmap_loss_function.reset(new ceres::HuberLoss(0.001));
         fconsis_loss_function.reset(new ceres::CauchyLoss(0.25));
         solver_options.function_tolerance = 0.0;
