@@ -125,7 +125,7 @@ def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap'
         if keypoints is not None:
             keypoints_in_order.append(keypoints[img_id])
 
-    # sift feature extraction and matching
+    # feature extraction and matching
     run_hloc_matches(cfg["hloc"], image_path, Path(db_path), keypoints=keypoints_in_order, neighbors=neighbors, imagecols=imagecols)
 
     ### write cameras.txt
