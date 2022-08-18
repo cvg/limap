@@ -27,19 +27,13 @@ def ReadInfos(model, colmap_path, model_path="sparse", image_path="images"):
 
     # read images
     n_images = len(colmap_images)
-    camimage_dict = {}
-    for image_id, colmap_image in colmap_images.items():
+    camimages = {}
+    for img_id, colmap_image in colmap_images.items():
         imname = colmap_image.name
         cam_id = colmap_image.camera_id
         pose = _base.CameraPose(colmap_image.qvec, colmap_image.tvec)
         camimage = _base.CameraImage(cam_id, pose, image_name=os.path.join(image_path, imname))
-        camimage_dict[imname] = camimage
-
-    # map to the correct order
-    camimages = []
-    for imname in image_names:
-        camimage = camimage_dict[imname]
-        camimages.append(camimage)
+        camimages[img_id] = camimage
 
     # get image collection
     imagecols = _base.ImageCollection(cameras, camimages)
