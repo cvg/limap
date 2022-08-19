@@ -11,9 +11,8 @@ namespace limap {
 
 using namespace nanoflann;
 
-bool KDTree::isInitialized() {
-    int count = int(cloud.pts.size());
-    return count > 0;
+bool KDTree::empty() const {
+    return cloud.pts.empty();
 }
 
 void KDTree::initialize(const Eigen::MatrixXd &points, bool build_index) {
@@ -25,6 +24,8 @@ void KDTree::initialize(const Eigen::MatrixXd &points, bool build_index) {
 }
 
 void KDTree::initialize(const std::vector<Eigen::Vector3d> &points, bool build_index) {
+    if (points.empty())
+        return;
     cloud.pts = points;
     index = std::unique_ptr<my_kd_tree_t>(new my_kd_tree_t(3, cloud, KDTreeSingleIndexAdaptorParams(10)));
     if (build_index)
@@ -33,7 +34,8 @@ void KDTree::initialize(const std::vector<Eigen::Vector3d> &points, bool build_i
 
 void KDTree::buildIndex() {
     index->buildIndex();
-    std::cout<<"KD-tree initialized ("<<cloud.pts.size()<<" points)"<<std::endl;
+    if (options_.do_print)
+        std::cout<<"KD-tree initialized ("<<cloud.pts.size()<<" points)"<<std::endl;
 }
 
 Eigen::Vector3d KDTree::query_nearest(const Eigen::Vector3d& query_pt) const {

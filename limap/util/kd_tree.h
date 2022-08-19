@@ -65,8 +65,12 @@ public:
     KDTree() {}
     ~KDTree() {}
     KDTree(const KDTreeOptions &options): options_(options) {}
+    KDTree(const Eigen::MatrixXd& points) { initialize(points); }
+    KDTree(const KDTreeOptions &options, const Eigen::MatrixXd& points): options_(options) { initialize(points); }
+    KDTree(const std::vector<Eigen::Vector3d>& points) { initialize(points); }
+    KDTree(const KDTreeOptions &options, const std::vector<Eigen::Vector3d>& points): options_(options) { initialize(points); }
 
-    bool isInitialized();
+    bool empty() const;
     std::vector<Eigen::Vector3d> all_points() { return cloud.pts; }
     Eigen::Vector3d point(const int &id) const { if (id >= cloud.pts.size()) {throw std::runtime_error("query id is out of range");} else {return cloud.pts[id];} }
 
@@ -74,6 +78,7 @@ public:
     void initialize(const Eigen::MatrixXd& points, bool build_index=true);
     void buildIndex();
     Eigen::Vector3d query_nearest(const Eigen::Vector3d& query_pt) const;
+    double point_distance(const Eigen::Vector3d& query_pt) const { return (query_pt - query_nearest(query_pt)).norm(); }
     void query_knn(const Eigen::Vector3d& query_pt, std::vector<int>& nearestVerticesIdx, size_t num_results=5) const;
     void query_radius_search(const Eigen::Vector3d& query_pt, std::vector<int>& nearestVerticesIdx, double search_radius=0.62) const;
 
