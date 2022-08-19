@@ -76,19 +76,18 @@ void LineBAEngine<DTYPE, CHANNELS>::ParameterizeCameras() {
         double* qvec_data = reconstruction_.imagecols_.qvec_data(img_id);
         double* tvec_data = reconstruction_.imagecols_.tvec_data(img_id);
 
-        // check if the image is in the problem
-        if (!problem_->HasParameterBlock(params_data))
-            continue;
-        if (!problem_->HasParameterBlock(qvec_data))
-            continue;
-        if (!problem_->HasParameterBlock(tvec_data))
-            continue;
-
-        if (config_.constant_intrinsics)
+        if (config_.constant_intrinsics) {
+            if (!problem_->HasParameterBlock(params_data))
+                continue;
             problem_->SetParameterBlockConstant(params_data);
+        }
 
         if (config_.constant_pose) {
+            if (!problem_->HasParameterBlock(qvec_data))
+                continue;
             problem_->SetParameterBlockConstant(qvec_data);
+            if (!problem_->HasParameterBlock(tvec_data))
+                continue;
             problem_->SetParameterBlockConstant(tvec_data);
         }
         else {

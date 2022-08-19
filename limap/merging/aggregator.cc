@@ -58,7 +58,7 @@ Line3d Aggregator::aggregate_line3d_list(const std::vector<Line3d>& lines,
         // return aggregate_line3d_list_takelongest(lines, scores);
     }
 
-    // SVD on endpoints
+    // total least square on endpoints
     V3D center(0.0, 0.0, 0.0);
     for (size_t i = 0; i < n_lines; ++i) {
         center += lines[i].start;
