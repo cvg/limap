@@ -21,6 +21,11 @@ public:
     VPResult() {}
     VPResult(const std::vector<int>& labels_, const std::vector<V3D>& vps_): labels(labels_), vps(vps_) {}
     VPResult(const VPResult& input): labels(input.labels), vps(input.vps) {}
+    py::dict as_dict() const { py::dict output; output["labels"] = labels; output["vps"] = vps; return output; }
+    VPResult(py::dict dict) { 
+        ASSIGN_PYDICT_ITEM(dict, labels, std::vector<int>) 
+        ASSIGN_PYDICT_ITEM(dict, vps, std::vector<V3D>) 
+    }
 
     std::vector<int> labels;
     std::vector<V3D> vps;
@@ -30,7 +35,10 @@ public:
     int GetVPLabel(const int& line_id) const { return labels[line_id]; }
     V3D GetVPbyCluster(const int& vp_id) const { return vps[vp_id]; }
     bool HasVP(const int& line_id) const { return GetVPLabel(line_id) >= 0; }
-    V3D GetVP(const int& line_id) const { if (HasVP(line_id)) return GetVPbyCluster(GetVPLabel(line_id)); else return V3D(0., 0., 0.); }
+    V3D GetVP(const int& line_id) const { 
+        THROW_CHECK_EQ(HasVP(line_id), true);
+        return GetVPbyCluster(GetVPLabel(line_id)); 
+    }
 };
 
 } // namespace vplib

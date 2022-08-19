@@ -12,13 +12,22 @@
 
 namespace limap {
 
-void bind_vplib(py::module &m) {
+void bind_vpdetector(py::module &m) {
     using namespace vplib;
 
     py::class_<VPResult>(m, "VPResult")
         .def(py::init<>())
         .def(py::init<const std::vector<int>&, const std::vector<V3D>&>())
         .def(py::init<const VPResult&>())
+        .def(py::init<py::dict>())
+        .def(py::pickle(
+            [](const VPResult& input) { // dump
+                return input.as_dict();
+            },
+            [](const py::dict& dict) { // load
+                return VPResult(dict);
+            }
+        ))
         .def_readonly("labels", &VPResult::labels)
         .def_readonly("vps", &VPResult::vps)
         .def("count_lines", &VPResult::count_lines)
@@ -41,6 +50,10 @@ void bind_vplib(py::module &m) {
         .def("ComputeVPLabels", &JLinkage::ComputeVPLabels)
         .def("AssociateVPs", &JLinkage::AssociateVPs)
         .def("AssociateVPsParallel", &JLinkage::AssociateVPsParallel); 
+}
+
+void bind_vplib(py::module& m) {
+    bind_vpdetector(m);
 }
 
 } // namespace limap
