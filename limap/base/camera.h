@@ -62,7 +62,7 @@ public:
 class CameraPose {
 public:
     CameraPose() {}
-    CameraPose(V4D qqvec, V3D ttvec): qvec(qqvec), tvec(ttvec) {}
+    CameraPose(V4D qqvec, V3D ttvec): qvec(qqvec.normalized()), tvec(ttvec) {}
     CameraPose(M3D R, V3D T): tvec(T) { qvec = colmap::RotationMatrixToQuaternion(R); }
     CameraPose(py::dict dict);
     CameraPose(const CameraPose& campose): qvec(campose.qvec), tvec(campose.tvec) {}

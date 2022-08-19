@@ -233,6 +233,7 @@ double CameraPose::projdepth(const V3D& p3d) const {
 
 CameraPose::CameraPose(py::dict dict) {
     ASSIGN_PYDICT_ITEM(dict, qvec, V4D);
+    qvec = qvec.normalized();
     ASSIGN_PYDICT_ITEM(dict, tvec, V3D);
 }
 
