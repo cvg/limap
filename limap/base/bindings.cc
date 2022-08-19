@@ -9,6 +9,7 @@ namespace py = pybind11;
 
 #include <colmap/util/threading.h>
 #include "util/types.h"
+#include "util/kd_tree.h"
 
 #include "base/graph.h"
 #include "base/camera.h"
@@ -20,8 +21,20 @@ namespace py = pybind11;
 #include "base/line_linker.h"
 #include "base/line_reconstruction.h"
 #include "base/featurepatch.h"
+#include "base/pointtrack.h"
 
 namespace limap {
+
+void bind_general_structures(py::module& m) {
+    py::class_<KDTree>(m, "KDTree")
+        .def(py::init<>())
+        .def(py::init<const std::vector<V3D>&>())
+        .def(py::init<const M3D&>())
+        .def("point_distance", &KDTree::point_distance)
+        .def("query_nearest", &KDTree::query_nearest)
+        .def("save", &KDTree::save)
+        .def("load", &KDTree::load);
+}
 
 void bind_graph(py::module& m) {
     py::class_<PatchNode>(m, "PatchNode")
@@ -147,7 +160,8 @@ void bind_linebase(py::module& m) {
         .def("length", &Line2d::length)
         .def("as_array", &Line2d::as_array)
         .def("midpoint", &Line2d::midpoint)
-        .def("direction", &Line2d::direction);
+        .def("direction", &Line2d::direction)
+        .def("point_distance", &Line2d::point_distance);
 
     py::class_<Line3d>(m, "Line3d")
         .def(py::init<>())
@@ -174,7 +188,8 @@ void bind_linebase(py::module& m) {
         .def("sensitivity", &Line3d::sensitivity)
         .def("computeUncertainty", &Line3d::computeUncertainty)
         .def("midpoint", &Line3d::midpoint)
-        .def("direction", &Line3d::direction);
+        .def("direction", &Line3d::direction)
+        .def("point_distance", &Line3d::point_distance);
 
     m.def("_GetLine2dVectorFromArray", &GetLine2dVectorFromArray);
     m.def("_GetLine3dVectorFromArray", &GetLine3dVectorFromArray);
@@ -440,6 +455,7 @@ void bind_camera(py::module& m) {
         .def("T", &CameraView::T)
         .def("projection", &CameraView::projection)
         .def("ray_direction", &CameraView::ray_direction)
+        .def("get_direction_from_vp", &CameraView::get_direction_from_vp)
         .def("image_name", &CameraView::image_name)
         .def("set_image_name", &CameraView::SetImageName);
 
@@ -504,9 +520,48 @@ void bind_patchinfo(py::module& m, std::string type_suffix) {
         .def_readwrite("img_hw", &PInfo::img_hw);
 }
 
+void bind_pointtrack(py::module& m) {
+    py::class_<Point2d>(m, "Point2d")
+        .def(py::init<>())
+        .def(py::init<V2D, int>(), py::arg("p"), py::arg("point3D_id")=-1)
+        .def("as_dict", &Point2d::as_dict)
+        .def(py::pickle(
+            [](const Point2d& input) { // dump
+                return input.as_dict();
+            },
+            [](const py::dict& dict) { // load
+                return Point2d(dict);
+            }
+        ))
+        .def_readwrite("p", &Point2d::p)
+        .def_readwrite("point3D_id", &Point2d::point3D_id);
+
+    py::class_<PointTrack>(m, "PointTrack")
+        .def(py::init<>())
+        .def(py::init<const PointTrack&>())
+        .def(py::init<const V3D&, const int&, const std::vector<int>&, const std::vector<int>&, const std::vector<V2D>&>())
+        .def(py::init<py::dict>())
+        .def("as_dict", &PointTrack::as_dict)
+        .def(py::pickle(
+            [](const PointTrack& input) { // dump
+                return input.as_dict();
+            },
+            [](const py::dict& dict) { // load
+                return PointTrack(dict);
+            }
+        ))
+        .def_readwrite("p", &PointTrack::p)
+        .def_readonly("image_id_list", &PointTrack::image_id_list)
+        .def_readonly("p2d_id_list", &PointTrack::p2d_id_list)
+        .def_readonly("p2d_list", &PointTrack::p2d_list)
+        .def("count_images", &PointTrack::count_images);
+}
+
 void bind_base(py::module& m) {
+    bind_general_structures(m);
     bind_graph(m);
     bind_transforms(m);
+    bind_pointtrack(m);
     bind_linebase(m);
     bind_linetrack(m);
     bind_line_dists(m);

@@ -66,5 +66,9 @@ V3D CameraView::ray_direction(const V2D& p2d) const {
     return (R().transpose() * K_inv() * V3D(p2d(0), p2d(1), 1.0)).normalized();
 }
 
+V3D CameraView::get_direction_from_vp(const V3D& vp) const {
+    return (R().transpose() * K_inv() * vp).normalized();
+}
+
 } // namespace limap
 

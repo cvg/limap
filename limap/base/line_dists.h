@@ -50,9 +50,7 @@ Eigen::MatrixXd compute_pairwise_distance(const std::vector<LineType> lines, con
 
 template <typename LineType>
 double cosine(const LineType& l1, const LineType& l2) {
-    auto vec1 = l1.end - l1.start;
-    auto vec2 = l2.end - l2.start;
-    return std::abs((vec1 / vec1.norm()).dot(vec2 / vec2.norm()));
+    return std::abs(l1.direction().dot(l2.direction()));
 }
 
 template <typename LineType>
@@ -97,7 +95,7 @@ double dist_midpoint_perpendicular(const LineType& l1, const LineType& l2) {
 template <typename LineType>
 std::pair<double, double> dists_endpoints_perpendicular_oneway(const LineType& l1, const LineType& l2) {
     // l1 endpoints projected to l2
-    auto v2 = (l2.end - l2.start) / (l2.end - l2.start).norm();
+    auto v2 = l2.direction();
 
     auto disps = l1.start - l2.start;
     double d12s_squared = disps.squaredNorm() - pow(disps.dot(v2), 2);

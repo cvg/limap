@@ -8,6 +8,7 @@ LIMAP_ADD_SOURCES(
     camera_view.h camera_view.cc
     image_collection.h image_collection.cc
 
+    pointtrack.h pointtrack.cc
     linebase.h linebase.cc
     linetrack.h linetrack.cc
     line_dists.h line_dists.cc
@@ -18,7 +19,6 @@ LIMAP_ADD_SOURCES(
 
     featuremap.h featuremap.cc
     featurepatch.h featurepatch.cc
-
     bindings.cc
 )
 

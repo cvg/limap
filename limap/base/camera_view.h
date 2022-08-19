@@ -59,6 +59,7 @@ public:
 
     V2D projection(const V3D& p3d) const;
     V3D ray_direction(const V2D& p2d) const;
+    V3D get_direction_from_vp(const V3D& vp) const;
 };
 
 } // namespace limap
