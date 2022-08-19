@@ -130,7 +130,7 @@ def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap'
 
     ### write cameras.txt
     colmap_cameras = {}
-    for cam_id in range(imagecols.NumCameras()):
+    for cam_id in imagecols.get_cam_ids():
         cam = imagecols.cam(cam_id)
         model_id = cam.model_id()
         model_name = None
