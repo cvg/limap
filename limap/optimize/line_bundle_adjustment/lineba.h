@@ -5,8 +5,8 @@
 #include <pybind11/numpy.h>
 #include "_limap/helpers.h"
 
-#include "base/featuremap.h"
-#include "base/featurepatch.h"
+#include "features/featuremap.h"
+#include "features/featurepatch.h"
 #include "util/types.h"
 #include "vplib/vpbase.h"
 
@@ -34,14 +34,14 @@ private:
     
     // heatmaps (for each image)
     bool enable_heatmap = false; // set to true when calling InitializeHeatmaps()
-    std::vector<FeatureMap<DTYPE>> p_heatmaps_f_;
-    std::vector<std::unique_ptr<FeatureInterpolator<DTYPE, 1>>> p_heatmaps_itp_;
+    std::vector<features::FeatureMap<DTYPE>> p_heatmaps_f_;
+    std::vector<std::unique_ptr<features::FeatureInterpolator<DTYPE, 1>>> p_heatmaps_itp_;
 
     // patches (for each supporting image in each track)
     bool enable_feature = false; // InitializePatches()
-    std::vector<std::vector<PatchInfo<DTYPE>>> p_patches_; //
-    std::vector<std::vector<FeaturePatch<DTYPE>>> p_patches_f_;
-    std::vector<std::vector<std::unique_ptr<PatchInterpolator<DTYPE, CHANNELS>>>> p_patches_itp_;
+    std::vector<std::vector<features::PatchInfo<DTYPE>>> p_patches_; //
+    std::vector<std::vector<features::FeaturePatch<DTYPE>>> p_patches_f_;
+    std::vector<std::vector<std::unique_ptr<features::PatchInterpolator<DTYPE, CHANNELS>>>> p_patches_itp_;
 
     // set up ceres problem
     void ParameterizeCameras();
@@ -64,7 +64,7 @@ public:
     }
     void InitializeVPs(const std::map<int, vplib::VPResult>& vpresults);
     void InitializeHeatmaps(const std::vector<Eigen::MatrixXd>& heatmaps);
-    void InitializePatches(const std::vector<std::vector<PatchInfo<DTYPE>>>& patchinfos);
+    void InitializePatches(const std::vector<std::vector<features::PatchInfo<DTYPE>>>& patchinfos);
     void SetUp();
     bool Solve();
 

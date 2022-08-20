@@ -1,5 +1,5 @@
-#ifndef LIMAP_BASE_FEATUREMAP_H_
-#define LIMAP_BASE_FEATUREMAP_H_
+#ifndef LIMAP_FEATURES_FEATUREMAP_H_
+#define LIMAP_FEATURES_FEATUREMAP_H_
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
@@ -16,6 +16,8 @@
 namespace py = pybind11;
 
 namespace limap {
+
+namespace features {
 
 template <typename DTYPE>
 class FeatureMap {
@@ -88,6 +90,8 @@ bool FeatureInterpolator<DTYPE, CHANNELS>::CheckBounds(const T* xy) const {
     return (IsInsideZeroL(xy[0], static_cast<double>(fmap_.Width())) &&
             IsInsideZeroL(xy[1], static_cast<double>(fmap_.Height())));
 }
+
+} // namespace features
 
 } // namespace limap
 

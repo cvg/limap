@@ -20,7 +20,6 @@ namespace py = pybind11;
 #include "base/line_dists.h"
 #include "base/line_linker.h"
 #include "base/line_reconstruction.h"
-#include "base/featurepatch.h"
 #include "base/pointtrack.h"
 
 namespace limap {
@@ -508,18 +507,6 @@ void bind_camera(py::module& m) {
         .def("apply_similarity_transform", &ImageCollection::apply_similarity_transform);
 }
 
-template <typename DTYPE>
-void bind_patchinfo(py::module& m, std::string type_suffix) {
-    using PInfo = PatchInfo<DTYPE>;
-    py::class_<PInfo>(m, ("PatchInfo" + type_suffix).c_str())
-        .def(py::init<>())
-        .def(py::init<py::array_t<DTYPE, py::array::c_style>, M2D, V2D, std::pair<int, int>>())
-        .def_readwrite("array", &PInfo::array)
-        .def_readwrite("R", &PInfo::R)
-        .def_readwrite("tvec", &PInfo::tvec)
-        .def_readwrite("img_hw", &PInfo::img_hw);
-}
-
 void bind_pointtrack(py::module& m) {
     py::class_<Point2d>(m, "Point2d")
         .def(py::init<>())
@@ -568,10 +555,6 @@ void bind_base(py::module& m) {
     bind_line_linker(m);
     bind_line_reconstruction(m);
     bind_camera(m);
-
-    bind_patchinfo<float16>(m, "_f16");
-    bind_patchinfo<float>(m, "_f32");
-    bind_patchinfo<double>(m, "_f64");
 
     m.def("get_effective_num_threads", &colmap::GetEffectiveNumThreads);
 }

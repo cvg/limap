@@ -1,6 +1,8 @@
-#include "base/featurepatch.h"
+#include "features/featurepatch.h"
 
 namespace limap {
+
+namespace features {
 
 template <typename DTYPE>
 PatchInfo<DTYPE> FeaturePatch<DTYPE>::GetPatchInfo() const {
@@ -21,6 +23,8 @@ PatchInfo<DTYPE> FeaturePatch<DTYPE>::GetPatchInfo() const {
 template class FeaturePatch<float16>;
 template class FeaturePatch<float>;
 template class FeaturePatch<double>;
+
+} // namespace features 
 
 } // namespace limap
 

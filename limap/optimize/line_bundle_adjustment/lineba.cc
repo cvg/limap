@@ -30,10 +30,10 @@ void LineBAEngine<DTYPE, CHANNELS>::InitializeHeatmaps(const std::vector<Eigen::
     p_heatmaps_itp_.clear();
     double memGB = 0;
     for (auto it = heatmaps.begin(); it != heatmaps.end(); ++it) {
-        p_heatmaps_f_.push_back(FeatureMap<DTYPE>(*it));
+        p_heatmaps_f_.push_back(features::FeatureMap<DTYPE>(*it));
         p_heatmaps_itp_.push_back(
-                std::unique_ptr<FeatureInterpolator<DTYPE, 1>>
-                    (new FeatureInterpolator<DTYPE, 1>(interp_cfg, p_heatmaps_f_.back()))
+                std::unique_ptr<features::FeatureInterpolator<DTYPE, 1>>
+                    (new features::FeatureInterpolator<DTYPE, 1>(interp_cfg, p_heatmaps_f_.back()))
         );
         memGB += p_heatmaps_f_.back().MemGB();
     }
@@ -41,7 +41,7 @@ void LineBAEngine<DTYPE, CHANNELS>::InitializeHeatmaps(const std::vector<Eigen::
 }
 
 template <typename DTYPE, int CHANNELS>
-void LineBAEngine<DTYPE, CHANNELS>::InitializePatches(const std::vector<std::vector<PatchInfo<DTYPE>>>& patchinfos) {
+void LineBAEngine<DTYPE, CHANNELS>::InitializePatches(const std::vector<std::vector<features::PatchInfo<DTYPE>>>& patchinfos) {
     enable_feature = true;
     THROW_CHECK_EQ(reconstruction_.NumTracks(), patchinfos.size());
     auto& interp_cfg = config_.feature_interpolation_config;
@@ -57,10 +57,10 @@ void LineBAEngine<DTYPE, CHANNELS>::InitializePatches(const std::vector<std::vec
         const auto& patches = patchinfos[track_id];
         for (auto it = patches.begin(); it != patches.end(); ++it) {
             p_patches_[track_id].push_back(*it);
-            p_patches_f_[track_id].push_back(FeaturePatch<DTYPE>(*it));
+            p_patches_f_[track_id].push_back(features::FeaturePatch<DTYPE>(*it));
             p_patches_itp_[track_id].push_back(
-                    std::unique_ptr<PatchInterpolator<DTYPE, CHANNELS>>
-                        (new PatchInterpolator<DTYPE, CHANNELS>(interp_cfg, p_patches_f_[track_id].back()))
+                    std::unique_ptr<features::PatchInterpolator<DTYPE, CHANNELS>>
+                        (new features::PatchInterpolator<DTYPE, CHANNELS>(interp_cfg, p_patches_f_[track_id].back()))
             );
             memGB += p_patches_f_[track_id].back().MemGB();
             n_patches += 1;
@@ -297,7 +297,7 @@ void LineBAEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals(const int tra
             switch (view_ref.cam.ModelId()) {
 #define CAMERA_MODEL_CASE(CameraModel) \
     case CameraModel::kModelId:        \
-        cost_function = line_refinement::FeatureConsisSrcFunctor<CameraModel, PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[track_id][ref_index], sample, ref_descriptor);
+        cost_function = line_refinement::FeatureConsisSrcFunctor<CameraModel, features::PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[track_id][ref_index], sample, ref_descriptor);
         break;
             LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
 #undef CAMERA_MODEL_CASE
@@ -323,7 +323,7 @@ void LineBAEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals(const int tra
 
 #define CAMERA_MODEL_CASE(CameraModel) \
     case CameraModel::kModelId:        \
-        cost_function = line_refinement::FeatureConsisTgtFunctor<colmap::SimplePinholeCameraModel, CameraModel, PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[track_id][ref_index], p_patches_itp_[track_id][tgt_index], sample, ref_descriptor);  \
+        cost_function = line_refinement::FeatureConsisTgtFunctor<colmap::SimplePinholeCameraModel, CameraModel, features::PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[track_id][ref_index], p_patches_itp_[track_id][tgt_index], sample, ref_descriptor);  \
         break;
             LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
 #undef CAMERA_MODEL_CASE
@@ -335,7 +335,7 @@ void LineBAEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals(const int tra
 
 #define CAMERA_MODEL_CASE(CameraModel) \
     case CameraModel::kModelId:        \
-        cost_function = line_refinement::FeatureConsisTgtFunctor<colmap::PinholeCameraModel, CameraModel, PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[track_id][ref_index], p_patches_itp_[track_id][tgt_index], sample, ref_descriptor);  \
+        cost_function = line_refinement::FeatureConsisTgtFunctor<colmap::PinholeCameraModel, CameraModel, features::PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[track_id][ref_index], p_patches_itp_[track_id][tgt_index], sample, ref_descriptor);  \
         break;
             LIMAP_UNDISTORTED_CAMERA_MODEL_SWITCH_CASES
 #undef CAMERA_MODEL_CASE

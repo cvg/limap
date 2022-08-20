@@ -46,10 +46,10 @@ void RefinementEngine<DTYPE, CHANNELS>::InitializeHeatmaps(const std::vector<Eig
     p_heatmaps_itp_.clear();
     double memGB = 0;
     for (auto it = p_heatmaps.begin(); it != p_heatmaps.end(); ++it) {
-        p_heatmaps_f_.push_back(FeatureMap<DTYPE>(*it));
+        p_heatmaps_f_.push_back(features::FeatureMap<DTYPE>(*it));
         p_heatmaps_itp_.push_back(
-                std::unique_ptr<FeatureInterpolator<DTYPE, 1>>
-                    (new FeatureInterpolator<DTYPE, 1>(interp_cfg, p_heatmaps_f_.back()))
+                std::unique_ptr<features::FeatureInterpolator<DTYPE, 1>>
+                    (new features::FeatureInterpolator<DTYPE, 1>(interp_cfg, p_heatmaps_f_.back()))
         );
         memGB += p_heatmaps_f_.back().MemGB();
     }
@@ -70,10 +70,10 @@ void RefinementEngine<DTYPE, CHANNELS>::InitializeFeatures(const std::vector<py:
     double memGB = 0;
     for (auto it = p_features.begin(); it != p_features.end(); ++it) {
         p_features_.push_back(*it);
-        p_features_f_.push_back(FeatureMap<DTYPE>(*it));
+        p_features_f_.push_back(features::FeatureMap<DTYPE>(*it));
         p_features_itp_.push_back(
-                std::unique_ptr<FeatureInterpolator<DTYPE, CHANNELS>>
-                    (new FeatureInterpolator<DTYPE, CHANNELS>(interp_cfg, p_features_f_.back()))
+                std::unique_ptr<features::FeatureInterpolator<DTYPE, CHANNELS>>
+                    (new features::FeatureInterpolator<DTYPE, CHANNELS>(interp_cfg, p_features_f_.back()))
         );
         memGB += p_features_f_.back().MemGB();
     }
@@ -82,7 +82,7 @@ void RefinementEngine<DTYPE, CHANNELS>::InitializeFeatures(const std::vector<py:
 }
 
 template <typename DTYPE, int CHANNELS>
-void RefinementEngine<DTYPE, CHANNELS>::InitializeFeaturesAsPatches(const std::vector<PatchInfo<DTYPE>>& patchinfos) {
+void RefinementEngine<DTYPE, CHANNELS>::InitializeFeaturesAsPatches(const std::vector<features::PatchInfo<DTYPE>>& patchinfos) {
     enable_feature = true;
     use_patches = true;
     int n_images = track_.count_images();
@@ -95,10 +95,10 @@ void RefinementEngine<DTYPE, CHANNELS>::InitializeFeaturesAsPatches(const std::v
     double memGB = 0;
     for (auto it = patchinfos.begin(); it != patchinfos.end(); ++it) {
         p_patches_.push_back(*it);
-        p_patches_f_.push_back(FeaturePatch<DTYPE>(*it));
+        p_patches_f_.push_back(features::FeaturePatch<DTYPE>(*it));
         p_patches_itp_.push_back(
-                std::unique_ptr<PatchInterpolator<DTYPE, CHANNELS>>
-                    (new PatchInterpolator<DTYPE, CHANNELS>(interp_cfg, p_patches_f_.back()))
+                std::unique_ptr<features::PatchInterpolator<DTYPE, CHANNELS>>
+                    (new features::PatchInterpolator<DTYPE, CHANNELS>(interp_cfg, p_patches_f_.back()))
         );
         memGB += p_patches_f_.back().MemGB();
     }
@@ -290,11 +290,11 @@ void RefinementEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals() {
 #define CAMERA_MODEL_CASE(CameraModel) \
     case CameraModel::kModelId:        \
         if (use_patches) {             \
-            cost_function = FeatureConsisSrcFunctor<CameraModel, PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[ref_index], sample, ref_descriptor, \
+            cost_function = FeatureConsisSrcFunctor<CameraModel, features::PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[ref_index], sample, ref_descriptor, \
                                                                                                               view_ref.cam.Params().data(), view_ref.pose.qvec.data(), view_ref.pose.tvec.data()); \
         } \
         else { \
-            cost_function = FeatureConsisSrcFunctor<CameraModel, FeatureInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_features_itp_[ref_index], sample, ref_descriptor, \
+            cost_function = FeatureConsisSrcFunctor<CameraModel, features::FeatureInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_features_itp_[ref_index], sample, ref_descriptor, \
                                                                                                               view_ref.cam.Params().data(), view_ref.pose.qvec.data(), view_ref.pose.tvec.data()); \
         } \
         break;
@@ -322,12 +322,12 @@ void RefinementEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals() {
 #define CAMERA_MODEL_CASE(CameraModel) \
     case CameraModel::kModelId:        \
         if (use_patches) {             \
-           cost_function = FeatureConsisTgtFunctor<colmap::SimplePinholeCameraModel, CameraModel, PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[ref_index], p_patches_itp_[tgt_index], sample, ref_descriptor,  \
+           cost_function = FeatureConsisTgtFunctor<colmap::SimplePinholeCameraModel, CameraModel, features::PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[ref_index], p_patches_itp_[tgt_index], sample, ref_descriptor,  \
                                                                                                          view_ref.cam.Params().data(), view_ref.pose.qvec.data(), view_ref.pose.tvec.data(),  \
                                                                                                          view_tgt.cam.Params().data(), view_tgt.pose.qvec.data(), view_tgt.pose.tvec.data()); \
         } \
         else { \
-           cost_function = FeatureConsisTgtFunctor<colmap::SimplePinholeCameraModel, CameraModel, FeatureInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_features_itp_[ref_index], p_features_itp_[tgt_index], sample, ref_descriptor,  \
+           cost_function = FeatureConsisTgtFunctor<colmap::SimplePinholeCameraModel, CameraModel, features::FeatureInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_features_itp_[ref_index], p_features_itp_[tgt_index], sample, ref_descriptor,  \
                                                                                                          view_ref.cam.Params().data(), view_ref.pose.qvec.data(), view_ref.pose.tvec.data(), \
                                                                                                          view_tgt.cam.Params().data(), view_tgt.pose.qvec.data(), view_tgt.pose.tvec.data()); \
         } \
@@ -343,12 +343,12 @@ void RefinementEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals() {
 #define CAMERA_MODEL_CASE(CameraModel) \
     case CameraModel::kModelId:        \
         if (use_patches) {             \
-           cost_function = FeatureConsisTgtFunctor<colmap::PinholeCameraModel, CameraModel, PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[ref_index], p_patches_itp_[tgt_index], sample, ref_descriptor,  \
+           cost_function = FeatureConsisTgtFunctor<colmap::PinholeCameraModel, CameraModel, features::PatchInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_patches_itp_[ref_index], p_patches_itp_[tgt_index], sample, ref_descriptor,  \
                                                                                                          view_ref.cam.Params().data(), view_ref.pose.qvec.data(), view_ref.pose.tvec.data(),  \
                                                                                                          view_tgt.cam.Params().data(), view_tgt.pose.qvec.data(), view_tgt.pose.tvec.data()); \
         } \
         else { \
-           cost_function = FeatureConsisTgtFunctor<colmap::PinholeCameraModel, CameraModel, FeatureInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_features_itp_[ref_index], p_features_itp_[tgt_index], sample, ref_descriptor,  \
+           cost_function = FeatureConsisTgtFunctor<colmap::PinholeCameraModel, CameraModel, features::FeatureInterpolator<DTYPE, CHANNELS>, CHANNELS>::Create(p_features_itp_[ref_index], p_features_itp_[tgt_index], sample, ref_descriptor,  \
                                                                                                          view_ref.cam.Params().data(), view_ref.pose.qvec.data(), view_ref.pose.tvec.data(), \
                                                                                                          view_tgt.cam.Params().data(), view_tgt.pose.qvec.data(), view_tgt.pose.tvec.data()); \
         } \

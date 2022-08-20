@@ -5,10 +5,10 @@
 #include <pybind11/numpy.h>
 #include "_limap/helpers.h"
 
+#include "features/featurepatch.h"
 #include "base/camera_view.h"
 #include "base/linebase.h"
 #include "base/linetrack.h"
-#include "base/featurepatch.h"
 #include "util/types.h"
 
 namespace py = pybind11;

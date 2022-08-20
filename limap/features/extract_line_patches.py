@@ -1,4 +1,4 @@
-from _limap import _base, _features
+from _limap import _features
 import numpy as np
 
 def write_patch(fname, patch, dtype="float16"):
@@ -16,7 +16,7 @@ def load_patch(fname, dtype="float16"):
     patch_info_name = "PatchInfo_f{0}".format(dtype[-2:])
     with open(fname, 'rb') as f:
         data = np.load(f, allow_pickle=True)
-        patch = getattr(_base, patch_info_name)(data["array"], data["R"], data["tvec"], data["img_hw"])
+        patch = getattr(_features, patch_info_name)(data["array"], data["R"], data["tvec"], data["img_hw"])
     return patch
 
 def get_extractor(cfg, channels):
@@ -28,7 +28,7 @@ def get_extractor(cfg, channels):
 def extract_line_patch_oneimage(cfg, track, img_id, camview, feature):
     '''
     Returns:
-    _base.PatchInfo_fx
+    _features.PatchInfo_fx
     '''
     lpe_options = _features.LinePatchExtractorOptions(cfg)
     patch_extractor_name = "LinePatchExtractor_f64_c{0}".format(feature.shape[2])
@@ -39,7 +39,7 @@ def extract_line_patch_oneimage(cfg, track, img_id, camview, feature):
 def extract_line_patches(cfg, track, p_camviews, p_features):
     '''
     Returns:
-    list of _base.PatchInfo_fx
+    list of _features.PatchInfo_fx
     '''
     lpe_options = _features.LinePatchExtractorOptions(cfg)
     patch_extractor_name = "LinePatchExtractor_f64_c{0}".format(p_features[0].shape[2])

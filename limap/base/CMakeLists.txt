@@ -17,8 +17,6 @@ LIMAP_ADD_SOURCES(
     line_reconstruction.h line_reconstruction.cc
     line2d_parameterization.h line2d_parameterization.cc
 
-    featuremap.h featuremap.cc
-    featurepatch.h featurepatch.cc
     bindings.cc
 )
 

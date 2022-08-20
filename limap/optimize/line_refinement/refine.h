@@ -9,8 +9,8 @@
 #include "base/linebase.h"
 #include "base/linetrack.h"
 #include "base/infinite_line.h"
-#include "base/featuremap.h"
-#include "base/featurepatch.h"
+#include "features/featuremap.h"
+#include "features/featurepatch.h"
 #include "util/types.h"
 #include "vplib/vpbase.h"
 
@@ -70,19 +70,19 @@ private:
 
     // heatmaps
     bool enable_heatmap = false; // set to true when calling InitializeHeatmaps()
-    std::vector<FeatureMap<DTYPE>> p_heatmaps_f_;
-    std::vector<std::unique_ptr<FeatureInterpolator<DTYPE, 1>>> p_heatmaps_itp_;
+    std::vector<features::FeatureMap<DTYPE>> p_heatmaps_f_;
+    std::vector<std::unique_ptr<features::FeatureInterpolator<DTYPE, 1>>> p_heatmaps_itp_;
 
     // features
     bool enable_feature = false; // set to true when calling InitializeFeatures() or InitializeFeaturesAsPatches()
     bool use_patches = false; // set to true when calling InitializeFeaturesAsPatches()
     std::vector<py::array_t<DTYPE, py::array::c_style>> p_features_; // size: number of supporting images
-    std::vector<FeatureMap<DTYPE>> p_features_f_;
-    std::vector<std::unique_ptr<FeatureInterpolator<DTYPE, CHANNELS>>> p_features_itp_;
+    std::vector<features::FeatureMap<DTYPE>> p_features_f_;
+    std::vector<std::unique_ptr<features::FeatureInterpolator<DTYPE, CHANNELS>>> p_features_itp_;
 
-    std::vector<PatchInfo<DTYPE>> p_patches_; // size: number of supporting images 
-    std::vector<FeaturePatch<DTYPE>> p_patches_f_;
-    std::vector<std::unique_ptr<PatchInterpolator<DTYPE, CHANNELS>>> p_patches_itp_;
+    std::vector<features::PatchInfo<DTYPE>> p_patches_; // size: number of supporting images 
+    std::vector<features::FeaturePatch<DTYPE>> p_patches_f_;
+    std::vector<std::unique_ptr<features::PatchInterpolator<DTYPE, CHANNELS>>> p_patches_itp_;
 
     // set up ceres problem
     void ParameterizeMinimalLine();
@@ -100,7 +100,7 @@ public:
     void InitializeVPs(const std::vector<vplib::VPResult>& p_vpresults);
     void InitializeHeatmaps(const std::vector<Eigen::MatrixXd>& p_heatmaps);
     void InitializeFeatures(const std::vector<py::array_t<DTYPE, py::array::c_style>>& p_featuremaps);
-    void InitializeFeaturesAsPatches(const std::vector<PatchInfo<DTYPE>>& patchinfos);
+    void InitializeFeaturesAsPatches(const std::vector<features::PatchInfo<DTYPE>>& patchinfos);
     void SetUp();
 
     bool Solve();

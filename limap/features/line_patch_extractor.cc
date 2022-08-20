@@ -1,6 +1,5 @@
 #include "features/line_patch_extractor.h"
-
-#include "base/featuremap.h"
+#include "features/featuremap.h"
 #include "ceresbase/interpolation.h"
 
 #include <algorithm>

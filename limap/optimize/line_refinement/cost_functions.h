@@ -12,8 +12,8 @@
 #include "base/linebase.h"
 #include "base/linetrack.h"
 #include "base/infinite_line.h"
-#include "base/featuremap.h"
-#include "base/featurepatch.h"
+#include "features/featuremap.h"
+#include "features/featurepatch.h"
 #include "util/types.h"
 
 #include "ceresbase/line_projection.h"
@@ -174,14 +174,14 @@ protected:
 template <typename CameraModel, typename DTYPE>
 struct MaxHeatmapFunctor {
 public:
-    MaxHeatmapFunctor(std::unique_ptr<FeatureInterpolator<DTYPE, 1>>& interpolator,  
+    MaxHeatmapFunctor(std::unique_ptr<features::FeatureInterpolator<DTYPE, 1>>& interpolator,  
                               const std::vector<InfiniteLine2d>& samples,
                               const double* params = NULL,
                               const double* qvec = NULL,
                               const double* tvec = NULL):
         interpolator_(interpolator), samples_(samples), params_(params), qvec_(qvec), tvec_(tvec) {}
 
-    static ceres::CostFunction* Create(std::unique_ptr<FeatureInterpolator<DTYPE, 1>>& interpolator,
+    static ceres::CostFunction* Create(std::unique_ptr<features::FeatureInterpolator<DTYPE, 1>>& interpolator,
                                        const std::vector<InfiniteLine2d>& samples,
                                        const double* params = NULL,
                                        const double* qvec = NULL,
@@ -229,7 +229,7 @@ public:
     }
 
 protected:
-    std::unique_ptr<FeatureInterpolator<DTYPE, 1>>& interpolator_;
+    std::unique_ptr<features::FeatureInterpolator<DTYPE, 1>>& interpolator_;
     std::vector<InfiniteLine2d> samples_;
     const double* params_;
     const double* qvec_;

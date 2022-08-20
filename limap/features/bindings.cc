@@ -7,12 +7,27 @@
 #include <Eigen/Core>
 #include "_limap/helpers.h"
 
+#include "features/featurepatch.h"
 #include "features/dense_sift.h"
 #include "features/line_patch_extractor.h"
 
 namespace py = pybind11;
 
 namespace limap {
+
+template <typename DTYPE>
+void bind_patchinfo(py::module& m, std::string type_suffix) {
+    using namespace features;
+
+    using PInfo = PatchInfo<DTYPE>;
+    py::class_<PInfo>(m, ("PatchInfo" + type_suffix).c_str())
+        .def(py::init<>())
+        .def(py::init<py::array_t<DTYPE, py::array::c_style>, M2D, V2D, std::pair<int, int>>())
+        .def_readwrite("array", &PInfo::array)
+        .def_readwrite("R", &PInfo::R)
+        .def_readwrite("tvec", &PInfo::tvec)
+        .def_readwrite("img_hw", &PInfo::img_hw);
+}
 
 template <typename DTYPE, int CHANNELS>
 void bind_extractor_dtype(py::module& m, std::string type_suffix) {
@@ -69,6 +84,9 @@ void bind_features(py::module& m) {
           py::arg("steps") = 1, py::arg("bin_size") = 4,
           "Extract DSIFT features.");
 
+    bind_patchinfo<float16>(m, "_f16");
+    bind_patchinfo<float>(m, "_f32");
+    bind_patchinfo<double>(m, "_f64");
     bind_extractor(m);
 }
 

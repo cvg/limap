@@ -1,17 +1,19 @@
-#ifndef LIMAP_BASE_FEATUREPATCH_H_
-#define LIMAP_BASE_FEATUREPATCH_H_
+#ifndef LIMAP_FEATURES_FEATUREPATCH_H_
+#define LIMAP_FEATURES_FEATUREPATCH_H_
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include "_limap/helpers.h"
 
-#include "base/featuremap.h"
+#include "features/featuremap.h"
 #include "util/types.h"
 #include "util/log_exceptions.h"
 
 namespace py = pybind11;
 
 namespace limap {
+
+namespace features {
 
 template <typename DTYPE>
 struct PatchInfo {
@@ -121,6 +123,8 @@ bool PatchInterpolator<DTYPE, CHANNELS>::CheckBounds(const T* xy) const {
                       IsInsideZeroL(local_xy[1], static_cast<double>(fpatch_.Height())));
     return res_global && res_local;
 }
+
+} // namespace features
 
 } // namespace limap
 

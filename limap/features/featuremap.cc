@@ -1,6 +1,8 @@
-#include "base/featuremap.h"
+#include "features/featuremap.h"
 
 namespace limap {
+
+namespace features {
 
 template <typename DTYPE>
 FeatureMap<DTYPE>::FeatureMap(const Eigen::MatrixXd& array) {
@@ -44,6 +46,8 @@ FeatureMap<DTYPE>::FeatureMap(const py::array_t<DTYPE, py::array::c_style>& pyar
 template class FeatureMap<float16>;
 template class FeatureMap<float>;
 template class FeatureMap<double>;
+
+} // namespace features 
 
 } // namespace limap
 
