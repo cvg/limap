@@ -21,3 +21,4 @@ def get_lines_to_track_map(all_lines_2d, linetracks):
         for img_id, line_id in zip(track.image_id_list, track.line_id_list):
             map[img_id][line_id] = track_id
     return map
+    
