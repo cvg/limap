@@ -40,12 +40,11 @@ class PointTrack {
 public:
     PointTrack() {}
     PointTrack(const PointTrack& track);
-    PointTrack(const V3D& p_, const int& point_id_, const std::vector<int>& image_id_list_, const std::vector<int>& p2d_id_list_, const std::vector<V2D> p2d_list_): p(p_), point_id(point_id_), image_id_list(image_id_list_), p2d_id_list(p2d_id_list_), p2d_list(p2d_list_) {}
+    PointTrack(const V3D& p_, const std::vector<int>& image_id_list_, const std::vector<int>& p2d_id_list_, const std::vector<V2D> p2d_list_): p(p_), image_id_list(image_id_list_), p2d_id_list(p2d_id_list_), p2d_list(p2d_list_) {}
     py::dict as_dict() const;
     PointTrack(py::dict dict);
     
     V3D p;
-    int point_id;
     std::vector<int> image_id_list;
     std::vector<int> p2d_id_list;
     std::vector<V2D> p2d_list;

@@ -526,7 +526,7 @@ void bind_pointtrack(py::module& m) {
     py::class_<PointTrack>(m, "PointTrack")
         .def(py::init<>())
         .def(py::init<const PointTrack&>())
-        .def(py::init<const V3D&, const int&, const std::vector<int>&, const std::vector<int>&, const std::vector<V2D>&>())
+        .def(py::init<const V3D&, const std::vector<int>&, const std::vector<int>&, const std::vector<V2D>&>())
         .def(py::init<py::dict>())
         .def("as_dict", &PointTrack::as_dict)
         .def(py::pickle(
