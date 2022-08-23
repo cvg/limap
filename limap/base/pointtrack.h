@@ -17,11 +17,12 @@ namespace py = pybind11;
 
 namespace limap {
 
-struct Point2d {
-    Point2d() {}
-    Point2d(V2D p_, int point3D_id_ = -1): p(p_), point3D_id(point3D_id_) {}
-    Point2d(py::dict dict) {
-        ASSIGN_PYDICT_ITEM(dict, p, V2D)
+template <typename PTYPE>
+struct Feature2dWith3dIndex {
+    Feature2dWith3dIndex() {}
+    Feature2dWith3dIndex(PTYPE p_, int point3D_id_ = -1): p(p_), point3D_id(point3D_id_) {}
+    Feature2dWith3dIndex(py::dict dict) {
+        ASSIGN_PYDICT_ITEM(dict, p, PTYPE)
         ASSIGN_PYDICT_ITEM(dict, point3D_id, int)
     }
     py::dict as_dict() const {
@@ -30,9 +31,10 @@ struct Point2d {
         output["point3D_id"] = point3D_id;
         return output;
     }
-    V2D p;
+    PTYPE p;
     int point3D_id = -1;
 };
+typedef Feature2dWith3dIndex<V2D> Point2d;
 
 class PointTrack {
 public:
