@@ -160,6 +160,7 @@ void bind_linebase(py::module& m) {
         .def("as_array", &Line2d::as_array)
         .def("midpoint", &Line2d::midpoint)
         .def("direction", &Line2d::direction)
+        .def("point_projection", &Line2d::point_projection)
         .def("point_distance", &Line2d::point_distance);
 
     py::class_<Line3d>(m, "Line3d")
@@ -188,6 +189,7 @@ void bind_linebase(py::module& m) {
         .def("computeUncertainty", &Line3d::computeUncertainty)
         .def("midpoint", &Line3d::midpoint)
         .def("direction", &Line3d::direction)
+        .def("point_projection", &Line3d::point_projection)
         .def("point_distance", &Line3d::point_distance);
 
     m.def("_GetLine2dVectorFromArray", &GetLine2dVectorFromArray);

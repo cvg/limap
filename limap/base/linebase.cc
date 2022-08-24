@@ -16,14 +16,18 @@ Line2d::Line2d(const Eigen::MatrixXd& seg) {
     end = V2D(seg(1, 0), seg(1, 1));
 }
 
-double Line2d::point_distance(const V2D& p) const {
+V2D Line2d::point_projection(const V2D& p) const {
     double projection = (p - start).dot(direction());
     if (projection < 0)
-        return (p - start).norm();
+        return start;
     if (projection > length())
-        return (p - end).norm();
-    double dist_squared = (p - start).squaredNorm() - pow(projection, 2);
-    double dist = sqrt(std::max(dist_squared, 0.0));
+        return end;
+    return start + projection * direction();
+}
+
+double Line2d::point_distance(const V2D& p) const {
+    V2D p_proj = point_projection(p);
+    double dist = (p - p_proj).norm();
     return dist;
 }
 
@@ -49,14 +53,18 @@ Line3d::Line3d(const Eigen::MatrixXd& seg) {
     end = V3D(seg(1, 0), seg(1, 1), seg(1, 2));
 }
 
-double Line3d::point_distance(const V3D& p) const {
+V3D Line3d::point_projection(const V3D& p) const {
     double projection = (p - start).dot(direction());
     if (projection < 0)
-        return (p - start).norm();
+        return start;
     if (projection > length())
-        return (p - end).norm();
-    double dist_squared = (p - start).squaredNorm() - pow(projection, 2);
-    double dist = sqrt(std::max(dist_squared, 0.0));
+        return end;
+    return start + projection * direction();
+}
+
+double Line3d::point_distance(const V3D& p) const {
+    V3D p_proj = point_projection(p);
+    double dist = (p - p_proj).norm();
     return dist;
 }
 
