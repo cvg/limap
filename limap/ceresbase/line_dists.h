@@ -38,8 +38,8 @@ T CeresComputeDist2D_angle(const T dir1[2], const T dir2[2]) {
 
 template <typename T>
 T CeresComputeDist3D_sine(const T dir1[3], const T dir2[3]) {
-    T dir1_norm = ceres::sqrt(dir1[0] * dir1[0] + dir1[1] * dir1[1] + EPS);
-    T dir2_norm = ceres::sqrt(dir2[0] * dir2[0] + dir2[1] * dir2[1] + EPS);
+    T dir1_norm = ceres::sqrt(dir1[0] * dir1[0] + dir1[1] * dir1[1] + dir1[2] * dir1[2] + EPS);
+    T dir2_norm = ceres::sqrt(dir2[0] * dir2[0] + dir2[1] * dir2[1] + dir2[2] * dir2[2] + EPS);
     T dir1_normalized[3], dir2_normalized[3];
     for (size_t i = 0; i < 3; ++i) {
         dir1_normalized[i] = dir1[i] / dir1_norm;
@@ -56,8 +56,8 @@ T CeresComputeDist3D_sine(const T dir1[3], const T dir2[3]) {
 
 template <typename T>
 T CeresComputeDist3D_cosine(const T dir1[3], const T dir2[3]) {
-    T dir1_norm = ceres::sqrt(dir1[0] * dir1[0] + dir1[1] * dir1[1] + EPS);
-    T dir2_norm = ceres::sqrt(dir2[0] * dir2[0] + dir2[1] * dir2[1] + EPS);
+    T dir1_norm = ceres::sqrt(dir1[0] * dir1[0] + dir1[1] * dir1[1] + dir1[2] * dir1[2] + EPS);
+    T dir2_norm = ceres::sqrt(dir2[0] * dir2[0] + dir2[1] * dir2[1] + dir2[2] * dir2[2] + EPS);
     T dir1_normalized[3], dir2_normalized[3];
     for (size_t i = 0; i < 3; ++i) {
         dir1_normalized[i] = dir1[i] / dir1_norm;
