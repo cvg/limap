@@ -112,7 +112,7 @@ MinimalInfiniteLine3d::MinimalInfiniteLine3d(const InfiniteLine3d& inf_line) {
     // orthonormal representation
     // SO(2)
     double w1, w2;
-    w1 = a.norm(); w2 = b.norm();
+    w1 = 1.0; w2 = b.norm();
     wvec(0) = w1 / (w1 + w2);
     wvec(1) = w2 / (w1 + w2);
 

@@ -66,7 +66,7 @@ Line3d GetLineSegmentFromInfiniteLine3d(const InfiniteLine3d& inf_line, const st
 ////////////////////////////////////////////
 
 template <typename T>
-void MinimalPluckerToNormal(const T uvec[4], const T wvec[2], T p[3], T direc[3]) {
+void MinimalPluckerToPlucker(const T uvec[4], const T wvec[2], T direc[3], T b[3]) {
     T rotmat[3 * 3];
     ceres::QuaternionToRotation(uvec, rotmat);
     T w1, w2;
@@ -75,22 +75,19 @@ void MinimalPluckerToNormal(const T uvec[4], const T wvec[2], T p[3], T direc[3]
 
     // direc = a = Q.col(0) * w1
     // b = Q.col(1) * w2
-    direc[0] = rotmat[0] * w1;
-    direc[1] = rotmat[3] * w1;
-    direc[2] = rotmat[6] * w1;
-    T b[3];
-    b[0] = rotmat[1] * w2;
-    b[1] = rotmat[4] * w2;
-    b[2] = rotmat[7] * w2;
+    direc[0] = rotmat[0];
+    direc[1] = rotmat[3];
+    direc[2] = rotmat[6];
+    T b_norm = w2 / (w1 + EPS);
+    b[0] = rotmat[1] * b_norm;
+    b[1] = rotmat[4] * b_norm;
+    b[2] = rotmat[7] * b_norm;
+}
 
-    // normalize Plucker coordinate
-    T norm = ceres::sqrt(direc[0] * direc[0] + direc[1] * direc[1] + direc[2] * direc[2]);
-    direc[0] /= norm;
-    direc[1] /= norm;
-    direc[2] /= norm;
-    b[0] /= norm;
-    b[1] /= norm;
-    b[2] /= norm;
+template <typename T>
+void MinimalPluckerToNormal(const T uvec[4], const T wvec[2], T p[3], T direc[3]) {
+    T b[3];
+    MinimalPluckerToPlucker(uvec, wvec, direc, b);
 
     // get position
     ceres::CrossProduct(direc, b, p);
