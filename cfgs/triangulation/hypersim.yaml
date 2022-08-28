@@ -10,4 +10,6 @@ input_stride: 1
 line2d:
     detector: 
         method: "sold2"
+    matcher:
+        weights: "indoor"
 
