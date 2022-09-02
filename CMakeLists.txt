@@ -77,7 +77,6 @@ endif()
 set(LIMAP_INTERNAL_LIBRARIES
   HighFive
   pybind11::module
-  pybind11::embed
   JLinkage
   igl::core
 )
