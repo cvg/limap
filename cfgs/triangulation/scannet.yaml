@@ -8,4 +8,6 @@ stride: 5
 line2d:
     detector: 
         method: "sold2"
+    matcher:
+        weights: "indoor"
 
