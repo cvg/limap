@@ -31,6 +31,12 @@ double Line2d::point_distance(const V2D& p) const {
     return dist;
 }
 
+V3D Line2d::coords() const {
+    V3D start_homo = V3D(start[0], start[1], 1.0);
+    V3D end_homo = V3D(end[0], end[1], 1.0);
+    return start_homo.cross(end_homo).normalized();
+}
+
 Eigen::MatrixXd Line2d::as_array() const {
     Eigen::MatrixXd arr(2, 2);
     arr(0, 0) = start[0]; arr(0, 1) = start[1];

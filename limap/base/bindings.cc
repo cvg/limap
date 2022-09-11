@@ -157,6 +157,7 @@ void bind_linebase(py::module& m) {
         .def_readonly("end", &Line2d::end)
         .def_readonly("score", &Line2d::score)
         .def("length", &Line2d::length)
+        .def("coords", &Line2d::coords)
         .def("as_array", &Line2d::as_array)
         .def("midpoint", &Line2d::midpoint)
         .def("direction", &Line2d::direction)
