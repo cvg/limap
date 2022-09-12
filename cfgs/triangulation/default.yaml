@@ -48,10 +48,11 @@ line2d:
         skip_exists: False
     matcher:
         method: "sold2" # ["sold2", "nn_endpoints", "superglue_endpoints"]
-        weights: "outdoor" # ["indoor", "outdoor"] for selecting superglue models
         n_jobs: 1
         topk: 10
         skip_exists: False
+        superglue:
+            weights: "outdoor" # ["indoor", "outdoor"] for selecting superglue models
 var2d: # in pixels
     sold2: 5.0
     lsd: 2.0

@@ -13,6 +13,6 @@ def get_matcher(cfg_matcher, extractor, n_neighbors=20):
         return NNEndpointsMatcher(extractor, options)
     elif method == "superglue_endpoints":
         from .endpoints import SuperGlueEndpointsMatcher
-        return SuperGlueEndpointsMatcher(extractor, options, weights=cfg_matcher["weights"])
+        return SuperGlueEndpointsMatcher(extractor, options, weights=cfg_matcher["superglue"]["weights"])
     else:
         raise NotImplementedError
