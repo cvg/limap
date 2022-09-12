@@ -22,9 +22,9 @@ def get_extractor(cfg_extractor):
     if method == "sold2":
         from .SOLD2 import SOLD2Detector
         return SOLD2Detector(options)
-    elif method == "superglue_endpoints":
-        from .superglue_endpoints import EndpointsExtractor
-        return EndpointsExtractor(options)
+    elif method == "superpoint_endpoints":
+        from .endpoints import SuperPointEndpointsExtractor
+        return SuperPointEndpointsExtractor(options)
     else:
         raise NotImplementedError
 

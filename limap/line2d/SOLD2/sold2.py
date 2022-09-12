@@ -87,6 +87,7 @@ class SOLD2Detector(BaseDetector):
 class SOLD2Matcher(BaseMatcher):
     def __init__(self, extractor, options = BaseMatcherOptions()):
         super(SOLD2Matcher, self).__init__(extractor, options)
+        assert self.extractor.get_module_name() == "sold2"
         self.detector = SOLD2LineDetector()
 
     def get_module_name(self):

@@ -8,8 +8,11 @@ def get_matcher(cfg_matcher, extractor, n_neighbors=20):
     if method == "sold2":
         from .SOLD2 import SOLD2Matcher
         return SOLD2Matcher(extractor, options)
+    elif method == "nn_endpoints":
+        from .endpoints import NNEndpointsMatcher
+        return NNEndpointsMatcher(extractor, options)
     elif method == "superglue_endpoints":
-        from .superglue_endpoints import SuperGlueEndpointsMatcher
+        from .endpoints import SuperGlueEndpointsMatcher
         return SuperGlueEndpointsMatcher(extractor, options, weights=cfg_matcher["weights"])
     else:
         raise NotImplementedError
