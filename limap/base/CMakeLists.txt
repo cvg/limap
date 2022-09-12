@@ -15,7 +15,6 @@ LIMAP_ADD_SOURCES(
     line_linker.h line_linker.cc
     infinite_line.h infinite_line.cc
     line_reconstruction.h line_reconstruction.cc
-    line2d_parameterization.h line2d_parameterization.cc
 
     bindings.cc
 )

@@ -5,13 +5,61 @@
 #include <ceres/rotation.h>
 #include "util/types.h"
 #include "ceresbase/point_projection.h"
+#include "ceresbase/line_transforms.h"
+
+// [Note] All the kvec here is a 4-dim array: [fx, fy, cx, cy]
 
 namespace limap {
 
-// All the kvec is a 4-dim array: [fx, fy, cx, cy]
+// line projection (camera frame) in plucker coordinate
+template <typename T>
+void Line_WorldToImage(const T* kvec, const T* mvec, T* coor) {
+    // K * [m]x * K.transpose()
+    Eigen::Matrix<T, 3, 3> mskew;
+    mskew(0, 0) = T(0.0); mskew(0, 1) = -mvec[2]; mskew(0, 2) = mvec[1];
+    mskew(1, 0) = mvec[2]; mskew(1, 1) = T(0.0); mskew(1, 2) = -mvec[0];
+    mskew(2, 0) = -mvec[1]; mskew(2, 1) = mvec[0]; mskew(2, 2) = T(0.0);
+
+    Eigen::Matrix<T, 3, 3> K;
+    K(0, 0) = kvec[0]; K(0, 1) = T(0.0); K(0, 2) = kvec[2];
+    K(1, 0) = T(0.0); K(1, 1) = kvec[1]; K(1, 2) = kvec[3];
+    K(2, 0) = T(0.0); K(2, 1) = T(0.0); K(2, 2) = T(1.0);
+    Eigen::Matrix<T, 3, 3> coor_skew = K * mskew * K.transpose();
+
+    coor[0] = coor_skew(2, 1);
+    coor[1] = coor_skew(0, 2);
+    coor[2] = coor_skew(1, 0);
+    T coor_norm = ceres::sqrt(coor[0] * coor[0] + coor[1] * coor[1] + coor[2] * coor[2] + EPS);
+    coor[0] /= coor_norm;
+    coor[1] /= coor_norm;
+    coor[2] /= coor_norm;
+}
 
 template <typename T>
-void Lines_WorldToImage(const T* kvec, const T* p3d, const T* dir3d, T* p2d, T* dir2d) {
+void Line_WorldToPixel(const T* kvec, const T* qvec, const T* tvec, const T* dvec, const T* mvec, T* coor) {
+    // R * [m]x * R.transpose() - t * (R * d).transpose() + (R * d) * t.transpose();
+    T R_pt[3 * 3];
+    ceres::QuaternionToRotation(qvec, R_pt);
+    Eigen::Map<Eigen::Matrix<T, 3, 3, Eigen::RowMajor>> R(R_pt);
+    Eigen::Map<const Eigen::Matrix<T, 3, 1>> t(tvec);
+    Eigen::Map<const Eigen::Matrix<T, 3, 1>> d(dvec);
+
+    Eigen::Matrix<T, 3, 3> mskew;
+    mskew(0, 0) = T(0.0); mskew(0, 1) = -mvec[2]; mskew(0, 2) = mvec[1];
+    mskew(1, 0) = mvec[2]; mskew(1, 1) = T(0.0); mskew(1, 2) = -mvec[0];
+    mskew(2, 0) = -mvec[1]; mskew(2, 1) = mvec[0]; mskew(2, 2) = T(0.0);
+
+    Eigen::Matrix<T, 3, 3> mskew_transformed = R * mskew * R.transpose() - t * (R * d).transpose() + (R * d) * t.transpose();
+    T mvec_transformed[3];
+    mvec_transformed[0] = mskew_transformed(2, 1);
+    mvec_transformed[1] = mskew_transformed(0, 2);
+    mvec_transformed[2] = mskew_transformed(1, 0);
+    Line_WorldToImage<T>(kvec, mvec_transformed, coor);
+}
+
+// line projection (camera frame) in normal coordinate
+template <typename T>
+void Line_WorldToImage_Regular(const T* kvec, const T* p3d, const T* dir3d, T* p2d, T* dir2d) {
     T u = p3d[0] / p3d[2];
     T v = p3d[1] / p3d[2];
     WorldToImage<T>(kvec, u, v, &p2d[0], &p2d[1]);
@@ -30,8 +78,9 @@ void Lines_WorldToImage(const T* kvec, const T* p3d, const T* dir3d, T* p2d, T* 
     dir2d[1] /= norm;
 }
 
+// line projection in normal coordinate
 template <typename T>
-void Lines_WorldToPixel(const T* kvec, const T* qvec, const T* tvec, const T* p3d, const T* dir3d, T* p2d, T* dir2d) {
+void Line_WorldToPixel_Regular(const T* kvec, const T* qvec, const T* tvec, const T* p3d, const T* dir3d, T* p2d, T* dir2d) {
     // transform point
     T p_projection[3];
     ceres::QuaternionRotatePoint(qvec, p3d, p_projection);
@@ -44,7 +93,7 @@ void Lines_WorldToPixel(const T* kvec, const T* qvec, const T* tvec, const T* p3
     ceres::QuaternionRotatePoint(qvec, dir3d, dir_projection);
 
     // world to image
-    Lines_WorldToImage<T>(kvec, p_projection, dir_projection, p2d, dir2d);
+    Line_WorldToImage_Regular<T>(kvec, p_projection, dir_projection, p2d, dir2d);
 }
 
 // get direction from vp
@@ -104,6 +153,19 @@ void GetEpipolarLineCoordinate(const T kvec_ref[4], const T qvec_ref[4], const T
     Eigen::Map<Eigen::Matrix<T, 3, 1>> map(epiline_coord);
     map = (F * p_homo).normalized();
 }
+
+template <typename T>
+bool Ceres_GetIntersection2dFromInfiniteLine3d(const T uvec[4], const T wvec[2], // MinimalLine
+                                               const T kvec[4], const T qvec[4], const T tvec[3], // CameraView 
+                                               const T coor[3], // InfiniteLine2d sample
+                                               T xy[2]) 
+{
+    T dvec[3], mvec[3];
+    MinimalPluckerToPlucker<T>(uvec, wvec, dvec, mvec);
+    T coor_proj[3];
+    Line_WorldToPixel<T>(kvec, qvec, tvec, dvec, mvec, coor_proj);
+    return Ceres_IntersectLineCoordinates(coor_proj, coor, xy);
+} 
 
 } // namespace limap
 

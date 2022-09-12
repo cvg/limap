@@ -1,5 +1,4 @@
 #include "vplib/jlinkage.h"
-#include "base/infinite_line.h"
 
 #include <VPCluster.h>
 #include <VPSample.h>
@@ -85,7 +84,7 @@ V3D JLinkage::fitVP(const std::vector<Line2d>& lines) const {
     Eigen::MatrixXd A(lines.size(), 3);
     for (int i = 0; i < n_lines; ++i) {
         const auto& line = lines[i];
-        V3D coor = InfiniteLine2d(line).GetLineCoordinate();
+        V3D coor = line.coords();
         A.row(i) = coor;
     }
 

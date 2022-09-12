@@ -18,18 +18,21 @@ std::pair<Line3d, ransac_lib::RansacStatistics> Fit3DPoints(const Eigen::Matrix3
 
     // get line segment
     std::vector<double> projections;
-    Eigen::Vector3d direc = best_model.direc.normalized();
+    Eigen::Vector3d direc = best_model.direction();
+    if (ransac_stats.inlier_indices.empty()) {
+        return std::make_pair(Line3d(), ransac_stats);
+    }
+    // use the first one as reference and do the projections
+    V3D p_ref = points.col(ransac_stats.inlier_indices[0]);
     for (auto it = ransac_stats.inlier_indices.begin(); it != ransac_stats.inlier_indices.end(); ++it) {
         Eigen::Vector3d p = points.col(*it);
-        double projection = (p - best_model.p).dot(direc);
+        double projection = (p - p_ref).dot(direc);
         projections.push_back(projection);
     }
-    if (projections.empty())
-        return std::make_pair(Line3d(), ransac_stats);
     std::sort(projections.begin(), projections.end());
     size_t n_projs = projections.size();
-    Eigen::Vector3d start = best_model.p + direc * projections[0];
-    Eigen::Vector3d end = best_model.p + direc * projections[n_projs - 1];
+    Eigen::Vector3d start = p_ref + direc * projections[0];
+    Eigen::Vector3d end = p_ref + direc * projections[n_projs - 1];
     Line3d line(start, end);
     return std::make_pair(line, ransac_stats);
 }

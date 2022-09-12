@@ -16,6 +16,7 @@
 #include "features/featurepatch.h"
 #include "util/types.h"
 
+#include "ceresbase/line_transforms.h"
 #include "ceresbase/line_projection.h"
 #include "ceresbase/line_dists.h"
 
@@ -61,8 +62,8 @@ public:
     bool operator()(const T* const uvec, const T* const wvec, const T* const params, const T* const qvec, T* residuals) const {
         T kvec[4];
         ParamsToKvec(CameraModel::model_id, params, kvec);
-        T p3d[3], dir3d[3];
-        MinimalPluckerToNormal<T>(uvec, wvec, p3d, dir3d);
+        T dir3d[3], m[3];
+        MinimalPluckerToPlucker<T>(uvec, wvec, dir3d, m);
         T dir3d_rotated[3];
         ceres::QuaternionRotatePoint(qvec, dir3d, dir3d_rotated);
 
@@ -85,30 +86,30 @@ protected:
 ////////////////////////////////////////////////////////////
 
 template <typename T>
-void Ceres_PerpendicularDist2D(const T p2d[2], const T dir2d[2], const T p1[2], const T p2[2], T* res) {
-    T disp1[2], disp2[2];
-    disp1[0] = p1[0] - p2d[0];
-    disp1[1] = p1[1] - p2d[1];
-    disp2[0] = p2[0] - p2d[0];
-    disp2[1] = p2[1] - p2d[1];
-    T sine1 = CeresComputeDist2D_sine(dir2d, disp1);
-    T dist1 = ceres::sqrt(disp1[0] * disp1[0] + disp1[1] * disp1[1] + EPS) * sine1;
-    T sine2 = CeresComputeDist2D_sine(dir2d, disp2);
-    T dist2 = ceres::sqrt(disp2[0] * disp2[0] + disp2[1] * disp2[1] + EPS) * sine2;
-
+void Ceres_PerpendicularDist2D(const T coor[3], const T p1[2], const T p2[2], T* res) {
+    T direc_norm = ceres::sqrt(coor[0] * coor[0] + coor[1] * coor[1] + EPS);
+    T dist1 = (p1[0] * coor[0] + p1[1] * coor[1] + coor[2]) / direc_norm;
+    T dist2 = (p2[0] * coor[0] + p2[1] * coor[1] + coor[2]) / direc_norm;
     res[0] = dist1; res[1] = dist2;
 }
 
 template <typename T>
-void Ceres_CosineWeightedPerpendicularDist2D_1D(const T p2d[2], const T dir2d[2], const T p1[2], const T p2[2], T* res, const double alpha=10.0) {
-    const T alpha_t = T(alpha);
+void Ceres_CosineWeightedPerpendicularDist2D_1D(const T coor[3], const T p1[2], const T p2[2], T* res, const double alpha=10.0) {
+    T direc_norm = ceres::sqrt(coor[0] * coor[0] + coor[1] * coor[1] + EPS);
+    // 2D direction of the projection
+    T dir2d[2];
+    dir2d[0] = -coor[1] / direc_norm;
+    dir2d[1] = coor[0] / direc_norm;
+    // 2D direction of the 2D line segment
     T direc[2];
     direc[0] = p2[0] - p1[0];
     direc[1] = p2[1] - p1[1];
+    // compute weight
     T cosine = CeresComputeDist2D_cosine(dir2d, direc);
+    const T alpha_t = T(alpha);
     T weight = ceres::exp(alpha_t * (T(1.0) - cosine));
-
-    Ceres_PerpendicularDist2D(p2d, dir2d, p1, p2, res);
+    // compute raw distance and multiply it by the weight
+    Ceres_PerpendicularDist2D(coor, p1, p2, res);
     res[0] *= weight; res[1] *= weight;
 }
 
@@ -147,15 +148,15 @@ public:
                     T* residuals) const {
         T kvec[4];
         ParamsToKvec(CameraModel::model_id, params, kvec);
-        T p3d[3], dir3d[3];
-        MinimalPluckerToNormal<T>(uvec, wvec, p3d, dir3d);
-        T p2d[2], dir2d[2];
-        Lines_WorldToPixel<T>(kvec, qvec, tvec, p3d, dir3d, p2d, dir2d);
+        T dvec[3], mvec[3];
+        MinimalPluckerToPlucker<T>(uvec, wvec, dvec, mvec);
+        T coor[3];
+        Line_WorldToPixel<T>(kvec, qvec, tvec, dvec, mvec, coor);
 
         const Line2d& line = line2d_;
         T p1[2] = {T(line.start(0)), T(line.start(1))};
         T p2[2] = {T(line.end(0)), T(line.end(1))};
-        Ceres_CosineWeightedPerpendicularDist2D_1D(p2d, dir2d, p1, p2, residuals, alpha_);
+        Ceres_CosineWeightedPerpendicularDist2D_1D(coor, p1, p2, residuals, alpha_);
         return true;
     }
 
@@ -216,10 +217,10 @@ public:
         size_t n_residuals = samples_.size();
         for (size_t i = 0; i < n_residuals; ++i) {
             const InfiniteLine2d& line = samples_[i];
-            T p_sample[2] = {T(line.p(0)), T(line.p(1))};
-            T dir_sample[2] = {T(line.direc(0)), T(line.direc(1))};
+            V3D coords = line.coords;
+            T coor[3] = {T(coords(0)), T(coords(1)), T(coords(2))};
             T xy[2];
-            bool res = GetIntersection2d<T>(uvec, wvec, kvec, qvec, tvec, p_sample, dir_sample, xy);
+            bool res = Ceres_GetIntersection2dFromInfiniteLine3d<T>(uvec, wvec, kvec, qvec, tvec, coor, xy);
             is_inside = is_inside && res;
             T heatmap_val;
             interpolator_->Evaluate(xy, &heatmap_val);
@@ -286,13 +287,13 @@ public:
         T kvec[4];
         ParamsToKvec(CameraModel::model_id, params, kvec);
         const InfiniteLine2d& line = sample_;
-        T p_sample[2] = {T(line.p(0)), T(line.p(1))};
-        T dir_sample[2] = {T(line.direc(0)), T(line.direc(1))};
+        V3D coords = line.coords;
+        T coor[3] = {T(coords(0)), T(coords(1)), T(coords(2))};
 
         // get feature at reference image
         bool is_inside = true;
         T xy[2];
-        bool res = GetIntersection2d<T>(uvec, wvec, kvec, qvec, tvec, p_sample, dir_sample, xy);
+        bool res = Ceres_GetIntersection2dFromInfiniteLine3d<T>(uvec, wvec, kvec, qvec, tvec, coor, xy);
         is_inside = is_inside && res;
         T feature[CHANNELS];
         interpolator_->Evaluate(xy, feature);
@@ -365,9 +366,9 @@ public:
         T tvec_ref[3] = {T(tvec_ref_[0]), T(tvec_ref_[1]), T(tvec_ref_[2])};
 
         const auto& line = sample_;
-        T p_sample[2] = {T(line.p(0)), T(line.p(1))};
-        T dir_sample[2] = {T(line.direc(0)), T(line.direc(1))};
-        GetIntersection2d<T>(uvec, wvec, kvec_ref, qvec_ref, tvec_ref, p_sample, dir_sample, intersection);
+        V3D coords = line.coords;
+        T coor[3] = {T(coords(0), coords(1), coords(2))};
+        Ceres_GetIntersection2dFromInfiniteLine3d<T>(uvec, wvec, kvec_ref, qvec_ref, tvec_ref, coor, intersection);
         return true;
     }
 
@@ -405,7 +406,7 @@ public:
 
         T epiline_coord[3];
         GetEpipolarLineCoordinate<T>(kvec_ref, qvec_ref, tvec_ref, kvec_tgt, qvec_tgt, tvec_tgt, xy, epiline_coord);
-        GetIntersection2d_line_coordinate<T>(uvec, wvec, kvec_tgt, qvec_tgt, tvec_tgt, epiline_coord, intersection);
+        Ceres_GetIntersection2dFromInfiniteLine3d<T>(uvec, wvec, kvec_tgt, qvec_tgt, tvec_tgt, epiline_coord, intersection);
         return true; 
     }
 
@@ -452,13 +453,13 @@ public:
         ParamsToKvec(CameraModelTgt::model_id, params_tgt, kvec_tgt);
 
         const InfiniteLine2d& line = sample_;
-        T p_sample[2] = {T(line.p(0)), T(line.p(1))};
-        T dir_sample[2] = {T(line.direc(0)), T(line.direc(1))};
+        V3D coords = line.coords;
+        T coor[3] = {T(coords(0)), T(coords(1)), T(coords(2))};
 
         // get feature at reference image
         bool is_inside = true;
         T xy_ref[2];
-        bool res = GetIntersection2d<T>(uvec, wvec, kvec_ref, qvec_ref, tvec_ref, p_sample, dir_sample, xy_ref);
+        bool res = Ceres_GetIntersection2dFromInfiniteLine3d<T>(uvec, wvec, kvec_ref, qvec_ref, tvec_ref, coor, xy_ref);
         is_inside = is_inside && res;
         T feature_ref[CHANNELS];
         interp_ref_->Evaluate(xy_ref, feature_ref);
@@ -467,7 +468,7 @@ public:
         T xy_tgt[2];
         T epiline_coord[3];
         GetEpipolarLineCoordinate<T>(kvec_ref, qvec_ref, tvec_ref, kvec_tgt, qvec_tgt, tvec_tgt, xy_ref, epiline_coord);
-        res = GetIntersection2d_line_coordinate<T>(uvec, wvec, kvec_tgt, qvec_tgt, tvec_tgt, epiline_coord, xy_tgt);
+        res = Ceres_GetIntersection2dFromInfiniteLine3d<T>(uvec, wvec, kvec_tgt, qvec_tgt, tvec_tgt, epiline_coord, xy_tgt);
         is_inside = is_inside && res;
         T feature_tgt[CHANNELS];
         interp_tgt_->Evaluate(xy_tgt, feature_tgt);

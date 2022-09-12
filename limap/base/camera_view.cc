@@ -54,16 +54,22 @@ py::array_t<uint8_t> CameraView::read_image(const bool set_gray) const {
     return img;
 }
 
+Eigen::MatrixXd CameraView::matrix() const {
+    Eigen::MatrixXd P(3, 4);
+    P.block<3, 3>(0, 0) = R();
+    P.col(3) = T();
+    P = K() * P;
+    return P;
+}
+
 V2D CameraView::projection(const V3D& p3d) const {
     V3D p_homo = K() * (R() * p3d + T());
-    V2D p2d;
-    p2d(0) = p_homo(0) / p_homo(2);
-    p2d(1) = p_homo(1) / p_homo(2);
+    V2D p2d = dehomogeneous(p_homo);
     return p2d;
 }
 
 V3D CameraView::ray_direction(const V2D& p2d) const {
-    return (R().transpose() * K_inv() * V3D(p2d(0), p2d(1), 1.0)).normalized();
+    return (R().transpose() * K_inv() * homogeneous(p2d)).normalized();
 }
 
 V3D CameraView::get_direction_from_vp(const V3D& vp) const {

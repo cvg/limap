@@ -26,7 +26,7 @@ public:
     V2D midpoint() const {return 0.5 * (start + end);}
     V2D direction() const {return (end - start).normalized();}
     V2D perp_direction() const {V2D dir = direction(); return V2D(dir[1], -dir[0]); }
-    V3D coords() const;
+    V3D coords() const; // get homogeneous coordinate
     V2D point_projection(const V2D& p) const;
     double point_distance(const V2D& p) const;
     Eigen::MatrixXd as_array() const;

@@ -1,6 +1,7 @@
 #include "optimize/line_refinement/refine.h"
 #include "optimize/line_refinement/cost_functions.h"
 #include "base/camera_models.h"
+#include "ceresbase/line_projection.h"
 
 #include <colmap/util/logging.h>
 #include <colmap/util/threading.h>
@@ -273,10 +274,9 @@ void RefinementEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals() {
             V2D ref_intersection;
             double kvec_ref[4];
             ParamsToKvec<double>(view_ref.cam.ModelId(), view_ref.cam.Params().data(), kvec_ref);
-            GetIntersection2d<double>(inf_line_.uvec.data(), inf_line_.wvec.data(), 
-                                      kvec_ref, view_ref.pose.qvec.data(), view_ref.pose.tvec.data(),
-                                      sample.p.data(), sample.direc.data(),
-                                      ref_intersection.data());
+            Ceres_GetIntersection2dFromInfiniteLine3d<double>(inf_line_.uvec.data(), inf_line_.wvec.data(), 
+                                                              kvec_ref, view_ref.pose.qvec.data(), view_ref.pose.tvec.data(),
+                                                              sample.coords.data(), ref_intersection.data());
 
             if (use_patches)
                 p_patches_itp_[ref_index]->Evaluate(ref_intersection.data(), ref_descriptor);
@@ -432,6 +432,7 @@ Line3d RefinementEngine<DTYPE, CHANNELS>::GetLine3d() const {
     }
 
     // get line segment
+    // Line3d line = GetLineSegmentFromInfiniteLine3d(inf_line_.GetInfiniteLine(), cameras, track_.line2d_list, config_.num_outliers_aggregate);
     Line3d line = GetLineSegmentFromInfiniteLine3d(inf_line_.GetInfiniteLine(), track_.line3d_list, config_.num_outliers_aggregate);
     return line;
 }
@@ -487,10 +488,9 @@ std::vector<std::vector<V2D>> RefinementEngine<DTYPE, CHANNELS>::GetHeatmapInter
                 V2D intersection;
                 double kvec[4];
                 ParamsToKvec<double>(view.cam.ModelId(), view.cam.Params().data(), kvec);
-                GetIntersection2d<double>(inf_line.uvec.data(), inf_line.wvec.data(), 
-                                          kvec, view.pose.qvec.data(), view.pose.tvec.data(),
-                                          it2->p.data(), it2->direc.data(),
-                                          intersection.data());
+                Ceres_GetIntersection2dFromInfiniteLine3d<double>(inf_line.uvec.data(), inf_line.wvec.data(), 
+                                                                  kvec, view.pose.qvec.data(), view.pose.tvec.data(),
+                                                                  it2->coords.data(), intersection.data());
                 out_samples_idx.push_back(intersection);
             }
         }
@@ -533,10 +533,9 @@ std::vector<std::vector<std::pair<int, V2D>>> RefinementEngine<DTYPE, CHANNELS>:
         V2D ref_intersection;
         double kvec_ref[4];
         ParamsToKvec<double>(view_ref.cam.ModelId(), view_ref.cam.Params().data(), kvec_ref);
-        GetIntersection2d<double>(inf_line.uvec.data(), inf_line.wvec.data(),
-                                  kvec_ref, view_ref.pose.qvec.data(), view_ref.pose.tvec.data(),
-                                  sample.p.data(), sample.direc.data(),
-                                  ref_intersection.data());
+        Ceres_GetIntersection2dFromInfiniteLine3d<double>(inf_line.uvec.data(), inf_line.wvec.data(),
+                                                          kvec_ref, view_ref.pose.qvec.data(), view_ref.pose.tvec.data(),
+                                                          sample.coords.data(), ref_intersection.data());
         out_samples_idx.push_back(std::make_pair(ref_index, ref_intersection));
 
         // get tgt_intersection for each target image
@@ -551,9 +550,9 @@ std::vector<std::vector<std::pair<int, V2D>>> RefinementEngine<DTYPE, CHANNELS>:
             GetEpipolarLineCoordinate<double>(kvec_ref, view_ref.pose.qvec.data(), view_ref.pose.tvec.data(),
                                               kvec_tgt, view_ref.pose.qvec.data(), view_tgt.pose.tvec.data(),
                                               ref_intersection.data(), epiline_coord.data());
-            GetIntersection2d_line_coordinate<double>(inf_line.uvec.data(), inf_line.wvec.data(),
-                                                      kvec_tgt, view_tgt.pose.qvec.data(), view_tgt.pose.tvec.data(),
-                                                      epiline_coord.data(), tgt_intersection.data());
+            Ceres_GetIntersection2dFromInfiniteLine3d<double>(inf_line.uvec.data(), inf_line.wvec.data(),
+                                                              kvec_tgt, view_tgt.pose.qvec.data(), view_tgt.pose.tvec.data(),
+                                                              epiline_coord.data(), tgt_intersection.data());
             out_samples_idx.push_back(std::make_pair(tgt_index, tgt_intersection));
         }
         out_samples.push_back(out_samples_idx);

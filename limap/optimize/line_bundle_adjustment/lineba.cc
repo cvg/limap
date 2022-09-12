@@ -285,10 +285,9 @@ void LineBAEngine<DTYPE, CHANNELS>::AddFeatureConsistencyResiduals(const int tra
         if (config_.use_ref_descriptor) {
             ref_descriptor = new double[CHANNELS];
             V2D ref_intersection;
-            GetIntersection2d<double>(inf_line.uvec.data(), inf_line.wvec.data(),
-                                      view_ref.cam.Params().data(), view_ref.pose.qvec.data(), view_ref.pose.tvec.data(),
-                                      sample.p.data(), sample.direc.data(),
-                                      ref_intersection.data());
+            Ceres_GetIntersection2dFromInfiniteLine3d<double>(inf_line.uvec.data(), inf_line.wvec.data(),
+                                                              view_ref.cam.Params().data(), view_ref.pose.qvec.data(), view_ref.pose.tvec.data(),
+                                                              sample.coords.data(), ref_intersection.data());
             p_patches_itp_[track_id][ref_index]->Evaluate(ref_intersection.data(), ref_descriptor);
 
             // source residuals
@@ -452,10 +451,9 @@ std::vector<std::vector<V2D>> LineBAEngine<DTYPE, CHANNELS>::GetHeatmapIntersect
                 const auto& samples = heatmap_samples.at(*it1);
                 for (auto it2 = samples.begin(); it2 != samples.end(); ++it2) {
                     V2D intersection;
-                    GetIntersection2d<double>(inf_line.uvec.data(), inf_line.wvec.data(), 
-                                              view.cam.Params().data(), view.pose.qvec.data(), view.pose.tvec.data(),
-                                              it2->p.data(), it2->direc.data(),
-                                              intersection.data());
+                    Ceres_GetIntersection2dFromInfiniteLine3d<double>(inf_line.uvec.data(), inf_line.wvec.data(), 
+                                                                      view.cam.Params().data(), view.pose.qvec.data(), view.pose.tvec.data(),
+                                                                      it2->coords.data(), intersection.data());
                     out_samples_idx.push_back(intersection);
                 }
             }

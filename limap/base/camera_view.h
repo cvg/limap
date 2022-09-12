@@ -56,6 +56,7 @@ public:
     M3D K_inv() const { return cam.K_inv(); }
     int h() const { return cam.h(); }
     int w() const { return cam.w(); }
+    Eigen::MatrixXd matrix() const;
 
     V2D projection(const V3D& p3d) const;
     V3D ray_direction(const V2D& p2d) const;

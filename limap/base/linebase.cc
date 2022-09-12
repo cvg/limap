@@ -32,8 +32,8 @@ double Line2d::point_distance(const V2D& p) const {
 }
 
 V3D Line2d::coords() const {
-    V3D start_homo = V3D(start[0], start[1], 1.0);
-    V3D end_homo = V3D(end[0], end[1], 1.0);
+    V3D start_homo = homogeneous(start);
+    V3D end_homo = homogeneous(end);
     return start_homo.cross(end_homo).normalized();
 }
 
@@ -111,10 +111,10 @@ Line2d projection_line3d(const Line3d& line3d, const CameraView& view) {
 
 Line3d unprojection_line2d(const Line2d& line2d, const CameraView& view, const std::pair<double, double>& depths) {
     Line3d line3d;
-    V3D start_homo = V3D(line2d.start[0], line2d.start[1], 1.0) * depths.first;
-    line3d.start = view.R().transpose() * (view.K_inv() * start_homo - view.T());
-    V3D end_homo = V3D(line2d.end[0], line2d.end[1], 1.0) * depths.second;
-    line3d.end = view.R().transpose() * (view.K_inv() * end_homo - view.T());
+    V3D start_homo = homogeneous(line2d.start);
+    line3d.start = view.R().transpose() * (view.K_inv() * start_homo * depths.first - view.T());
+    V3D end_homo = homogeneous(line2d.end);
+    line3d.end = view.R().transpose() * (view.K_inv() * end_homo * depths.second - view.T());
     return line3d;
 }
 

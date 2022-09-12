@@ -23,10 +23,17 @@ using V4D = Eigen::Vector4d;
 
 using M2F = Eigen::Matrix2f;
 using M3F = Eigen::Matrix3f;
+using M4F = Eigen::Matrix4f;
 using M2D = Eigen::Matrix2d;
 using M3D = Eigen::Matrix3d;
+using M4D = Eigen::Matrix4d;
 
 const double EPS = 1e-12;
+
+inline V3D homogeneous(const V2D& v2d) { return V3D(v2d(0), v2d(1), 1.0); }
+inline V4D homogeneous(const V3D& v3d) { return V4D(v3d(0), v3d(1), v3d(2), 1.0); }
+inline V2D dehomogeneous(const V3D& v3d) { return V2D(v3d(0), v3d(1)) / (v3d(2) + EPS); }
+inline V3D dehomogeneous(const V4D& v4d) { return V3D(v4d(0), v4d(1), v4d(2)) / (v4d(3) + EPS); }
 
 }
 

@@ -5,63 +5,116 @@
 
 namespace limap {
 
+InfiniteLine2d::InfiniteLine2d(const V2D& p, const V2D& direc) {
+    THROW_CHECK_LT(std::abs(direc.norm() - 1.0), EPS);
+    V3D coor;
+    coor[0] = direc[1];
+    coor[1] = (-1) * direc[0];
+    coor[2] = (-1) * direc[1] * p[0] + direc[0] * p[1];
+    coords = coor.normalized();
+}
+
 InfiniteLine2d::InfiniteLine2d(const Line2d& line) {
     CHECK_GT(line.length(), 0.0);
-    p = line.start;
-    direc = (line.end - line.start).normalized();
+    coords = line.coords();
 }
 
-V3D InfiniteLine2d::GetLineCoordinate() const {
-    V3D coor;
-    coor(0) = direc(1);
-    coor(1) = -direc(0);
-    coor(2) = - direc(1) * p(0) + direc(0) * p(1);
-    return coor.normalized();
+V2D InfiniteLine2d::point_projection(const V2D& q) const {
+    V2D direc = direction();
+    InfiniteLine2d inf_line_perp = InfiniteLine2d(q, V2D(direc[1], -direc[0]));
+    V3D p_homo = coords.cross(inf_line_perp.coords);
+    THROW_CHECK_GT(p_homo(2), EPS);
+    return dehomogeneous(p_homo);
 }
 
-V2D InfiniteLine2d::point_projection(const V2D& p2d) const {
-    return p + (p2d - p).dot(direc) * direc;
+double InfiniteLine2d::point_distance(const V2D& q) const {
+    return (q - point_projection(q)).norm();
 }
 
-double InfiniteLine2d::point_distance(const V2D& p2d) const {
-    return (p2d - point_projection(p2d)).norm();
+V2D InfiniteLine2d::point() const {
+    return point_projection(V2D(0., 0.));
+}
+
+V2D InfiniteLine2d::direction() const {
+    return V2D(coords[1], -coords[0]).normalized();
 }
 
 std::pair<V2D, bool> Intersect_InfiniteLine2d(const InfiniteLine2d& l1, const InfiniteLine2d& l2) {
-    V3D coor1 = l1.GetLineCoordinate();
-    V3D coor2 = l2.GetLineCoordinate();
+    V3D coor1 = l1.coords;
+    V3D coor2 = l2.coords;
     V3D p_homo = coor1.cross(coor2).normalized();
     V2D p(0, 0);
     if (std::abs(p_homo(2)) < EPS)
         return std::make_pair(p, false);
     else {
-        p(0) = p_homo(0) / p_homo(2);
-        p(1) = p_homo(1) / p_homo(2);
+        p = dehomogeneous(p_homo);
         return std::make_pair(p, true);
+    }
+}
+
+InfiniteLine3d::InfiniteLine3d(const V3D& a, const V3D& b, bool use_normal) {
+    if (use_normal) {
+        THROW_CHECK_LT(std::abs(b.norm() - 1.0), EPS);
+        d = b;
+        m = a.cross(b);
+    }
+    else {
+        THROW_CHECK_LT(std::abs(a.norm() - 1.0), EPS);
+        d = a;
+        m = b;
     }
 }
 
 InfiniteLine3d::InfiniteLine3d(const Line3d& line) {
     CHECK_GT(line.length(), 0.0);
-    p = line.start;
-    direc = (line.end - line.start).normalized();
+    d = line.direction();
+    m = line.start.cross(d);
 }
 
-V3D InfiniteLine3d::point_projection(const V3D& p3d) const {
-    return p + (p3d - p).dot(direc) * direc;
+V3D InfiniteLine3d::point_projection(const V3D& q) const {
+    // Reference: page 4 at https://faculty.sites.iastate.edu/jia/files/inline-files/plucker-coordinates.pdf
+    V3D m_q = m + d.cross(q);
+    return q + d.cross(m_q);
 }
 
-double InfiniteLine3d::point_distance(const V3D& p) const {
-    return (p - point_projection(p)).norm();
+double InfiniteLine3d::point_distance(const V3D& q) const {
+    return (q - point_projection(q)).norm();
+}
+
+V3D InfiniteLine3d::point() const {
+    return point_projection(V3D(0., 0., 0.));
+}
+
+V3D InfiniteLine3d::direction() const {
+    return d;
+}
+
+M4D InfiniteLine3d::matrix() const {
+    // Plucker matrix from geometric form
+    // [LINK] https://en.wikipedia.org/wiki/Pl%C3%BCcker_matrix
+    M4D L = M4D::Zero();
+    L(0, 3) = d[0]; L(3, 0) = -d[0];
+    L(1, 3) = d[1]; L(3, 1) = -d[1];
+    L(2, 3) = d[2]; L(3, 2) = -d[2];
+    L(1, 2) = -m[0]; L(2, 1) = m[0];
+    L(0, 2) = m[1]; L(2, 0) = -m[1];
+    L(0, 1) = -m[2]; L(1, 0) = m[2]; 
+    return L;
 }
 
 InfiniteLine2d InfiniteLine3d::projection(const CameraView& view) const {
-    InfiniteLine2d inf_line2d;
-    V2D p2d = view.projection(p);
-    V2D p2d_prime = view.projection(p + direc * 1.0);
-    inf_line2d.p = p2d;
-    inf_line2d.direc = (p2d_prime - p2d).normalized();
-    return inf_line2d;
+    // Projection from Plucker coordinate to 2D homogeneous line coordinate
+    // [LINK] https://math.stackexchange.com/questions/1811665/how-to-project-a-3d-line-represented-in-pl%C3%BCcker-coordinates-into-2d-image
+    M4D L = matrix();
+    Eigen::MatrixXd P = view.matrix();
+    M3D l_skew = P * L * P.transpose();
+    V3D coords;
+    coords(0) = l_skew(2, 1);
+    coords(1) = l_skew(0, 2);
+    coords(2) = l_skew(1, 0);
+    coords = coords.normalized();
+    InfiniteLine2d inf_line = InfiniteLine2d(coords);
+    return inf_line;
 }
 
 V3D InfiniteLine3d::unprojection(const V2D& p2d, const CameraView& view) const {
@@ -69,10 +122,10 @@ V3D InfiniteLine3d::unprojection(const V2D& p2d, const CameraView& view) const {
     // min |C0 + C1 * t1 + C2 * t2|^2, C0 = p1 - p2
     V3D p1, p2;
     V3D C0, C1, C2;
-    p1 = p; 
+    p1 = point(); 
     p2 = view.pose.center(); 
     C0 = p1 - p2;
-    C1 = direc;
+    C1 = direction();
     C2 = view.ray_direction(p2d);
     C1 = C1.normalized(); C2 = C2.normalized();
     
@@ -88,7 +141,7 @@ V3D InfiniteLine3d::unprojection(const V2D& p2d, const CameraView& view) const {
     }
     else
         t = (B1 * A22 - B2 * A12) / det;
-    return p + t * direc;
+    return p1 + t * C1;
 }
 
 MinimalInfiniteLine3d::MinimalInfiniteLine3d(const std::vector<double>& values) {
@@ -106,8 +159,8 @@ MinimalInfiniteLine3d::MinimalInfiniteLine3d(const InfiniteLine3d& inf_line) {
     // [LINK] https://hal.archives-ouvertes.fr/hal-00092589/document
 
     // get Plucker coordinate
-    V3D a = inf_line.direc;
-    V3D b = inf_line.p.cross(inf_line.direc);
+    V3D a = inf_line.d;
+    V3D b = inf_line.m;
 
     // orthonormal representation
     // SO(2)
@@ -145,20 +198,16 @@ MinimalInfiniteLine3d::MinimalInfiniteLine3d(const InfiniteLine3d& inf_line) {
 InfiniteLine3d MinimalInfiniteLine3d::GetInfiniteLine() const {
     // get plucker coordinate
     M3D Q = colmap::QuaternionToRotationMatrix(uvec);
-    V3D a = std::abs(wvec(0)) * Q.col(0);
-    V3D b = std::abs(wvec(1)) * Q.col(1);
-
-    // transform plucker coordniate
-    InfiniteLine3d inf_line;
-    inf_line.direc = a.normalized();
-    inf_line.p = a.cross(b) / (a.squaredNorm());
-    return inf_line;
+    V3D d = Q.col(0);
+    V3D m = std::abs(wvec(1)) / std::abs(wvec(0)) * Q.col(1);
+    return InfiniteLine3d(d, m, false);
 }
 
 Line3d GetLineSegmentFromInfiniteLine3d(const InfiniteLine3d& inf_line, const std::vector<CameraView>& views, const std::vector<Line2d>& line2ds, const int num_outliers) {
     THROW_CHECK_EQ(views.size(), line2ds.size());
     int n_lines = line2ds.size();
-    V3D dir = inf_line.direc.normalized();
+    V3D dir = inf_line.direction();
+    V3D p_ref = inf_line.point();
 
     std::vector<double> values;
     for (int i = 0; i < n_lines; ++i) {
@@ -168,37 +217,39 @@ Line3d GetLineSegmentFromInfiniteLine3d(const InfiniteLine3d& inf_line, const st
         // project the two 2D endpoints to the 2d projection of the infinite line
         V2D pstart_2d = inf_line2d_proj.point_projection(line2d.start);
         V3D pstart_3d = inf_line.unprojection(pstart_2d, view);
-        double tstart = (pstart_3d - inf_line.p).dot(dir);
+        double tstart = (pstart_3d - p_ref).dot(dir);
         V2D pend_2d = inf_line2d_proj.point_projection(line2d.end);
         V3D pend_3d = inf_line.unprojection(pend_2d, view);
-        double tend = (pend_3d - inf_line.p).dot(dir);
+        double tend = (pend_3d - p_ref).dot(dir);
 
         values.push_back(tstart);
         values.push_back(tend);
     }
     std::sort(values.begin(), values.end());
     Line3d final_line;
-    final_line.start = inf_line.p + dir * values[num_outliers];
-    final_line.end = inf_line.p + dir * values[n_lines * 2 - 1 - num_outliers];
+    final_line.start = p_ref + dir * values[num_outliers];
+    final_line.end = p_ref + dir * values[n_lines * 2 - 1 - num_outliers];
     return final_line;
 }
 
 Line3d GetLineSegmentFromInfiniteLine3d(const InfiniteLine3d& inf_line, const std::vector<Line3d>& line3ds, const int num_outliers) {
+    THROW_CHECK_GT(line3ds.size(), 0);
     int n_lines = line3ds.size();
-    V3D dir = inf_line.direc.normalized();
+    V3D dir = inf_line.direction();
+    V3D p_ref = inf_line.point_projection(line3ds[0].start); // get a point on the line
 
     std::vector<double> values;
     for (int i = 0; i < n_lines; ++i) {
         const Line3d& line3d = line3ds[i];
-        double tstart = (line3d.start - inf_line.p).dot(dir);
-        double tend = (line3d.end - inf_line.p).dot(dir);
+        double tstart = (line3d.start - p_ref).dot(dir);
+        double tend = (line3d.end - p_ref).dot(dir);
         values.push_back(tstart);
         values.push_back(tend);
     }
     std::sort(values.begin(), values.end());
     Line3d final_line;
-    final_line.start = inf_line.p + dir * values[num_outliers];
-    final_line.end = inf_line.p + dir * values[n_lines * 2 - 1 - num_outliers];
+    final_line.start = p_ref + dir * values[num_outliers];
+    final_line.end = p_ref + dir * values[n_lines * 2 - 1 - num_outliers];
     return final_line;
 }
 

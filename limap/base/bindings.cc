@@ -455,6 +455,7 @@ void bind_camera(py::module& m) {
         .def("w", &CameraView::w)
         .def("R", &CameraView::R)
         .def("T", &CameraView::T)
+        .def("matrix", &CameraView::matrix)
         .def("projection", &CameraView::projection)
         .def("ray_direction", &CameraView::ray_direction)
         .def("get_direction_from_vp", &CameraView::get_direction_from_vp)

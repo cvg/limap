@@ -1,5 +1,4 @@
 #include "triangulation/functions.h"
-#include "base/infinite_line.h"
 
 namespace limap {
 
@@ -64,13 +63,13 @@ double compute_epipolar_IoU(const Line2d& l1, const CameraView& view1,
     M3D F = K1_inv.transpose() * E * K2_inv;
 
     // epipolar lines
-    V3D coor_l2 = InfiniteLine2d(l2).GetLineCoordinate();
+    V3D coor_l2 = l2.coords();
     V3D coor_epline_start = (F * V3D(l1.start[0], l1.start[1], 1)).normalized();
     V3D homo_c_start = coor_l2.cross(coor_epline_start);
-    V2D c_start = V2D(homo_c_start[0], homo_c_start[1]) / homo_c_start[2];
+    V2D c_start = dehomogeneous(homo_c_start);
     V3D coor_epline_end = (F * V3D(l1.end[0], l1.end[1], 1)).normalized();
     V3D homo_c_end = coor_l2.cross(coor_epline_end);
-    V2D c_end = V2D(homo_c_end[0], homo_c_end[1]) / homo_c_end[2];
+    V2D c_end = dehomogeneous(homo_c_end);
 
     // compute IoU
     double c1 = (c_start - l2.start).dot(l2.direction()) / l2.length();
