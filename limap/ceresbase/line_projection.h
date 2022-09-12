@@ -145,7 +145,7 @@ void GetEpipolarLineCoordinate(const T kvec_ref[4], const T qvec_ref[4], const T
     Kinv_tgt(0, 0) = T(1.0) / kvec_tgt[0]; Kinv_tgt(0, 1) = T(0.0); Kinv_tgt(0, 2) = -kvec_tgt[2] / kvec_tgt[0];
     Kinv_tgt(1, 0) = T(0.0); Kinv_tgt(1, 1) = T(1.0) / kvec_tgt[1]; Kinv_tgt(1, 2) = -kvec_tgt[3] / kvec_tgt[1];
     Kinv_tgt(2, 0) = T(0.0); Kinv_tgt(2, 1) = T(0.0); Kinv_tgt(2, 2) = T(1.0);
-    Eigen::Matrix<T, 3, 3> F = Kinv_ref.transpose() * E * Kinv_tgt;
+    Eigen::Matrix<T, 3, 3> F = Kinv_tgt.transpose() * E * Kinv_ref;
 
     // compute epipolar line
     Eigen::Matrix<T, 3, 1> p_homo;
