@@ -478,7 +478,7 @@ std::vector<LineTrack> RemergeLineTracks(const std::vector<LineTrack>& linetrack
             active_ids.push_back(i);
     }
     int n_active_ids = active_ids.size();
-    progressbar bar(n_active_ids);
+    progressbar bar(n_active_ids, n_active_ids >= 10000);
 #pragma omp parallel for
     for (size_t k = 0; k < n_active_ids; ++k) {
         int i = active_ids[k];

@@ -147,7 +147,8 @@ std::string progressbar::get_update_str() {
 
     if (n_cycles == 0) throw std::runtime_error(
             "progressbar::update: number of cycles not set");
-    progressstream<<"\r";
+    if (do_show_bar)
+        progressstream<<"\r";
 
     size_t perc = 0;
     // compute percentage, if did not change, do nothing and return
@@ -178,16 +179,14 @@ std::string progressbar::get_update_str() {
 
             // readd trailing percentage characters
             progressstream << closing_bracket_char;
-        }
 
-        //progressstream << "\b\b\b"; 
-        // erase the correct  number of characters
-        if (perc < 10) {
-            progressstream <<"  "<< perc << '%';
-        } else if (perc  >= 10 && perc < 100) {
-            progressstream <<" "<<perc << '%';
-        } else {
-            progressstream << 100 <<'%';
+            if (perc < 10) {
+                progressstream <<"  "<< perc << '%';
+            } else if (perc  >= 10 && perc < 100) {
+                progressstream <<" "<<perc << '%';
+            } else {
+                progressstream << 100 <<'%';
+            }
         }
 
         std::string total = std::to_string(n_cycles);
@@ -195,20 +194,21 @@ std::string progressbar::get_update_str() {
 
         int sizediff = total.size() - progressstr.size();
 
-        progressstream<<"("<<std::string(sizediff,*const_cast<char*>(" "))
-            <<progressstr << "/" << total <<")";
-
-        progressstream << "  " << opening_bracket_char;
+        if (do_show_bar) {
+            progressstream<<"("<<std::string(sizediff,*const_cast<char*>(" "))
+                <<progressstr << "/" << total <<")";
+            progressstream << "  " << opening_bracket_char;
+        }
         
         double sec = std::chrono::duration_cast<std::chrono::milliseconds>(now-last_timepoint).count() / 1000.0;
-
         double iterations_per_second = static_cast<double>(progress) / sec;
 
-        progressstream << std::to_string(iterations_per_second).substr(0,7);
-        progressstream << "it/s" << closing_bracket_char;
-
-        if (perc == 100) {
-            progressstream << std::endl;
+        if (do_show_bar) {
+            progressstream << std::to_string(iterations_per_second).substr(0,7);
+            progressstream << "it/s" << closing_bracket_char;
+            if (perc == 100) {
+                progressstream << std::endl;
+            }
         }
     }
     if (!update_is_called) update_is_called = true;
