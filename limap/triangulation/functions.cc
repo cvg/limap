@@ -60,7 +60,7 @@ double compute_epipolar_IoU(const Line2d& l1, const CameraView& view1,
     tskew(1, 0) = relT[2]; tskew(1, 1) = 0.0; tskew(1, 2) = -relT[0];
     tskew(2, 0) = -relT[1]; tskew(2, 1) = relT[0]; tskew(2, 2) = 0.0;
     M3D E = tskew * relR;
-    M3D F = K1_inv.transpose() * E * K2_inv;
+    M3D F = K2_inv.transpose() * E * K1_inv;
 
     // epipolar lines
     V3D coor_l2 = l2.coords();
