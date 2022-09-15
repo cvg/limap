@@ -67,7 +67,7 @@ public:
     CameraPose(py::dict dict);
     CameraPose(const CameraPose& campose): qvec(campose.qvec), tvec(campose.tvec) {}
 
-    V4D qvec = V4D::Zero();
+    V4D qvec = V4D(1., 0., 0., 0.);
     V3D tvec = V3D::Zero();
 
     py::dict as_dict() const;
