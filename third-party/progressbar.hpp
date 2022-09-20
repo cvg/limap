@@ -101,7 +101,7 @@ progressbar::progressbar() :
     todo_char(" "),
     opening_bracket_char("["),
     closing_bracket_char("]"),
-    last_timepoint(std::chrono::system_clock::now()) {
+    last_timepoint(std::chrono::high_resolution_clock::now()) {
         update();
     }
 

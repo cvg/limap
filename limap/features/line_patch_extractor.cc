@@ -40,7 +40,7 @@ PatchInfo<DTYPE> LinePatchExtractor<DTYPE, CHANNELS>::ExtractLinePatch(const Lin
     // sample on the feature to get patches (size: (finallength + 1, options_.range_perp + 1, channels))
     int patch_h = int(std::round(line2d_final.length())) + 1;
     int patch_w = options_.range_perp + 1;
-    py::array_t<DTYPE, py::array::c_style> pyarray = py::array_t<DTYPE, py::array::c_style>(std::vector<size_t>{patch_h, patch_w, CHANNELS});
+    py::array_t<DTYPE, py::array::c_style> pyarray = py::array_t<DTYPE, py::array::c_style>(std::vector<size_t>{static_cast<unsigned long>(patch_h), static_cast<unsigned long>(patch_w), CHANNELS});
     DTYPE* data_ptr = static_cast<DTYPE*>(pyarray.request().ptr);
 
 #pragma omp parallel for
@@ -99,7 +99,7 @@ std::vector<PatchInfo<DTYPE>> LinePatchExtractor<DTYPE, CHANNELS>::ExtractLinePa
         // sample on the feature to get patches (size: (finallength + 1, options_.range_perp + 1, channels))
         int patch_h = int(std::round(line2d_final.length())) + 1;
         int patch_w = options_.range_perp + 1;
-        py::array_t<DTYPE, py::array::c_style> pyarray = py::array_t<DTYPE, py::array::c_style>(std::vector<size_t>{patch_h, patch_w, CHANNELS});
+        py::array_t<DTYPE, py::array::c_style> pyarray = py::array_t<DTYPE, py::array::c_style>(std::vector<size_t>{static_cast<unsigned long>(patch_h), static_cast<unsigned long>(patch_w), CHANNELS});
         DTYPE* data_ptr = static_cast<DTYPE*>(pyarray.request().ptr);
 
         for (int x = 0; x < patch_w; ++x) {
