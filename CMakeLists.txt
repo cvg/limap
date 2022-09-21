@@ -23,13 +23,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CMakeHelper.cmake NO_POLICY_SCOPE)
 # Options
 ################################################################################
 option(OPENMP_ENABLED "Whether to enable OpenMP parallelization" ON)
-
-################################################################################
-# Find packages
-################################################################################
-# find_package(CUDA ${CUDA_MIN_VERSION} REQUIRED) #not-required
-find_package(Eigen3 3.3 REQUIRED)
-find_package(COLMAP REQUIRED)
+option(INTERPOLATION_ENABLED "Whether to enable interpolation-based pixel-perfect optimization" OFF)
 
 ################################################################################
 # Compiler specific configuration
@@ -45,6 +39,19 @@ if(OPENMP_ENABLED)
   endif()
 endif()
 
+if(INTERPOLATION_ENABLED)
+    message(STATUS "Enabling pixelwise optimization with ceres interpolation. This should be disabled for clang.")
+    add_definitions("-DINTERPOLATION_ENABLED")
+else()
+    message(STATUS "Disabling pixelwise optimization with ceres interpolation.")
+endif()
+
+################################################################################
+# Find packages
+################################################################################
+find_package(Eigen3 3.3 REQUIRED)
+find_package(COLMAP REQUIRED)
+
 ################################################################################
 # Add sources
 ################################################################################
@@ -54,7 +61,6 @@ set(LIMAP_INCLUDE_DIRS
   ${EIGEN3_INCLUDE_DIR}
   ${PROJECT_SOURCE_DIR}
   ${FREEIMAGE_INCLUDE_DIRS}
-  ${CERES_INCLUDE_DIRS}
   ${COLMAP_INCLUDE_DIRS}
 )
 

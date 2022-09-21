@@ -24,16 +24,18 @@ void bind_refinement_engine(py::module& m, std::string type_suffix) {
         .def(py::init<>())
         .def(py::init<const RefinementConfig&>())
         .def("Initialize", &RFEngine::Initialize)
-        .def("InitializeHeatmaps", &RFEngine::InitializeHeatmaps)
         .def("InitializeVPs", &RFEngine::InitializeVPs)
-        .def("InitializeFeatures", &RFEngine::InitializeFeatures)
-        .def("InitializeFeaturesAsPatches", &RFEngine::InitializeFeaturesAsPatches)
         .def("SetUp", &RFEngine::SetUp)
         .def("Solve", &RFEngine::Solve)
         .def("GetLine3d", &RFEngine::GetLine3d)
-        .def("GetAllStates", &RFEngine::GetAllStates)
+#ifdef INTERPOLATION_ENABLED
+        .def("InitializeHeatmaps", &RFEngine::InitializeHeatmaps)
+        .def("InitializeFeatures", &RFEngine::InitializeFeatures)
+        .def("InitializeFeaturesAsPatches", &RFEngine::InitializeFeaturesAsPatches)
         .def("GetHeatmapIntersections", &RFEngine::GetHeatmapIntersections)
-        .def("GetFConsistencyIntersections", &RFEngine::GetFConsistencyIntersections);
+        .def("GetFConsistencyIntersections", &RFEngine::GetFConsistencyIntersections)
+#endif // INTERPOLATION_ENABLED
+        .def("GetAllStates", &RFEngine::GetAllStates);
 }
 
 void bind_line_refinement(py::module &m) {

@@ -9,10 +9,13 @@
 #include "base/linebase.h"
 #include "base/linetrack.h"
 #include "base/infinite_line.h"
-#include "features/featuremap.h"
-#include "features/featurepatch.h"
 #include "util/types.h"
 #include "vplib/vpbase.h"
+
+#ifdef INTERPOLATION_ENABLED
+    #include "features/featuremap.h"
+    #include "features/featurepatch.h"
+#endif // INTERPOLATION_ENABLED
 
 #include <ceres/ceres.h>
 #include <tuple>
@@ -68,6 +71,12 @@ private:
     bool enable_vp = false;
     std::vector<vplib::VPResult> p_vpresults_;
 
+    // set up ceres problem
+    void ParameterizeMinimalLine();
+    void AddGeometricResiduals();
+    void AddVPResiduals();
+
+#ifdef INTERPOLATION_ENABLED
     // heatmaps
     bool enable_heatmap = false; // set to true when calling InitializeHeatmaps()
     std::vector<features::FeatureMap<DTYPE>> p_heatmaps_f_;
@@ -85,11 +94,9 @@ private:
     std::vector<std::unique_ptr<features::PatchInterpolator<DTYPE, CHANNELS>>> p_patches_itp_;
 
     // set up ceres problem
-    void ParameterizeMinimalLine();
-    void AddGeometricResiduals();
-    void AddVPResiduals();
     void AddHeatmapResiduals();
     void AddFeatureConsistencyResiduals();
+#endif // INTERPOLATION_ENABLED
 
 public:
     RefinementEngine() {}
@@ -98,23 +105,26 @@ public:
     void Initialize(const LineTrack& track,
                     const std::vector<CameraView>& p_views); // the order of p_camviews conform that of track.GetSortedImageIds()
     void InitializeVPs(const std::vector<vplib::VPResult>& p_vpresults);
-    void InitializeHeatmaps(const std::vector<Eigen::MatrixXd>& p_heatmaps);
-    void InitializeFeatures(const std::vector<py::array_t<DTYPE, py::array::c_style>>& p_featuremaps);
-    void InitializeFeaturesAsPatches(const std::vector<features::PatchInfo<DTYPE>>& patchinfos);
     void SetUp();
-
     bool Solve();
     Line3d GetLine3d() const;
 
     // for visualization, ids are corresponding to track_.GetSortedImageIds()
     std::vector<Line3d> GetAllStates() const;
-    std::vector<std::vector<V2D>> GetHeatmapIntersections(const Line3d& line) const; // collection of 2d samples for each image
-    std::vector<std::vector<std::pair<int, V2D>>> GetFConsistencyIntersections(const Line3d& line) const; // collection of (image_id, projection) for each 3d point track
     
     // ceres
     std::unique_ptr<ceres::Problem> problem_;
     ceres::Solver::Summary summary_;
     RefinementCallback state_collector_;
+
+#ifdef INTERPOLATION_ENABLED
+    void InitializeHeatmaps(const std::vector<Eigen::MatrixXd>& p_heatmaps);
+    void InitializeFeatures(const std::vector<py::array_t<DTYPE, py::array::c_style>>& p_featuremaps);
+    void InitializeFeaturesAsPatches(const std::vector<features::PatchInfo<DTYPE>>& patchinfos);
+
+    std::vector<std::vector<V2D>> GetHeatmapIntersections(const Line3d& line) const; // collection of 2d samples for each image
+    std::vector<std::vector<std::pair<int, V2D>>> GetFConsistencyIntersections(const Line3d& line) const; // collection of (image_id, projection) for each 3d point track
+#endif // INTERPOLATION_ENABLED
 };
 
 } // namespace line_refinement

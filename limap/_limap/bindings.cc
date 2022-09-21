@@ -14,11 +14,13 @@ namespace py = pybind11;
 #include "triangulation/bindings.cc"
 #include "merging/bindings.cc"
 #include "undistortion/bindings.cc"
-#include "features/bindings.cc"
 #include "vplib/bindings.cc"
 #include "evaluation/bindings.cc"
 #include "fitting/bindings.cc"
 #include "optimize/bindings.cc"
+#ifdef INTERPOLATION_ENABLED
+    #include "features/bindings.cc"
+#endif // INTERPOLATION_ENABLED
 
 #include "_limap/helpers.h"
 
@@ -28,11 +30,13 @@ void bind_pointsfm(py::module &);
 void bind_triangulation(py::module &);
 void bind_merging(py::module &);
 void bind_undistortion(py::module &);
-void bind_features(py::module &);
 void bind_vplib(py::module &);
 void bind_evaluation(py::module &);
 void bind_fitting(py::module &);
 void bind_optimize(py::module &);
+#ifdef INTERPOLATION_ENABLED
+    void bind_features(py::module &);
+#endif // INTERPOLATION_ENABLED
 
 namespace limap {
 
@@ -60,11 +64,13 @@ PYBIND11_MODULE(_limap, m) {
     bind_triangulation(_tri);
     bind_merging(_mrg);
     bind_undistortion(_undist);
-    bind_features(_f);
     bind_vplib(_vplib);
     bind_evaluation(_eval);
     bind_fitting(_fitting);
     bind_optimize(_optim);
+#ifdef INTERPOLATION_ENABLED
+    bind_features(_f);
+#endif // INTERPOLATION_ENABLED
 }
 
 }

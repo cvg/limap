@@ -26,15 +26,17 @@ void bind_lineba_engine(py::module& m, std::string type_suffix) {
         .def("Initialize", &BAEngine::Initialize)
         .def("InitializeReconstruction", &BAEngine::InitializeReconstruction)
         .def("InitializeVPs", &BAEngine::InitializeVPs)
-        .def("InitializeHeatmaps", &BAEngine::InitializeHeatmaps)
-        .def("InitializePatches", &BAEngine::InitializePatches)
         .def("SetUp", &BAEngine::SetUp)
         .def("Solve", &BAEngine::Solve)
         .def("GetOutputCameras", &BAEngine::GetOutputCameras)
         .def("GetOutputLines", &BAEngine::GetOutputLines)
         .def("GetOutputTracks", &BAEngine::GetOutputTracks)
-        .def("GetOutputReconstruction", &BAEngine::GetOutputReconstruction)
-        .def("GetHeatmapIntersections", &BAEngine::GetHeatmapIntersections);
+#ifdef INTERPOLATION_ENABLED
+        .def("InitializeHeatmaps", &BAEngine::InitializeHeatmaps)
+        .def("InitializePatches", &BAEngine::InitializePatches)
+        .def("GetHeatmapIntersections", &BAEngine::GetHeatmapIntersections)
+#endif // INTERPOLATION_ENABLED
+        .def("GetOutputReconstruction", &BAEngine::GetOutputReconstruction);
 }
 
 void bind_line_bundle_adjustment(py::module &m) {
