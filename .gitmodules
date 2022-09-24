@@ -19,5 +19,4 @@
 	url = git@github.com:B1ueber2y/HighFive.git
 [submodule "third-party/pytlsd"]
 	path = third-party/pytlsd
-	url = git@github.com:B1ueber2y/pytlsd.git
-    branch = dev
+	url = git@github.com:iago-suarez/pytlsd.git
