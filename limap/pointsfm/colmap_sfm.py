@@ -95,7 +95,7 @@ def run_hloc_matches(cfg, image_path, db_path, keypoints=None, neighbors=None, i
     reconstruction.import_matches(image_ids, db_path, sfm_pairs, match_path, None, None)
     triangulation.estimation_and_geometric_verification(db_path, sfm_pairs)
 
-def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap', keypoints=None, skip_exists=False, map_to_original_image_names=True, neighbors=None):
+def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap', keypoints=None, skip_exists=False, map_to_original_image_names=False, neighbors=None):
     ### set up path
     db_path = os.path.join(output_path, 'db.db')
     image_path = os.path.join(output_path, 'images')

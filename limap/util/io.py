@@ -207,9 +207,9 @@ def save_l3dpp(folder, imagecols, all_2d_segs):
         index_list = np.argsort(number_list).tolist()
     for idx in imagecols.get_img_ids():
         if mode == 'default':
-            image_id = idx + 1
+            image_id = idx
         elif mode == 'tnt':
-            image_id = index_list.index(idx) + 1
+            image_id = index_list.index(idx)
         else:
             raise NotImplementedError
         fname = "segments_L3D++_{0}_{1}x{2}_3000.txt".format(image_id, width, height)
@@ -345,7 +345,7 @@ def read_lines_from_input(input_file):
     General reader for lines
     '''
     if not os.path.exists(input_file):
-        raise ValueError("Error! Input file/directory {0} not found.".format(input_dir))
+        raise ValueError("Error! Input file/directory {0} not found.".format(input_file))
 
     # linetracks folder
     if not os.path.isfile(input_file):
@@ -367,7 +367,7 @@ def read_lines_from_input(input_file):
 
     # line3dpp format
     if input_file.endswith('.txt'):
-        linetracks, _ = read_txt_Line3Dpp(input_dir)
+        linetracks, _, _, _ = read_txt_Line3Dpp(input_file)
         lines = [track.line for track in linetracks]
         return lines, linetracks
 

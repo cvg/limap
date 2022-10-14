@@ -99,7 +99,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     ##########################################################
     if not cfg["refinement"]["disable"]:
         reconstruction = _base.LineReconstruction(linetracks, imagecols)
-        lineba_engine = _optim.solve(cfg["refinement"], reconstruction)
+        lineba_engine = _optim.solve_line_bundle_adjustment(cfg["refinement"], reconstruction)
         new_reconstruction = lineba_engine.GetOutputReconstruction()
         linetracks = new_reconstruction.GetTracks()
 
