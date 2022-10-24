@@ -96,7 +96,7 @@ def compute_sfminfos(cfg, imagecols, fname="metainfos.txt"):
     return neighbors, ranges
 
 def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
-    print("[LOG] Start 2D line detection and description (detector = {0}, n_images = {1})...".format(cfg["line2d"]["detector"]["method"], imagecols.NumImages()))
+    print("[LOG] Start 2D line detection and description (detector = {0}, extractor = {1}, n_images = {2})...".format(cfg["line2d"]["detector"]["method"], cfg["line2d"]["extractor"]["method"], imagecols.NumImages()))
     import limap.line2d
     if not imagecols.IsUndistorted():
         warnings.warn("The input images are distorted!")
@@ -130,7 +130,7 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
     return all_2d_segs, descinfo_folder
 
 def compute_matches(cfg, descinfo_folder, image_ids, neighbors):
-    print("[LOG] Start matching 2D lines... (n_images = {0}, n_neighbors = {1})".format(len(image_ids), cfg["n_neighbors"]))
+    print("[LOG] Start matching 2D lines... (extractor = {0}, matcher = {1}, n_images = {2}, n_neighbors = {3})".format(cfg["line2d"]["extractor"]["method"], cfg["line2d"]["matcher"]["method"], len(image_ids), cfg["n_neighbors"]))
     import limap.line2d
     basedir = os.path.join("line_matchings", cfg["line2d"]["detector"]["method"], "feats_{0}".format(cfg["line2d"]["extractor"]["method"]))
     extractor = limap.line2d.get_extractor(cfg["line2d"]["extractor"])
@@ -141,6 +141,6 @@ def compute_matches(cfg, descinfo_folder, image_ids, neighbors):
         matches_folder = matcher.match_all_neighbors(folder_save, image_ids, neighbors, descinfo_folder, skip_exists=se_match)
     else:
         folder_load = os.path.join(cfg["dir_load"], basedir)
-        matches_folder = matcher.get_matchings_folder(folder_load)
+        matches_folder = matcher.get_matches_folder(folder_load)
     return matches_folder
 
