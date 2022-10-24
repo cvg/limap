@@ -83,21 +83,13 @@ double compute_epipolar_IoU(const Line2d& l1, const CameraView& view1,
 V3D point_triangulation(const V2D& p1, const CameraView& view1,
                         const V2D& p2, const CameraView& view2) 
 {
-    const M3D K1_inv = view1.K_inv();
-    const M3D R1 = view1.R();
-    const V3D T1 = view1.T();
-
-    const M3D K2_inv = view2.K_inv();
-    const M3D R2 = view2.R();
-    const V3D T2 = view2.T();
-
-    V3D C1 = - R1.transpose() * T1;
-    V3D C2 = - R2.transpose() * T2;
-    V3D n1e = R1.transpose() * K1_inv * V3D(p1[0], p1[1], 1);
-    V3D n2e = R2.transpose() * K2_inv * V3D(p2[0], p2[1], 1);
+    V3D C1 = view1.pose.center();
+    V3D C2 = view2.pose.center();
+    V3D n1e = view1.ray_direction(p1);
+    V3D n2e = view2.ray_direction(p2);
     M2D A; A << n1e.dot(n1e), -n1e.dot(n2e), -n2e.dot(n1e), n2e.dot(n2e);
     V2D b; b(0) = n1e.dot(C2 - C1); b(1) = n2e.dot(C1 - C2);
-    V2D res = A.inverse() * b;
+    V2D res = A.ldlt().solve(b);
     V3D point = 0.5 * (n1e * res[0] + C1 + n2e * res[1] + C2);
     return point;
 }
@@ -116,31 +108,23 @@ Line3d triangulate_endpoints(const Line2d& l1, const CameraView& view1,
 Line3d triangulate(const Line2d& l1, const CameraView& view1,
                    const Line2d& l2, const CameraView& view2) 
 {
-    const M3D K1_inv = view1.K_inv();
-    const M3D R1 = view1.R();
-    const V3D T1 = view1.T();
-
-    const M3D K2_inv = view2.K_inv();
-    const M3D R2 = view2.R();
-    const V3D T2 = view2.T();
-
-    V3D c1_start = R1.transpose() * K1_inv * V3D(l1.start[0], l1.start[1], 1);
-    V3D c1_end = R1.transpose() * K1_inv * V3D(l1.end[0], l1.end[1], 1);
-    V3D c2 = -R2.transpose() * K2_inv * V3D(l2.start[0], l2.start[1], 1);
-    V3D c3 = -R2.transpose() * K2_inv * V3D(l2.end[0], l2.end[1], 1);
-    V3D B = R1.transpose() * T1 - R2.transpose() * T2;
+    V3D c1_start = view1.ray_direction(l1.start);
+    V3D c1_end = view1.ray_direction(l1.end);
+    V3D c2_start = view2.ray_direction(l2.start);
+    V3D c2_end = view2.ray_direction(l2.end);
+    V3D B = view2.pose.center() - view1.pose.center();
 
     // start point
-    M3D A_start; A_start << c1_start, c2, c3;
+    M3D A_start; A_start << c1_start, -c2_start, -c2_end;
     auto res_start = A_start.inverse() * B;
     double z_start = res_start[0];
-    V3D l3d_start = c1_start * z_start - R1.transpose() * T1;
+    V3D l3d_start = c1_start * z_start + view1.pose.center();
 
     // end point
-    M3D A_end; A_end << c1_end, c2, c3;
+    M3D A_end; A_end << c1_end, -c2_start, -c2_end;
     auto res_end = A_end.inverse() * B;
     double z_end = res_end[0];
-    V3D l3d_end = c1_end * z_end - R1.transpose() * T1;
+    V3D l3d_end = c1_end * z_end + view1.pose.center();
     
     // check
     if (z_start < EPS || z_end < EPS)
