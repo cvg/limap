@@ -9,6 +9,7 @@ from base_matcher import BaseMatcher, BaseMatcherOptions
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import limap.util.io as limapio
 
+
 class NNEndpointsMatcher(BaseMatcher):
     def __init__(self, extractor, options = BaseMatcherOptions(), device=None):
         super(NNEndpointsMatcher, self).__init__(extractor, options)
@@ -87,6 +88,7 @@ class NNEndpointsMatcher(BaseMatcher):
                               matches.flatten()], axis=1)
         return matches_t
 
+
 class SuperGlueEndpointsMatcher(BaseMatcher):
     def __init__(self, extractor, options = BaseMatcherOptions(),
                  weights='outdoor', device=None):
@@ -99,10 +101,13 @@ class SuperGlueEndpointsMatcher(BaseMatcher):
         return "superglue_endpoints"
 
     def match_pair(self, descinfo1, descinfo2):
+        if len(descinfo1['lines']) == 0 or len(descinfo1['lines']) == 0:
+            return np.empty((0, 2))
         if self.topk == 0:
             return self.match_segs_with_descinfo(descinfo1, descinfo2)
         else:
-            return self.match_segs_with_descinfo_topk(descinfo1, descinfo2, topk=self.topk)
+            return self.match_segs_with_descinfo_topk(descinfo1, descinfo2,
+                                                      topk=self.topk)
 
     def match_segs_with_descinfo(self, descinfo1, descinfo2):
         # Setup the inputs for SuperGlue
@@ -199,4 +204,3 @@ class SuperGlueEndpointsMatcher(BaseMatcher):
         matches_t = np.stack([np.arange(n_lines).repeat(topk),
                               matches.flatten()], axis=1)
         return matches_t
-

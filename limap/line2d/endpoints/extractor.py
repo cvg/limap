@@ -9,6 +9,7 @@ from base_detector import BaseDetector, BaseDetectorOptions
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import limap.util.io as limapio
 
+
 class SuperPointEndpointsExtractor(BaseDetector):
     def __init__(self, options = BaseDetectorOptions(), device=None):
         super(SuperPointEndpointsExtractor, self).__init__(options)
@@ -45,6 +46,11 @@ class SuperPointEndpointsExtractor(BaseDetector):
             - the descriptor of each endpoints of shape [256, N*2]
         """
         lines = segs[:, :4].reshape(-1, 2)
+        if len(lines) == 0:
+            return {
+                'image_shape': img.shape, 'lines': lines,
+                'lines_score': np.zeros((0,)),
+                'endpoints_desc': np.zeros((256, 0))}
         scores = segs[:, -1] * np.sqrt(np.linalg.norm(segs[:, :2]
                                                       - segs[:, 2:4], axis=1))
         scores /= np.amax(scores) + 1e-8
@@ -58,5 +64,3 @@ class SuperPointEndpointsExtractor(BaseDetector):
                 torch_img, torch_endpoints)['descriptors'][0].cpu().numpy()
         return {'image_shape': img.shape, 'lines': lines,
                 'lines_score': scores, 'endpoints_desc': endpoint_descs}
-
-
