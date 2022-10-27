@@ -17,6 +17,9 @@ V3D getNormalDirection(const Line2d& l, const CameraView& view);
 V3D getDirectionFromVP(const V3D& vp, const CameraView& view);
 
 // weak epipolar constraints
+M3D compute_essential_matrix(const CameraView& view1, const CameraView& view2);
+M3D compute_fundamental_matrix(const CameraView& view1, const CameraView& view2);
+
 // intersect epipolar lines with the matched line on image 2
 double compute_epipolar_IoU(const Line2d& l1, const CameraView& view1,
                             const Line2d& l2, const CameraView& view2);

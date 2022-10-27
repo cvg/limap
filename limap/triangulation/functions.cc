@@ -39,14 +39,10 @@ V3D getDirectionFromVP(const V3D& vp, const CameraView& view) {
     return direc.normalized();
 }
 
-double compute_epipolar_IoU(const Line2d& l1, const CameraView& view1,
-                            const Line2d& l2, const CameraView& view2) 
+M3D compute_essential_matrix(const CameraView& view1, const CameraView& view2) 
 {
-    const M3D K1_inv = view1.K_inv();
     const M3D R1 = view1.R();
     const V3D T1 = view1.T();
-
-    const M3D K2_inv = view2.K_inv();
     const M3D R2 = view2.R();
     const V3D T2 = view2.T();
 
@@ -60,7 +56,21 @@ double compute_epipolar_IoU(const Line2d& l1, const CameraView& view1,
     tskew(1, 0) = relT[2]; tskew(1, 1) = 0.0; tskew(1, 2) = -relT[0];
     tskew(2, 0) = -relT[1]; tskew(2, 1) = relT[0]; tskew(2, 2) = 0.0;
     M3D E = tskew * relR;
-    M3D F = K2_inv.transpose() * E * K1_inv;
+    return E;
+}
+
+M3D compute_fundamental_matrix(const CameraView& view1, const CameraView& view2) 
+{
+    M3D E = compute_essential_matrix(view1, view2);
+    M3D F = view2.K_inv().transpose() * E * view1.K_inv();
+    return F;
+}
+
+double compute_epipolar_IoU(const Line2d& l1, const CameraView& view1,
+                            const Line2d& l2, const CameraView& view2) 
+{
+    // fundamental matrix
+    M3D F = compute_fundamental_matrix(view1, view2);
 
     // epipolar lines
     V3D coor_l2 = l2.coords();

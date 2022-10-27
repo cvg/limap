@@ -8,6 +8,12 @@ def get_normal_direction(l, view):
 def get_direction_from_VP(vp, view):
     return _tri.get_direction_from_VP(vp, view)
 
+def compute_essential_matrix(view1, view2):
+    return _tri.compute_essential_matrix(view1, view2)
+
+def compute_fundamental_matrix(view1, view2):
+    return _tri.compute_fundamental_matrix(view1, view2)
+
 def compute_epipolar_IoU(l1, view1, l2, view2):
     return _tri.compute_epipolar_IoU(l1, view1, l2, view2)
 
