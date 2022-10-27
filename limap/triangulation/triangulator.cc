@@ -259,7 +259,11 @@ void Triangulator::triangulateOneNode(const int img_id, const int line_id) {
             continue;
 
         // triangulation with weak epipolar constraints test
-        Line3d line = triangulate(l1, view1, l2, view2);
+        Line3d line;
+        if (!config_.use_endpoints_triangulation)
+            line = triangulate(l1, view1, l2, view2);
+        else
+            line = triangulate_endpoints(l1, view1, l2, view2);
         if (line.sensitivity(view1) > config_.sensitivity_threshold && line.sensitivity(view2) > config_.sensitivity_threshold)
             line.score = -1;
         if (line.score > 0) {

@@ -107,7 +107,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     # [F] output and visualization
     ##########################################################
     # save tracks
-    limapio.save_folder_linetracks_with_info(os.path.join(cfg["dir_save"], "fitnmerge_finaltracks"), linetracks, config=cfg, imagecols=imagecols, all_2d_segs=all_2d_segs)
+    limapio.save_folder_linetracks_with_info(os.path.join(cfg["dir_save"], cfg["output_folder"]), linetracks, config=cfg, imagecols=imagecols, all_2d_segs=all_2d_segs)
     limapio.save_txt_linetracks(os.path.join(cfg["dir_save"], "fitnmerge_alltracks.txt"), linetracks, n_visible_views=4)
     VisTrack = limapvis.Open3DTrackVisualizer(linetracks)
     VisTrack.report()

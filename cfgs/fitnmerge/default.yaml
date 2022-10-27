@@ -12,6 +12,7 @@ use_cuda: True
 visualize: True
 skip_exists: False
 output_dir: null 
+output_folder: "fitnmerge_finaltracks"
 load_dir: null
 
 ##############################

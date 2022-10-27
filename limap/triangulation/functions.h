@@ -27,7 +27,7 @@ V3D point_triangulation(const V2D& p1, const CameraView& view1,
 
 // Triangulating endpoints for triangulation
 Line3d triangulate_endpoints(const Line2d& l1, const CameraView& view1,
-                                  const Line2d& l2, const CameraView& view2);
+                             const Line2d& l2, const CameraView& view2);
 
 // Asymmetric perspective to (view1, l1)
 // Triangulation by plane intersection

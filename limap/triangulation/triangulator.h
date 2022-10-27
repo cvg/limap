@@ -25,6 +25,7 @@ public:
     TriangulatorConfig(py::dict dict) {
         ASSIGN_PYDICT_ITEM(dict, add_halfpix, bool)
         ASSIGN_PYDICT_ITEM(dict, use_vp, bool)
+        ASSIGN_PYDICT_ITEM(dict, use_endpoints_triangulation, bool)
         ASSIGN_PYDICT_ITEM(dict, min_length_2d, double)
         ASSIGN_PYDICT_ITEM(dict, var2d, double);
         ASSIGN_PYDICT_ITEM(dict, plane_angle_threshold, double)
@@ -46,6 +47,7 @@ public:
 
     bool add_halfpix = false; // offset half pixel for each line
     bool use_vp = true;
+    bool use_endpoints_triangulation = false;
     vplib::JLinkageConfig vpdet_config;
 
     double min_length_2d = 20.0;

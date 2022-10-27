@@ -39,6 +39,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     if neighbors is None:
         neighbors, ranges = _runners.compute_sfminfos(cfg, imagecols)
     else:
+        limapio.save_txt_metainfos(os.path.join(cfg["dir_save"], "metainfos.txt"), neighbors, ranges)
         neighbors = imagecols.update_neighbors(neighbors)
         for img_id, neighbor in neighbors.items():
             neighbors[img_id] = neighbors[img_id][:cfg["n_neighbors"]]
@@ -103,7 +104,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     ##########################################################
     # save tracks
     limapio.save_txt_linetracks(os.path.join(cfg["dir_save"], "alltracks.txt"), linetracks, n_visible_views=4)
-    limapio.save_folder_linetracks_with_info(os.path.join(cfg["dir_save"], "finaltracks"), linetracks, config=cfg, imagecols=imagecols, all_2d_segs=all_2d_segs)
+    limapio.save_folder_linetracks_with_info(os.path.join(cfg["dir_save"], cfg["output_folder"]), linetracks, config=cfg, imagecols=imagecols, all_2d_segs=all_2d_segs)
     VisTrack = limapvis.Open3DTrackVisualizer(linetracks)
     VisTrack.report()
     limapio.save_obj(os.path.join(cfg["dir_save"], 'triangulated_lines_nv{0}.obj'.format(cfg["n_visible_views"])), VisTrack.get_lines_np(n_visible_views=cfg["n_visible_views"]))

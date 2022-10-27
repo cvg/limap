@@ -96,11 +96,13 @@ V3D point_triangulation(const V2D& p1, const CameraView& view1,
 
 // Triangulating endpoints for triangulation
 Line3d triangulate_endpoints(const Line2d& l1, const CameraView& view1,
-                                  const Line2d& l2, const CameraView& view2) 
+                             const Line2d& l2, const CameraView& view2) 
 {
     V3D pstart = point_triangulation(l1.start, view1, l2.start, view2);
+    double z_start = view1.pose.projdepth(pstart);
     V3D pend = point_triangulation(l1.end, view1, l2.end, view2);
-    return Line3d(pstart, pend);
+    double z_end = view1.pose.projdepth(pend);
+    return Line3d(pstart, pend, 1.0, z_start, z_end);
 }
 
 // Asymmetric perspective to (view1, l1)

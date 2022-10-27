@@ -14,6 +14,7 @@ visualize: True
 max_image_dim: 1600
 skip_exists: False
 output_dir: null 
+output_folder: "finaltracks"
 load_dir: null
 n_jobs: -1 # for undistortion
 undistortion_output_dir: "undistorted_images"
@@ -61,6 +62,7 @@ var2d: # in pixels
 # triangulation config
 triangulation:
     use_exhaustive_matcher: False
+    use_endpoints_triangulation: False
     add_halfpix: false
     min_length_2d: 0.0 # in pixels
     var2d: -1.0 # depending on the detector
