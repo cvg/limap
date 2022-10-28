@@ -233,6 +233,28 @@ def test_line_inside_ranges(line, ranges):
         return False
     return True
 
+def compute_robust_range(arr, range_robust=[0.05, 0.95], k_stretch=2.0):
+    N = arr.shape[0]
+    start_idx = int(round((N - 1) * range_robust[0]))
+    end_idx = int(round((N - 1) * range_robust[1]))
+    arr_sorted = np.sort(arr)
+    start = arr_sorted[start_idx]
+    end = arr_sorted[end_idx]
+    start_stretched = (start + end) / 2.0 - k_stretch * (end - start) / 2.0
+    end_stretched = (start + end) / 2.0 + k_stretch * (end - start) / 2.0
+    return start_stretched, end_stretched
+
+def compute_robust_range_lines(lines, range_robust=[0.05, 0.95], k_stretch=2.0):
+    lines_array = np.array([line.as_array() for line in lines])
+    x_array = lines_array.reshape(-1, 3)[:, 0]
+    y_array = lines_array.reshape(-1, 3)[:, 1]
+    z_array = lines_array.reshape(-1, 3)[:, 2]
+
+    x_start, x_end = compute_robust_range(x_array, range_robust=range_robust, k_stretch=k_stretch)
+    y_start, y_end = compute_robust_range(y_array, range_robust=range_robust, k_stretch=k_stretch)
+    z_start, z_end = compute_robust_range(z_array, range_robust=range_robust, k_stretch=k_stretch)
+    ranges = np.array([[x_start, y_start, z_start], [x_end, y_end, z_end]])
+    return ranges
 
 def filter_ranges(lines_np, counts_np, ranges):
     new_lines_np, new_counts_np = [], []
@@ -276,7 +298,7 @@ def visualize_line_track(imagecols, linetrack, prefix='linetrack', report=False)
         cv2.imwrite(fname, img)
 
 
-def vis_vpresult(img, lines, vpres, show_original=False, endpoints=False):
+def vis_vpresult(img, lines, vpres, vp_id = -1, show_original=False, endpoints=False):
     import seaborn as sns
     import cv2
     n_vps = vpres.count_vps()
@@ -285,10 +307,13 @@ def vis_vpresult(img, lines, vpres, show_original=False, endpoints=False):
     if n_vps == 1:
         colors = [[255, 0, 0]]
     for line_id, line in enumerate(lines):
+        c = [255, 255, 255] # default color: white
         if not vpres.HasVP(line_id):
             if not show_original:
                 continue
-            c = [255, 255, 255]
+        elif vp_id >= 0 and vpres.labels[line_id] != vp_id:
+            if not show_original:
+                continue
         else:
             c = colors[vpres.labels[line_id]]
         cv2.line(img, (int(line.start[0]), int(line.start[1])), (int(line.end[0]), int(line.end[1])), c, 2)
@@ -296,7 +321,6 @@ def vis_vpresult(img, lines, vpres, show_original=False, endpoints=False):
             cv2.circle(img, (int(line.start[0]), int(line.start[1])), 3, [0, 0, 0], -1)
             cv2.circle(img, (int(line.end[0]), int(line.end[1])), 3, [0, 0, 0], -1)
     return img
-
 
 def features_to_RGB(*Fs, skip=1):
     """Copied from pixloc repo. [LINK] https://github.com/cvg/pixloc/blob/master/pixloc/visualization/viz_2d.py"""

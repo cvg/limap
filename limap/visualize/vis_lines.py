@@ -1,6 +1,9 @@
+import os, sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
+from vis_utils import test_point_inside_ranges, test_line_inside_ranges
 
-def pyvista_vis_3d_lines(lines, img_hw=(600, 800), width=2):
+def pyvista_vis_3d_lines(lines, img_hw=(600, 800), width=2, ranges=None, scale=1.0):
     '''
     Input:
     - lines: list of _base.Line3d
@@ -8,16 +11,22 @@ def pyvista_vis_3d_lines(lines, img_hw=(600, 800), width=2):
     import pyvista as pv
     plotter = pv.Plotter(window_size=[img_hw[1], img_hw[0]])
     for line in lines:
-        plotter.add_lines(line.as_array(), '#ff0000', width=width)
+        if ranges is not None:
+            if not test_line_inside_ranges(line, ranges):
+                continue
+        plotter.add_lines(line.as_array() * scale, '#ff0000', width=width)
     plotter.show()
 
-def open3d_add_points(w, points, color=[0.0, 0.0, 0.0], psize=1.0, name="pcd"):
+def open3d_add_points(w, points, color=[0.0, 0.0, 0.0], psize=1.0, name="pcd", ranges=None, scale=1.0):
     if np.array(points).shape[0] == 0:
         return w
     import open3d as o3d
     o3d_points, o3d_colors = [], []
     for idx in range(np.array(points).shape[0]):
-        o3d_points.append(points[idx])
+        if ranges is not None:
+            if not test_point_inside_ranges(points[idx], ranges):
+                continue
+        o3d_points.append(points[idx] * scale)
         o3d_colors.append(color)
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(np.stack(o3d_points))
@@ -28,13 +37,18 @@ def open3d_add_points(w, points, color=[0.0, 0.0, 0.0], psize=1.0, name="pcd"):
     w.add_geometry(name, pcd, mat)
     return w
 
-def open3d_add_line_set(w, lines, color=[0.0, 0.0, 0.0], width=2, name="lineset"):
+def open3d_add_line_set(w, lines, color=[0.0, 0.0, 0.0], width=2, name="lineset", ranges=None, scale=1.0):
     import open3d as o3d
     o3d_points, o3d_lines, o3d_colors = [], [], []
-    for idx, line in enumerate(lines):
-        o3d_points.append(line.start)
-        o3d_points.append(line.end)
-        o3d_lines.append([2*idx, 2*idx+1])
+    counter = 0
+    for line in lines:
+        if ranges is not None:
+            if not test_line_inside_ranges(line, ranges):
+                continue
+        o3d_points.append(line.start * scale)
+        o3d_points.append(line.end * scale)
+        o3d_lines.append([2*counter, 2*counter+1])
+        counter += 1
         o3d_colors.append(color)
     line_set = o3d.geometry.LineSet()
     line_set.points = o3d.utility.Vector3dVector(o3d_points)
@@ -46,25 +60,28 @@ def open3d_add_line_set(w, lines, color=[0.0, 0.0, 0.0], width=2, name="lineset"
     w.add_geometry(name, line_set, mat)
     return w
 
-def open3d_add_cameras(w, imagecols, color=[1.0, 0.0, 0.0]):
+def open3d_add_cameras(w, imagecols, color=[1.0, 0.0, 0.0], ranges=None, scale_cam_geometry=1.0, scale=1.0):
     import open3d as o3d
     import copy
     camera_lines = {}
     for cam_id in imagecols.get_cam_ids():
         cam = imagecols.cam(cam_id)
-        camera_lines[cam_id] = o3d.geometry.LineSet.create_camera_visualization(cam.w(), cam.h(), cam.K(), np.eye(4), scale=0.1)
+        camera_lines[cam_id] = o3d.geometry.LineSet.create_camera_visualization(cam.w(), cam.h(), cam.K(), np.eye(4), scale=0.005 * scale_cam_geometry * scale)
     for img_id in imagecols.get_img_ids():
         camimage = imagecols.camimage(img_id)
+        if ranges is not None:
+            if not test_point_inside_ranges(camimage.pose.center(), ranges):
+                continue
         T = np.eye(4)
         T[:3, :3] = camimage.R()
-        T[:3, 3] = camimage.T()
+        T[:3, 3] = camimage.T() * scale
         T = np.linalg.inv(T)
         cam = copy.deepcopy(camera_lines[camimage.cam_id]).transform(T)
         cam.paint_uniform_color(color)
         w.add_geometry(camimage.image_name(), cam)
     return w
 
-def open3d_vis_3d_lines(lines, width=2):
+def open3d_vis_3d_lines(lines, width=2, ranges=None, scale=1.0):
     import open3d as o3d
     app = o3d.visualization.gui.Application.instance
     app.initialize()
@@ -74,7 +91,7 @@ def open3d_vis_3d_lines(lines, width=2):
     w.show_ground = False
     w.show_axes = False
 
-    w = open3d_add_line_set(w, lines, width=width)
+    w = open3d_add_line_set(w, lines, width=width, ranges=ranges, scale=scale)
 
     w.reset_camera_to_default()
     w.scene_shader = w.UNLIT

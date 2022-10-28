@@ -18,10 +18,10 @@ class PyVistaTrackVisualizer(BaseTrackVisualizer):
         my_theme.background = 'white'
         self.plotter = pv.Plotter(window_size=[img_hw[1], img_hw[0]], theme=my_theme)
 
-    def vis_all_lines(self, n_visible_views=4, width=2):
+    def vis_all_lines(self, n_visible_views=4, width=2, scale=1.0):
         lines = self.get_lines_n_visible_views(n_visible_views)
         for line in lines:
-            self.plotter.add_lines(line.as_array(), color, width=width)
+            self.plotter.add_lines(line.as_array() * scale, color, width=width)
         self.plotter.show()
 
     def vis_all_lines_image(self, img_id, img_hw=(600, 800), n_visible_views=4, width=2):
