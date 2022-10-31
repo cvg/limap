@@ -40,7 +40,7 @@ void bind_triangulator(py::module &m) {
         .def_readwrite("use_endpoints_triangulation", &TriangulatorConfig::use_endpoints_triangulation)
         .def_readwrite("min_length_2d", &TriangulatorConfig::min_length_2d)
         .def_readwrite("var2d", &TriangulatorConfig::var2d)
-        .def_readwrite("plane_angle_threshold", &TriangulatorConfig::plane_angle_threshold)
+        .def_readwrite("line_tri_angle_threshold", &TriangulatorConfig::line_tri_angle_threshold)
         .def_readwrite("IoU_threshold", &TriangulatorConfig::IoU_threshold)
         .def_readwrite("fullscore_th", &TriangulatorConfig::fullscore_th)
         .def_readwrite("max_valid_conns", &TriangulatorConfig::max_valid_conns)

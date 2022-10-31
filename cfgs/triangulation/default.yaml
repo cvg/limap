@@ -66,7 +66,7 @@ triangulation:
     add_halfpix: false
     min_length_2d: 0.0 # in pixels
     var2d: -1.0 # depending on the detector
-    plane_angle_threshold: 1.0
+    line_tri_angle_threshold: 1.0
     IoU_threshold: 0.1
     sensitivity_threshold: 70.0
     fullscore_th: 1.0

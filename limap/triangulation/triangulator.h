@@ -28,7 +28,7 @@ public:
         ASSIGN_PYDICT_ITEM(dict, use_endpoints_triangulation, bool)
         ASSIGN_PYDICT_ITEM(dict, min_length_2d, double)
         ASSIGN_PYDICT_ITEM(dict, var2d, double);
-        ASSIGN_PYDICT_ITEM(dict, plane_angle_threshold, double)
+        ASSIGN_PYDICT_ITEM(dict, line_tri_angle_threshold, double)
         ASSIGN_PYDICT_ITEM(dict, IoU_threshold, double)
         ASSIGN_PYDICT_ITEM(dict, sensitivity_threshold, double)
         ASSIGN_PYDICT_ITEM(dict, fullscore_th, double)
@@ -52,7 +52,7 @@ public:
 
     double min_length_2d = 20.0;
     double var2d = 2.0;
-    double plane_angle_threshold = 5.0;
+    double line_tri_angle_threshold = 5.0;
     double IoU_threshold = 0.1;
     double sensitivity_threshold = 70.0;
     double fullscore_th = 1.0;

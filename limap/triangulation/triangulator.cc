@@ -246,11 +246,15 @@ void Triangulator::triangulateOneNode(const int img_id, const int line_id) {
             continue;
         const CameraView& view2 = imagecols_.camview(ng_img_id);
 
-        // test degeneracy by plane angle
-        V3D n1 = getNormalDirection(l1, view1);
+        // test degeneracy by ray-plane angles
         V3D n2 = getNormalDirection(l2, view2);
-        double plane_angle = acos(std::abs(n1.dot(n2))) * 180.0 / M_PI;
-        if (plane_angle < config_.plane_angle_threshold)
+        V3D ray1_start = view1.ray_direction(l1.start);
+        double angle_start = 90 - acos(std::abs(n2.dot(ray1_start))) * 180.0 / M_PI;
+        if (angle_start < config_.line_tri_angle_threshold)
+            continue;
+        V3D ray1_end = view1.ray_direction(l1.end);
+        double angle_end = 90 - acos(std::abs(n2.dot(ray1_end))) * 180.0 / M_PI;
+        if (angle_end < config_.line_tri_angle_threshold)
             continue;
 
         // test weak epipolar constraints
