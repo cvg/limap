@@ -1,4 +1,5 @@
 #include "triangulation/functions.h"
+#include "solvers/triangulation/triangulate_line_with_one_point.h"
 
 namespace limap {
 
@@ -172,6 +173,65 @@ Line3d triangulate_with_infinite_line(const Line2d& l1, const CameraView& view1,
     return Line3d(pstart, pend, 1.0, z_start, z_end);
 }
 
+// Asymmetric perspective to (view1, l1)
+// Triangulation with a known point
+Line3d triangulate_with_one_point(const Line2d& l1, const CameraView& view1,
+                                  const Line2d& l2, const CameraView& view2,
+                                  const V3D& point) 
+{
+    // project point onto plane 1
+    V3D n1 = getNormalDirection(l1, view1);
+    V3D C1 = view1.pose.center();
+    V3D p = point - n1.dot(point - C1) * n1;
+    V3D v1s = view1.ray_direction(l1.start);
+    V3D v1e = view1.ray_direction(l1.end);
+
+    // get plane 2
+    V3D n2 = getNormalDirection(l2, view2);
+    double alpha = (-1) * n2.dot(view2.pose.center());
+
+    // construct transformation
+    M3D R;
+    R.col(0) = v1s;
+    R.col(1) = (v1e - v1s.dot(v1e) * v1s).normalized();
+    R.col(2) = (R.col(0).cross(R.col(1))).normalized();
+    V3D t = C1;
+
+    // apply inverse transform
+    V3D v1_transformed = V3D(1., 0., 0.);
+    V3D v2_transformed = R.transpose() * v1e;
+    V3D p_transformed = R.transpose() * (p - C1);
+    V3D n2_transformed = R.transpose() * n2;
+    double alpha_transformed = alpha + n2.dot(t);
+
+    // generate input and apply the quartic polynomial solver 
+    V4D input_plane = V4D(n2_transformed[0], n2_transformed[1], n2_transformed[2], alpha_transformed);
+    V2D input_p = V2D(p_transformed[0], p_transformed[1]);
+    V2D input_v1 = V2D(v1_transformed[0], v1_transformed[1]).normalized();
+    V2D input_v2 = V2D(v2_transformed[0], v2_transformed[1]).normalized();
+    std::pair<double, double> res = solvers::triangulation::triangulate_line_with_one_point(input_plane, input_p, input_v1, input_v2);
+    if (res.first < 0 || res.second < 0) {
+        return Line3d(V3D(0, 0, 0), V3D(1, 1, 1), -1.0);
+    }
+    V2D lstart_2d = input_v1 * res.first;
+    V3D lstart = R * V3D(lstart_2d[0], lstart_2d[1], 0.0) + t;
+    V2D lend_2d = input_v2 * res.second;
+    V3D lend = R * V3D(lend_2d[0], lend_2d[1], 0.0) + t;
+
+    // cheirality check
+    double z_start = view1.pose.projdepth(lstart);
+    double z_end = view1.pose.projdepth(lend);
+    if (z_start < EPS || z_end < EPS) {
+        return Line3d(V3D(0, 0, 0), V3D(1, 1, 1), -1.0);
+    }
+    double d21, d22;
+    d21 = view2.pose.projdepth(lstart);
+    d22 = view2.pose.projdepth(lend);
+    if (d21 < EPS || d22 < EPS) {
+        return Line3d(V3D(0, 0, 0), V3D(1, 1, 1), -1.0);
+    }
+    return Line3d(lstart, lend, 1.0, z_start, z_end);
+}
 
 // Asymmetric perspective to (view1, l1)
 // Triangulation with known direction

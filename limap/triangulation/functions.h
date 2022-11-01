@@ -42,6 +42,11 @@ Line3d triangulate(const Line2d& l1, const CameraView& view1,
 Line3d triangulate_with_infinite_line(const Line2d& l1, const CameraView& view1,
                                       const InfiniteLine3d& inf_line);
 
+// Asymmetric perspective to (view1, l1)
+// Triangulation with a known point
+Line3d triangulate_with_one_point(const Line2d& l1, const CameraView& view1,
+                                  const Line2d& l2, const CameraView& view2,
+                                  const V3D& point);
 
 // Asymmetric perspective to (view1, l1)
 // Triangulation with known direction
