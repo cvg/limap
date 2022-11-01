@@ -48,6 +48,8 @@ public:
     double point_distance(const V3D& q) const;
     InfiniteLine2d projection(const CameraView& view) const;
     V3D unprojection(const V2D& p2d, const CameraView& view) const;
+    V3D project_from_infinite_line(const InfiniteLine3d& line) const;
+    V3D project_to_infinite_line(const InfiniteLine3d& line) const;
 
     V3D point() const; // get a point on the line
     V3D direction() const; // get the direction of the line

@@ -144,6 +144,20 @@ V3D InfiniteLine3d::unprojection(const V2D& p2d, const CameraView& view) const {
     return p1 + t * C1;
 }
 
+V3D InfiniteLine3d::project_from_infinite_line(const InfiniteLine3d& line) const {
+    // [LINK] Section 4.2 https://faculty.sites.iastate.edu/jia/files/inline-files/plucker-coordinates.pdf
+    V3D l1, m1, l2, m2;
+    l1 = d; m1 = m;
+    l2 = line.d; m2 = line.m;
+    V3D p = (-1) * (m1.cross(l2.cross(l1.cross(l2)))) + m2.dot(l1.cross(l2)) * l1;
+    p /= (l1.cross(l2)).squaredNorm();
+    return p;
+}
+
+V3D InfiniteLine3d::project_to_infinite_line(const InfiniteLine3d& line) const {
+    return line.project_from_infinite_line(*this);
+}
+
 MinimalInfiniteLine3d::MinimalInfiniteLine3d(const std::vector<double>& values) {
     THROW_CHECK_EQ(values.size(), 6);
     uvec[0] = values[0];

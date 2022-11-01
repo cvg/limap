@@ -112,6 +112,8 @@ Line3d triangulate_endpoints(const Line2d& l1, const CameraView& view1,
     double z_start = view1.pose.projdepth(pstart);
     V3D pend = point_triangulation(l1.end, view1, l2.end, view2);
     double z_end = view1.pose.projdepth(pend);
+    if (z_start < EPS || z_end < EPS) // cheriality test
+        return Line3d(V3D(0, 0, 0), V3D(1, 1, 1), -1.0);
     return Line3d(pstart, pend, 1.0, z_start, z_end);
 }
 
@@ -129,14 +131,14 @@ Line3d triangulate(const Line2d& l1, const CameraView& view1,
     // start point
     M3D A_start; A_start << c1_start, -c2_start, -c2_end;
     auto res_start = A_start.inverse() * B;
-    double z_start = res_start[0];
-    V3D l3d_start = c1_start * z_start + view1.pose.center();
+    V3D l3d_start = c1_start * res_start[0] + view1.pose.center();
+    double z_start = view1.pose.projdepth(l3d_start);
 
     // end point
     M3D A_end; A_end << c1_end, -c2_start, -c2_end;
     auto res_end = A_end.inverse() * B;
-    double z_end = res_end[0];
-    V3D l3d_end = c1_end * z_end + view1.pose.center();
+    V3D l3d_end = c1_end * res_end[0] + view1.pose.center();
+    double z_end = view1.pose.projdepth(l3d_end);
     
     // check
     if (z_start < EPS || z_end < EPS)
@@ -148,11 +150,28 @@ Line3d triangulate(const Line2d& l1, const CameraView& view1,
         return Line3d(V3D(0, 0, 0), V3D(1, 1, 1), -1.0);
 
     // return the triangulated line
-    if (std::isnan(l3d_start[0]))
+    if (std::isnan(l3d_start[0]) || std::isnan(l3d_end[0]))
         return Line3d(V3D(0, 0, 0), V3D(1, 1, 1), -1.0); // give it a -1.0 IoU
     else
         return Line3d(l3d_start, l3d_end, 1.0, z_start, z_end);
 }
+
+// unproject endpoints with known infinite line
+Line3d triangulate_with_infinite_line(const Line2d& l1, const CameraView& view1,
+                                      const InfiniteLine3d& inf_line) 
+{
+    InfiniteLine3d ray1_start = InfiniteLine3d(view1.pose.center(), view1.ray_direction(l1.start));
+    V3D pstart = inf_line.project_to_infinite_line(ray1_start);
+    double z_start = view1.pose.projdepth(pstart);
+    InfiniteLine3d ray1_end = InfiniteLine3d(view1.pose.center(), view1.ray_direction(l1.end));
+    V3D pend = inf_line.project_to_infinite_line(ray1_end);
+    double z_end = view1.pose.projdepth(pend);
+    
+    if (z_start < EPS || z_end < EPS) // cheriality test
+        return Line3d(V3D(0, 0, 0), V3D(1, 1, 1), -1.0); 
+    return Line3d(pstart, pend, 1.0, z_start, z_end);
+}
+
 
 // Asymmetric perspective to (view1, l1)
 // Triangulation with known direction
@@ -160,14 +179,6 @@ Line3d triangulate_with_direction(const Line2d& l1, const CameraView& view1,
                                   const Line2d& l2, const CameraView& view2,
                                   const V3D& direction) 
 {
-    const M3D K1_inv = view1.K_inv();
-    const M3D R1 = view1.R();
-    const V3D T1 = view1.T();
-
-    const M3D K2_inv = view2.K_inv();
-    const M3D R2 = view2.R();
-    const V3D T2 = view2.T();
-
     // Step 1: project direction onto plane 1
     V3D n1 = getNormalDirection(l1, view1);
     V3D direc = direction - (n1.dot(direction)) * n1;
@@ -177,9 +188,9 @@ Line3d triangulate_with_direction(const Line2d& l1, const CameraView& view1,
 
     // Step 2: parameterize on plane 1 (a1s * d1s - a1e * d1e = 0)
     V3D perp_direc = n1.cross(direc);
-    V3D v1s = R1.transpose() * K1_inv * V3D(l1.start[0], l1.start[1], 1);
+    V3D v1s = view1.ray_direction(l1.start);
     double a1s = v1s.dot(perp_direc);
-    V3D v1e = R1.transpose() * K1_inv * V3D(l1.end[0], l1.end[1], 1);
+    V3D v1e = view1.ray_direction(l1.end);
     double a1e = v1e.dot(perp_direc);
     const double MIN_VALUE = 0.001;
     if (a1s < 0) {
@@ -189,8 +200,8 @@ Line3d triangulate_with_direction(const Line2d& l1, const CameraView& view1,
         return Line3d(V3D(0, 0, 0), V3D(1, 1, 1), -1.0);
 
     // Step 3: min [(c1s * d1s - b)^2 + (c1e * d1e - b)^2]
-    V3D C1 = -R1.transpose() * T1;
-    V3D C2 = -R2.transpose() * T2;
+    V3D C1 = view1.pose.center();
+    V3D C2 = view2.pose.center();
     V3D n2 = getNormalDirection(l2, view2);
     double c1s = n2.dot(v1s);
     double c1e = n2.dot(v1e);
@@ -205,16 +216,20 @@ Line3d triangulate_with_direction(const Line2d& l1, const CameraView& view1,
     double d1e = d1s * a1s / a1e;
 
     // check
-    if (d1s < EPS || d1e < EPS)
-        return Line3d(V3D(0, 0, 0), V3D(1, 1, 1), -1.0);
     V3D lstart = d1s * v1s + C1;
     V3D lend = d1e * v1e + C1;
+    double z_start = view1.pose.projdepth(lstart);
+    double z_end = view1.pose.projdepth(lend);
+    if (z_start < EPS || z_end < EPS)
+        return Line3d(V3D(0, 0, 0), V3D(1, 1, 1), -1.0);
     double d21, d22;
     d21 = view2.pose.projdepth(lstart);
     d22 = view2.pose.projdepth(lend);
     if (d21 < EPS || d22 < EPS)
         return Line3d(V3D(0, 0, 0), V3D(1, 1, 1), -1.0);
-    return Line3d(lstart, lend, 1.0, d1s, d1e);
+    if (std::isnan(lstart[0]) || std::isnan(lend[0]))
+        return Line3d(V3D(0, 0, 0), V3D(1, 1, 1), -1.0);
+    return Line3d(lstart, lend, 1.0, z_start, z_end);
 }
 
 } // namespace triangulation

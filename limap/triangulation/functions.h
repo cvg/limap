@@ -4,6 +4,7 @@
 #include "util/types.h"
 #include "base/linebase.h"
 #include "base/camera_view.h"
+#include "base/infinite_line.h"
 #include <tuple>
 
 namespace limap {
@@ -36,6 +37,11 @@ Line3d triangulate_endpoints(const Line2d& l1, const CameraView& view1,
 // Triangulation by plane intersection
 Line3d triangulate(const Line2d& l1, const CameraView& view1,
                    const Line2d& l2, const CameraView& view2);
+
+// unproject endpoints with known infinite line
+Line3d triangulate_with_infinite_line(const Line2d& l1, const CameraView& view1,
+                                      const InfiniteLine3d& inf_line);
+
 
 // Asymmetric perspective to (view1, l1)
 // Triangulation with known direction
