@@ -172,6 +172,10 @@ def main():
     if linetracks is not None:
         lines = [track.line for track in linetracks if track.count_images() >= cfg["n_visible_views"]]
         linetracks = [track for track in linetracks if track.count_images() >= cfg["n_visible_views"]]
+        sup_image_counts = np.array([track.count_images() for track in linetracks])
+        sup_line_counts = np.array([track.count_lines() for track in linetracks])
+        print("supporting images, {0}".format(sup_image_counts.mean()))
+        print("supporting lines, {0}".format(sup_line_counts.mean()))
 
     if cfg["transform_txt"]:
         lines = transform_lines(cfg["transform_txt"], lines)
