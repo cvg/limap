@@ -96,7 +96,10 @@ def compute_sfminfos(cfg, imagecols, fname="metainfos.txt"):
     return neighbors, ranges
 
 def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
-    print("[LOG] Start 2D line detection and description (detector = {0}, extractor = {1}, n_images = {2})...".format(cfg["line2d"]["detector"]["method"], cfg["line2d"]["extractor"]["method"], imagecols.NumImages()))
+    if "extractor" in cfg["line2d"]:
+        print("[LOG] Start 2D line detection and description (detector = {0}, extractor = {1}, n_images = {2})...".format(cfg["line2d"]["detector"]["method"], cfg["line2d"]["extractor"]["method"], imagecols.NumImages()))
+    else:
+        print("[LOG] Start 2D line detection and description (detector = {0}, n_images = {1})...".format(cfg["line2d"]["detector"]["method"], imagecols.NumImages()))
     import limap.line2d
     if not imagecols.IsUndistorted():
         warnings.warn("The input images are distorted!")

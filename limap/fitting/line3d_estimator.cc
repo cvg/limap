@@ -55,6 +55,8 @@ int Line3dEstimator::MinimalSolver(const std::vector<int>& sample,
       lines->clear();
       return 0;
   }
+  if (std::isnan(seg.length()) || seg.length() < EPS)
+      return 0;
   (*lines)[0] = InfiniteLine3d(seg);
   return 1;
 }
