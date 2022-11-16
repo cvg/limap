@@ -38,8 +38,8 @@ class Open3DTrackVisualizer(BaseTrackVisualizer):
 
         lines = self.get_lines_n_visible_views(n_visible_views)
         open3d_add_line_set(w, lines, width=width, ranges=ranges, scale=scale)
-        ranges = compute_robust_range_lines(lines)
-        scale_cam_geometry = (ranges[1, :] - ranges[0, :]).max()
+        lranges = compute_robust_range_lines(lines)
+        scale_cam_geometry = abs(lranges[1, :] - lranges[0, :]).max()
         open3d_add_cameras(w, imagecols, ranges=ranges, scale_cam_geometry=scale_cam_geometry * cam_scale, scale=scale)
 
         w.reset_camera_to_default()
