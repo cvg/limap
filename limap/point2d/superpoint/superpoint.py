@@ -40,6 +40,7 @@
 # --------------------------------------------------------------------*/
 # %BANNER_END%
 
+import os, sys
 from pathlib import Path
 import torch
 from torch import nn
@@ -134,6 +135,8 @@ class SuperPoint(nn.Module):
             kernel_size=1, stride=1, padding=0)
 
         path = Path(__file__).parent / 'weights/superpoint_v1.pth'
+        if not os.path.isfile(path):
+            self.download_model(path)
         self.load_state_dict(torch.load(str(path)))
 
         mk = self.config['max_keypoints']
@@ -141,6 +144,15 @@ class SuperPoint(nn.Module):
             raise ValueError('\"max_keypoints\" must be positive or \"-1\"')
 
         print('Loaded SuperPoint model')
+
+    def download_model(self, path):
+        import subprocess
+        if not os.path.exists(os.path.dirname(path)):
+            os.makedirs(os.path.dirname(path))
+        link = "https://github.com/magicleap/SuperPointPretrainedNetwork/blob/master/superpoint_v1.pth?raw=true"
+        cmd = ["wget", link, "-O", path]
+        print("Downloading SuperPoint model...")
+        subprocess.run(cmd, check=True)
 
     def compute_dense_descriptor(self, data):
         """ Compute keypoints, scores, descriptors for image """

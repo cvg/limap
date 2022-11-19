@@ -8,7 +8,7 @@ import logging
 
 from PIL import Image
 from .base_model import BaseModel
-import sys
+import os, sys
 from torchvision import transforms
 import numpy as np
 import torch.nn.functional as F
@@ -134,11 +134,22 @@ class S2DNet(BaseModel):
 
         if conf.pretrained == 's2dnet':
             path = Path(__file__).parent / 'checkpoints/s2dnet_weights.pth'
+            if not os.path.isfile(path):
+                self.download_s2dnet_model(path)
             logging.info(f'Loading S2DNet checkpoint at {path}.')
             state_dict = torch.load(path, map_location='cpu')['state_dict']
             params = self.state_dict()
             state_dict = {k: v for k, v in state_dict.items()}
             self.load_state_dict(state_dict, strict=False)
+
+    def download_s2dnet_model(self, path):
+        import subprocess
+        if not os.path.exists(os.path.dirname(path)):
+            os.makedirs(os.path.dirname(path))
+        link = "https://www.dropbox.com/s/hnv51iwu4hn82rj/s2dnet_weights.pth?dl=0"
+        cmd = ["wget", link, "-O", path]
+        print("Downloading S2DNet model...")
+        subprocess.run(cmd, check=True)
 
     def _forward(self, data):
         image = data#data['image']

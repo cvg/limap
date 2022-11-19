@@ -40,6 +40,7 @@
 # --------------------------------------------------------------------*/
 # %BANNER_END%
 
+import os, sys
 from copy import deepcopy
 from pathlib import Path
 from typing import List, Tuple
@@ -191,9 +192,21 @@ class SuperGlue(nn.Module):
         assert self.config['weights'] in ['indoor', 'outdoor']
         path = Path(__file__).parent
         path = path / 'weights/superglue_{}.pth'.format(self.config['weights'])
+        if not os.path.isfile(path):
+            self.download_model(path)
         self.load_state_dict(torch.load(str(path)))
         print('Loaded SuperGlue model (\"{}\" weights)'.format(
             self.config['weights']))
+
+    def download_model(self, path):
+        import subprocess
+        if not os.path.exists(os.path.dirname(path)):
+            os.makedirs(os.path.dirname(path))
+        model_name = os.path.basename(path)
+        print("Downloading SuperGlue model {0}...".format(model_name))
+        link = "https://github.com/magicleap/SuperGluePretrainedNetwork/blob/master/models/weights/{0}?raw=true".format(model_name)
+        cmd = ["wget", link, "-O", path]
+        subprocess.run(cmd, check=True)
 
     def forward(self, data):
         """Run SuperGlue on a pair of keypoints and descriptors"""

@@ -1,8 +1,10 @@
+import os, sys
 import numpy as np
 from torch.nn.functional import softmax
 import cv2
 import torch
 from skimage.draw import line
+import subprocess
 
 from SOLD2.experiment import load_config
 from SOLD2.model.line_matcher import LineMatcher
@@ -25,6 +27,13 @@ class SOLD2LineDetector():
         self.initialize_line_matcher()
 
     def initialize_line_matcher(self):
+        if not os.path.isfile(self.ckpt_path):
+            if not os.path.exists(os.path.dirname(self.ckpt_path)):
+                os.makedirs(os.path.dirname(self.ckpt_path))
+            link = "https://www.polybox.ethz.ch/index.php/s/blOrW89gqSLoHOk/download"
+            cmd = ['wget', link, '-O', self.ckpt_path]
+            print("Downloading SOLD2 model...")
+            subprocess.run(cmd, check=True)
         self.line_matcher = LineMatcher(self.cfg['model_cfg'], self.ckpt_path, self.device, self.cfg['line_detector_cfg'], self.cfg['line_matcher_cfg'], False)
 
     def sold2segstosegs(self, segs_sold2):
