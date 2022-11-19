@@ -180,8 +180,9 @@ MinimalInfiniteLine3d::MinimalInfiniteLine3d(const InfiniteLine3d& inf_line) {
     // SO(2)
     double w1, w2;
     w1 = 1.0; w2 = b.norm();
-    wvec(0) = w1 / (w1 + w2);
-    wvec(1) = w2 / (w1 + w2);
+    double denom = V2D(w1, w2).norm(); 
+    wvec(0) = w1 / denom;
+    wvec(1) = w2 / denom;
 
     // SO(3)
     M3D Q;
