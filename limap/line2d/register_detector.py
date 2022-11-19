@@ -22,6 +22,15 @@ def get_extractor(cfg_extractor):
     if method == "sold2":
         from .SOLD2 import SOLD2Detector
         return SOLD2Detector(options)
+    elif method == "lbd":
+        from .LBD import LBDExtractor
+        return LBDExtractor(options)
+    elif method == "linetr":
+        from .LineTR import LineTRExtractor
+        return LineTRExtractor(options)
+    elif method == "l2d2":
+        from .L2D2 import L2D2Extractor
+        return L2D2Extractor(options)
     elif method == "superpoint_endpoints":
         from .endpoints import SuperPointEndpointsExtractor
         return SuperPointEndpointsExtractor(options)

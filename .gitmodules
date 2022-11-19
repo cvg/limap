@@ -20,3 +20,6 @@
 [submodule "third-party/pytlsd"]
 	path = third-party/pytlsd
 	url = git@github.com:iago-suarez/pytlsd.git
+[submodule "third-party/pytlbd"]
+	path = third-party/pytlbd
+	url = git@github.com:iago-suarez/pytlbd.git

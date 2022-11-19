@@ -26,4 +26,9 @@ plyfile
 pathlib
 open3d
 imagesize
+einops
+ninja
+yacs
+python-json-logger
 ./third-party/pytlsd
+./third-party/pytlbd

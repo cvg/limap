@@ -91,7 +91,7 @@ class SOLD2Matcher(BaseMatcher):
         self.detector = SOLD2LineDetector()
 
     def get_module_name(self):
-        return "sold2_matcher"
+        return "sold2"
 
     def match_pair(self, descinfo1, descinfo2):
         if self.topk == 0:

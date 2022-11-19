@@ -10,6 +10,7 @@
 *.swp
 *.zip
 *.tar.gz
+*.th
 
 experiments
 build

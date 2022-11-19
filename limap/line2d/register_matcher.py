@@ -8,6 +8,15 @@ def get_matcher(cfg_matcher, extractor, n_neighbors=20):
     if method == "sold2":
         from .SOLD2 import SOLD2Matcher
         return SOLD2Matcher(extractor, options)
+    elif method == "lbd":
+        from .LBD import LBDMatcher
+        return LBDMatcher(extractor, options)
+    elif method == "linetr":
+        from .LineTR import LineTRMatcher
+        return LineTRMatcher(extractor, options)
+    elif method == "l2d2":
+        from .L2D2 import L2D2Matcher
+        return L2D2Matcher(extractor, options)
     elif method == "nn_endpoints":
         from .endpoints import NNEndpointsMatcher
         return NNEndpointsMatcher(extractor, options)
