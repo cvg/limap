@@ -8,7 +8,6 @@
 ```bash
 git submodule update --init --recursive
 python -m pip install -r requirements.txt
-cd third-party/Hierarchical-Localization && python -m pip install -e . && cd ../..
 ```
 
 To compile LIMAP:

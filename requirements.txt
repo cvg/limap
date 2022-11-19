@@ -30,5 +30,8 @@ einops
 ninja
 yacs
 python-json-logger
+
 ./third-party/pytlsd
 ./third-party/pytlbd
+./third-party/Hierarchical-Localization
+
