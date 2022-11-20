@@ -1,5 +1,5 @@
-#ifndef LIMAP_BASE_IMAGE_H
-#define LIMAP_BASE_IMAGE_H
+#ifndef LIMAP_BASE_CAMERA_VIEW_H_
+#define LIMAP_BASE_CAMERA_VIEW_H_
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>

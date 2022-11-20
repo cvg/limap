@@ -1,5 +1,5 @@
-#ifndef LIMAP_BASE_TRANSFORMS_H
-#define LIMAP_BASE_TRANSFORMS_H
+#ifndef LIMAP_BASE_TRANSFORMS_H_
+#define LIMAP_BASE_TRANSFORMS_H_
 
 #include <colmap/base/pose.h>
 

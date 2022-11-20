@@ -1,5 +1,5 @@
-#ifndef LIMAP_BASE_POINTTRACK_H
-#define LIMAP_BASE_POINTTRACK_H
+#ifndef LIMAP_BASE_POINTTRACK_H_
+#define LIMAP_BASE_POINTTRACK_H_
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>

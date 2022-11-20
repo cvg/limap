@@ -1,5 +1,5 @@
-#ifndef LIMAP_BASE_CAMERA_MODELS_H
-#define LIMAP_BASE_CAMERA_MODELS_H
+#ifndef LIMAP_BASE_CAMERA_MODELS_H_
+#define LIMAP_BASE_CAMERA_MODELS_H_
 
 #include <colmap/base/camera_models.h>
 
