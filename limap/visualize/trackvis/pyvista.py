@@ -2,15 +2,14 @@ from .base import BaseTrackVisualizer
 import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import pyvista as pv
-from pyvista import themes
-
 class PyVistaTrackVisualizer(BaseTrackVisualizer):
     def __init__(self, tracks):
         super(PyVistaTrackVisualizer, self).__init__(tracks)
         self.reset()
 
     def reset(self, img_hw=(600, 800)):
+        import pyvista as pv
+        from pyvista import themes
         my_theme = themes.DefaultTheme()
         my_theme.lighting = True
         my_theme.show_edges = True
