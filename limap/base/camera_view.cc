@@ -72,6 +72,15 @@ V3D CameraView::ray_direction(const V2D& p2d) const {
     return (R().transpose() * K_inv() * homogeneous(p2d)).normalized();
 }
 
+std::pair<V3D, V3D> CameraView::ray_direction_gradient(const V2D& p2d) const {
+    V3D v = R().transpose() * K_inv() * homogeneous(p2d);
+    V3D direc = v.normalized();
+    M3D M = (M3D::Identity() - direc * direc.transpose()) / v.norm();
+    V3D grad1 = M * R().transpose() * K_inv() * V3D(1., 0., 0.);
+    V3D grad2 = M * R().transpose() * K_inv() * V3D(0., 1., 0.);
+    return std::make_pair(grad1, grad2);
+}
+
 V3D CameraView::get_direction_from_vp(const V3D& vp) const {
     return (R().transpose() * K_inv() * vp).normalized();
 }

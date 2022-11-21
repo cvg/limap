@@ -91,8 +91,8 @@ double compute_epipolar_IoU(const Line2d& l1, const CameraView& view1,
     return IoU;
 }
 
-V3D point_triangulation(const V2D& p1, const CameraView& view1,
-                        const V2D& p2, const CameraView& view2) 
+std::pair<V3D, bool> point_triangulation(const V2D& p1, const CameraView& view1,
+                                         const V2D& p2, const CameraView& view2) 
 {
     V3D C1 = view1.pose.center();
     V3D C2 = view2.pose.center();
@@ -102,26 +102,83 @@ V3D point_triangulation(const V2D& p1, const CameraView& view1,
     V2D b; b(0) = n1e.dot(C2 - C1); b(1) = n2e.dot(C1 - C2);
     V2D res = A.ldlt().solve(b);
     V3D point = 0.5 * (n1e * res[0] + C1 + n2e * res[1] + C2);
-    return point;
+    // cheirality test
+    if (view1.pose.projdepth(point) < EPS || view2.pose.projdepth(point) < EPS)
+        return std::make_pair(V3D(0., 0., 0.), false);
+    return std::make_pair(point, true);
+}
+
+M3D point_triangulation_covariance(const V2D& p1, const CameraView& view1,
+                                   const V2D& p2, const CameraView& view2,
+                                   const Eigen::Matrix4d& covariance) 
+{
+    V3D C1 = view1.pose.center();
+    V3D C2 = view2.pose.center();
+    V3D n1e = view1.ray_direction(p1);
+    V3D n2e = view2.ray_direction(p2);
+
+    std::pair<V3D, V3D> n1e_grad = view1.ray_direction_gradient(p1);
+    std::pair<V3D, V3D> n2e_grad = view2.ray_direction_gradient(p2);
+
+    M2D A; A << n1e.dot(n1e), -n1e.dot(n2e), -n2e.dot(n1e), n2e.dot(n2e);
+    M2D A_inv = A.inverse();
+    V2D b; b(0) = n1e.dot(C2 - C1); b(1) = n2e.dot(C1 - C2);
+    V2D res = A.ldlt().solve(b);
+
+    std::vector<M2D> dAsdx(4, M2D::Zero());
+    dAsdx[0](0, 0) = 2 * n1e_grad.first.dot(n1e);
+    dAsdx[0](0, 1) = dAsdx[0](1, 0) = (-1) * n1e_grad.first.dot(n2e);
+    dAsdx[1](0, 0) = 2 * n1e_grad.second.dot(n1e);
+    dAsdx[1](0, 1) = dAsdx[1](1, 0) = (-1) * n1e_grad.second.dot(n2e);
+    dAsdx[2](1, 1) = 2 * n2e_grad.first.dot(n2e);
+    dAsdx[2](0, 1) = dAsdx[2](1, 0) = (-1) * n2e_grad.first.dot(n1e);
+    dAsdx[3](1, 1) = 2 * n2e_grad.second.dot(n2e);
+    dAsdx[3](0, 1) = dAsdx[3](1, 0) = (-1) * n2e_grad.second.dot(n1e);
+
+    Eigen::MatrixXd dbdx = Eigen::MatrixXd::Zero(2, 4);
+    dbdx(0, 0) = n1e_grad.first.dot(C2 - C1);
+    dbdx(0, 1) = n1e_grad.second.dot(C2 - C1);
+    dbdx(1, 2) = n2e_grad.first.dot(C1 - C2);
+    dbdx(1, 3) = n2e_grad.second.dot(C1 - C2);
+
+    Eigen::MatrixXd J_res = Eigen::MatrixXd::Zero(2, 4);
+    for (size_t i = 0; i < 4; ++i) {
+        J_res.col(i) = (-1) * (A_inv * dAsdx[i] * A_inv) * b + A_inv * dbdx.col(i);
+    }
+    
+    Eigen::MatrixXd J = Eigen::MatrixXd::Zero(3, 4);
+    J.col(0) = 0.5 * (n1e * J_res(0, 0) + n2e * J_res(1, 0) + n1e_grad.first * res[0]);
+    J.col(1) = 0.5 * (n1e * J_res(0, 1) + n2e * J_res(1, 1) + n1e_grad.second * res[0]);
+    J.col(2) = 0.5 * (n1e * J_res(0, 2) + n2e * J_res(1, 2) + n2e_grad.first * res[1]);
+    J.col(3) = 0.5 * (n1e * J_res(0, 3) + n2e * J_res(1, 3) + n2e_grad.second * res[1]);
+    return J * covariance * J.transpose();
 }
 
 // Triangulating endpoints for triangulation
 Line3d triangulate_endpoints(const Line2d& l1, const CameraView& view1,
                              const Line2d& l2, const CameraView& view2) 
 {
-    V3D pstart = point_triangulation(l1.start, view1, l2.start, view2);
-    double z_start = view1.pose.projdepth(pstart);
-    V3D pend = point_triangulation(l1.end, view1, l2.end, view2);
-    double z_end = view1.pose.projdepth(pend);
-    if (z_start < EPS || z_end < EPS) // cheriality test
+    // start point
+    auto res_start = point_triangulation(l1.start, view1, l2.start, view2);
+    if (!res_start.second)
         return Line3d(V3D(0, 0, 0), V3D(1, 1, 1), -1.0);
+    V3D pstart = res_start.first;
+    // end point
+    auto res_end = point_triangulation(l1.end, view1, l2.end, view2);
+    if (!res_end.second)
+        return Line3d(V3D(0, 0, 0), V3D(1, 1, 1), -1.0);
+    V3D pend = res_end.first;
+
+    // construct line
+    double z_start = view1.pose.projdepth(pstart);
+    double z_end = view1.pose.projdepth(pend);
     return Line3d(pstart, pend, 1.0, z_start, z_end);
 }
 
 // Asymmetric perspective to (view1, l1)
 // Triangulation by plane intersection
-Line3d triangulate(const Line2d& l1, const CameraView& view1,
-                   const Line2d& l2, const CameraView& view2) 
+std::pair<Line3d, bool> line_triangulation(const Line2d& l1, const CameraView& view1,
+                                           const Line2d& l2, const CameraView& view2) 
 {
     V3D c1_start = view1.ray_direction(l1.start);
     V3D c1_end = view1.ray_direction(l1.end);
@@ -143,18 +200,93 @@ Line3d triangulate(const Line2d& l1, const CameraView& view1,
     
     // check
     if (z_start < EPS || z_end < EPS)
-        return Line3d(V3D(0, 0, 0), V3D(1, 1, 1), -1.0);
+        return std::make_pair(Line3d(), false);
     double d21, d22;
     d21 = view2.pose.projdepth(l3d_start);
     d22 = view2.pose.projdepth(l3d_end);
     if (d21 < EPS || d22 < EPS)
-        return Line3d(V3D(0, 0, 0), V3D(1, 1, 1), -1.0);
+        return std::make_pair(Line3d(), false);
 
-    // return the triangulated line
+    // check nan 
     if (std::isnan(l3d_start[0]) || std::isnan(l3d_end[0]))
-        return Line3d(V3D(0, 0, 0), V3D(1, 1, 1), -1.0); // give it a -1.0 IoU
-    else
-        return Line3d(l3d_start, l3d_end, 1.0, z_start, z_end);
+        return std::make_pair(Line3d(), false);
+
+    Line3d line = Line3d(l3d_start, l3d_end, 1.0, z_start, z_end);
+    return std::make_pair(line, true);
+}
+
+Eigen::Matrix6d line_triangulation_covariance(const Line2d& l1, const CameraView& view1,
+                                              const Line2d& l2, const CameraView& view2,
+                                              const Eigen::MatrixXd& covariance) 
+{
+    // check: input covariance should be 8 x 8
+    THROW_CHECK_EQ(covariance.rows(), 8);
+    THROW_CHECK_EQ(covariance.cols(), 8);
+
+    // compute matrix form again
+    V3D c1_start = view1.ray_direction(l1.start);
+    V3D c1_end = view1.ray_direction(l1.end);
+    V3D c2_start = view2.ray_direction(l2.start);
+    V3D c2_end = view2.ray_direction(l2.end);
+    V3D B = view2.pose.center() - view1.pose.center();
+    M3D A_start; A_start << c1_start, -c2_start, -c2_end;
+    auto res_start = A_start.inverse() * B;
+    M3D A_end; A_end << c1_end, -c2_start, -c2_end;
+    auto res_end = A_end.inverse() * B;
+ 
+    // compute first-order gradient
+    Eigen::MatrixXd J = Eigen::MatrixXd::Zero(6, 8);
+
+    // gradient
+    std::pair<V3D, V3D> c1_start_grad = view1.ray_direction_gradient(l1.start);
+    std::pair<V3D, V3D> c1_end_grad = view1.ray_direction_gradient(l1.end);
+    std::pair<V3D, V3D> c2_start_grad = view2.ray_direction_gradient(l2.start);
+    std::pair<V3D, V3D> c2_end_grad = view2.ray_direction_gradient(l2.end);
+
+    // start point
+    M3D A_start_inv = A_start.inverse();
+    std::vector<M3D> dAsdx(8, M3D::Zero());
+    dAsdx[0].col(0) = c1_start_grad.first;
+    dAsdx[1].col(0) = c1_start_grad.second;
+    dAsdx[4].col(1) = -c2_start_grad.first;
+    dAsdx[5].col(1) = -c2_start_grad.second;
+    dAsdx[6].col(1) = -c2_end_grad.first;
+    dAsdx[7].col(1) = -c2_end_grad.second;
+    for (size_t i = 0; i < 8; ++i) {
+        double dzdx = (-1) * (A_start_inv * dAsdx[i] * A_start_inv).row(0) * B;
+        J.block<3, 1>(0, i) = c1_start * dzdx;
+    }
+    J.block<3, 1>(0, 0) += c1_start_grad.first * res_start[0];
+    J.block<3, 1>(0, 1) += c1_start_grad.second * res_start[0];
+    // end point
+    M3D A_end_inv = A_end.inverse();
+    std::vector<M3D> dAedx(8, M3D::Zero());
+    dAedx[2].col(0) = c1_end_grad.first;
+    dAedx[3].col(0) = c1_end_grad.second;
+    dAedx[4].col(1) = -c2_start_grad.first;
+    dAedx[5].col(1) = -c2_start_grad.second;
+    dAedx[6].col(1) = -c2_end_grad.first;
+    dAedx[7].col(1) = -c2_end_grad.second;
+    for (size_t i = 0; i < 8; ++i) {
+        double dzdx = (-1) * (A_end_inv * dAedx[i] * A_end_inv).row(0) * B;
+        J.block<3, 1>(3, i) = c1_end * dzdx;
+    }
+    J.block<3, 1>(3, 2) += c1_end_grad.first * res_end[0];
+    J.block<3, 1>(3, 3) += c1_end_grad.second * res_end[0];
+    // covariance propagation
+    return J * covariance * J.transpose();
+} 
+
+// Algebraic line triangulation
+Line3d triangulate(const Line2d& l1, const CameraView& view1,
+                   const Line2d& l2, const CameraView& view2) 
+{
+    // triangulate line
+    auto res = line_triangulation(l1, view1, l2, view2);
+    if (!res.second)
+        return Line3d(V3D(0, 0, 0), V3D(1, 1, 1), -1.0);
+    Line3d line = res.first;
+    return line;
 }
 
 // unproject endpoints with known infinite line

@@ -26,8 +26,12 @@ double compute_epipolar_IoU(const Line2d& l1, const CameraView& view1,
                             const Line2d& l2, const CameraView& view2);
 
 // point triangulation
-V3D point_triangulation(const V2D& p1, const CameraView& view1,
-                        const V2D& p2, const CameraView& view2);
+std::pair<V3D, bool> point_triangulation(const V2D& p1, const CameraView& view1,
+                                         const V2D& p2, const CameraView& view2);
+
+Eigen::Matrix3d point_triangulation_covariance(const V2D& p1, const CameraView& view1,
+                                               const V2D& p2, const CameraView& view2,
+                                               const Eigen::Matrix4d& covariance);
 
 // Triangulating endpoints for triangulation
 Line3d triangulate_endpoints(const Line2d& l1, const CameraView& view1,
@@ -35,6 +39,15 @@ Line3d triangulate_endpoints(const Line2d& l1, const CameraView& view1,
 
 // Asymmetric perspective to (view1, l1)
 // Triangulation by plane intersection
+std::pair<Line3d, bool> line_triangulation(const Line2d& l1, const CameraView& view1,
+                                           const Line2d& l2, const CameraView& view2);
+
+Eigen::Matrix6d line_triangulation_covariance(const Line2d& l1, const CameraView& view1,
+                                              const Line2d& l2, const CameraView& view2,
+                                              const Eigen::MatrixXd& covariance);
+
+// Asymmetric perspective to (view1, l1)
+// Algebraic line triangulation
 Line3d triangulate(const Line2d& l1, const CameraView& view1,
                    const Line2d& l2, const CameraView& view2);
 
