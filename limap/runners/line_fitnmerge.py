@@ -44,7 +44,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     '''
     Args:
     - imagecols: limap.base.ImageCollection
-    - depths: map<int, np.ndarray>
+    - depths: map<int, CustomizedDepthReader>, where CustomizedDepthReader inherits _base.BaseDepthReader
     '''
     # assertion check
     assert imagecols.IsUndistorted() == True
