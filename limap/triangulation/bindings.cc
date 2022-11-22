@@ -45,7 +45,7 @@ void bind_triangulator(py::module &m) {
         .def_readwrite("line_tri_angle_threshold", &TriangulatorConfig::line_tri_angle_threshold) \
         .def_readwrite("IoU_threshold", &TriangulatorConfig::IoU_threshold) \
         .def_readwrite("var2d", &TriangulatorConfig::var2d) \
-        .def_readwrite("vpdet_config", &TriangulatorConfig::vpdet_config) \
+        .def_readwrite("vpdet_config", &TriangulatorConfig::vpdet_config)
 
     py::class_<GlobalLineTriangulatorConfig>(m, "GlobalLineTriangulatorConfig")
         REGISTER_TRIANGULATOR_CONFIG(GlobalLineTriangulatorConfig)
