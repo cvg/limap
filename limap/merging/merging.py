@@ -23,6 +23,7 @@ def remerge(linker3d, linetracks, num_outliers=2):
         if num_tracks == num_tracks_new:
             break
         num_tracks = num_tracks_new
+    print("[LOG] tracks after iterative remerging: {0} / {1}".format(len(new_linetracks), len(linetracks)))
     return new_linetracks
 
 def checktrackbyreprojection(track, imagecols, th_angular2d, th_perp2d):

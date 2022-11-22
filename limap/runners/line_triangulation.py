@@ -62,19 +62,17 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     # [D] multi-view triangulation
     ##########################################################
     print('Start multi-view triangulation...')
-    Triangulator = _tri.Triangulator(cfg["triangulation"])
+    Triangulator = _tri.GlobalLineTriangulator(cfg["triangulation"])
     Triangulator.SetRanges(ranges)
     all_2d_lines = _base.get_all_lines_2d(all_2d_segs)
     Triangulator.Init(all_2d_lines, imagecols)
     for img_id in tqdm(imagecols.get_img_ids()):
         if cfg["triangulation"]["use_exhaustive_matcher"]:
-            Triangulator.InitExhaustiveMatchImage(img_id, neighbors[img_id])
+            Triangulator.TriangulateImageExhaustiveMatch(img_id, neighbors[img_id])
         else:
             matches = limapio.read_npy(os.path.join(matches_dir, "matches_{0}.npy".format(img_id)))
-            Triangulator.InitMatchImage(img_id, matches, neighbors[img_id], triangulate=True, scoring=True)
-    Triangulator.RunClustering()
-    Triangulator.ComputeLineTracks()
-    linetracks = Triangulator.GetTracks()
+            Triangulator.TriangulateImage(img_id, matches, neighbors[img_id])
+    linetracks = Triangulator.ComputeLineTracks()
 
     # filtering 2d supports
     linetracks = _mrg.filtertracksbyreprojection(linetracks, imagecols, cfg["triangulation"]["filtering2d"]["th_angular_2d"], cfg["triangulation"]["filtering2d"]["th_perp_2d"])

@@ -15,7 +15,7 @@ def solve_line_bundle_adjustment(cfg, reconstruction, vpresults=None, heatmaps=N
     else:
         channels = 128
     lineba_engine_name = "LineBAEngine_f{0}_c{1}".format(dtype[-2:], channels)
-    print("Refinement type: ", lineba_engine_name)
+    # print("Refinement type: ", lineba_engine_name)
     lineba_engine = getattr(_optimize, lineba_engine_name)(ba_config)
     lineba_engine.InitializeReconstruction(reconstruction)
 

@@ -546,7 +546,7 @@ std::vector<LineTrack> RemergeLineTracks(const std::vector<LineTrack>& linetrack
             group_labels[track_idx] = n_groups++;
         }
     }
-    STDLOG(INFO) << "# groups after remerging:" << " " << n_groups << std::endl;
+    // STDLOG(INFO) << "# groups after remerging:" << " " << n_groups << std::endl;
     for (size_t track_idx = 0; track_idx < n_tracks; ++track_idx) {
         if (group_labels[track_idx] != -1) {
             continue;

@@ -12,7 +12,7 @@
 namespace py = pybind11;
 
 #include "triangulation/functions.h"
-#include "triangulation/triangulator.h"
+#include "triangulation/global_line_triangulator.h"
 
 namespace limap {
 
@@ -34,84 +34,67 @@ void bind_functions(py::module &m) {
 void bind_triangulator(py::module &m) {
     using namespace triangulation;
 
-    py::class_<TriangulatorConfig>(m, "TriangulatorConfig")
-        .def(py::init<>())
-        .def(py::init<py::dict>())
-        .def_readwrite("add_halfpix", &TriangulatorConfig::add_halfpix)
-        .def_readwrite("use_vp", &TriangulatorConfig::use_vp)
-        .def_readwrite("use_endpoints_triangulation", &TriangulatorConfig::use_endpoints_triangulation)
-        .def_readwrite("min_length_2d", &TriangulatorConfig::min_length_2d)
-        .def_readwrite("var2d", &TriangulatorConfig::var2d)
-        .def_readwrite("line_tri_angle_threshold", &TriangulatorConfig::line_tri_angle_threshold)
-        .def_readwrite("IoU_threshold", &TriangulatorConfig::IoU_threshold)
-        .def_readwrite("fullscore_th", &TriangulatorConfig::fullscore_th)
-        .def_readwrite("max_valid_conns", &TriangulatorConfig::max_valid_conns)
-        .def_readwrite("min_num_outer_edges", &TriangulatorConfig::min_num_outer_edges)
-        .def_readwrite("merging_strategy", &TriangulatorConfig::merging_strategy)
-        .def_readwrite("num_outliers_aggregator", &TriangulatorConfig::num_outliers_aggregator)
-        .def_readwrite("debug_mode", &TriangulatorConfig::debug_mode)
-        .def_readwrite("linker2d_config", &TriangulatorConfig::linker2d_config)
-        .def_readwrite("linker3d_config", &TriangulatorConfig::linker3d_config);
+#define REGISTER_TRIANGULATOR_CONFIG(TriangulatorConfig) \
+        .def(py::init<>()) \
+        .def(py::init<py::dict>()) \
+        .def_readwrite("debug_mode", &TriangulatorConfig::debug_mode) \
+        .def_readwrite("add_halfpix", &TriangulatorConfig::add_halfpix) \
+        .def_readwrite("use_vp", &TriangulatorConfig::use_vp) \
+        .def_readwrite("use_endpoints_triangulation", &TriangulatorConfig::use_endpoints_triangulation) \
+        .def_readwrite("min_length_2d", &TriangulatorConfig::min_length_2d) \
+        .def_readwrite("line_tri_angle_threshold", &TriangulatorConfig::line_tri_angle_threshold) \
+        .def_readwrite("IoU_threshold", &TriangulatorConfig::IoU_threshold) \
+        .def_readwrite("var2d", &TriangulatorConfig::var2d) \
+        .def_readwrite("vpdet_config", &TriangulatorConfig::vpdet_config) \
 
-    py::class_<Triangulator>(m, "Triangulator")
-        .def(py::init<>())
-        .def(py::init<const TriangulatorConfig&>())
-        .def(py::init<py::dict>())
-        .def("Init", &Triangulator::Init)
-        .def("InitMatches", &Triangulator::InitMatches, 
-                py::arg("all_matches"),
-                py::arg("all_neigbhors"),
-                py::arg("triangulate") = true,
-                py::arg("scoring") = false
-        )
-        .def("InitMatchImage", &Triangulator::InitMatchImage,
-                py::arg("img_id"),
-                py::arg("matches"),
-                py::arg("neighbors"),
-                py::arg("triangulate") = true,
-                py::arg("scoring") = false
-        )
-        .def("InitExhaustiveMatchImage", &Triangulator::InitExhaustiveMatchImage,
-                py::arg("img_id"),
-                py::arg("neighbors"),
-                py::arg("scoring") = true
-        )
-        .def("InitAll", &Triangulator::InitAll,
-                py::arg("all_2d_segs"),
-                py::arg("views"),
-                py::arg("all_matches"),
-                py::arg("all_neighbors"),
-                py::arg("triangulate") = true,
-                py::arg("scoring") = false
-        )
-        .def("SetRanges", &Triangulator::SetRanges)
+    py::class_<GlobalLineTriangulatorConfig>(m, "GlobalLineTriangulatorConfig")
+        REGISTER_TRIANGULATOR_CONFIG(GlobalLineTriangulatorConfig)
+        .def_readwrite("fullscore_th", &GlobalLineTriangulatorConfig::fullscore_th)
+        .def_readwrite("max_valid_conns", &GlobalLineTriangulatorConfig::max_valid_conns)
+        .def_readwrite("min_num_outer_edges", &GlobalLineTriangulatorConfig::min_num_outer_edges)
+        .def_readwrite("merging_strategy", &GlobalLineTriangulatorConfig::merging_strategy)
+        .def_readwrite("num_outliers_aggregator", &GlobalLineTriangulatorConfig::num_outliers_aggregator)
+        .def_readwrite("linker2d_config", &GlobalLineTriangulatorConfig::linker2d_config)
+        .def_readwrite("linker3d_config", &GlobalLineTriangulatorConfig::linker3d_config);
+
+#undef REGISTER_TRIANGULATOR_CONFIG
+
+#define REGISTER_TRIANGULATOR(Triangulator) \
+        .def(py::init<>()) \
+        .def(py::init<py::dict>()) \
+        .def("Init", &Triangulator::Init) \
+        .def("TriangulateImage", &Triangulator::TriangulateImage) \
+        .def("TriangulateImageExhaustiveMatch", &Triangulator::TriangulateImageExhaustiveMatch) \
+        .def("ComputeLineTracks", &Triangulator::ComputeLineTracks) \
+        .def("GetVPResult", &Triangulator::GetVPResult) \
+        .def("GetVPResults", &Triangulator::GetVPResults) \
+        .def("CountImages", &Triangulator::CountImages) \
+        .def("CountLines", &Triangulator::CountLines) \
+        .def("GetTracks", &Triangulator::GetTracks) \
+        .def("SetRanges", &Triangulator::SetRanges) \
         .def("UnsetRanges", &Triangulator::UnsetRanges)
-        .def("GetLinker", &Triangulator::GetLinker)
-        .def("RunTriangulate", &Triangulator::RunTriangulate)
-        .def("RunScoring", &Triangulator::RunScoring)
-        .def("RunClustering", &Triangulator::RunClustering)
-        .def("ComputeLineTracks", &Triangulator::ComputeLineTracks)
-        .def("Run", &Triangulator::Run)
-        .def("GetTracks", &Triangulator::GetTracks)
-        .def("GetVPResult", &Triangulator::GetVPResult)
-        .def("GetVPResults", &Triangulator::GetVPResults)
-        .def("CountImages", &Triangulator::CountImages)
-        .def("CountLines", &Triangulator::CountLines)
-        .def("CountAllTris", &Triangulator::CountAllTris)
-        .def("GetScoredTrisNode", &Triangulator::GetScoredTrisNode)
-        .def("GetValidScoredTrisNode", &Triangulator::GetValidScoredTrisNode)
-        .def("GetValidScoredTrisNodeSet", &Triangulator::GetValidScoredTrisNodeSet)
-        .def("CountAllValidTris", &Triangulator::CountAllValidTris)
-        .def("GetAllValidTris", &Triangulator::GetAllValidTris)
-        .def("GetValidTrisImage", &Triangulator::GetValidTrisImage)
-        .def("GetValidTrisNode", &Triangulator::GetValidTrisNode)
-        .def("GetValidTrisNodeSet", &Triangulator::GetValidTrisNodeSet)
-        .def("GetAllBestTris", &Triangulator::GetAllBestTris)
-        .def("GetAllValidBestTris", &Triangulator::GetAllValidBestTris)
-        .def("GetBestTrisImage", &Triangulator::GetBestTrisImage)
-        .def("GetBestTriNode", &Triangulator::GetBestTriNode)
-        .def("GetBestScoredTriNode", &Triangulator::GetBestScoredTriNode)
-        .def("GetSurvivedLinesImage", &Triangulator::GetSurvivedLinesImage);
+
+    py::class_<GlobalLineTriangulator>(m, "GlobalLineTriangulator")
+        REGISTER_TRIANGULATOR(GlobalLineTriangulator)
+        .def(py::init<const GlobalLineTriangulatorConfig&>())
+        .def("GetLinker", &GlobalLineTriangulator::GetLinker)
+        .def("CountAllTris", &GlobalLineTriangulator::CountAllTris)
+        .def("GetScoredTrisNode", &GlobalLineTriangulator::GetScoredTrisNode)
+        .def("GetValidScoredTrisNode", &GlobalLineTriangulator::GetValidScoredTrisNode)
+        .def("GetValidScoredTrisNodeSet", &GlobalLineTriangulator::GetValidScoredTrisNodeSet)
+        .def("CountAllValidTris", &GlobalLineTriangulator::CountAllValidTris)
+        .def("GetAllValidTris", &GlobalLineTriangulator::GetAllValidTris)
+        .def("GetValidTrisImage", &GlobalLineTriangulator::GetValidTrisImage)
+        .def("GetValidTrisNode", &GlobalLineTriangulator::GetValidTrisNode)
+        .def("GetValidTrisNodeSet", &GlobalLineTriangulator::GetValidTrisNodeSet)
+        .def("GetAllBestTris", &GlobalLineTriangulator::GetAllBestTris)
+        .def("GetAllValidBestTris", &GlobalLineTriangulator::GetAllValidBestTris)
+        .def("GetBestTrisImage", &GlobalLineTriangulator::GetBestTrisImage)
+        .def("GetBestTriNode", &GlobalLineTriangulator::GetBestTriNode)
+        .def("GetBestScoredTriNode", &GlobalLineTriangulator::GetBestScoredTriNode)
+        .def("GetSurvivedLinesImage", &GlobalLineTriangulator::GetSurvivedLinesImage);
+
+#undef REGISTER_TRIANGULATOR
 }
 
 void bind_triangulation(py::module& m) {

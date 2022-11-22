@@ -76,7 +76,7 @@ void FilterSupportingLines(std::vector<LineTrack>& new_linetracks,
         newtrack.line = Aggregator::aggregate_line3d_list(newtrack.line3d_list, newtrack.score_list, num_outliers);
         new_linetracks.push_back(newtrack);
     }
-    STDLOG(INFO) << "# tracks after filtering:" << " " << new_linetracks.size() << std::endl;
+    // STDLOG(INFO) << "# tracks after filtering:" << " " << new_linetracks.size() << std::endl;
 }
 
 void CheckSensitivity(std::vector<bool>& results,
@@ -122,7 +122,7 @@ void FilterTracksBySensitivity(std::vector<LineTrack>& new_linetracks,
         if (counter >= min_support_ns)
             new_linetracks.push_back(track);
     }
-    STDLOG(INFO) << "# tracks after filtering by sensitivity:" << " " << new_linetracks.size() << std::endl;
+    // STDLOG(INFO) << "# tracks after filtering by sensitivity:" << " " << new_linetracks.size() << std::endl;
 }
 
 void FilterTracksByOverlap(std::vector<LineTrack>& new_linetracks,
@@ -147,7 +147,7 @@ void FilterTracksByOverlap(std::vector<LineTrack>& new_linetracks,
         if (counter >= min_support_ns)
             new_linetracks.push_back(track);
     }
-    STDLOG(INFO) << "# tracks after filtering by overlap:" << " " << new_linetracks.size() << std::endl;
+    // STDLOG(INFO) << "# tracks after filtering by overlap:" << " " << new_linetracks.size() << std::endl;
 }
 
 } // namespace merging
