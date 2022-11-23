@@ -1,3 +1,8 @@
+/build/
+/dist/
+cmake-build-*
+*.egg-info/
+
 *.npy
 *.png
 *.pyc
@@ -11,12 +16,11 @@
 *.zip
 *.tar.gz
 *.th
+*.so
 
 experiments
-build
 data
-precomputed
 results
-tmp
 outputs
+tmp
 

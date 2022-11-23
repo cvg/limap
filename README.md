@@ -7,16 +7,20 @@
 
 ```bash
 git submodule update --init --recursive
+sudo apt-get install libhdf5-dev
+python -m pip install torch==1.11.0 torchvision==0.12.0
 python -m pip install -r requirements.txt
 ```
 
-To compile LIMAP:
-```bash
-sudo apt-get install libhdf5-dev
-mkdir -p build && cd build
-cmake -DPYTHON_EXECUTABLE=${path-to-your-python-executable} ..
-make -j8
-cd ..
+## Installation
+
+```
+python setup.py develop
+```
+
+or you can use the ``pip`` alternatively:
+```
+python -m pip install -ve .
 ```
 
 ## Quickstart
