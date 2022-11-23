@@ -23,3 +23,7 @@
 [submodule "third-party/pytlbd"]
 	path = third-party/pytlbd
 	url = git@github.com:iago-suarez/pytlbd.git
+[submodule "third-party/hawp"]
+	path = third-party/hawp
+	url = git@github.com:cherubicXN/hawp.git
+	ignore = dirty

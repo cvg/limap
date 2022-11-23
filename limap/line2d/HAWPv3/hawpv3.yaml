@@ -1,0 +1,84 @@
+ENCODER:
+  ANG_TH: 0.0
+  BACKGROUND_WEIGHT: 0.0
+  DIS_TH: 2
+  NUM_STATIC_NEG_LINES: 0
+  NUM_STATIC_POS_LINES: 300
+MODEL:
+  DEVICE: cuda
+  USE_LINE_HEATMAP: True
+  HEAD_SIZE:
+  - - 3
+  - - 1
+  - - 1
+  - - 2
+  - - 2
+  HGNETS:
+    DEPTH: 4
+    INPLANES: 64
+    NUM_BLOCKS: 1
+    NUM_FEATS: 128
+    NUM_STACKS: 2
+  LOI_POOLING:
+    ACTIVATION: relu
+    DIM_EDGE_FEATURE: 4
+    DIM_FC: 1024
+    DIM_JUNCTION_FEATURE: 128
+    LAYER_NORM: false
+    NUM_POINTS: 32
+    TYPE: softmax
+  LOSS_WEIGHTS:
+    loss_aux: 1.0
+    loss_dis: 1.0
+    loss_jloc: 8.0
+    loss_joff: 0.25
+    # loss_joff: 0.0
+    loss_lineness: 1.0
+    loss_md: 1.0
+    loss_neg: 1.0
+    loss_pos: 1.0
+    loss_res: 1.0
+    loss_heatmap: 1.0
+  NAME: Hourglass
+  OUT_FEATURE_CHANNELS: 256
+  PARSING_HEAD:
+    DIM_FC: 1024
+    DIM_LOI: 128
+    J2L_THRESHOLD: 10.0
+    JMATCH_THRESHOLD: 1.5
+    MATCHING_STRATEGY: junction
+    MAX_DISTANCE: 5.0
+    N_DYN_JUNC: 300
+    N_DYN_NEGL: 40
+    N_DYN_OTHR: 0
+    N_DYN_OTHR2: 300
+    N_DYN_POSL: 300
+    N_OUT_JUNC: 250
+    N_OUT_LINE: 2500
+    N_PTS0: 32
+    N_PTS1: 8
+    N_STC_NEGL: 40
+    N_STC_POSL: 300
+    USE_RESIDUAL: 1
+  RESNETS:
+    BASENET: resnet50
+    PRETRAIN: true
+  SCALE: 1.0
+  WEIGHTS: ''
+MODELING_PATH: ihawp-v2
+OUTPUT_DIR: output/ihawp
+SOLVER:
+  AMSGRAD: true
+  BACKBONE_LR_FACTOR: 1.0
+  BASE_LR: 0.00004
+  BIAS_LR_FACTOR: 1
+  CHECKPOINT_PERIOD: 1
+  GAMMA: 0.1
+  IMS_PER_BATCH: 6
+  MAX_EPOCH: 30
+  MOMENTUM: 0.9
+  OPTIMIZER: ADAM
+  STEPS:
+  - 25
+  WEIGHT_DECAY: 0.0001
+  WEIGHT_DECAY_BIAS: 0

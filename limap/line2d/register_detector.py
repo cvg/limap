@@ -11,6 +11,9 @@ def get_detector(cfg_detector, max_num_2d_segs=3000, do_merge_lines=False):
     elif method == "sold2":
         from .SOLD2 import SOLD2Detector
         return SOLD2Detector(options)
+    elif method == "hawpv3":
+        from .HAWPv3 import HAWPv3Detector
+        return HAWPv3Detector(options)
     else:
         raise NotImplementedError
 

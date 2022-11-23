@@ -42,13 +42,13 @@ line2d:
     save_l3dpp: False
     compute_descinfo: False
     detector: 
-        method: "lsd" # ["lsd", "sold2"]
+        method: "lsd" # ["lsd", "sold2", "hawpv3"]
         skip_exists: False
     extractor: 
-        method: "sold2" # ["sold2", "superpoint_endpoints"]
+        method: "sold2" # ["sold2", "lbd", "l2d2", "linetr", "superpoint_endpoints"]
         skip_exists: False
     matcher:
-        method: "sold2" # ["sold2", "nn_endpoints", "superglue_endpoints"]
+        method: "sold2" # ["sold2", "lbd", "l2d2", "linetr", "nn_endpoints", "superglue_endpoints"]
         n_jobs: 1
         topk: 10
         skip_exists: False
@@ -57,6 +57,7 @@ line2d:
 var2d: # in pixels
     sold2: 5.0
     lsd: 2.0
+    hawpv3: 2.0
 
 ##############################
 # triangulation config
