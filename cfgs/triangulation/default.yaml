@@ -57,7 +57,7 @@ line2d:
 var2d: # in pixels
     sold2: 5.0
     lsd: 2.0
-    hawpv3: 2.0
+    hawpv3: 5.0
 
 ##############################
 # triangulation config
