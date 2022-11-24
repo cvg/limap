@@ -1,9 +1,10 @@
+import os, sys
 from _limap import _base
-from .read_write_model import *
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from read_write_model import *
 
-def ReadInfos(model, colmap_path, model_path="sparse", image_path="images"):
+def ReadInfos(colmap_path, model_path="sparse", image_path="images"):
     print("Start loading COLMAP sparse reconstruction.")
-    image_names = model.GetImageNames()
     model_path = os.path.join(colmap_path, model_path)
     image_path = os.path.join(colmap_path, image_path)
     if os.path.exists(os.path.join(model_path, "cameras.bin")):

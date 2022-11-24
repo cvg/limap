@@ -2,7 +2,9 @@ import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from limap.util.geometry import rotation_from_quaternion
 
-from .colmap_reader import PyReadCOLMAP
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from colmap_reader import PyReadCOLMAP
+import read_write_model as colmap_utils
 
 def convert_colmap_to_visualsfm(colmap_model_path, output_nvm_file):
     colmap_cameras, colmap_images, colmap_points = PyReadCOLMAP(colmap_model_path)
@@ -63,4 +65,43 @@ def convert_colmap_to_visualsfm(colmap_model_path, output_nvm_file):
                 xy = colmap_images[img_id].xys[xy_id]
                 f.write(" {0} {1}".format(xy[0], xy[1]))
             f.write("\n")
+
+def convert_imagecols_to_colmap(imagecols, colmap_output_path):
+    ### make folders
+    if not os.path.exists(colmap_output_path):
+        os.makedirs(colmap_output_path)
+
+    ### write cameras.txt
+    colmap_cameras = {}
+    for cam_id in imagecols.get_cam_ids():
+        cam = imagecols.cam(cam_id)
+        model_id = cam.model_id()
+        model_name = None
+        if model_id == 0:
+            model_name = "SIMPLE_PINHOLE"
+        elif model_id == 1:
+            model_name = "PINHOLE"
+        else:
+            raise ValueError("The provided camera model should be without distortion.")
+        colmap_cameras[cam_id] = colmap_utils.Camera(id=cam_id, model=model_name, width=cam.w(), height=cam.h(), params=cam.params())
+    fname = os.path.join(colmap_output_path, 'cameras.txt')
+    colmap_utils.write_cameras_text(colmap_cameras, fname)
+
+    ### write images.txt
+    colmap_images = {}
+    for img_id in imagecols.get_img_ids():
+        imname = imagecols.image_name(img_id)
+        camimage = imagecols.camimage(img_id)
+        cam_id = camimage.cam_id
+        qvec = camimage.pose.qvec
+        tvec = camimage.pose.tvec
+        colmap_images[img_id] = colmap_utils.Image(id=img_id, qvec=qvec, tvec=tvec,
+                                                   camera_id=cam_id, name=imname,
+                                                   xys=[], point3D_ids=[])
+    fname = os.path.join(colmap_output_path, 'images.txt')
+    colmap_utils.write_images_text(colmap_images, fname)
+
+    ### write empty points3D.txt
+    fname = os.path.join(colmap_output_path, 'points3D.txt')
+    colmap_utils.write_points3D_text({}, fname)
 

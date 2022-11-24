@@ -2,14 +2,15 @@ import os, sys
 import shutil
 import numpy as np
 import cv2
+import copy
 import subprocess
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-import read_write_model as colmap_utils
-import database
 from pathlib import Path
 from tqdm import tqdm
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+import read_write_model as colmap_utils
+import database
+from model_converter import convert_imagecols_to_colmap
 
 def import_images_with_known_cameras(image_dir, database_path, imagecols):
     image_ids = imagecols.get_img_ids()
@@ -27,6 +28,7 @@ def import_images_with_known_cameras(image_dir, database_path, imagecols):
     # add image
     for img_name, img_id in zip(image_name_list, image_ids):
         cam_id = imagecols.camimage(img_id).cam_id
+        assert img_name == imagecols.image_name(img_id)
         db.add_image(img_name, cam_id, image_id=img_id)
     db.commit()
 
@@ -118,54 +120,20 @@ def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap'
 
     ### copy images to tmp folder
     keypoints_in_order = []
+    imagecols_tmp = copy.deepcopy(imagecols)
     for idx, img_id in enumerate(imagecols.get_img_ids()):
         img = imagecols.read_image(img_id)
         fname_to_save = os.path.join(image_path, 'image{0:08d}.png'.format(img_id))
         cv2.imwrite(fname_to_save, img)
         if keypoints is not None:
             keypoints_in_order.append(keypoints[img_id])
+        imagecols_tmp.change_image_name(img_id, 'image{0:08d}.png'.format(img_id))
 
     # feature extraction and matching
-    run_hloc_matches(cfg["hloc"], image_path, Path(db_path), keypoints=keypoints_in_order, neighbors=neighbors, imagecols=imagecols)
+    run_hloc_matches(cfg["hloc"], image_path, Path(db_path), keypoints=keypoints_in_order, neighbors=neighbors, imagecols=imagecols_tmp)
 
-    ### write cameras.txt
-    colmap_cameras = {}
-    for cam_id in imagecols.get_cam_ids():
-        cam = imagecols.cam(cam_id)
-        model_id = cam.model_id()
-        model_name = None
-        if model_id == 0:
-            model_name = "SIMPLE_PINHOLE"
-        elif model_id == 1:
-            model_name = "PINHOLE"
-        else:
-            raise ValueError("The provided camera model should be without distortion.")
-        colmap_cameras[cam_id] = colmap_utils.Camera(id=cam_id, model=model_name, width=cam.w(), height=cam.h(), params=cam.params())
-    fname = os.path.join(model_path, 'cameras.txt')
-    colmap_utils.write_cameras_text(colmap_cameras, fname)
-
-    ### write images.txt
-    # [IMPORTANT] get image id from the database
-    db = database.COLMAPDatabase(db_path)
-    rows = db.execute("SELECT * from images")
-    colmap_images = {}
-    for img_id in imagecols.get_img_ids():
-        kk = next(rows)
-        assert (kk[0] == img_id)
-        imname = kk[1]
-        camimage = imagecols.camimage(img_id)
-        cam_id = camimage.cam_id
-        qvec = camimage.pose.qvec
-        tvec = camimage.pose.tvec
-        colmap_images[img_id] = colmap_utils.Image(id=img_id, qvec=qvec, tvec=tvec,
-                                                   camera_id=cam_id, name=imname,
-                                                   xys=[], point3D_ids=[])
-    fname = os.path.join(model_path, 'images.txt')
-    colmap_utils.write_images_text(colmap_images, fname)
-
-    ### write empty points3D.txt
-    fname = os.path.join(model_path, 'points3D.txt')
-    colmap_utils.write_points3D_text({}, fname)
+    # write colmap model from imagecols
+    convert_imagecols_to_colmap(imagecols_tmp, model_path)
 
     ### [COLMAP] point triangulation
     # point triangulation

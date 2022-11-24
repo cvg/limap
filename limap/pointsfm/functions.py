@@ -37,38 +37,43 @@ def compute_metainfos(cfg, model, n_neighbors=20):
     ranges = model.ComputeRanges(cfg["ranges"]["range_robust"], cfg["ranges"]["k_stretch"])
     return neighbors, ranges
 
-def read_infos_colmap(cfg, colmap_path, model_path="sparse", image_path="images", n_neighbors=20):
+def read_infos_colmap(cfg, colmap_path, model_path="sparse", image_path="images", compute_neighbors=True, n_neighbors=20):
     '''
     Read all infos from colmap including imagecols, neighbors, and ranges
     '''
-    from .colmap_reader import ReadInfos
-    model = _pointsfm.SfmModel()
-    model.ReadFromCOLMAP(colmap_path, model_path, image_path)
-
     # get imagecols
-    imagecols = ReadInfos(model, colmap_path, model_path=model_path, image_path=image_path)
+    from .colmap_reader import ReadInfos
+    imagecols = ReadInfos(colmap_path, model_path=model_path, image_path=image_path)
+    if not compute_neighbors:
+        return imagecols
 
     # get metainfos
+    model = _pointsfm.SfmModel()
+    model.ReadFromCOLMAP(colmap_path, model_path, image_path)
     neighbors, ranges = compute_metainfos(cfg, model, n_neighbors=n_neighbors)
     return imagecols, neighbors, ranges
 
-def read_infos_bundler(cfg, bundler_path, list_path, model_path, n_neighbors=20):
+def read_infos_bundler(cfg, bundler_path, list_path, model_path, compute_neighbors=True, n_neighbors=20):
     '''
     Read all infos from Bundler format including imagecols, neighbors, ranges
     '''
     from .bundler_reader import ReadModelBundler
     model, imagecols = ReadModelBundler(bundler_path, list_path, model_path)
+    if not compute_neighbors:
+        return imagecols
 
     # get metainfos
     neighbors, ranges = compute_metainfos(cfg, model, n_neighbors=n_neighbors)
     return imagecols, neighbors, ranges
 
-def read_infos_visualsfm(cfg, vsfm_path, nvm_file="reconstruction.nvm", n_neighbors=20):
+def read_infos_visualsfm(cfg, vsfm_path, nvm_file="reconstruction.nvm", compute_neighbors=True, n_neighbors=20):
     '''
     Read all infos from VisualSfM format including imagecols, neighbors, ranges
     '''
     from .visualsfm_reader import ReadModelVisualSfM
     model, imagecols = ReadModelVisualSfM(vsfm_path, nvm_file=nvm_file)
+    if not compute_neighbors:
+        return imagecols
 
     # get metainfos
     neighbors, ranges = compute_metainfos(cfg, model, n_neighbors=n_neighbors)
