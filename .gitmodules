@@ -27,3 +27,6 @@
 	path = third-party/hawp
 	url = git@github.com:cherubicXN/hawp.git
 	ignore = dirty
+[submodule "third-party/TP-LSD"]
+	path = third-party/TP-LSD
+	url = git@github.com:rpautrat/TP-LSD.git

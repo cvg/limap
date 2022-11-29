@@ -42,9 +42,9 @@ Line3d triangulate_endpoints(const Line2d& l1, const CameraView& view1,
 std::pair<Line3d, bool> line_triangulation(const Line2d& l1, const CameraView& view1,
                                            const Line2d& l2, const CameraView& view2);
 
-Eigen::Matrix6d line_triangulation_covariance(const Line2d& l1, const CameraView& view1,
-                                              const Line2d& l2, const CameraView& view2,
-                                              const Eigen::MatrixXd& covariance);
+M6D line_triangulation_covariance(const Line2d& l1, const CameraView& view1,
+                                  const Line2d& l2, const CameraView& view2,
+                                  const M8D& covariance);
 
 // Asymmetric perspective to (view1, l1)
 // Algebraic line triangulation

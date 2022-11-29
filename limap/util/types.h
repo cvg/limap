@@ -27,6 +27,8 @@ using M4F = Eigen::Matrix4f;
 using M2D = Eigen::Matrix2d;
 using M3D = Eigen::Matrix3d;
 using M4D = Eigen::Matrix4d;
+using M6D = Eigen::Matrix<double, 6, 6>;
+using M8D = Eigen::Matrix<double, 8, 8>;
 
 const double EPS = 1e-12;
 

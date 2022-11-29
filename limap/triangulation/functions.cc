@@ -215,14 +215,10 @@ std::pair<Line3d, bool> line_triangulation(const Line2d& l1, const CameraView& v
     return std::make_pair(line, true);
 }
 
-Eigen::Matrix6d line_triangulation_covariance(const Line2d& l1, const CameraView& view1,
-                                              const Line2d& l2, const CameraView& view2,
-                                              const Eigen::MatrixXd& covariance) 
+M6D line_triangulation_covariance(const Line2d& l1, const CameraView& view1,
+                                  const Line2d& l2, const CameraView& view2,
+                                  const M8D& covariance) 
 {
-    // check: input covariance should be 8 x 8
-    THROW_CHECK_EQ(covariance.rows(), 8);
-    THROW_CHECK_EQ(covariance.cols(), 8);
-
     // compute matrix form again
     V3D c1_start = view1.ray_direction(l1.start);
     V3D c1_end = view1.ray_direction(l1.end);

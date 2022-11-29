@@ -42,7 +42,7 @@ line2d:
     save_l3dpp: False
     compute_descinfo: False
     detector: 
-        method: "lsd" # ["lsd", "sold2", "hawpv3"]
+        method: "lsd" # ["lsd", "sold2", "hawpv3", "tp_lsd"]
         skip_exists: False
     extractor: 
         method: "sold2" # ["sold2", "lbd", "l2d2", "linetr", "superpoint_endpoints"]
@@ -58,6 +58,7 @@ var2d: # in pixels
     sold2: 5.0
     lsd: 2.0
     hawpv3: 5.0
+    tp_lsd: 5.0
 
 ##############################
 # triangulation config

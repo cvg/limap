@@ -14,6 +14,9 @@ def get_detector(cfg_detector, max_num_2d_segs=3000, do_merge_lines=False):
     elif method == "hawpv3":
         from .HAWPv3 import HAWPv3Detector
         return HAWPv3Detector(options)
+    elif method == "tp_lsd":
+        from .TP_LSD import TPLSDDetector
+        return TPLSDDetector(options)
     else:
         raise NotImplementedError
 
