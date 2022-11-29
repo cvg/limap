@@ -5,5 +5,7 @@ LIMAP_ADD_SOURCES(
     vpbase.h
     base_vp_detector.h base_vp_detector.cc
     jlinkage.h jlinkage.cc
+
+    vptrack.h vptrack.cc
 )
 
