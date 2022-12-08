@@ -24,6 +24,10 @@ python -m pip install -r requirements.txt
 ```
 python -m pip install -Ive . 
 ```
+To double check if the package is successfully installed:
+```
+python -c "import limap"
+```
 
 ## Quickstart
 
