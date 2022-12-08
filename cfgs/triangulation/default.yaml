@@ -117,7 +117,7 @@ triangulation:
         enable: false
         colmap_folder: null
         use_triangulated_points: true
-        use_neighbors: false
+        use_neighbors: true 
     disable_many_points_triangulation: false
     disable_one_point_triangulation: false
     disable_algebraic_triangulation: false
