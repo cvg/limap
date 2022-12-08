@@ -6,6 +6,7 @@
 #include "base/linetrack.h"
 #include "base/image_collection.h"
 #include "vplib/jlinkage.h"
+#include "structures/pl_bipartite.h"
 
 #include <tuple>
 
@@ -24,6 +25,10 @@ public:
         ASSIGN_PYDICT_ITEM(dict, add_halfpix, bool)
         ASSIGN_PYDICT_ITEM(dict, use_vp, bool)
         ASSIGN_PYDICT_ITEM(dict, use_endpoints_triangulation, bool)
+        ASSIGN_PYDICT_ITEM(dict, disable_many_points_triangulation, bool)
+        ASSIGN_PYDICT_ITEM(dict, disable_one_point_triangulation, bool)
+        ASSIGN_PYDICT_ITEM(dict, disable_algebraic_triangulation, bool)
+        ASSIGN_PYDICT_ITEM(dict, disable_vp_triangulation, bool)
         ASSIGN_PYDICT_ITEM(dict, min_length_2d, double)
         ASSIGN_PYDICT_ITEM(dict, line_tri_angle_threshold, double)
         ASSIGN_PYDICT_ITEM(dict, IoU_threshold, double)
@@ -34,12 +39,20 @@ public:
         ASSIGN_PYDICT_ITEM(dict, var2d, double);
     }
 
+    // general options
     bool debug_mode = false;
     bool add_halfpix = false; // offset half pixel for each line
     bool use_vp = false;
     bool use_endpoints_triangulation = false;
     vplib::JLinkageConfig vpdet_config;
 
+    // proposal types
+    bool disable_many_points_triangulation = false;
+    bool disable_one_point_triangulation = false;
+    bool disable_algebraic_triangulation = false;
+    bool disable_vp_triangulation = false;
+
+    // hyperparameters
     double min_length_2d = 20.0;
     double line_tri_angle_threshold = 5.0;
     double IoU_threshold = 0.1;
@@ -66,6 +79,10 @@ public:
     void SetRanges(const std::pair<V3D, V3D>& ranges) { ranges_flag_ = true; ranges_ = ranges; }
     void UnsetRanges() { ranges_flag_ = false; }
 
+    // optional (for pointsfm)
+    void SetBipartites2d(const std::map<int, structures::PL_Bipartite2d>& all_bpt2ds) { use_pointsfm_ = true; all_bpt2ds_ = std::make_shared<std::map<int, structures::PL_Bipartite2d>>(all_bpt2ds); }
+    void SetSfMPoints(const std::map<int, V3D>& points) { sfm_points_ = points; }
+
     // data
     std::vector<LineTrack> GetTracks() const {return tracks_; };
     vplib::VPResult GetVPResult(const int& image_id) const {return vpresults_.at(image_id); }
@@ -91,6 +108,11 @@ protected:
 
     // connections
     std::map<int, std::vector<std::vector<LineNode>>> edges_; // list of (img_id, line_id) for each node, cleared after triangulation
+
+    // [optional]
+    bool use_pointsfm_ = false;
+    std::shared_ptr<std::map<int, structures::PL_Bipartite2d>> all_bpt2ds_;
+    std::map<int, V3D> sfm_points_;
 
     // triangulation
     void clearEdgesOneNode(const int img_id, const int line_id);

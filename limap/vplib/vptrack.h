@@ -32,6 +32,8 @@ public:
     size_t length() const { return supports.size(); }
 };
 
+std::vector<VPTrack> MergeVPTracksByDirection(const std::vector<VPTrack>& vptracks, const double th_angle_merge = 1.0);
+
 } // namespace vplib
 
 } // namespace limap

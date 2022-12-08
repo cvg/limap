@@ -3,6 +3,13 @@ from _limap import _base
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from read_write_model import *
 
+def check_exists_colmap_model(model_path):
+    if os.path.exists(os.path.join(model_path, "cameras.bin")) and os.path.exists(os.path.join(model_path, "images.bin")) and os.path.exists(os.path.join(model_path, "points3D.bin")):
+        return True
+    if os.path.exists(os.path.join(model_path, "cameras.txt")) and os.path.exists(os.path.join(model_path, "images.txt")) and os.path.exists(os.path.join(model_path, "points3D.txt")):
+        return True
+    return False
+
 def ReadInfos(colmap_path, model_path="sparse", image_path="images"):
     print("Start loading COLMAP sparse reconstruction.")
     model_path = os.path.join(colmap_path, model_path)

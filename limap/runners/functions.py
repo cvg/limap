@@ -88,12 +88,13 @@ def compute_sfminfos(cfg, imagecols, fname="metainfos.txt"):
         limapio.save_txt_metainfos(fname_save, neighbors, ranges)
     else:
         # load from precomputed info
+        colmap_output_path = os.path.join(cfg["dir_load"], cfg["sfm"]["colmap_output_path"])
         limapio.check_path(cfg["dir_load"])
         fname_load = os.path.join(cfg["dir_load"], fname)
         neighbors, ranges = limapio.read_txt_metainfos(fname_load)
         for img_id, neighbor in neighbors.items():
             neighbors[img_id] = neighbors[img_id][:cfg["n_neighbors"]]
-    return neighbors, ranges
+    return colmap_output_path, neighbors, ranges
 
 def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
     if "extractor" in cfg["line2d"]:

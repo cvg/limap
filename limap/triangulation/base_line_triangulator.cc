@@ -152,39 +152,79 @@ void BaseLineTriangulator::triangulateOneNode(const int img_id, const int line_i
             continue;
         const CameraView& view2 = imagecols_.camview(ng_img_id);
 
-        // test degeneracy by ray-plane angles
-        V3D n2 = getNormalDirection(l2, view2);
-        V3D ray1_start = view1.ray_direction(l1.start);
-        double angle_start = 90 - acos(std::abs(n2.dot(ray1_start))) * 180.0 / M_PI;
-        if (angle_start < config_.line_tri_angle_threshold)
-            continue;
-        V3D ray1_end = view1.ray_direction(l1.end);
-        double angle_end = 90 - acos(std::abs(n2.dot(ray1_end))) * 180.0 / M_PI;
-        if (angle_end < config_.line_tri_angle_threshold)
-            continue;
+        // Step 1.1: many points: connect points
+        // Step 1.2: one point: point-based triangulation
+        if (use_pointsfm_ && (!config_.disable_many_points_triangulation || !config_.disable_one_point_triangulation)) {
+            std::map<int, Point2d> points1;
+            std::set<int> set1;
+            std::map<int, std::pair<V2D, V2D>> points_info;
+            for (const int& point_id: all_bpt2ds_->at(img_id).neighbor_points(line_id)) {
+                auto p = all_bpt2ds_->at(img_id).point(point_id);
+                set1.insert(p.point3D_id);
+                points1.insert(std::make_pair(p.point3D_id, p));
+            }
+            for (const int& point_id: all_bpt2ds_->at(ng_img_id).neighbor_points(ng_line_id))
+            {
+                auto p = all_bpt2ds_->at(ng_img_id).point(point_id);
+                if (set1.find(p.point3D_id) != set1.end()) {
+                    V2D p1 = points1.at(p.point3D_id).p;
+                    points_info.insert(std::make_pair(p.point3D_id, std::pair<V2D, V2D>(p1, p.p)));
+                }
+            }
+            // triangulate points
+            std::vector<V3D> points;
+            for (auto it = points_info.begin(); it != points_info.end(); ++it) {
+                if (sfm_points_.empty()) {
+                    auto res = point_triangulation(it->second.first, view1, it->second.second, view2);
+                    if (res.second)
+                        points.push_back(res.first);
+                }
+                else
+                    points.push_back(sfm_points_.at(it->first));
+            }
 
-        // test weak epipolar constraints
-        double IoU = compute_epipolar_IoU(l1, view1, l2, view2);
-        if (IoU < config_.IoU_threshold)
-            continue;
+            // Step 1.1: many points: connect points
+            // points.size() >= 2 -> fit line
+            // fit lines with total least square
+            if (!config_.disable_many_points_triangulation && points.size() >= 2) {
+                V3D center(0.0, 0.0, 0.0);
+                for (size_t i = 0; i < points.size(); ++i) {
+                    center += points[i];
+                }
+                center /= points.size();
+                Eigen::MatrixXd epoints;
+                epoints.resize(points.size(), 3);
+                for (size_t i = 0; i < points.size(); ++i) {
+                    epoints.row(i) = points[i] - center;
+                }
+                Eigen::JacobiSVD<Eigen::MatrixXd> svd(epoints, Eigen::ComputeThinV);
+                V3D direc = svd.matrixV().col(0).normalized();
+                InfiniteLine3d inf_line = InfiniteLine3d(center, direc);
+                Line3d line = triangulate_with_infinite_line(l1, view1, inf_line);
+                if (line.score > 0) {
+                    double u1 = line.computeUncertainty(view1, config_.var2d);
+                    double u2 = line.computeUncertainty(view2, config_.var2d);
+                    line.uncertainty = std::min(u1, u2);
+                    results[conn_id].push_back(std::make_tuple(line, -1.0, std::make_pair(ng_img_id, ng_line_id)));
+                }
+            }
 
-        // triangulation with weak epipolar constraints test
-        Line3d line;
-        if (!config_.use_endpoints_triangulation)
-            line = triangulate(l1, view1, l2, view2);
-        else
-            line = triangulate_endpoints(l1, view1, l2, view2);
-        if (line.sensitivity(view1) > config_.sensitivity_threshold && line.sensitivity(view2) > config_.sensitivity_threshold)
-            line.score = -1;
-        if (line.score > 0) {
-            double u1 = line.computeUncertainty(view1, config_.var2d);
-            double u2 = line.computeUncertainty(view2, config_.var2d);
-            line.uncertainty = std::min(u1, u2);
-            results[conn_id].push_back(std::make_tuple(line, -1.0, std::make_pair(ng_img_id, ng_line_id)));
+            // Step 1.2 one point triangulation
+            if (!config_.disable_one_point_triangulation && !points.empty()) {
+                for (const V3D& p: points) {
+                    Line3d line = triangulate_with_one_point(l1, view1, l2, view2, p);
+                    if (line.score > 0) {
+                        double u1 = line.computeUncertainty(view1, config_.var2d);
+                        double u2 = line.computeUncertainty(view2, config_.var2d);
+                        line.uncertainty = std::min(u1, u2);
+                        results[conn_id].push_back(std::make_tuple(line, -1.0, std::make_pair(ng_img_id, ng_line_id)));
+                    }
+                }
+            }
         }
 
-        // triangulation with VPs
-        if (config_.use_vp) {
+        // Step 2: triangulation with VPs
+        if (config_.use_vp && !config_.disable_vp_triangulation) {
             // vp1
             if (vpresults_[img_id].HasVP(line_id)) {
                 V3D direc = getDirectionFromVP(vpresults_[img_id].GetVP(line_id), view1);
@@ -206,6 +246,40 @@ void BaseLineTriangulator::triangulateOneNode(const int img_id, const int line_i
                     line.uncertainty = std::min(u1, u2);
                     results[conn_id].push_back(std::make_tuple(line, -1.0, std::make_pair(ng_img_id, ng_line_id)));
                 }
+            }
+        }
+
+        // Step 3: line triangulation
+        if (!config_.disable_algebraic_triangulation) {
+            // test degeneracy by ray-plane angles
+            V3D n2 = getNormalDirection(l2, view2);
+            V3D ray1_start = view1.ray_direction(l1.start);
+            double angle_start = 90 - acos(std::abs(n2.dot(ray1_start))) * 180.0 / M_PI;
+            if (angle_start < config_.line_tri_angle_threshold)
+                continue;
+            V3D ray1_end = view1.ray_direction(l1.end);
+            double angle_end = 90 - acos(std::abs(n2.dot(ray1_end))) * 180.0 / M_PI;
+            if (angle_end < config_.line_tri_angle_threshold)
+                continue;
+
+            // test weak epipolar constraints
+            double IoU = compute_epipolar_IoU(l1, view1, l2, view2);
+            if (IoU < config_.IoU_threshold)
+                continue;
+
+            // triangulation with weak epipolar constraints test
+            Line3d line;
+            if (!config_.use_endpoints_triangulation)
+                line = triangulate(l1, view1, l2, view2);
+            else
+                line = triangulate_endpoints(l1, view1, l2, view2);
+            if (line.sensitivity(view1) > config_.sensitivity_threshold && line.sensitivity(view2) > config_.sensitivity_threshold)
+                line.score = -1;
+            if (line.score > 0) {
+                double u1 = line.computeUncertainty(view1, config_.var2d);
+                double u2 = line.computeUncertainty(view2, config_.var2d);
+                line.uncertainty = std::min(u1, u2);
+                results[conn_id].push_back(std::make_tuple(line, -1.0, std::make_pair(ng_img_id, ng_line_id)));
             }
         }
     }

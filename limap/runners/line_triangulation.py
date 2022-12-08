@@ -8,6 +8,7 @@ import limap.base as _base
 import limap.merging as _mrg
 import limap.triangulation as _tri
 import limap.vplib as _vplib
+import limap.pointsfm as _psfm
 import limap.optimize as _optim
 import limap.runners as _runners
 import limap.util.io as limapio
@@ -36,8 +37,9 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     ##########################################################
     # [A] sfm metainfos (neighbors, ranges)
     ##########################################################
+    sfminfos_colmap_folder = None
     if neighbors is None:
-        neighbors, ranges = _runners.compute_sfminfos(cfg, imagecols)
+        sfminfos_colmap_folder, neighbors, ranges = _runners.compute_sfminfos(cfg, imagecols)
     else:
         limapio.save_txt_metainfos(os.path.join(cfg["dir_save"], "metainfos.txt"), neighbors, ranges)
         neighbors = imagecols.update_neighbors(neighbors)
@@ -61,11 +63,35 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     ##########################################################
     # [D] multi-view triangulation
     ##########################################################
-    print('Start multi-view triangulation...')
     Triangulator = _tri.GlobalLineTriangulator(cfg["triangulation"])
     Triangulator.SetRanges(ranges)
     all_2d_lines = _base.get_all_lines_2d(all_2d_segs)
     Triangulator.Init(all_2d_lines, imagecols)
+    # get 2d bipartites from pointsfm model
+    if cfg["triangulation"]["use_pointsfm"]["enable"]:
+        if cfg["triangulation"]["use_pointsfm"]["colmap_folder"] is None:
+            colmap_model_path = None
+            # check if colmap model exists from sfminfos computation
+            if sfminfos_colmap_folder is not None:
+                colmap_model_path = os.path.join(sfminfos_colmap_folder, "sparse")
+                if not _psfm.check_exists_colmap_model(colmap_model_path):
+                    colmap_model_path = None
+            # retriangulate
+            if colmap_model_path is None:
+                colmap_output_path = os.path.join(cfg["dir_save"], "colmap_outputs_junctions")
+                input_neighbors = None
+                if cfg["triangulation"]["use_pointsfm"]["use_neighbors"]:
+                    input_neighbors = neighbors
+                _psfm.run_colmap_sfm_with_known_poses(cfg["sfm"], imagecols, output_path=colmap_output_path, skip_exists=cfg["skip_exists"], neighbors=input_neighbors)
+                colmap_model_path = os.path.join(colmap_output_path, "sparse")
+        else:
+            colmap_model_path = cfg["triangulation"]["use_pointsfm"]["colmap_folder"]
+        all_bpt2ds, sfm_points = _runners.compute_2d_bipartites_from_colmap(cfg["structures"]["bpt2d"], colmap_model_path, imagecols, all_2d_lines)
+        Triangulator.SetBipartites2d(all_bpt2ds)
+        if cfg["triangulation"]["use_pointsfm"]["use_triangulated_points"]:
+            Triangulator.SetSfMPoints(sfm_points)
+    # triangulate
+    print('Start multi-view triangulation...')
     for img_id in tqdm(imagecols.get_img_ids()):
         if cfg["triangulation"]["use_exhaustive_matcher"]:
             Triangulator.TriangulateImageExhaustiveMatch(img_id, neighbors[img_id])

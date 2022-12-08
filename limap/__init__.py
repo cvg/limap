@@ -15,9 +15,10 @@ from . import evaluation
 from . import fitting
 from . import util
 from . import visualize
-
-from . import runners
+from . import structures
 
 from . import features
 from . import optimize
+
+from . import runners
 

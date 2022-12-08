@@ -62,7 +62,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     # [A] sfm metainfos (neighbors, ranges)
     ##########################################################
     if neighbors is None:
-        neighbors, ranges = _runners.compute_sfminfos(cfg, imagecols)
+        _, neighbors, ranges = _runners.compute_sfminfos(cfg, imagecols)
     else:
         neighbors = imagecols.update_neighbors(neighbors)
         for img_id, neighbor in neighbors.items():
@@ -95,7 +95,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
         linetracks = _mrg.filtertracksbyreprojection(linetracks, imagecols, cfg["filtering2d"]["th_angular_2d"], cfg["filtering2d"]["th_perp_2d"], num_outliers=0)
 
     ##########################################################
-    # [E] geometric refinement
+    # [E] [disabled by default] geometric refinement
     ##########################################################
     if not cfg["refinement"]["disable"]:
         reconstruction = _base.LineReconstruction(linetracks, imagecols)

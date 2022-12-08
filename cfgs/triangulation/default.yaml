@@ -113,6 +113,15 @@ triangulation:
         min_length: 40
         inlier_threshold: 1.0
         min_num_supports: 10
+    use_pointsfm:
+        enable: false
+        colmap_folder: null
+        use_triangulated_points: true
+        use_neighbors: false
+    disable_many_points_triangulation: false
+    disable_one_point_triangulation: false
+    disable_algebraic_triangulation: false
+    disable_vp_triangulation: false
 
 ##############################
 # geometric refinement config
@@ -129,4 +138,12 @@ refinement:
     vp_multiplier: 0.1
     use_heatmap: False 
     use_feature: False
+
+##############################
+# structures config
+structures:
+    bpt2d:
+        threshold_keypoints: 2.0
+        threshold_intersection: 2.0
+        threshold_merge_junctions: 2.0
 

@@ -41,6 +41,10 @@ void bind_triangulator(py::module &m) {
         .def_readwrite("add_halfpix", &TriangulatorConfig::add_halfpix) \
         .def_readwrite("use_vp", &TriangulatorConfig::use_vp) \
         .def_readwrite("use_endpoints_triangulation", &TriangulatorConfig::use_endpoints_triangulation) \
+        .def_readwrite("disable_many_points_triangulation", &TriangulatorConfig::disable_many_points_triangulation) \
+        .def_readwrite("disable_one_point_triangulation", &TriangulatorConfig::disable_one_point_triangulation) \
+        .def_readwrite("disable_algebraic_triangulation", &TriangulatorConfig::disable_algebraic_triangulation) \
+        .def_readwrite("disable_vp_triangulation", &TriangulatorConfig::disable_vp_triangulation) \
         .def_readwrite("min_length_2d", &TriangulatorConfig::min_length_2d) \
         .def_readwrite("line_tri_angle_threshold", &TriangulatorConfig::line_tri_angle_threshold) \
         .def_readwrite("IoU_threshold", &TriangulatorConfig::IoU_threshold) \
@@ -65,6 +69,8 @@ void bind_triangulator(py::module &m) {
         .def("Init", &Triangulator::Init) \
         .def("TriangulateImage", &Triangulator::TriangulateImage) \
         .def("TriangulateImageExhaustiveMatch", &Triangulator::TriangulateImageExhaustiveMatch) \
+        .def("SetBipartites2d", &Triangulator::SetBipartites2d) \
+        .def("SetSfMPoints", &Triangulator::SetSfMPoints) \
         .def("ComputeLineTracks", &Triangulator::ComputeLineTracks) \
         .def("GetVPResult", &Triangulator::GetVPResult) \
         .def("GetVPResults", &Triangulator::GetVPResults) \

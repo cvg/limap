@@ -7,5 +7,6 @@ LIMAP_ADD_SOURCES(
     jlinkage.h jlinkage.cc
 
     vptrack.h vptrack.cc
+    global_vptrack_constructor.h global_vptrack_constructor.cc
 )
 

@@ -9,8 +9,9 @@
 
 #include "vplib/vpbase.h"
 #include "vplib/jlinkage.h"
-
 #include "vplib/vptrack.h"
+#include "vplib/global_vptrack_constructor.h"
+
 namespace limap {
 
 void bind_vpdetector(py::module &m) {
@@ -86,11 +87,32 @@ void bind_vptrack(py::module& m) {
         .def_readwrite("direction", &VPTrack::direction)
         .def_readwrite("supports", &VPTrack::supports)
         .def("length", &VPTrack::length);
+    
+    m.def("MergeVPTracksByDirection", &MergeVPTracksByDirection, py::arg("tracks"), py::arg("th_angle_merge") = 1.0);
+}
+
+void bind_global_vptrack_constructor(py::module& m) {
+    using namespace vplib;
+
+    py::class_<GlobalVPTrackConstructorConfig>(m, "GlobalVPTrackConstructorConfig")
+        .def(py::init<>())
+        .def(py::init<py::dict>())
+        .def_readwrite("min_common_lines", &GlobalVPTrackConstructorConfig::min_common_lines)
+        .def_readwrite("th_angle_verify", &GlobalVPTrackConstructorConfig::th_angle_verify)
+        .def_readwrite("min_track_length", &GlobalVPTrackConstructorConfig::min_track_length);
+
+    py::class_<GlobalVPTrackConstructor>(m, "GlobalVPTrackConstructor")
+        .def(py::init<>())
+        .def(py::init<const GlobalVPTrackConstructorConfig&>())
+        .def(py::init<py::dict>())
+        .def("Init", &GlobalVPTrackConstructor::Init)
+        .def("ClusterLineTracks", &GlobalVPTrackConstructor::ClusterLineTracks);
 }
 
 void bind_vplib(py::module& m) {
     bind_vpdetector(m);
     bind_vptrack(m);
+    bind_global_vptrack_constructor(m);
 }
 
 } // namespace limap
