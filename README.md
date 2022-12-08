@@ -21,14 +21,8 @@ python -m pip install -r requirements.txt
 
 ## Installation
 
-You can install ``limap`` package with:
 ```
-python setup.py develop
-```
-
-or you can also use ``pip`` alternatively:
-```
-python -m pip install -ve . 
+python -m pip install -Ive . 
 ```
 
 ## Quickstart
