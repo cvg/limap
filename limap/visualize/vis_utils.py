@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+import copy
 
 def random_color():
     r = int(255 * np.random.rand())
@@ -14,6 +14,7 @@ def random_color():
 
 
 def draw_points(image, points, color=None, thickness=1):
+    image = copy.deepcopy(image)
     for p in points:
         c = random_color() if color is None else color
         pos_x, pos_y = int(round(p[0])), int(round(p[1]))
@@ -22,6 +23,7 @@ def draw_points(image, points, color=None, thickness=1):
 
 
 def draw_segments(image, segments, color=None, thickness=1, endpoints=True):
+    image = copy.deepcopy(image)
     for s in segments:
         c = random_color() if color is None else color
         p1 = (int(s[0]), int(s[1]))
@@ -36,6 +38,7 @@ def draw_segments(image, segments, color=None, thickness=1, endpoints=True):
 def draw_salient_segments(image, segments, saliency, color1=(0, 255, 0), color2=(0, 0, 255), thickness=1,
                           endpoints=True):
     assert len(segments) == len(saliency)
+    image = copy.deepcopy(image)
     max_saliency, min_saliency = np.max(saliency), np.min(saliency)
     for s, s_saliency in zip(segments, saliency):
         r = (s_saliency - min_saliency) / (max_saliency - min_saliency)
@@ -52,6 +55,7 @@ def draw_salient_segments(image, segments, saliency, color1=(0, 255, 0), color2=
 
 
 def draw_multiscale_segments(img, segs, color=None, endpoints=True, thickness=2):
+    img = copy.deepcopy(img)
     for s in segs:
         mycolor = random_color() if color is None else color
         octave, l = s[0]

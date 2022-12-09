@@ -16,6 +16,7 @@ def parse_args():
     arg_parser.add_argument('--use_robust_ranges', action='store_true', help="whether to use computed robust ranges")
     arg_parser.add_argument('--scale', type=float, default=1.0, help="scaling both the lines and the camera geometry")
     arg_parser.add_argument('--cam_scale', type=float, default=1.0, help="scale of the camera geometry")
+    arg_parser.add_argument('--output_dir', type=str, default=None, help="if set, save the scaled lines in obj format")
     args = arg_parser.parse_args()
     return args
 
@@ -51,6 +52,8 @@ def main(args):
             raise ValueError("Error! Input file {0} is not valid".format(args.imagecols))
         imagecols = _base.ImageCollection(limapio.read_npy(args.imagecols).item())
         vis_reconstruction(linetracks, imagecols, mode=args.mode, n_visible_views=args.n_visible_views, ranges=ranges, scale=args.scale, cam_scale=args.cam_scale)
+    if args.output_dir is not None:
+        limapio.save_obj(args.output_dir, lines)
 
 if __name__ == '__main__':
     args = parse_args()
