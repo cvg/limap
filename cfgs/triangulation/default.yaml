@@ -116,6 +116,7 @@ triangulation:
     use_pointsfm:
         enable: false
         colmap_folder: null
+        reuse_sfminfos_colmap: true
         use_triangulated_points: true
         use_neighbors: true 
     disable_many_points_triangulation: false

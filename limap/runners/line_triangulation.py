@@ -72,7 +72,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
         if cfg["triangulation"]["use_pointsfm"]["colmap_folder"] is None:
             colmap_model_path = None
             # check if colmap model exists from sfminfos computation
-            if sfminfos_colmap_folder is not None:
+            if cfg["triangulation"]["use_pointsfm"]["reuse_sfminfos_colmap"] and sfminfos_colmap_folder is not None:
                 colmap_model_path = os.path.join(sfminfos_colmap_folder, "sparse")
                 if not _psfm.check_exists_colmap_model(colmap_model_path):
                     colmap_model_path = None
