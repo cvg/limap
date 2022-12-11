@@ -45,12 +45,12 @@ class SuperPointEndpointsExtractor(BaseDetector):
             - the line score of shape [N] (NFA * sqrt(line_length))
             - the descriptor of each endpoints of shape [256, N*2]
         """
-        lines = segs[:, :4].reshape(-1, 2)
-        if len(lines) == 0:
+        if len(segs) == 0:
             return {
-                'image_shape': img.shape, 'lines': lines,
+                'image_shape': img.shape, 'lines': np.array([]),
                 'lines_score': np.zeros((0,)),
                 'endpoints_desc': np.zeros((256, 0))}
+        lines = segs[:, :4].reshape(-1, 2)
         scores = segs[:, -1] * np.sqrt(np.linalg.norm(segs[:, :2]
                                                       - segs[:, 2:4], axis=1))
         scores /= np.amax(scores) + 1e-8
