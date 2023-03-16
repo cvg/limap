@@ -17,6 +17,9 @@ def get_detector(cfg_detector, max_num_2d_segs=3000, do_merge_lines=False):
     elif method == "tp_lsd":
         from .TP_LSD import TPLSDDetector
         return TPLSDDetector(options)
+    elif method == "deeplsd":
+        from .DeepLSD import DeepLSDDetector
+        return DeepLSDDetector(options)
     else:
         raise NotImplementedError
 

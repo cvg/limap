@@ -64,6 +64,10 @@ The following line detectors are currently supported:
 - [SOLD2](https://github.com/cvg/SOLD2)
 - [HAWPv3](https://github.com/cherubicXN/hawp)
 - [TP-LSD](https://github.com/Siyuada7/TP-LSD)
+- [DeepLSD](https://github.com/cvg/DeepLSD) (separate installation needed)
+
+If you wish to use DeepLSD, you will need to install it with the instructions of their [README](https://github.com/cvg/DeepLSD/blob/main/README.md).
+
 
 The following line descriptors/matchers are currently supported:
 - [LBD](https://github.com/iago-suarez/pytlbd)

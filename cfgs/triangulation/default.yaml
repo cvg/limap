@@ -59,6 +59,7 @@ var2d: # in pixels
     lsd: 2.0
     hawpv3: 5.0
     tp_lsd: 5.0
+    deeplsd: 4.0
 
 ##############################
 # triangulation config
