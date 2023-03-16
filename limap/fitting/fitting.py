@@ -1,9 +1,22 @@
 from _limap import _base
-from _limap import _fitting as _fit
+from _limap import _estimators
+from _limap import _fitting
 
 import os, sys
 import numpy as np
 from bresenham import bresenham
+from hloc.localize_inloc import interpolate_scan
+
+def estimate_seg3d(points, ransac_th=0.75, min_percentage_inliers=0.6):
+    options = _estimators.LORansacOptions()
+    options.squared_inlier_threshold_ = ransac_th * ransac_th
+    result = _fitting.Fit3DPoints(points, options)
+    line, stats = result[0], result[1]
+    if stats.inlier_ratio < min_percentage_inliers:
+        return None
+    else:
+        start_3dpt, end_3dpt = line.start, line.end
+        return start_3dpt, end_3dpt
 
 def estimate_seg3d_from_depth(seg2d, depth, camview, ransac_th=0.75, min_percentage_inliers=0.6, var2d=5.0):
     K, R, T = camview.K(), camview.R(), camview.T()
@@ -27,13 +40,33 @@ def estimate_seg3d_from_depth(seg2d, depth, camview, ransac_th=0.75, min_percent
     # fitting
     uncertainty = var2d * np.median(seg1_depths) / ((K[0, 0] + K[1, 1]) / 2.0)
     ransac_th = ransac_th * uncertainty
-    options = _fit.LORansacOptions()
-    options.squared_inlier_threshold_ = ransac_th * ransac_th
-    result = _fit.Fit3DPoints(points, options)
-    line, stats = result[0], result[1]
-    if stats.inlier_ratio < min_percentage_inliers:
-        return None
-    else:
-        start_3dpt, end_3dpt = line.start, line.end
-        return start_3dpt, end_3dpt
+    return estimate_seg3d(points, ransac_th, min_percentage_inliers)
 
+def estimate_seg3d_from_points3d(seg2d, p3ds, camview, image_name, inloc_dataset=None, ransac_th=0.75, min_percentage_inliers=0.6, var2d=5.0):
+    h, w = camview.h(), camview.w()
+    K, R, T = camview.K(), camview.R(), camview.T()
+
+    # get points and depths
+    seg1_pts = np.linspace(seg2d[0:2], seg2d[2:4], int(np.linalg.norm(seg2d[2:4]-seg2d[0:2]) * 2)).T
+    valid_pxs = (seg1_pts[0] > 0) & (seg1_pts[1] > 0) & (seg1_pts[0] < w-1) & (seg1_pts[1] < h-1)
+    seg1_pts = seg1_pts[:, valid_pxs].T
+    seg1_p3ds, valid = interpolate_scan(p3ds, seg1_pts)
+    seg1_p3ds = seg1_p3ds[valid]
+    seg1_ray_depths = np.linalg.norm(seg1_p3ds, axis=1)
+
+    if inloc_dataset is not None:
+        from hloc.localize_inloc import get_scan_pose
+        Tr = get_scan_pose(inloc_dataset, image_name)
+        points = (Tr[:3, :3] @ seg1_p3ds.T + Tr[:3, -1:])
+    else:
+        points = (R.T @ seg1_p3ds.T) - (R.T @ T)[:, None].repeat(seg1_p3ds.T.shape[1], 1)
+
+    if points.shape[1] <= 6:
+        return None
+    
+    # TODO: test the best way to estimate uncertainty here
+    uncertainty = var2d * np.median(seg1_ray_depths) / (0.7 * max(h, w))
+    ransac_th = ransac_th * uncertainty
+
+    # fitting
+    return estimate_seg3d(points, ransac_th, min_percentage_inliers)

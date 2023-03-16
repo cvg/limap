@@ -1,0 +1,35 @@
+---
+##############################
+# global config
+max_image_dim: -1
+visualize: False
+load_undistort: True
+n_jobs: 1
+
+localization:
+    2d_matcher: "sold2" 
+    epipolar_filter: False 
+    IoU_threshold: 0.2
+    reprojection_filter: null  
+    ransac: 
+        method: "hybrid"
+        thres: 5
+        thres_point: 5
+        thres_line: 5
+    line_cost_func: "PerpendicularDist"
+
+line2d:
+    detector: 
+        skip_exists: True
+        method: "lsd"
+    extractor:
+        skip_exists: True
+        method: "sold2"  
+    matcher:
+        skip_exists: True
+        method: "sold2"  
+
+sfm:
+    hloc:
+        descriptor: "superpoint_inloc"
+        matcher: "superglue"

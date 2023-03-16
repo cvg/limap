@@ -3,6 +3,7 @@
 ## Dependencies
 * CMake >= 3.17
 * COLMAP [[Guide](https://colmap.github.io/install.html)]
+* PoseLib [[Guide](misc/install_poselib.md)]
 * HDF5
 ```bash
 sudo apt-get install libhdf5-dev
@@ -15,7 +16,9 @@ sudo apt-get install libopencv-dev libopencv-contrib-dev libarpack++2-dev libarp
 * Python 3.9 + required packages
 ```bash
 git submodule update --init --recursive
-python -m pip install torch==1.11.0 torchvision==0.12.0 # Refer to https://pytorch.org/get-started/previous-versions/ to install packages that are compatible with your CUDA
+
+# Refer to https://pytorch.org/get-started/previous-versions/ to install pytorch compatible with your CUDA
+python -m pip install torch==1.11.0 torchvision==0.12.0 
 python -m pip install -r requirements.txt
 ```
 

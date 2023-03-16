@@ -51,6 +51,7 @@ endif()
 ################################################################################
 find_package(Eigen3 3.3 REQUIRED)
 find_package(COLMAP REQUIRED)
+find_package(PoseLib REQUIRED)
 
 ################################################################################
 # Add sources
@@ -74,6 +75,7 @@ set(LIMAP_EXTERNAL_LIBRARIES
   ${COLMAP_LIBRARIES}
   ${HDF5_C_LIBRARIES}
   ${Boost_LIBRARIES}
+  PoseLib::PoseLib
 )
 
 if(OPENMP_FOUND)
@@ -97,6 +99,7 @@ link_directories(${LIMAP_LINK_DIRS})
 
 add_subdirectory(third-party)
 include_directories(${JLINKAGE_INCLUDE_DIRS})
+include_directories(${POSELIB_INCLUDE_DIRS})
 include_directories(${RANSACLIB_INCLUDE_DIRS})
 add_subdirectory(limap)
 
@@ -117,5 +120,6 @@ LIMAP_ADD_SOURCE_DIR(limap/evaluation BASE_SRCS *.h *.cc)
 LIMAP_ADD_SOURCE_DIR(limap/structures BASE_SRCS *.h *.cc)
 LIMAP_ADD_SOURCE_DIR(limap/optimize BASE_SRCS *.h *.cc)
 LIMAP_ADD_SOURCE_DIR(limap/optimize/line_refinement BASE_SRCS *.h *.cc)
+LIMAP_ADD_SOURCE_DIR(limap/optimize/line_localization BASE_SRCS *.h *.cc)
 LIMAP_ADD_SOURCE_DIR(limap/optimize/line_bundle_adjustment BASE_SRCS *.h *.cc)
 

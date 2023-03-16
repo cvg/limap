@@ -1,0 +1,215 @@
+---
+##############################
+# global config
+cfg_type: "lineloc"
+load_meta: False
+load_det: False 
+load_match: False
+load_fit: False 
+load_undistort: False 
+use_tmp: False
+n_visible_views: 4
+n_neighbors: 20 
+use_cuda: True
+visualize: True
+max_image_dim: 1600
+skip_exists: False
+output_dir: null 
+output_folder: "finaltracks"
+load_dir: null
+n_jobs: -1 # for undistortion
+undistortion_output_dir: "undistorted_images"
+resized_output_dir: "resized_images"
+
+##############################
+# localization config
+localization:
+    2d_matcher: "sold2" # ["epipolar", "sold2", "superglue_endpoints"] Other configs for superglue_endpoints are the same as in "line2d" section
+    epipolar_filter: False # No use for epipolar matcher
+    IoU_threshold: 0.2
+    reprojection_filter: null  # [null, "Perpendicular", "Midpoint", "Midpoint_Perpendicular"]
+    ransac: 
+        method: "hybrid"    # [null, "ransac", "solver", "hybrid"]
+        thres: 10.0         # Only for normal & solver
+        thres_point: 10.0
+        thres_line: 10.0
+        weight_point: 1.0   # data type weights for scoring
+        weight_line: 1.0    # data type weights for scoring
+        final_least_squares: True
+        min_num_iterations: 100
+        solver_flags: [True, True, True, True]
+    line_cost_func: "PerpendicularDist"
+    line_weight: 1.0        # weight for optimization (cost function)
+    hloc:
+        skip_exists: False
+    skip_exists: False
+
+##############################
+# fitting config
+fitting:
+    var2d: -1.0 # depends on the detector
+    ransac_th: 0.75
+    min_percentage_inliers: 0.9
+    n_jobs: -1
+
+##############################
+# merging config
+merging:
+    do_merging: False
+    var2d: -1.0 # depends on the detector
+    linker3d:
+        score_th: 0.5
+        th_angle: 8.0
+        th_overlap: 0.01
+        th_smartoverlap: 0.1
+        th_smartangle: 1.0
+        th_perp: 0.75
+        th_innerseg: 0.75
+    linker2d:
+        score_th: 0.5
+        th_angle: 5.0
+        th_perp: 2.0 # in pixels
+        th_overlap: 0.05
+remerging:
+    disable: False
+    linker3d:
+        score_th: 0.5
+        th_angle: 5.0
+        th_overlap: 0.001
+        th_smartoverlap: 0.1
+        th_smartangle: 1.0
+        th_perp: 0.5
+        th_innerseg: 0.5
+filtering2d:
+    th_angular_2d: 8.0
+    th_perp_2d: 5.0 # in pixels
+
+##############################
+# sfm config
+sfm: 
+    colmap_output_path: "colmap_outputs"
+    reuse: False
+    min_triangulation_angle: 1.0
+    neighbor_type: "dice" # ["overlap", "iou", "dice"]
+    ranges:
+        range_robust: [0.05, 0.95]
+        k_stretch: 1.25
+    hloc:
+        descriptor: "superpoint_aachen"
+        matcher: "NN-superpoint"
+
+##############################
+# line detection and matching config
+line2d:
+    max_num_2d_segs: 3000
+    do_merge_lines: False 
+    visualize: False
+    save_l3dpp: False
+    compute_descinfo: False
+    detector: 
+        method: "lsd" # ["lsd", "sold2", "hawpv3", "tp_lsd"]
+        skip_exists: False
+    extractor: 
+        method: "sold2" # ["sold2", "lbd", "l2d2", "linetr", "superpoint_endpoints"]
+        skip_exists: False
+    matcher:
+        method: "sold2" # ["sold2", "lbd", "l2d2", "linetr", "nn_endpoints", "superglue_endpoints"]
+        n_jobs: 1
+        topk: 10
+        skip_exists: False
+        superglue:
+            weights: "outdoor" # ["indoor", "outdoor"] for selecting superglue models
+var2d: # in pixels
+    sold2: 5.0
+    lsd: 2.0
+    hawpv3: 5.0
+    tp_lsd: 5.0
+
+##############################
+# triangulation config
+triangulation:
+    use_exhaustive_matcher: False
+    use_endpoints_triangulation: False
+    add_halfpix: False
+    min_length_2d: 0.0 # in pixels
+    var2d: -1.0 # depending on the detector
+    line_tri_angle_threshold: 1.0
+    IoU_threshold: 0.1
+    sensitivity_threshold: 70.0
+    fullscore_th: 1.0
+    max_valid_conns: 1000
+    min_num_outer_edges: 0
+    merging_strategy: "greedy"
+    num_outliers_aggregator: 2
+    debug_mode: False
+    linker2d_config:
+        score_th: 0.5
+        th_angle: 5.0
+        th_perp: 2.0 # in pixels
+        th_overlap: 0.05
+    linker3d_config:
+        score_th: 0.5
+        th_angle: 10.0
+        th_overlap: 0.05
+        th_smartoverlap: 0.1
+        th_smartangle: 2.0
+        th_perp: 1.0
+        th_innerseg: 1.0
+        th_scaleinv: 0.015
+    remerging:
+        disable: False
+        linker3d:
+            score_th: 0.5
+            th_angle: 5.0
+            th_overlap: 0.001
+            th_smartoverlap: 0.1
+            th_smartangle: 1.0
+            th_perp: 1.0
+            th_innerseg: 1.0
+    filtering2d:
+        th_angular_2d: 8.0
+        th_perp_2d: 5.0 # in pixels
+        th_sv_angular_3d: 75.0 # for sensitivity
+        th_sv_num_supports: 3
+        th_overlap: 0.5
+        th_overlap_num_supports: 3
+    use_vp: False 
+    vpdet_config:
+        min_length: 40
+        inlier_threshold: 1.0
+        min_num_supports: 10
+    use_pointsfm:
+        enable: false
+        colmap_folder: null
+        reuse_sfminfos_colmap: true
+        use_triangulated_points: true
+        use_neighbors: true 
+    disable_many_points_triangulation: false
+    disable_one_point_triangulation: false
+    disable_algebraic_triangulation: false
+    disable_vp_triangulation: false
+
+##############################
+# geometric refinement config
+refinement:
+    disable: False
+    constant_intrinsics: True
+    constant_pose: True
+    constant_line: False
+    min_num_images: 4
+    num_outliers_aggregator: 2
+    use_geometric: True
+    geometric_alpha: 10.0
+    use_vp: False 
+    vp_multiplier: 0.1
+    use_heatmap: False 
+    use_feature: False
+
+##############################
+# structures config
+structures:
+    bpt2d:
+        threshold_keypoints: 2.0
+        threshold_intersection: 2.0
+        threshold_merge_junctions: 2.0
+

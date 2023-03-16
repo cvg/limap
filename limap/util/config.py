@@ -64,6 +64,9 @@ def update_config(cfg, unknown, shortcuts):
             if val is not None:
                 v = argtype(v)
 
+        if isinstance(v, str) and (v.lower() == 'none' or v.lower() == 'null'):
+            v = None
+
         # modify value
         n_lvls = len(keys)
         if n_lvls == 1:

@@ -1,0 +1,38 @@
+---
+##############################
+# global config
+max_image_dim: 1600
+visualize: False
+n_jobs: 1
+
+localization:
+    2d_matcher: "sold2" 
+    epipolar_filter: False 
+    IoU_threshold: 0.2
+    reprojection_filter: null  
+    ransac: 
+        method: "hybrid"
+        thres: 12
+        thres_point: 12
+        thres_line: 12
+    line_cost_func: "PerpendicularDist"
+
+line2d:
+    detector: 
+        skip_exists: True
+        method: "lsd"
+    extractor:
+        method: "sold2"
+        skip_exists: True
+    matcher:
+        method: "sold2"
+        skip_exists: True
+        superglue:
+            weights: "outdoor"
+
+fitting:
+    n_jobs: 4
+    ransac_th: 0.6
+
+merging:
+    do_merging: False

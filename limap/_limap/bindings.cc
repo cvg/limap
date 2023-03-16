@@ -17,6 +17,7 @@ namespace py = pybind11;
 #include "vplib/bindings.cc"
 #include "evaluation/bindings.cc"
 #include "fitting/bindings.cc"
+#include "estimators/bindings.cc"
 #include "optimize/bindings.cc"
 #include "structures/bindings.cc"
 #ifdef INTERPOLATION_ENABLED
@@ -34,6 +35,7 @@ void bind_undistortion(py::module &);
 void bind_vplib(py::module &);
 void bind_evaluation(py::module &);
 void bind_fitting(py::module &);
+void bind_estimators(py::module &);
 void bind_optimize(py::module &);
 void bind_structures(py::module &);
 #ifdef INTERPOLATION_ENABLED
@@ -57,6 +59,7 @@ PYBIND11_MODULE(_limap, m) {
     pybind11::module_ _vplib = m.def_submodule("_vplib");
     pybind11::module_ _eval = m.def_submodule("_evaluation");
     pybind11::module_ _fitting = m.def_submodule("_fitting");
+    pybind11::module_ _estimators = m.def_submodule("_estimators");
     pybind11::module_ _optim = m.def_submodule("_optimize");
     pybind11::module_ _structures = m.def_submodule("_structures");
 
@@ -70,6 +73,7 @@ PYBIND11_MODULE(_limap, m) {
     bind_vplib(_vplib);
     bind_evaluation(_eval);
     bind_fitting(_fitting);
+    bind_estimators(_estimators);
     bind_optimize(_optim);
     bind_structures(_structures);
 #ifdef INTERPOLATION_ENABLED

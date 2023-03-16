@@ -1,0 +1,118 @@
+import os, sys
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+import limap.util.io as limapio
+import limap.util.config as cfgutils
+import limap.runners as _runners
+import argparse
+import logging
+from tqdm import tqdm
+from pathlib import Path
+from utils import InLocP3DReader, read_dataset_inloc, get_result_filenames, run_hloc_inloc, parse_retrieval
+
+formatter = logging.Formatter(
+    fmt='[%(asctime)s %(name)s %(levelname)s] %(message)s',
+    datefmt='%Y/%m/%d %H:%M:%S')
+handler = logging.StreamHandler()
+handler.setFormatter(formatter)
+handler.setLevel(logging.INFO)
+
+logger = logging.getLogger("JointLoc")
+logger.setLevel(logging.INFO)
+logger.addHandler(handler)
+logger.propagate = False
+
+def parse_config():
+    arg_parser = argparse.ArgumentParser(description='run localization with point and lines')
+    arg_parser.add_argument('-c', '--config_file', type=str, default='cfgs/localization/inloc.yaml', help='config file')
+    arg_parser.add_argument('--default_config_file', type=str, default='cfgs/localization/default.yaml', help='default config file')
+    arg_parser.add_argument('--dataset', type=Path, required=True, help='inloc dataset path')
+    arg_parser.add_argument('--info_path', type=str, default=None, help='load precomputed info')
+    arg_parser.add_argument('--outputs', type=Path, default='outputs/localization/inloc',
+                        help='Path to the output directory, default: %(default)s')
+
+    arg_parser.add_argument('--num_loc', type=int, default=40,
+                        help='Number of image pairs for loc, default: %(default)s')
+    arg_parser.add_argument('--num_skip', type=int, default=15,
+                        help='skip database images with too few matches, default: %(default)s')
+    arg_parser.add_argument('--no_temporal', action='store_false', dest='use_temporal', default=True,
+                        help='Whether use the temporal retrieved neighbor file of hloc')
+
+    args, unknown = arg_parser.parse_known_args()
+    cfg = cfgutils.load_config(args.config_file, default_path=args.default_config_file)
+    shortcuts = dict()
+    shortcuts['-nv'] = '--n_visible_views'
+    shortcuts['-nn'] = '--n_neighbors'
+    cfg = cfgutils.update_config(cfg, unknown, shortcuts)
+    if cfg["merging"]["do_merging"] and '--refinement.disable' not in unknown:
+        # disable refinement for fitnmerge
+        cfg["refinement"]["disable"] = True
+    cfg['info_path'] = args.info_path
+    cfg['n_neighbors_loc'] = args.num_loc
+    return cfg, args
+
+def main():
+    cfg, args = parse_config()
+    cfg['inloc_dataset'] = args.dataset # For reading camera poses for estimating 3D lines fron depth 
+    
+    # Output path for LIMAP results (tmp)
+    if cfg['output_dir'] is None:
+        cfg['output_dir'] = 'tmp/inloc'
+    cfg = _runners.setup(cfg)
+
+    # args.outputs is for localization-related results
+    args.outputs.mkdir(exist_ok=True, parents=True)
+
+    logger.info(f'Working on InLoc.')
+    pairs = Path('third-party/Hierarchical-Localization/pairs/inloc/')
+    loc_pairs = pairs / 'pairs-query-netvlad{}{}.txt'.format(args.num_loc, '-temporal' if args.use_temporal else '')  # top 40 retrieved by NetVLAD
+
+    imagecols, train_ids, query_ids, img_rel_names, scales = read_dataset_inloc(cfg, args.dataset, loc_pairs)
+    if cfg["max_image_dim"] != -1 and cfg["max_image_dim"] is not None:
+        imagecols.set_max_image_dim(cfg["max_image_dim"])
+
+    results_point, results_joint = get_result_filenames(cfg['localization'], args.use_temporal)
+    results_point, results_joint = args.outputs / results_point, args.outputs / results_joint
+
+    ##########################################################
+    # [A] hloc point-based localization
+    ##########################################################
+    poses, hloc_log_file = run_hloc_inloc(cfg, args.dataset, loc_pairs, results_point, args.num_skip, logger)
+
+    ##########################################################
+    # [B] LIMAP fitting for database line tracks
+    ##########################################################
+    imagecols_train = imagecols.subset_by_image_ids(train_ids)
+
+    # Only have tracks if we do fit&merge
+    finaltracks_dir = os.path.join(cfg["output_dir"], cfg["output_folder"])
+    if not cfg['skip_exists'] or not os.path.exists(finaltracks_dir) or not cfg["merging"]["do_merging"]:
+        logger.info("Running LIMAP fit&merge")
+        points_readers = {id: InLocP3DReader(imagecols.image_name(id)) for id in train_ids}
+        linetracks_db = _runners.line_fitting_with_3Dpoints(cfg, imagecols_train, points_readers, inloc_read_transformations=True)
+    else:
+        linetracks_db = limapio.read_folder_linetracks(finaltracks_dir)
+        logger.info(f"Loaded LIMAP triangulation result from {finaltracks_dir}")
+
+    ##########################################################
+    # [C] Localization with points and lines
+    ##########################################################
+    retrieval = parse_retrieval(loc_pairs)
+    img_id_to_name = {id: img_rel_names[id] for id in imagecols.get_img_ids()}
+    final_poses = _runners.line_localization(
+        cfg, imagecols, linetracks_db, hloc_log_file, train_ids, query_ids, retrieval, results_joint, 
+        poses, img_id_to_name, resize_scales=scales)
+
+    # Overwrite results with filename without prefix path
+    lines = []
+    for qid, fpose in zip(query_ids, final_poses):
+        name = img_id_to_name[qid]
+        fq, ft = fpose.qvec, fpose.tvec
+        line = ' '.join([name.split('/')[-1]] + [str(x) for x in fq] + [str(x) for x in ft]) + '\n'
+        lines.append(line)
+    with open(results_joint, 'w') as f:
+        f.writelines(lines)
+
+if __name__ == '__main__':
+    main()

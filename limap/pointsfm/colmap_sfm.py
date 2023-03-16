@@ -107,7 +107,7 @@ def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap'
     ### initialize sparse folder
     if skip_exists and os.path.exists(point_triangulation_path):
         print("[COLMAP] Skipping point triangulation")
-        return
+        return Path(point_triangulation_path)
     if os.path.exists(output_path):
         shutil.rmtree(output_path)
     if not os.path.exists(output_path):
@@ -152,3 +152,4 @@ def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap'
             colmap_images[img_id] = colmap_images[img_id]._replace(name = imagecols.image_name(img_id))
         colmap_utils.write_images_binary(colmap_images, fname_images_bin)
 
+    return Path(point_triangulation_path)
