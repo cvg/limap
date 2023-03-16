@@ -144,7 +144,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
         linetracks = [track for (track_id, track) in linetracks_map.items()]
 
     ### Filter out 0-length 3D lines
-    linetracks = [track for linetracks if track.line.length() > 0]
+    linetracks = [track for track in linetracks if track.line.length() > 0]
 
     ##########################################################
     # [F] output and visualization

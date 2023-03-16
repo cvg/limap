@@ -16,6 +16,7 @@ namespace py = pybind11;
 #include "base/camera_view.h"
 #include "base/image_collection.h"
 #include "base/linebase.h"
+#include "base/infinite_line.h"
 #include "base/linetrack.h"
 #include "base/line_dists.h"
 #include "base/line_linker.h"
@@ -194,6 +195,36 @@ void bind_linebase(py::module& m) {
 
     m.def("_GetLine2dVectorFromArray", &GetLine2dVectorFromArray);
     m.def("_GetLine3dVectorFromArray", &GetLine3dVectorFromArray);
+
+    py::class_<InfiniteLine2d>(m, "InfiniteLine2d")
+        .def(py::init<>())
+        .def(py::init<const V3D&>()) // coords
+        .def(py::init<const V2D&, const V2D&>()) // point + direction
+        .def(py::init<const Line2d&>())
+        .def_readonly("coords", &InfiniteLine2d::coords)
+        .def("point", &InfiniteLine2d::point)
+        .def("direction", &InfiniteLine2d::direction)
+        .def("point_projection", &InfiniteLine2d::point_projection)
+        .def("point_distance", &InfiniteLine2d::point_distance);
+
+    py::class_<InfiniteLine3d>(m, "InfiniteLine3d")
+        .def(py::init<>())
+        .def(py::init<const V3D&, const V3D&, bool>())
+        .def(py::init<const Line3d&>())
+        .def_readonly("d", &InfiniteLine3d::d)
+        .def_readonly("m", &InfiniteLine3d::m)
+        .def("point", &InfiniteLine3d::point)
+        .def("direction", &InfiniteLine3d::point)
+        .def("matrix", &InfiniteLine3d::point)
+        .def("point_projection", &InfiniteLine3d::point)
+        .def("point_distance", &InfiniteLine3d::point)
+        .def("projection", &InfiniteLine3d::point)
+        .def("unprojection", &InfiniteLine3d::point)
+        .def("project_from_infinite_line", &InfiniteLine3d::project_from_infinite_line)
+        .def("project_to_infinite_line", &InfiniteLine3d::project_to_infinite_line);
+
+    m.def("_GetLineSegmentFromInfiniteLine3d", py::overload_cast<const InfiniteLine3d&, const std::vector<CameraView>&, const std::vector<Line2d>&, const int>(&GetLineSegmentFromInfiniteLine3d), py::arg("inf_line"), py::arg("camviews"), py::arg("line2ds"), py::arg("num_outliers") = 2);
+    m.def("_GetLineSegmentFromInfiniteLine3d", py::overload_cast<const InfiniteLine3d&, const std::vector<Line3d>&, const int>(&GetLineSegmentFromInfiniteLine3d), py::arg("inf_line"), py::arg("line3ds"), py::arg("num_outliers") = 2);
 }
 
 void bind_linetrack(py::module& m) {
