@@ -1,0 +1,37 @@
+global_pl_association:
+    use_vp: True
+    print_summary: True 
+    constant_intrinsics: True 
+    constant_pose: True 
+    constant_point: False 
+    constant_line: False
+    constant_vp: False
+
+    # geometric loss
+    lw_point: 0.1
+    geometric_alpha: 10.0
+
+    # junction reassociation
+    th_count_lineline: 3
+    th_angle_lineline: 30.0
+
+    # point-line association
+    lw_pointline_association: 10.0 # the global loss weight
+    th_pixel_sigma: 2.0 # in pixels
+    th_weight_pointline: 3.0
+
+    # vp-line association
+    lw_vpline_association: 1.0
+    th_count_vpline: 3
+
+    # vp orthogonality
+    lw_vp_orthogonality: 1.0
+    th_angle_orthogonality: 87.0
+
+    # vp collinearity 
+    lw_vp_collinearity: 0.0
+    th_angle_collinearity: 1.0
+
+    # hard association for output
+    th_hard_pl_dist3d: 2.0
+

@@ -108,7 +108,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
         limapio.save_npy(os.path.join(cfg["dir_save"], fname_fit_segs), seg3d_list)
     else:
         seg3d_list = limapio.read_npy(os.path.join(cfg["dir_load"], fname_fit_segs)).item()
-    
+
     if "do_merging" in cfg["merging"] and not cfg["merging"]["do_merging"]:
         linetracks = []
         for img_id in all_2d_segs:
@@ -137,17 +137,14 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     # [E] geometric refinement
     ##########################################################
     if not cfg["refinement"]["disable"]:
-        reconstruction = _base.LineReconstruction(linetracks, imagecols)
-        lineba_engine = _optim.solve_line_bundle_adjustment(cfg["refinement"], reconstruction)
-        new_reconstruction = lineba_engine.GetOutputReconstruction()
-        linetracks = new_reconstruction.GetTracks()
-    
+        cfg_ba = _optim.HybridBAConfig(cfg["refinement"])
+        cfg_ba.set_constant_camera()
+        ba_engine = _optim.solve_line_bundle_adjustment(cfg["refinement"], imagecols, linetracks, max_num_iterations=200)
+        linetracks_map = ba_engine.GetOutputLineTracks(num_outliers=cfg["refinement"]["num_outliers_aggregator"])
+        linetracks = [track for (track_id, track) in linetracks_map.items()]
+
     ### Filter out 0-length 3D lines
-    valid_idx = []
-    for i, track in enumerate(linetracks):
-        if track.line.length() > 0:
-            valid_idx.append(i)
-    linetracks = [linetracks[i] for i in valid_idx]
+    linetracks = [track for linetracks if track.line.length() > 0]
 
     ##########################################################
     # [F] output and visualization
@@ -202,7 +199,7 @@ def line_fitting_with_3Dpoints(cfg, imagecols, p3d_readers, inloc_read_transform
         limapio.save_npy(os.path.join(cfg["dir_save"], fname_fit_segs), seg3d_list)
     else:
         seg3d_list = limapio.read_npy(os.path.join(cfg["dir_load"], fname_fit_segs)).item()
-    
+
     linetracks = []
     for img_id in all_2d_segs:
         for line_id, seg2d in enumerate(all_2d_segs[img_id]):

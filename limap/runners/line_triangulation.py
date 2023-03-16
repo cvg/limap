@@ -86,7 +86,8 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
                 colmap_model_path = os.path.join(colmap_output_path, "sparse")
         else:
             colmap_model_path = cfg["triangulation"]["use_pointsfm"]["colmap_folder"]
-        all_bpt2ds, sfm_points = _runners.compute_2d_bipartites_from_colmap(cfg["structures"]["bpt2d"], colmap_model_path, imagecols, all_2d_lines)
+        reconstruction = _psfm.PyReadCOLMAP(colmap_model_path)
+        all_bpt2ds, sfm_points = _runners.compute_2d_bipartites_from_colmap(reconstruction, imagecols, all_2d_lines, cfg["structures"]["bpt2d"])
         Triangulator.SetBipartites2d(all_bpt2ds)
         if cfg["triangulation"]["use_pointsfm"]["use_triangulated_points"]:
             Triangulator.SetSfMPoints(sfm_points)
@@ -115,13 +116,11 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     # [E] geometric refinement
     ##########################################################
     if not cfg["refinement"]["disable"]:
-        reconstruction = _base.LineReconstruction(linetracks, imagecols)
-        vpresults = None
-        if cfg["refinement"]["use_vp"]:
-            vpresults = _vplib.AssociateVPsParallel(all_2d_lines)
-        lineba_engine = _optim.solve_line_bundle_adjustment(cfg["refinement"], reconstruction, vpresults=vpresults, max_num_iterations=200)
-        new_reconstruction = lineba_engine.GetOutputReconstruction()
-        linetracks = new_reconstruction.GetTracks(num_outliers=cfg["refinement"]["num_outliers_aggregator"])
+        cfg_ba = _optim.HybridBAConfig(cfg["refinement"])
+        cfg_ba.set_constant_camera()
+        ba_engine = _optim.solve_line_bundle_adjustment(cfg["refinement"], imagecols, linetracks, max_num_iterations=200)
+        linetracks_map = ba_engine.GetOutputLineTracks(num_outliers=cfg["refinement"]["num_outliers_aggregator"])
+        linetracks = [track for (track_id, track) in linetracks_map.items()]
 
     ##########################################################
     # [F] output and visualization

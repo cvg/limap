@@ -19,7 +19,6 @@ namespace py = pybind11;
 #include "base/linetrack.h"
 #include "base/line_dists.h"
 #include "base/line_linker.h"
-#include "base/line_reconstruction.h"
 #include "base/pointtrack.h"
 
 namespace limap {
@@ -335,24 +334,6 @@ void bind_line_linker(py::module& m) {
         .def("compute_score_3d", &LineLinker::compute_score_3d);
 }
 
-void bind_line_reconstruction(py::module& m) {
-    py::class_<LineReconstruction>(m, "LineReconstruction")
-        .def(py::init<>())
-        .def(py::init<const std::vector<LineTrack>&, const ImageCollection&>())
-        .def("NumTracks", &LineReconstruction::NumTracks)
-        .def("NumImages", &LineReconstruction::NumImages)
-        .def("GetInitTrack", &LineReconstruction::GetInitTrack)
-        .def("GetInitTracks", &LineReconstruction::GetInitTracks)
-        .def("GetInitImagecols", &LineReconstruction::GetInitImagecols)
-        .def("NumSupportingLines", &LineReconstruction::NumSupportingLines)
-        .def("NumSupportingImages", &LineReconstruction::NumSupportingImages)
-        .def("GetImageIds", &LineReconstruction::GetImageIds)
-        .def("GetLine2ds", &LineReconstruction::GetLine2ds)
-        .def("GetImagecols", &LineReconstruction::GetImagecols)
-        .def("GetLines", &LineReconstruction::GetLines, py::arg("num_outliers") = 2)
-        .def("GetTracks", &LineReconstruction::GetTracks, py::arg("num_outliers") = 2);
-}
-
 void bind_camera(py::module& m) {
     py::class_<Camera>(m, "Camera")
         .def(py::init<>())
@@ -557,7 +538,6 @@ void bind_base(py::module& m) {
     bind_linetrack(m);
     bind_line_dists(m);
     bind_line_linker(m);
-    bind_line_reconstruction(m);
     bind_camera(m);
 
     m.def("get_effective_num_threads", &colmap::GetEffectiveNumThreads);

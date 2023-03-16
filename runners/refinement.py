@@ -33,22 +33,16 @@ def one_by_one_refinement(cfg):
 
 def joint_refinement(cfg):
     '''
-    Joint refinement
+    refine all the lines together
     '''
     linetracks, cfg_info, imagecols, all_2d_segs = limapio.read_folder_linetracks_with_info(cfg["input_folder"])
 
-    # vp
-    vpresults = None
-    if cfg["refinement"]["use_vp"]:
-        all_2d_lines = _base.get_all_lines_2d(all_2d_segs)
-        vpresults = _vplib.AssociateVPsParallel(all_2d_lines)
-
-    # joint refinement
-    reconstruction = _base.LineReconstruction(linetracks, imagecols)
-    lineba_engine = _optim.solve_line_bundle_adjustment(cfg["refinement"], reconstruction, vpresults=vpresults, max_num_iterations=200)
-    new_reconstruction = lineba_engine.GetOutputReconstruction()
-    newtracks = new_reconstruction.GetTracks(num_outliers=cfg["refinement"]["num_outliers_aggregator"])
-    imagecols_output = new_reconstruction.GetImagecols()
+    # all refinements in a single problem
+    cfg_ba = _optim.HybridBAConfig(cfg["refinement"])
+    cfg_ba.set_constant_camera()
+    ba_engine = _optim.solve_line_bundle_adjustment(cfg["refinement"], imagecols, linetracks, max_num_iterations=200)
+    newtracks_map = ba_engine.GetOutputLineTracks(num_outliers=cfg["refinement"]["num_outliers_aggregator"])
+    newtracks = [track for (track_id, track) in newtracks_map.items()]
 
     # write
     newlines = np.array([track.line.as_array() for track in newtracks if track.count_images() >= cfg_info["n_visible_views"]])

@@ -55,7 +55,7 @@ void RefinementEngine<DTYPE, CHANNELS>::AddGeometricResiduals() {
     int n_images = track_.count_images();
     std::vector<int> image_ids = track_.GetSortedImageIds();
     for (int i = 0; i < n_images; ++i) {
-        ceres::LossFunction* loss_function = config_.geometric_loss_function.get();
+        ceres::LossFunction* loss_function = config_.line_geometric_loss_function.get();
 
         auto& view = p_camviews_[i];
         int img_id = image_ids[i];

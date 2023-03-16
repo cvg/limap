@@ -19,10 +19,11 @@ namespace line_refinement {
 class RefinementConfig {
 public:
     RefinementConfig() {
-        geometric_loss_function.reset(new ceres::CauchyLoss(0.25));
+        line_geometric_loss_function.reset(new ceres::CauchyLoss(0.25));
         vp_loss_function.reset(new ceres::TrivialLoss());
         heatmap_loss_function.reset(new ceres::HuberLoss(0.001));
         fconsis_loss_function.reset(new ceres::CauchyLoss(0.25));
+
         solver_options.function_tolerance = 0.0;
         solver_options.gradient_tolerance = 0.0;
         solver_options.parameter_tolerance = 0.0;
@@ -41,27 +42,31 @@ public:
     RefinementConfig(py::dict dict): RefinementConfig() {
         ASSIGN_PYDICT_ITEM(dict, use_geometric, bool);
         ASSIGN_PYDICT_ITEM(dict, min_num_images, int);
-        ASSIGN_PYDICT_ITEM(dict, sample_range_min, double);
-        ASSIGN_PYDICT_ITEM(dict, sample_range_max, double);
         ASSIGN_PYDICT_ITEM(dict, num_outliers_aggregate, int);
+        ASSIGN_PYDICT_ITEM(dict, print_summary, bool);
         ASSIGN_PYDICT_ITEM(dict, geometric_alpha, double);
         ASSIGN_PYDICT_ITEM(dict, vp_multiplier, double);
+
+        ASSIGN_PYDICT_ITEM(dict, sample_range_min, double);
+        ASSIGN_PYDICT_ITEM(dict, sample_range_max, double);
         ASSIGN_PYDICT_ITEM(dict, n_samples_heatmap, int);
         ASSIGN_PYDICT_ITEM(dict, heatmap_multiplier, double);
         ASSIGN_PYDICT_ITEM(dict, n_samples_feature, int);
         ASSIGN_PYDICT_ITEM(dict, use_ref_descriptor, bool);
         ASSIGN_PYDICT_ITEM(dict, ref_multiplier, double);
         ASSIGN_PYDICT_ITEM(dict, fconsis_multiplier, double);
-        ASSIGN_PYDICT_ITEM(dict, print_summary, bool);
     }
     bool use_geometric = true;
     int min_num_images = 4;
-    double sample_range_min = 0.05;
-    double sample_range_max = 0.95;
     int num_outliers_aggregate = 2;
 
+    // solver config
+    ceres::Solver::Options solver_options;
+    ceres::Problem::Options problem_options;
+    bool print_summary = true;
+
     // geometric config
-    std::shared_ptr<ceres::LossFunction> geometric_loss_function;
+    std::shared_ptr<ceres::LossFunction> line_geometric_loss_function;
     double geometric_alpha = 10.0;
 
     // vp config
@@ -69,6 +74,8 @@ public:
     double vp_multiplier = 1.0;
 
     // heatmap config
+    double sample_range_min = 0.05;
+    double sample_range_max = 0.95;
     int n_samples_heatmap = 10;
     InterpolationConfig heatmap_interpolation_config;
     std::shared_ptr<ceres::LossFunction> heatmap_loss_function;
@@ -81,10 +88,6 @@ public:
     InterpolationConfig feature_interpolation_config;
     std::shared_ptr<ceres::LossFunction> fconsis_loss_function;
     double fconsis_multiplier = 1.0; 
-
-    ceres::Solver::Options solver_options;
-    ceres::Problem::Options problem_options;
-    bool print_summary = true;
 };
 
 } // namespace line_refinement

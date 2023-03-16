@@ -7,7 +7,8 @@ from colmap_reader import PyReadCOLMAP
 import read_write_model as colmap_utils
 
 def convert_colmap_to_visualsfm(colmap_model_path, output_nvm_file):
-    colmap_cameras, colmap_images, colmap_points = PyReadCOLMAP(colmap_model_path)
+    reconstruction = PyReadCOLMAP(colmap_model_path)
+    colmap_cameras, colmap_images, colmap_points = reconstruction["cameras"], reconstruction["images"], reconstruction["points"]
     with open(output_nvm_file, "w") as f:
         f.write("NVM_V3\n\n")
 

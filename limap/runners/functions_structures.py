@@ -55,10 +55,10 @@ def compute_colmap_model_with_junctions(cfg_bpt2d, cfg_sfm, imagecols, all_2d_li
     _psfm.run_colmap_sfm_with_known_poses(cfg_sfm, imagecols, output_path=output_model_path, skip_exists=skip_exists, keypoints=all_keypoints_updated, neighbors=neighbors)
     return True
 
-def compute_2d_bipartites_from_colmap(cfg, colmap_folder, imagecols, all_2d_lines):
+def compute_2d_bipartites_from_colmap(reconstruction, imagecols, all_2d_lines, cfg=dict()):
     all_bpt2ds = {}
     cfg_bpt2d = _structures.PL_Bipartite2dConfig(cfg)
-    colmap_cameras, colmap_images, colmap_points = _psfm.PyReadCOLMAP(colmap_folder)
+    colmap_cameras, colmap_images, colmap_points = reconstruction["cameras"], reconstruction["images"], reconstruction["points"]
     print("Start computing 2D bipartites...")
     for img_id, colmap_image in tqdm(colmap_images.items()):
         n_points = colmap_image.xys.shape[0]

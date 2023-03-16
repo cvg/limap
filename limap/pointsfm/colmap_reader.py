@@ -68,5 +68,20 @@ def PyReadCOLMAP(colmap_path, model_path=None):
         colmap_points = read_points3D_text(fname_points)
     else:
         raise ValueError("Error! The model file does not exist at {0}".format(model_path))
-    return colmap_cameras, colmap_images, colmap_points
+    reconstruction = {}
+    reconstruction["cameras"] = colmap_cameras
+    reconstruction["images"] = colmap_images
+    reconstruction["points"] = colmap_points
+    return reconstruction
+
+def ReadPointTracks(colmap_reconstruction):
+    pointtracks = {}
+    for point3d_id, p in colmap_reconstruction["points"].items():
+        p_image_ids, point2d_ids = p.image_ids, p.point2D_idxs
+        p2d_list = []
+        for p_img_id, point2d_id in zip(p_image_ids.tolist(), point2d_ids.tolist()):
+            p2d_list.append(colmap_reconstruction["images"][p_img_id].xys[point2d_id])
+        ptrack = _base.PointTrack(p.xyz, p_image_ids, point2d_ids, p2d_list)
+        pointtracks[point3d_id] = ptrack
+    return pointtracks
 

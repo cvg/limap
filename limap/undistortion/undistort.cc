@@ -18,7 +18,7 @@ Camera UndistortCamera(const std::string& imname_in, const Camera& camera, const
     if (cam.Height() != img.Height() || cam.Width() != img.Width()) {
         if (cam.Width() != img.Height() || cam.Height() != img.Width())
             throw std::runtime_error("Error! The height and width of the given camera do not match the input image.");
-        std::cout<<"[WARNING] Auto rotating image (EXIF): "<<imname_in<<std::endl;
+        // std::cout<<"[WARNING] Auto rotating image (EXIF): "<<imname_in<<std::endl;
         exif_autorotate = true;
         cam.Rescale(img.Width(), img.Height());
     }

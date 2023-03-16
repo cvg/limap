@@ -58,7 +58,7 @@ void bind_line_refinement(py::module &m) {
         .def_readwrite("solver_options", &RefinementConfig::solver_options)
         .def_readwrite("heatmap_interpolation_config", &RefinementConfig::heatmap_interpolation_config)
         .def_readwrite("feature_interpolation_config", &RefinementConfig::feature_interpolation_config)
-        .def_readwrite("geometric_loss_function", &RefinementConfig::geometric_loss_function)
+        .def_readwrite("line_geometric_loss_function", &RefinementConfig::line_geometric_loss_function)
         .def_readwrite("geometric_alpha", &RefinementConfig::geometric_alpha)
         .def_readwrite("vp_loss_function", &RefinementConfig::vp_loss_function)
         .def_readwrite("heatmap_loss_function", &RefinementConfig::heatmap_loss_function)
