@@ -9,14 +9,15 @@ import limap.visualize as limapvis
 
 from collections import namedtuple
 BaseDetectorOptions = namedtuple("BaseDetectorOptions",
-                                 ["set_gray", "max_num_2d_segs", "do_merge_lines"],
-                                 defaults=[True, 3000, False])
+                                 ["set_gray", "max_num_2d_segs", "do_merge_lines", "visualize"],
+                                 defaults=[True, 3000, False, False])
 
 class BaseDetector():
     def __init__(self, options = BaseDetectorOptions()):
         self.set_gray = options.set_gray
         self.max_num_2d_segs = options.max_num_2d_segs
         self.do_merge_lines = options.do_merge_lines
+        self.visualize = options.visualize
 
     # Module name needs to be set
     def get_module_name(self):
@@ -78,14 +79,24 @@ class BaseDetector():
         if not skip_exists:
             limapio.delete_folder(seg_folder)
         limapio.check_makedirs(seg_folder)
+        if self.visualize:
+            vis_folder = os.path.join(output_folder, "visualize")
+            limapio.check_makedirs(vis_folder)
         for img_id in tqdm(imagecols.get_img_ids()):
             if skip_exists and limapio.exists_txt_segments(seg_folder, img_id):
-                continue
-            segs = self.detect(imagecols.camview(img_id))
-            if self.do_merge_lines:
-                segs = self.merge_lines(segs)
-            segs, _ = self.take_longest_k(segs, max_num_2d_segs=self.max_num_2d_segs)
-            limapio.save_txt_segments(seg_folder, img_id, segs)
+                if self.visualize:
+                    segs = limapio.read_txt_segments(seg_folder, img_id)
+            else:
+                segs = self.detect(imagecols.camview(img_id))
+                if self.do_merge_lines:
+                    segs = self.merge_lines(segs)
+                segs, _ = self.take_longest_k(segs, max_num_2d_segs=self.max_num_2d_segs)
+                limapio.save_txt_segments(seg_folder, img_id, segs)
+            if self.visualize:
+                img = imagecols.read_image(img_id)
+                img = limapvis.draw_segments(img, segs, (0, 255, 0))
+                fname = os.path.join(vis_folder, "img_{0}_det.png".format(img_id))
+                cv2.imwrite(fname, img)
         all_2d_segs = limapio.read_all_segments_from_folder(seg_folder)
         all_2d_segs = {id: all_2d_segs[id] for id in imagecols.get_img_ids()}
         return all_2d_segs
@@ -111,16 +122,26 @@ class BaseDetector():
             limapio.delete_folder(descinfo_folder)
         limapio.check_makedirs(seg_folder)
         limapio.check_makedirs(descinfo_folder)
+        if self.visualize:
+            vis_folder = os.path.join(output_folder, "visualize")
+            limapio.check_makedirs(vis_folder)
         for img_id in tqdm(imagecols.get_img_ids()):
             if skip_exists and os.path.exists(self.get_descinfo_fname(descinfo_folder, img_id)) and limapio.exists_txt_segments(seg_folder, img_id):
-                continue
-            segs, descinfo = self.detect_and_extract(imagecols.camview(img_id))
-            n_segs_orig = segs.shape[0]
-            segs, indexes = self.take_longest_k(segs, max_num_2d_segs=self.max_num_2d_segs)
-            if indexes.shape[0] < n_segs_orig:
-                descinfo = self.sample_descinfo_by_indexes(descinfo, indexes)
-            limapio.save_txt_segments(seg_folder, img_id, segs)
-            self.save_descinfo(descinfo_folder, img_id, descinfo)
+                if self.visualize:
+                    segs = limapio.read_txt_segments(seg_folder, img_id)
+            else:
+                segs, descinfo = self.detect_and_extract(imagecols.camview(img_id))
+                n_segs_orig = segs.shape[0]
+                segs, indexes = self.take_longest_k(segs, max_num_2d_segs=self.max_num_2d_segs)
+                if indexes.shape[0] < n_segs_orig:
+                    descinfo = self.sample_descinfo_by_indexes(descinfo, indexes)
+                limapio.save_txt_segments(seg_folder, img_id, segs)
+                self.save_descinfo(descinfo_folder, img_id, descinfo)
+            if self.visualize:
+                img = imagecols.read_image(img_id)
+                img = limapvis.draw_segments(img, segs, (0, 255, 0))
+                fname = os.path.join(vis_folder, "img_{0}_det.png".format(img_id))
+                cv2.imwrite(fname, img)
         all_2d_segs = limapio.read_all_segments_from_folder(seg_folder)
         all_2d_segs = {id: all_2d_segs[id] for id in imagecols.get_img_ids()}
         return all_2d_segs, descinfo_folder

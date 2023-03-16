@@ -1,8 +1,8 @@
 from .base_detector import BaseDetectorOptions
 
-def get_detector(cfg_detector, max_num_2d_segs=3000, do_merge_lines=False):
+def get_detector(cfg_detector, max_num_2d_segs=3000, do_merge_lines=False, visualize=False):
     options = BaseDetectorOptions()
-    options = options._replace(set_gray = True, max_num_2d_segs = max_num_2d_segs, do_merge_lines = do_merge_lines)
+    options = options._replace(set_gray = True, max_num_2d_segs = max_num_2d_segs, do_merge_lines = do_merge_lines, visualize = visualize)
 
     method = cfg_detector["method"]
     if method == "lsd":
