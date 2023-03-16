@@ -1,16 +1,16 @@
 ## Install PoseLib as Dependency
-Clone the repository, use the main repo if you have Eigen >= 3.4:
+Clone the repository
 ```bash
 git clone --recursive https://github.com/vlarsson/PoseLib.git
+cd PoseLib
 ```
-Or clone this fork that fixes the alignment and compatible with COLMAP if you have Eigen 3.3:
+Switch to "alignment" branch that fixes the alignment and compatible with COLMAP if you have Eigen 3.3 (you can stay on master if you have Eigen >= 3.4):
 ```bash
-git clone --recursive -b alignment_colmap https://github.com/MarkYu98/PoseLib.git
+git checkout alignment
 ```
 
 Build and install:
 ```bash
-cd PoseLib
 mkdir build && cd build
 cmake ..
 sudo make install -j8
