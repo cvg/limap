@@ -24,7 +24,7 @@ handler = logging.StreamHandler()
 handler.setFormatter(formatter)
 handler.setLevel(logging.INFO)
 
-logger = logging.getLogger("JointLoc")
+logger = logging.getLogger('JointLoc')
 logger.setLevel(logging.INFO)
 logger.addHandler(handler)
 logger.propagate = False
@@ -57,7 +57,7 @@ def parse_config():
     cfg['info_path'] = args.info_path
     cfg['n_neighbors'] = args.num_covis
     cfg['n_neighbors_loc'] = args.num_loc
-    if cfg["merging"]["do_merging"] and '--refinement.disable' not in unknown:
+    if cfg['merging']['do_merging'] and '--refinement.disable' not in unknown:
         # disable refinement for fitnmerge
         cfg['refinement']['disable'] = True
     return cfg, args
@@ -67,15 +67,18 @@ def main():
 
     # Output path for LIMAP results (tmp)
     if cfg['output_dir'] is None:
-        cfg['output_dir'] = 'tmp/7scenes/{}/{}'.format(args.scene, 'dense' if args.use_dense_depth else 'sparse')
+        cfg['output_dir'] = 'tmp/7scenes/{}'.format(args.scene)
+    # Output folder for LIMAP linetracks (in tmp)
+    if cfg['output_folder'] is None:
+        cfg['output_folder'] = 'finaltracks'
+    cfg['output_folder'] += '_{}'.format('dense' if args.use_dense_depth else 'sparse')
     cfg = _runners.setup(cfg)
 
     # outputs is for localization-related results
-    outputs = args.outputs / ('dense' if args.use_dense_depth else 'sparse') / f'{args.scene}'
+    outputs = args.outputs / f'{args.scene}'
     outputs.mkdir(exist_ok=True, parents=True)
 
     logger.info(f'Working on scene "{args.scene}".')
-
     gt_dir = f'7scenes_sfm_triangulated/{args.scene}/triangulated'
     imagecols, neighbors, ranges = read_scene_7scenes(cfg, str(args.dataset), gt_dir, args.scene, n_neighbors=args.num_covis)
 
@@ -109,22 +112,22 @@ def main():
     all_images = colmap_utils.read_images_binary(gt_dir / 'images.bin')
     imagecols_train = imagecols.subset_by_image_ids(train_ids)
     if not args.use_dense_depth:
-        finaltracks_dir = os.path.join(cfg["output_dir"], cfg["output_folder"])
+        finaltracks_dir = os.path.join(cfg['output_dir'], cfg['output_folder'])
         if not cfg['skip_exists'] or not os.path.exists(finaltracks_dir):
-            logger.info("Running LIMAP triangulation...")
+            logger.info('Running LIMAP triangulation...')
             linetracks_db = _runners.line_triangulation(cfg, imagecols_train, neighbors=neighbors, ranges=ranges)
         else:
             linetracks_db = limapio.read_folder_linetracks(finaltracks_dir)
-            logger.info(f"Loaded LIMAP triangulation result from {finaltracks_dir}")
+            logger.info(f'Loaded LIMAP triangulation result from {finaltracks_dir}')
     else:
-        finaltracks_dir = os.path.join(cfg["output_dir"], cfg["output_folder"])
-        if not cfg['skip_exists'] or not os.path.exists(finaltracks_dir) or not cfg["merging"]["do_merging"]:
-            logger.info("Running LIMAP fit&merge")
+        finaltracks_dir = os.path.join(cfg['output_dir'], cfg['output_folder'])
+        if not cfg['skip_exists'] or not os.path.exists(finaltracks_dir) or not cfg['merging']['do_merging']:
+            logger.info('Running LIMAP fit&merge')
             depths = {id: DepthReader(image_path_to_rendered_depth_path(all_images[id].name), depth_dir) for id in train_ids}
             linetracks_db = _runners.line_fitnmerge(cfg, imagecols_train, depths, neighbors, ranges)
         else:
             linetracks_db = limapio.read_folder_linetracks(finaltracks_dir)
-            logger.info(f"Loaded LIMAP triangulation result from {finaltracks_dir}")
+            logger.info(f'Loaded LIMAP triangulation result from {finaltracks_dir}')
 
     ##########################################################
     # [C] Localization with points and lines
