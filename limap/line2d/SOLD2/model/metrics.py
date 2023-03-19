@@ -257,7 +257,7 @@ class junction_precision(object):
     # Compute the evaluation result
     def __call__(self, junc_pred, junc_gt, valid_mask):
         # Convert prediction to discrete detection
-        junc_pred = (junc_pred >= self.detection_thresh).astype(np.int)
+        junc_pred = (junc_pred >= self.detection_thresh).astype(np.int32)
         junc_pred = junc_pred * valid_mask.squeeze()
 
         # Deal with the corner case of the prediction
@@ -278,7 +278,7 @@ class junction_recall(object):
     # Compute the evaluation result
     def __call__(self, junc_pred, junc_gt, valid_mask):
         # Convert prediction to discrete detection
-        junc_pred = (junc_pred >= self.detection_thresh).astype(np.int)
+        junc_pred = (junc_pred >= self.detection_thresh).astype(np.int32)
         junc_pred = junc_pred * valid_mask.squeeze()
 
         # Deal with the corner case of the recall.
@@ -310,7 +310,7 @@ class junction_pr(object):
         # Iterate through all the thresholds
         for thresh in list(self.intervals):
             # Convert prediction to discrete detection
-            junc_pred = (junc_pred_raw >= thresh).astype(np.int)
+            junc_pred = (junc_pred_raw >= thresh).astype(np.int32)
             junc_pred = junc_pred * valid_mask
 
             # Compute tp, fp, tn, fn
@@ -454,8 +454,8 @@ def super_nms(prob_predictions, dist_thresh, prob_thresh=0.01, top_k=0):
 
         # Re-compose the probability map
         output_map = np.zeros([im_h, im_w])
-        output_map[keep_points[:, 0].astype(np.int),
-                   keep_points[:, 1].astype(np.int)] = keep_score.squeeze()
+        output_map[keep_points[:, 0].astype(np.int32),
+                   keep_points[:, 1].astype(np.int32)] = keep_score.squeeze()
 
         output_lst.append(output_map[None, ...])
 

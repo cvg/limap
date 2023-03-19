@@ -49,7 +49,7 @@ def plot_junctions(input_image, junctions, junc_size=3, color=None):
     
     # Round and convert junctions to int (and check the boundary)
     H, W = image.shape[:2]
-    junctions = (np.round(junctions)).astype(np.int)
+    junctions = (np.round(junctions)).astype(np.int32)
     junctions[junctions < 0] = 0 
     junctions[junctions[:, 0] >= H, 0] = H-1  # (first dim) max bounded by H-1
     junctions[junctions[:, 1] >= W, 1] = W-1  # (second dim) max bounded by W-1
@@ -146,7 +146,7 @@ def plot_line_segments(input_image, junctions, line_map, junc_size=3,
     
     # Draw segment pairs
     for idx in range(segments.shape[0]):
-        seg = np.round(segments[idx, :]).astype(np.int)
+        seg = np.round(segments[idx, :]).astype(np.int32)
         # Decide the color
         if color != "random":
             color = tuple(color)
@@ -165,7 +165,7 @@ def plot_line_segments(input_image, junctions, line_map, junc_size=3,
     # Only plot the junctions which are part of a line segment
     else:
         for idx in range(segments.shape[0]):
-            seg = np.round(segments[idx, :]).astype(np.int) # Already in HW format.
+            seg = np.round(segments[idx, :]).astype(np.int32) # Already in HW format.
             cv2.circle(image, tuple(seg[:2]), radius=junc_size, 
                     color=(0, 255., 0), thickness=3)
             cv2.circle(image, tuple(seg[2:]), radius=junc_size, 

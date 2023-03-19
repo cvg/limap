@@ -2,7 +2,7 @@ pyyaml
 tqdm
 attrdict
 h5py
-numpy
+numpy==1.21.6
 scipy
 matplotlib
 seaborn
@@ -31,8 +31,8 @@ python-json-logger
 
 ./third-party/pytlsd
 ./third-party/pytlbd
-./third-party/Hierarchical-Localization
 ./third-party/hawp
+-e ./third-party/Hierarchical-Localization
 -e ./third-party/TP-LSD/tp_lsd/modeling/DCNv2
 -e ./third-party/TP-LSD
 
