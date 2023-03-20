@@ -1,6 +1,5 @@
 #include "solvers/triangulation/triangulate_line_with_one_point.h"
-#include "solvers/univariate.h"
-
+#include <PoseLib/misc/univariate.h>
 #include <iostream>
 
 namespace limap {
