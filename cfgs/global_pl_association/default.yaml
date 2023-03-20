@@ -7,6 +7,12 @@ global_pl_association:
     constant_line: False
     constant_vp: False
 
+    # vpdetection
+    vpdet:
+        method: "jlinkage"
+        n_jobs: 8
+        min_length: 20
+
     # geometric loss
     lw_point: 0.1
     geometric_alpha: 10.0

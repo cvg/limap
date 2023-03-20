@@ -30,20 +30,6 @@ void BaseLineTriangulator::Init(const std::map<int, std::vector<Line2d>>& all_2d
     THROW_CHECK_EQ(imagecols.IsUndistorted(), true);
     imagecols_ = imagecols;
     
-    // compute vanishing points (optional)
-    if (config_.use_vp) {
-        for (const int& img_id: imagecols.get_img_ids()) {
-            vpresults_.insert(std::make_pair(img_id, vplib::VPResult()));
-        }
-        std::cout<<"Start vanishing point detection..."<<std::endl;
-        progressbar bar(imagecols.NumImages());
-#pragma omp parallel for
-        for (const int& img_id: imagecols.get_img_ids()) {
-            bar.update();
-            vpresults_.at(img_id) = vpdetector_.AssociateVPs(all_2d_segs.at(img_id));
-        }
-    }
-
     // initialize empty containers
     for (const int& img_id: imagecols.get_img_ids()) {
         size_t n_lines = all_2d_segs.at(img_id).size();

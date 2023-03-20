@@ -12,6 +12,9 @@ refinement:
     # vp
     use_vp: False
     vp_multiplier: 0.1
+    vpdet:
+        method: "jlinkage"
+        n_jobs: 8
     
     # heatmap
     use_heatmap: False 

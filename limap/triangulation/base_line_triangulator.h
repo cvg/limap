@@ -5,9 +5,8 @@
 #include "base/linebase.h"
 #include "base/linetrack.h"
 #include "base/image_collection.h"
-#include "vplib/jlinkage.h"
+#include "vplib/vpbase.h"
 #include "structures/pl_bipartite.h"
-
 #include <tuple>
 
 namespace limap {
@@ -33,8 +32,6 @@ public:
         ASSIGN_PYDICT_ITEM(dict, line_tri_angle_threshold, double)
         ASSIGN_PYDICT_ITEM(dict, IoU_threshold, double)
         ASSIGN_PYDICT_ITEM(dict, debug_mode, bool)
-        if (dict.contains("vpdet_config"))
-            vpdet_config = vplib::JLinkageConfig(dict["vpdet_config"]);
         ASSIGN_PYDICT_ITEM(dict, sensitivity_threshold, double)
         ASSIGN_PYDICT_ITEM(dict, var2d, double);
     }
@@ -44,7 +41,6 @@ public:
     bool add_halfpix = false; // offset half pixel for each line
     bool use_vp = false;
     bool use_endpoints_triangulation = false;
-    vplib::JLinkageConfig vpdet_config;
 
     // proposal types
     bool disable_many_points_triangulation = false;
@@ -63,13 +59,13 @@ public:
 class BaseLineTriangulator {
 public:
     BaseLineTriangulator() {}
-    BaseLineTriangulator(const BaseLineTriangulatorConfig& config): config_(config), vpdetector_(config.vpdet_config) {}
+    BaseLineTriangulator(const BaseLineTriangulatorConfig& config): config_(config) {}
     const BaseLineTriangulatorConfig config_;
-    const vplib::JLinkage vpdetector_;
 
     // interfaces
     void Init(const std::map<int, std::vector<Line2d>>& all_2d_segs,
               const ImageCollection& imagecols);
+    void InitVPResults(const std::map<int, vplib::VPResult>& vpresults) { vpresults_ = vpresults; }
     void TriangulateImage(const int img_id,
                           const std::vector<Eigen::MatrixXi>& matches,
                           const std::vector<int>& neighbors);

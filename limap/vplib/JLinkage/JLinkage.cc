@@ -1,4 +1,4 @@
-#include "vplib/jlinkage.h"
+#include "vplib/JLinkage/JLinkage.h"
 
 #include <VPCluster.h>
 #include <VPSample.h>
@@ -7,6 +7,8 @@
 namespace limap {
 
 namespace vplib {
+
+namespace JLinkage {
 
 std::vector<int> JLinkage::ComputeVPLabels(const std::vector<Line2d>& lines) const {
     // filter line
@@ -121,6 +123,8 @@ VPResult JLinkage::AssociateVPs(const std::vector<Line2d>& lines) const
     }
     return VPResult(labels, vps);
 }
+
+} // namespace JLinkage
 
 } // namespace vplib
 

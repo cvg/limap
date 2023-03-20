@@ -67,6 +67,10 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     Triangulator.SetRanges(ranges)
     all_2d_lines = _base.get_all_lines_2d(all_2d_segs)
     Triangulator.Init(all_2d_lines, imagecols)
+    if cfg["triangulation"]["use_vp"]:
+        vpdetector = _vplib.get_vp_detector(cfg["triangulation"]["vpdet_config"], n_jobs = cfg["triangulation"]["vpdet_config"]["n_jobs"])
+        vpresults = vpdetector.detect_vp_all_images(all_2d_lines, imagecols.get_map_camviews())
+        Triangulator.InitVPResults(vpresults)
     # get 2d bipartites from pointsfm model
     if cfg["triangulation"]["use_pointsfm"]["enable"]:
         if cfg["triangulation"]["use_pointsfm"]["colmap_folder"] is None:

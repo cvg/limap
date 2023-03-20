@@ -111,6 +111,8 @@ triangulation:
         th_overlap_num_supports: 3
     use_vp: False 
     vpdet_config:
+        method: "jlinkage"
+        n_jobs: 8
         min_length: 40
         inlier_threshold: 1.0
         min_num_supports: 10

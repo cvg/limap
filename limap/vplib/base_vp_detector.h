@@ -27,6 +27,7 @@ public:
         ASSIGN_PYDICT_ITEM(dict, min_num_supports, int)
         ASSIGN_PYDICT_ITEM(dict, th_perp_supports, double)
     }
+    py::dict as_dict() const;
 
     double min_length = 40; // in pixel
     double inlier_threshold = 1.0; // in pixel

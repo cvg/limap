@@ -27,7 +27,7 @@ public:
         ASSIGN_PYDICT_ITEM(dict, vps, std::vector<V3D>) 
     }
 
-    std::vector<int> labels;
+    std::vector<int> labels; // -1 denotes the unassociated lines
     std::vector<V3D> vps;
 
     size_t count_lines() const { return labels.size(); }

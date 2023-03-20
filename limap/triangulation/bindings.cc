@@ -48,8 +48,7 @@ void bind_triangulator(py::module &m) {
         .def_readwrite("min_length_2d", &TriangulatorConfig::min_length_2d) \
         .def_readwrite("line_tri_angle_threshold", &TriangulatorConfig::line_tri_angle_threshold) \
         .def_readwrite("IoU_threshold", &TriangulatorConfig::IoU_threshold) \
-        .def_readwrite("var2d", &TriangulatorConfig::var2d) \
-        .def_readwrite("vpdet_config", &TriangulatorConfig::vpdet_config)
+        .def_readwrite("var2d", &TriangulatorConfig::var2d)
 
     py::class_<GlobalLineTriangulatorConfig>(m, "GlobalLineTriangulatorConfig")
         REGISTER_TRIANGULATOR_CONFIG(GlobalLineTriangulatorConfig)
@@ -67,6 +66,7 @@ void bind_triangulator(py::module &m) {
         .def(py::init<>()) \
         .def(py::init<py::dict>()) \
         .def("Init", &Triangulator::Init) \
+        .def("InitVPResults", &Triangulator::InitVPResults) \
         .def("TriangulateImage", &Triangulator::TriangulateImage) \
         .def("TriangulateImageExhaustiveMatch", &Triangulator::TriangulateImageExhaustiveMatch) \
         .def("SetBipartites2d", &Triangulator::SetBipartites2d) \

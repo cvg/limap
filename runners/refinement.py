@@ -14,12 +14,13 @@ def one_by_one_refinement(cfg):
     One by one refinement
     '''
     linetracks, cfg_info, imagecols, all_2d_segs = limapio.read_folder_linetracks_with_info(cfg["input_folder"])
+    all_2d_lines = _base.get_all_lines_2d(all_2d_segs)
 
     # vp
     vpresults = None
     if cfg["refinement"]["use_vp"]:
-        all_2d_lines = _base.get_all_lines_2d(all_2d_segs)
-        vpresults = _vplib.AssociateVPsParallel(all_2d_lines)
+        vpdetector = _vplib.get_vp_detector(cfg["refinement"]["vpdet"], n_jobs=cfg["refinement"]["vpdet"]["n_jobs"])
+        vpresults = vpdetector.detect_vp_all_images(all_2d_lines, imagecols.get_map_camviews())
 
     # one-by-one refinement
     newtracks = _optim.line_refinement(cfg["refinement"], linetracks, imagecols, cfg["heatmap_folder"], cfg["patch_folder"], cfg["featuremap_folder"], vpresults=vpresults)

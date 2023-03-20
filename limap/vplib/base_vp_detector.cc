@@ -9,6 +9,15 @@ namespace limap {
 
 namespace vplib {
 
+py::dict BaseVPDetectorConfig::as_dict() const {
+    py::dict output;
+    output["min_length"] = min_length;
+    output["inlier_threshold"] = inlier_threshold;
+    output["min_num_supports"] = min_num_supports;
+    output["th_perp_supports"] = th_perp_supports;
+    return output;
+}
+
 std::map<int, VPResult> BaseVPDetector::AssociateVPsParallel(const std::map<int, std::vector<Line2d>>& all_lines) const {
     std::vector<int> image_ids;
     for (std::map<int, std::vector<Line2d>>::const_iterator it = all_lines.begin(); it != all_lines.end(); ++it) {

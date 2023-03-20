@@ -52,9 +52,8 @@ def pointline_association(cfg, input_folder, output_folder, colmap_folder):
     ############################################################
     if cfg["global_pl_association"]["use_vp"]:
         # detect vp
-        cfg_vpdet = _vplib.JLinkageConfig()
-        cfg_vpdet.min_length = 20 # in pixels
-        vpresults = _vplib.AssociateVPsParallel(all_2d_lines, cfg_vpdet)
+        vpdetector = _vplib.get_vp_detector(cfg["global_pl_association"]["vpdet"], n_jobs=cfg["global_pl_association"]["vpdet"]["n_jobs"])
+        vpresults = vpdetector.detect_vp_all_images(all_2d_lines, imagecols.get_map_camviews())
 
         # build vanishing point tracks
         vptrack_constructor = _vplib.GlobalVPTrackConstructor()

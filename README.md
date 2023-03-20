@@ -57,9 +57,11 @@ python runners/hypersim/triangulation.py --sfm.fbase sift --line2d.detector.meth
 ```
 In particular, ``skip_exists`` is a very useful option to avoid running point-based SfM and line detection/description repeatedly in each pass.
 
-## Supported line detectors and descriptors
+## Supported line detectors, matchers and VP estimators
 
-The following line detectors are currently supported:
+Note: PR on integration of new features are very welcomed.
+
+**The following line detectors are currently supported:**
 - [LSD](https://github.com/iago-suarez/pytlsd)
 - [SOLD2](https://github.com/cvg/SOLD2)
 - [HAWPv3](https://github.com/cherubicXN/hawp)
@@ -68,12 +70,17 @@ The following line detectors are currently supported:
 
 If you wish to use DeepLSD, you will need to install it with the instructions of their [README](https://github.com/cvg/DeepLSD/blob/main/README.md).
 
-
-The following line descriptors/matchers are currently supported:
+**The following line descriptors/matchers are currently supported:**
 - [LBD](https://github.com/iago-suarez/pytlbd)
 - [SOLD2](https://github.com/cvg/SOLD2)
 - [LineTR](https://github.com/yosungho/LineTR)
 - [L2D2](https://github.com/hichem-abdellali/L2D2)
 - Endpoint matching with [SuperPoint](https://github.com/magicleap/SuperPointPretrainedNetwork) + Nearest Neighbors
 - Endpoint matching with [SuperPoint](https://github.com/magicleap/SuperPointPretrainedNetwork) + [SuperGlue](https://github.com/magicleap/SuperGluePretrainedNetwork)
+
+**The following vanishing point estimators are currently supported:**
+- [JLinkage](https://github.com/B1ueber2y/JLinkage)
+- [Progressive-X](https://github.com/danini/progressive-x) (separation installation needed)
+
+If you wish to use Progressive-X, you will need to install it with the instructions of their [README](https://github.com/danini/progressive-x/blob/master/README.md).
 
