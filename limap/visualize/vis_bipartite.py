@@ -88,6 +88,10 @@ def open3d_draw_bipartite3d_pointline(bpt3d, ranges=None, draw_edges=True, image
             planes.append([vert1, vert2, vert3, vert4])
 
     # open3d
+    ###########################################################################################
+    # TODO: known bug for open3d
+    # cannot cope with the new open3d. need modification here for open3d==0.16.0!!!!!
+    ###########################################################################################
     import open3d as o3d
     app = o3d.visualization.gui.Application.instance
     app.initialize()
