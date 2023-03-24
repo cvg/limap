@@ -23,12 +23,10 @@ def import_images_with_known_cameras(image_dir, database_path, imagecols):
     # add camera
     for cam_id in imagecols.get_cam_ids():
         cam = imagecols.cam(cam_id)
-        import pdb
         db.add_camera(cam.model_id(), cam.w(), cam.h(), cam.params(), camera_id=cam_id)
     # add image
     for img_name, img_id in zip(image_name_list, image_ids):
         cam_id = imagecols.camimage(img_id).cam_id
-        assert img_name == imagecols.image_name(img_id)
         db.add_image(img_name, cam_id, image_id=img_id)
     db.commit()
 
@@ -96,6 +94,56 @@ def run_hloc_matches(cfg, image_path, db_path, keypoints=None, neighbors=None, i
     reconstruction.import_features(image_ids, db_path, feature_path)
     reconstruction.import_matches(image_ids, db_path, sfm_pairs, match_path, None, None)
     triangulation.estimation_and_geometric_verification(db_path, sfm_pairs)
+
+def run_colmap_sfm(cfg, imagecols, output_path='tmp/tmp_colmap', keypoints=None, skip_exists=False, map_to_original_image_names=True, neighbors=None):
+    ### set up path
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    db_path = os.path.join(output_path, 'db.db')
+    image_path = os.path.join(output_path, 'images')
+    model_path = os.path.join(output_path, 'sparse')
+
+    ### initialize sparse folder
+    if skip_exists and os.path.exists(output_path):
+        print("[COLMAP] Skipping mapping")
+        return
+    if os.path.exists(output_path):
+        shutil.rmtree(output_path)
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    if not os.path.exists(image_path):
+        os.makedirs(image_path)
+    if not os.path.exists(model_path):
+        os.makedirs(model_path)
+
+    ### copy images to tmp folder
+    keypoints_in_order = []
+    for idx, img_id in enumerate(imagecols.get_img_ids()):
+        img = imagecols.read_image(img_id)
+        fname_to_save = os.path.join(image_path, 'image{0:08d}.png'.format(img_id))
+        cv2.imwrite(fname_to_save, img)
+        if keypoints is not None:
+            keypoints_in_order.append(keypoints[img_id])
+
+    # feature extraction and matching
+    run_hloc_matches(cfg["hloc"], image_path, Path(db_path), keypoints=keypoints_in_order, neighbors=neighbors, imagecols=imagecols)
+
+    ### [COLMAP] mapper
+    cmd = ['colmap', 'mapper',
+           '--database_path', db_path,
+           '--image_path', image_path,
+           '--output_path', model_path]
+    subprocess.run(cmd, check=True)
+
+    # map to original image names
+    if map_to_original_image_names:
+        fname_images_bin = os.path.join(model_path, "0", "images.bin")
+        colmap_images = colmap_utils.read_images_binary(fname_images_bin)
+        for img_id in imagecols.get_img_ids():
+            if img_id not in colmap_images:
+                continue
+            colmap_images[img_id] = colmap_images[img_id]._replace(name = imagecols.image_name(img_id))
+        colmap_utils.write_images_binary(colmap_images, fname_images_bin)
 
 def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap', keypoints=None, skip_exists=False, map_to_original_image_names=False, neighbors=None):
     ### set up path
