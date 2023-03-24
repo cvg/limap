@@ -10,13 +10,30 @@ Welcome to LIMAP's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :hidden:
+   :caption: Tutorials: 
 
+   tutorials/installation
+   tutorials/triangulation
+   tutorials/localization
 
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: API references: 
 
-.. Indices and tables
-.. ==================
+   api/limap.runners
 
-.. * :ref:`genindex`
-.. * :ref:`modindex`
-.. * :ref:`search`
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+   :caption: Community: 
+
+   contributors
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
