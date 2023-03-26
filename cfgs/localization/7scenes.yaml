@@ -16,6 +16,10 @@ localization:
         thres: 5
         thres_point: 5
         thres_line: 5
+    optimize:
+        normalize_weight: False     # For Stairs: Set this to True, and loss_func to TrivialLoss for best performance
+        loss_func: "HuberLoss"
+        loss_func_args: [1.0]
     line_cost_func: "PerpendicularDist"
 
 line2d:

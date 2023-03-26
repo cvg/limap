@@ -16,6 +16,10 @@ localization:
         thres: 6
         thres_point: 6
         thres_line: 6
+    optimize:
+        normalize_weight: False
+        loss_func: HuberLoss
+        loss_func_args: [1.2]
     line_cost_func: "PerpendicularDist"
 
 line2d:

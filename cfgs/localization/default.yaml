@@ -38,6 +38,10 @@ localization:
         final_least_squares: True
         min_num_iterations: 100
         solver_flags: [True, True, True, True]
+    optimize:
+        normalize_weight: False
+        loss_func: "TrivialLoss"
+        loss_func_args: []
     line_cost_func: "PerpendicularDist"
     line_weight: 1.0        # weight for optimization (cost function)
     hloc:
