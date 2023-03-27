@@ -78,23 +78,38 @@ def line_localization(cfg, imagecols, linetracks, hloc_log_file, train_ids, quer
     calls limap.estimators.pl_estimate_absolute_pose to estimate the absolute camera pose for all query images,
     and writes results in results file in `results_path`.
 
-    :param cfg:             dict, configurations which fields refer to `cfgs/localization/default.yaml`
-    :param imagecols:       limap.base.ImageCollection
-    :param linetracks:      iterable of limap.base.LineTrack, LIMAP triangulated/fitted line tracks
-    :param hloc_log_file:   str or Path, path to the log file of HLoc localization, for point correspondences and inlier indices
-    :param train_ids:       iterable of int, image IDs for training/database images
-    :param query_ids:       iterable of int, image IDs for query images
-    :param retrieval:       dict, map query image file path to list of neighbor image file paths,
-                            e.g. returned from hloc.utils.parsers.parse_retrieval
-    :param results_path:    str or Path, file path to write the localization results
-    :param coarse_poses:    dict (optional), map query image IDs to coarse poses, e.g. returned by HLoc
-    :param img_name_dict:   dict (optional), map query image IDs to the image file path, by default the image names from `imagecols`
-    :param ref_sfm:         str or Path or pycolmap.Reconstruction (optional)
-    :param resize_scales:   dict (optional), map query image names to resize scales
-    :param hloc_name_dict:  dict (optional), if the IDs map to different image file paths in HLoc log file
-    :param logger:          logging.Logger (optional), print logs for information
+    :param cfg:             Configuration, fields refer to :file:`cfgs/localization/default.yaml`
+    :type cfg:              dict
+    :param imagecols:       The image collection
+    :type imagecols:        :class:`limap.base.ImageCollection`
+    :param linetracks:      List of :class:`limap.base.LineTrack`, LIMAP triangulated/fitted line tracks
+    :type linetracks:       list
+    :param hloc_log_file:   Path to the log file of HLoc localization, for point correspondences and inlier indices
+    :type hloc_log_file:    str | Path
+    :param train_ids:       List of image IDs for training/database images
+    :type train_ids:        list
+    :param query_ids:       List of image IDs for query images
+    :type query_ids:        list
+    :param retrieval:       Mapping of query image file path to list of neighbor image file paths,
+                            e.g. returned from :func:`hloc.utils.parsers.parse_retrieval`
+    :type retrieval:        dict
+    :param results_path:    File path to write the localization results
+    :type results_path:     str | Path
+    :param coarse_poses:    Mapping of query image IDs to coarse poses, e.g. returned by hloc
+    :type coarse_poses:     dict, optional
+    :param img_name_dict:   Mapping of query image IDs to the image file path, by default the image names from `imagecols`
+    :type img_name_dict:    dict, optional
+    :param ref_sfm:         The referencing SfM model or the path to it
+    :type ref_sfm:          str | Path | :class:`pycolmap.Reconstruction`, optional
+    :param resize_scales:   Mapping of query image names to resize scales (two-tuples of float)
+    :type resize_scales:    dict
+    :param hloc_name_dict:  Similar to `img_name_dict`, used when the IDs map to different image file paths in HLoc log file
+    :type hloc_name_dict:   dict
+    :param logger:          Logger to print logs for information
+    :type logger:           logging.Logger, optional
 
-    :return: list<limap.base.CameraPose>, the localized camera poses for all query images.
+    :rtype: List of :class:`limap.base.CameraPose`
+    :return: The localized camera poses for all query images.
     """ 
     if cfg['localization']['2d_matcher'] not in ['epipolar', 'sold2', 'superglue_endpoints', 'gluestick', 'linetr', 'lbd', 'l2d2']:
         raise ValueError("Unknown 2d line matcher: {}".format(cfg['localization']['2d_matcher']))
