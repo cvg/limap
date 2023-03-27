@@ -75,7 +75,7 @@ def line_localization(cfg, imagecols, linetracks, hloc_log_file, train_ids, quer
     """
     Run visual localization on query images with `imagecols`, it takes 2D-3D point correspondences from HLoc;
     runs line matching using 2D line matcher ("epipolar" for Gao et al. "Pose Refinement with Joint Optimization of Visual Points and Lines");
-    calls limap.estimators.pl_estimate_absolute_pose to estimate the absolute camera pose for all query images,
+    calls :func:`~limap.estimators.absolute_pose.pl_estimate_absolute_pose` to estimate the absolute camera pose for all query images,
     and writes results in results file in `results_path`.
 
     :param cfg:             Configuration, fields refer to :file:`cfgs/localization/default.yaml`
