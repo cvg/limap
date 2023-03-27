@@ -106,7 +106,7 @@ def line_localization(cfg, imagecols, linetracks, hloc_log_file, train_ids, quer
     :param hloc_name_dict:  Similar to `img_name_dict`, used when the IDs map to different image file paths in HLoc log file
     :type hloc_name_dict:   dict
     :param logger:          Logger to print logs for information
-    :type logger:           logging.Logger, optional
+    :type logger:           :class:`logging.Logger`, optional
 
     :rtype: List of :class:`limap.base.CameraPose`
     :return: The localized camera poses for all query images.

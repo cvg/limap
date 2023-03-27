@@ -34,7 +34,7 @@ def pl_estimate_absolute_pose(cfg, l3ds, l3d_ids, l2ds, p3ds, p2ds, camera, camp
     :param silent:          Turn off to print logs during Ceres optimization
     :type silent:           bool, optional
     :param logger:          Logger to print logs for information
-    :type logger:           logging.Logger, optional
+    :type logger:           :class:`logging.Logger`, optional
 
     :rtype: Tuple <:class:`limap.base.CameraPose`, :class:`limap.estimators.RansacStatistics`>
     :return: Estimated pose and ransac statistics.
