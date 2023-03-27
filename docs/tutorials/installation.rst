@@ -68,7 +68,7 @@ Alternatively:
     cmake -DPYTHON_EXECUTABLE=`which python` ..
     make -j8
 
-To test if LIMAP is successfully installed, try `import limap` and it should reports no error.
+To test if LIMAP is successfully installed, try ``import limap`` and it should reports no error.
 
 .. code-block:: bash
 

@@ -7,7 +7,7 @@ Some examples are prepared for users to quickly try out LIMAP for mapping and lo
 Line Mapping
 ------------------
 
-For this example we are using the first scene `ai_001_001` from `Hypersim <https://github.com/apple/ml-hypersim>`_ dataset. Download the test scene **(100 images)** with the following command:
+For this example we are using the first scene ``ai_001_001`` from `Hypersim <https://github.com/apple/ml-hypersim>`_ dataset. Download the test scene **(100 images)** with the following command:
 
 .. code-block:: bash
 
@@ -79,7 +79,7 @@ Now, to run the localization pipeline with points and lines. As shown above, the
                                            --localization.optimize.loss_func TrivialLoss \
                                            --localization.optimize.normalize_weight
 
-It is also possible to use the rendered depth with the `--use_dense_depth` flag, in which case the 3D line map will be built using LIMAP's Fit&Merge (enable merging by adding `--merging.do_merging`) utilities instead of triangulation.
+It is also possible to use the rendered depth with the ``--use_dense_depth`` flag, in which case the 3D line map will be built using LIMAP's Fit&Merge (enable merging by adding ``--merging.do_merging``) utilities instead of triangulation.
 
 .. code-block:: bash
 
