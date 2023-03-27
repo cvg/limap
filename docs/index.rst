@@ -11,24 +11,22 @@ Welcome to LIMAP's documentation!
 LIMAP is toolbox for mapping and localization with line features.
 
 .. toctree::
-   :maxdepth: 2
-   :hidden:
+   :maxdepth: 1
    :caption: Tutorials: 
 
    tutorials/installation
+   tutorials/quickstart
    tutorials/triangulation
    tutorials/localization
 
 .. toctree::
-   :maxdepth: 2
-   :hidden:
+   :maxdepth: 1
    :caption: API references: 
 
    api/limap.runners
 
 .. toctree::
-   :maxdepth: 2
-   :hidden:
+   :maxdepth: 1
    :caption: Community: 
 
    contributors
