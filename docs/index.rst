@@ -8,7 +8,7 @@ Welcome to LIMAP's documentation!
 
 [teasor image and introduction to LIMAP library]
 
-LIMAP is toolbox for mapping and localization with line features.
+LIMAP is a toolbox for mapping and localization with line features.
 
 .. toctree::
    :maxdepth: 1
@@ -23,6 +23,7 @@ LIMAP is toolbox for mapping and localization with line features.
    :maxdepth: 1
    :caption: API references: 
 
+   api/limap.base
    api/limap.estimators.absolute_pose
    api/limap.runners
 

@@ -44,6 +44,14 @@ limap.base.unit\_test module
    :undoc-members:
    :show-inheritance:
 
+limap.base.Line2d
+----------------------------
+
+.. autoclass:: limap.base.Line2d
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

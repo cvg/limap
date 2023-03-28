@@ -140,7 +140,7 @@ void bind_transforms(py::module& m) {
 }
 
 void bind_linebase(py::module& m) {
-    py::class_<Line2d>(m, "Line2d")
+    py::class_<Line2d>(m, "Line2d", "2D Line")
         .def(py::init<>())
         .def(py::init<const Eigen::MatrixXd&>())
         .def(py::init<V2D, V2D>(), py::arg("start"), py::arg("end"))
@@ -153,7 +153,7 @@ void bind_linebase(py::module& m) {
                 return Line2d(arr);
             }
         ))
-        .def_readonly("start", &Line2d::start)
+        .def_readonly("start", &Line2d::start, "2D `np.array`, starting endpoint")
         .def_readonly("end", &Line2d::end)
         .def_readonly("score", &Line2d::score)
         .def("length", &Line2d::length)
