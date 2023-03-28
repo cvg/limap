@@ -153,9 +153,9 @@ void bind_linebase(py::module& m) {
                 return Line2d(arr);
             }
         ))
-        .def_readonly("start", &Line2d::start, "2D `np.array`, starting endpoint")
-        .def_readonly("end", &Line2d::end)
-        .def_readonly("score", &Line2d::score)
+        .def_readonly("start", &Line2d::start, "2-dimensional :class:`np.array`, first endpoint")
+        .def_readonly("end", &Line2d::end, "2-dimensional :class:`np.array`, second endpoint")
+        .def_readonly("score", &Line2d::score, "score score score")
         .def("length", &Line2d::length)
         .def("coords", &Line2d::coords)
         .def("as_array", &Line2d::as_array)

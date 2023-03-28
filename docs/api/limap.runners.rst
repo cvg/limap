@@ -33,8 +33,8 @@ limap.runners.line\_localization module
 
 .. automodule:: limap.runners.line_localization
    :members:
-   :undoc-members:
    :show-inheritance:
+
 
 limap.runners.line\_triangulation module
 ----------------------------------------
