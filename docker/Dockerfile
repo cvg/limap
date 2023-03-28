@@ -103,12 +103,7 @@ RUN git clone --recursive https://github.com/vlarsson/PoseLib.git && \
 
 RUN apt-get update && \
     apt-get install -y \
-    libhdf5-dev \
-    libopencv-dev \
-    libopencv-contrib-dev \
-    libarpack++2-dev \
-    libarpack2-dev \
-    libsuperlu-dev
+    libhdf5-dev
 
 # Only Python 3.9 seems to satisfy all dependencies
 RUN add-apt-repository ppa:deadsnakes/ppa

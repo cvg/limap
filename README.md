@@ -3,16 +3,11 @@
 ## Dependencies
 * CMake >= 3.17
 * COLMAP [[Guide](https://colmap.github.io/install.html)]
-* PoseLib [[Guide](misc/install_poselib.md)]
+* PoseLib [[Guide](misc/install/poselib.md)]
 * HDF5
 ```bash
 sudo apt-get install libhdf5-dev
 ```
-* OpenCV (only for installing [pytlbd](https://github.com/B1ueber2y/limap-internal/blob/main/requirements.txt#L33))
-```bash
-sudo apt-get install libopencv-dev libopencv-contrib-dev libarpack++2-dev libarpack2-dev libsuperlu-dev
-```
-
 * Python 3.9 + required packages
 ```bash
 git submodule update --init --recursive
@@ -59,19 +54,19 @@ In particular, ``skip_exists`` is a very useful option to avoid running point-ba
 
 ## Supported line detectors, matchers and VP estimators
 
-Note: PR on integration of new features are very welcomed.
+If you wish to use the methods with **separate installation needed** you need to install it yourself with the corresponding guides. This is to avoid potential issues at the LIMAP installation to ensure a quicker start.
+
+**Note**: PR on integration of new features are very welcomed.
 
 **The following line detectors are currently supported:**
 - [LSD](https://github.com/iago-suarez/pytlsd)
 - [SOLD2](https://github.com/cvg/SOLD2)
 - [HAWPv3](https://github.com/cherubicXN/hawp)
-- [TP-LSD](https://github.com/Siyuada7/TP-LSD)
-- [DeepLSD](https://github.com/cvg/DeepLSD) (separate installation needed)
-
-If you wish to use DeepLSD, you will need to install it with the instructions of their [README](https://github.com/cvg/DeepLSD/blob/main/README.md).
+- [TP-LSD](https://github.com/Siyuada7/TP-LSD) (separate installation needed [[Guide](misc/install/tp_lsd.md)]) 
+- [DeepLSD](https://github.com/cvg/DeepLSD) (separate installation needed [[Guide](https://github.com/cvg/DeepLSD)])
 
 **The following line descriptors/matchers are currently supported:**
-- [LBD](https://github.com/iago-suarez/pytlbd)
+- [LBD](https://github.com/iago-suarez/pytlbd) (separate installation needed [[Guide](misc/install/lbd.md)])
 - [SOLD2](https://github.com/cvg/SOLD2)
 - [LineTR](https://github.com/yosungho/LineTR)
 - [L2D2](https://github.com/hichem-abdellali/L2D2)
@@ -80,7 +75,5 @@ If you wish to use DeepLSD, you will need to install it with the instructions of
 
 **The following vanishing point estimators are currently supported:**
 - [JLinkage](https://github.com/B1ueber2y/JLinkage)
-- [Progressive-X](https://github.com/danini/progressive-x) (separation installation needed)
-
-If you wish to use Progressive-X, you will need to install it with the instructions of their [README](https://github.com/danini/progressive-x/blob/master/README.md).
+- [Progressive-X](https://github.com/danini/progressive-x) (separation installation needed [[Guide](https://github.com/danini/progressive-x/blob/master/README.md)])
 
