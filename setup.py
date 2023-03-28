@@ -67,10 +67,10 @@ class CMakeBuild(build_ext):
 # logic and declaration, and simpler if you include description/version in a file.
 setup(
     name="limap",
-    version="0.0.1",
+    version="1.0.0",
     author="B1ueber2y",
     author_email="b1ueber2y@gmail.com",
-    description="3D mapping library of lines and structures",
+    description="A toolbox for mapping and localization with line features",
     long_description="",
     ext_modules=[CMakeExtension("_limap")],
     cmdclass={"build_ext": CMakeBuild},
