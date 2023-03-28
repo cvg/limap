@@ -275,9 +275,15 @@ void GlobalAssociator::ParameterizeVPs() {
             problem_->SetParameterBlockConstant(vp_data);
         }
         else {
+#ifdef CERES_PARAMETERIZATION_ENABLED
             ceres::LocalParameterization* homo3d_parameterization = 
                 new ceres::HomogeneousVectorParameterization(3);
             problem_->SetParameterization(vp_data, homo3d_parameterization);
+#else
+            ceres::Manifold* homo3d_manifold = 
+                new ceres::SphereManifold<3>;
+            problem_->SetManifold(vp_data, homo3d_manifold);
+#endif
         }
     }
 }
