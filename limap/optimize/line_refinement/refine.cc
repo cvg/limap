@@ -36,12 +36,21 @@ template <typename DTYPE, int CHANNELS>
 void RefinementEngine<DTYPE, CHANNELS>::ParameterizeMinimalLine() {
     double* uvec_data = inf_line_.uvec.data();
     double* wvec_data = inf_line_.wvec.data();
+#ifdef CERES_PARAMETERIZATION_ENABLED
     ceres::LocalParameterization* quaternion_parameterization = 
         new ceres::QuaternionParameterization;
     problem_->SetParameterization(uvec_data, quaternion_parameterization);
     ceres::LocalParameterization* homo2d_parameterization = 
         new ceres::HomogeneousVectorParameterization(2);
     problem_->SetParameterization(wvec_data, homo2d_parameterization);
+#else
+    ceres::Manifold* quaternion_manifold = 
+        new ceres::QuaternionManifold;
+    problem_->SetManifold(uvec_data, quaternion_manifold);
+    ceres::Manifold* homo2d_manifold = 
+        new ceres::SphereManifold<2>;
+    problem_->SetManifold(wvec_data, homo2d_manifold);
+#endif
 }
 
 template <typename DTYPE, int CHANNELS>

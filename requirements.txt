@@ -22,7 +22,7 @@ omegaconf
 rtree
 plyfile
 pathlib
-open3d
+open3d==0.16.0
 imagesize
 einops
 ninja
@@ -30,9 +30,6 @@ yacs
 python-json-logger
 
 ./third-party/pytlsd
-./third-party/pytlbd
 ./third-party/hawp
 -e ./third-party/Hierarchical-Localization
--e ./third-party/TP-LSD/tp_lsd/modeling/DCNv2
--e ./third-party/TP-LSD
 

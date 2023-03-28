@@ -51,6 +51,10 @@ endif()
 ################################################################################
 find_package(Eigen3 3.3 REQUIRED)
 find_package(COLMAP REQUIRED)
+if(${CERES_VERSION} VERSION_LESS "2.2.0")
+    # ceres 2.2.0 changes the interface of local parameterization
+    add_definitions("-DCERES_PARAMETERIZATION_ENABLED")
+endif()
 find_package(PoseLib REQUIRED)
 
 ################################################################################

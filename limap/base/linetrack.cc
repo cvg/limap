@@ -146,28 +146,44 @@ void LineTrack::Write(const std::string& filename) const {
     for (size_t i = 0; i < n_lines; ++i)
         file << line_id_list[i] << " ";
     file << "\n";
-    // row5: node id
-    file << "node_id_list ";
-    for (size_t i = 0; i < n_lines; ++i)
-        file << node_id_list[i] << " ";
-    file << "\n";
-    // row6: scores
-    file << "score_list ";
-    for (size_t i = 0; i < n_lines; ++i)
-        file << score_list[i] << " ";
-    file << "\n";
-    // row7 lines
-    file << "lines\n";
-    // row(8+i): line2d_list[i].start line2d_list[i].end line3d_list[i].start line3d_list[i].end
+    // row5: line2d_list
+    file << "line2d_list\n";
+    // row(5+i): line2d_list[i].start line2d_list[i].end 
     for (size_t i = 0; i < n_lines; ++i) {
         const Line2d& line2d = line2d_list[i];
-        const Line3d& line3d = line3d_list[i];
         file << line2d.start[0] << " " << line2d.start[1] << " ";
         file << line2d.end[0] << " " << line2d.end[1] << " ";
-        file << line3d.start[0] << " " << line3d.start[1] << " " << line3d.start[2] << " ";
-        file << line3d.end[0] << " " << line3d.end[1] << " " << line3d.end[2] << " ";
         file << "\n";
     }
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // auxiliary information
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // row6: node_id_list
+    if (node_id_list.empty() == false) {
+        file << "node_id_list ";
+        for (size_t i = 0; i < n_lines; ++i)
+            file << node_id_list[i] << " ";
+        file << "\n";
+    }
+    // row7: score_list
+    if (score_list.empty() == false) {
+        file << "score_list ";
+        for (size_t i = 0; i < n_lines; ++i)
+            file << score_list[i] << " ";
+        file << "\n";
+    }
+    // row8: line3d_list
+    // row(8+i): line3d_list[i].start line3d_list[i].end
+    if (line3d_list.empty() == false) {
+        file << "line3d_list\n";
+        for (size_t i = 0; i < n_lines; ++i) {
+            const Line3d& line3d = line3d_list[i];
+            file << line3d.start[0] << " " << line3d.start[1] << " " << line3d.start[2] << " ";
+            file << line3d.end[0] << " " << line3d.end[1] << " " << line3d.end[2] << " ";
+            file << "\n";
+        }
+    }
+    file << "END\n";
 }
 
 void LineTrack::Read(const std::string& filename) {
@@ -190,21 +206,34 @@ void LineTrack::Read(const std::string& filename) {
     file >> str; THROW_CHECK_EQ(str, "line_id_list");
     for (size_t i = 0; i < n_lines; ++i)
         file >> line_id_list[i];
-    // row5: node id
-    file >> str; THROW_CHECK_EQ(str, "node_id_list");
+    // row5: line2d_list
+    file >> str; THROW_CHECK_EQ(str, "line2d_list");
+    // row(5+i): line2d_list[i].start line2d_list[i].end
+    for (size_t i = 0; i < n_lines; ++i) {
+        Line2d& line2d = line2d_list[i];
+        file >> line2d.start[0] >> line2d.start[1];
+        file >> line2d.end[0] >> line2d.end[1];
+    }
+    file >> str;
+    if (str == "END") {
+        return;
+    }
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // auxiliary information
+    //////////////////////////////////////////////////////////////////////////////////////////
+    // row6: node_id_list
+    THROW_CHECK_EQ(str, "node_id_list");
     for (size_t i = 0; i < n_lines; ++i)
         file >> node_id_list[i];
-    // row6: scores
+    // row7: scores
     file >> str; THROW_CHECK_EQ(str, "score_list");
     for (size_t i = 0; i < n_lines; ++i)
         file >> score_list[i];
-    // row7: lines
-    file >> str; THROW_CHECK_EQ(str, "lines");
+    // row8: line3d_list
+    // row(8+i): line3d_list[i].start line3d_list[i].end
+    file >> str; THROW_CHECK_EQ(str, "line3d_list");
     for (size_t i = 0; i < n_lines; ++i) {
-        Line2d& line2d = line2d_list[i];
         Line3d& line3d = line3d_list[i];
-        file >> line2d.start[0] >> line2d.start[1];
-        file >> line2d.end[0] >> line2d.end[1];
         file >> line3d.start[0] >> line3d.start[1] >> line3d.start[2];
         file >> line3d.end[0] >> line3d.end[1] >> line3d.end[2];
     }

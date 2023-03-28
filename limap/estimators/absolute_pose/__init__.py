@@ -41,7 +41,13 @@ def pl_estimate_absolute_pose(cfg, l3ds, l3d_ids, l2ds, p3ds, p2ds, camera, camp
     """ 
     if jointloc_cfg is None:
         jointloc_cfg = {}
-        jointloc_cfg['loss_function'] = _ceresbase.TrivialLoss()
+        if cfg.get('optimize'):
+            jointloc_cfg = cfg.get('optimize').copy()
+            jointloc_cfg['loss_function'] = getattr(_ceresbase, jointloc_cfg['loss_func'])(*jointloc_cfg['loss_func_args'])
+            del jointloc_cfg['loss_func'], jointloc_cfg['loss_func_args']
+        else:
+            jointloc_cfg['loss_function'] = _ceresbase.TrivialLoss()
+            jointloc_cfg['normalize_weight'] = False
 
     # Optimization weight, not for RANSAC scoring
     if 'line_weight' in cfg:
@@ -59,7 +65,6 @@ def pl_estimate_absolute_pose(cfg, l3ds, l3d_ids, l2ds, p3ds, p2ds, camera, camp
             line_matches_2to3 = np.array(line_matches_2to3)[inliers_line]
             if logger:
                 logger.info(f'{len(line_matches_2to3)} inliers reserved from {len(inliers_line)} line matches')
-        jointloc_cfg['loss_function'] = _ceresbase.HuberLoss(1.0)
         jointloc = _optimize.solve_jointloc(cfg['line_cost_func'], jointloc_cfg, l3ds, l3d_ids, l2ds, p3ds, p2ds, camera.K(), campose.R(), campose.T(), silent=silent)
         final_t = jointloc.GetFinalT().copy()
         final_q = jointloc.GetFinalQ().copy()
@@ -92,5 +97,3 @@ def pl_estimate_absolute_pose(cfg, l3ds, l3d_ids, l2ds, p3ds, p2ds, camera, camp
         result = _estimators.EstimateAbsolutePose_PointLine(l3ds, l3d_ids, l2ds, p3ds, p2ds,
                                                 camera, options, jointloc_config, ransac_cfg['method'] == 'solver')
     return result
-
-

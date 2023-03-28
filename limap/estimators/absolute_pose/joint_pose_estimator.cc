@@ -141,6 +141,7 @@ int JointPoseEstimator::NonMinimalSolver(const std::vector<int>& sample, CameraP
 
     LineLocConfig config = loc_config_;
     config.weight_line = config.weight_point = 1.0;
+    config.normalize_weight = false;
     config.loss_function.reset(new ceres::TrivialLoss()); 
     JointLocEngine loc_engine(config);
     V4D kvec = V4D(cam_.Params().data());
