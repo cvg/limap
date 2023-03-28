@@ -46,7 +46,7 @@ python runners/hypersim/triangulation.py --output_dir outputs/quickstart_triangu
 
 [Tips] Options are stored in the config folder: ``cfgs``. You can easily change the options with the Python argument parser. In the following shows an example:
 ```bash
-python runners/hypersim/triangulation.py --sfm.fbase sift --line2d.detector.method lsd \
+python runners/hypersim/triangulation.py --sfm.hloc.descriptor sift --line2d.detector.method lsd \
                                          --line2d.visualize --triangulation.IoU_threshold 0.2 \
                                          --skip_exists --n_visible_views 5
 ```
