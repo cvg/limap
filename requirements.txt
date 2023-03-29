@@ -13,7 +13,6 @@ opencv-python
 opencv-contrib-python
 scikit-learn
 scikit-image
-kornia==0.2.0
 shapely
 jupyter
 bresenham
