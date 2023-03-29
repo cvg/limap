@@ -23,42 +23,17 @@ def plot_curve(fname, thresholds, data):
 def report_error_to_GT(evaluator, lines):
     lengths = np.array([line.length() for line in lines])
     sum_length = lengths.sum()
-    thresholds = np.arange(1, 11, 1) * 0.001
-    list_survived, list_fracs_05, list_fracs_02, list_fracs_00 = [], [], [], []
-    for threshold in thresholds.tolist():
-        ratios = np.array([evaluator.ComputeInlierRatio(line, threshold) for line in lines])
-        lengths_survived = (lengths * ratios).sum()
-        list_survived.append(lengths_survived)
-        val = ratios >= 0.5
-        fracs_05 = 100 * val.sum() / val.shape[0]
-        list_fracs_05.append(fracs_05)
-        val = ratios >= 0.2
-        fracs_02 = 100 * val.sum() / val.shape[0]
-        list_fracs_02.append(fracs_02)
-        val = ratios > 0
-        fracs_00 = 100 * val.sum() / val.shape[0]
-        list_fracs_00.append(fracs_00)
-    list_survived = np.array(list_survived)
-    list_survived_ratio = 100 * list_survived / sum_length
-    print("th, recall, precision, p50, p20, p0")
-    for idx, threshold in enumerate(thresholds):
-        print("{0}mm, {1:.2f}, {2:.2f}, {3:.2f}, {4:.2f}, {5:.2f}".format(int(threshold * 1000), list_survived[idx], list_survived_ratio[idx], list_fracs_05[idx], list_fracs_02[idx], list_fracs_00[idx]))
-    return evaluator
-
-def report_error_to_ref_lines(evaluator, lines):
-    lengths = np.array([line.length() for line in lines])
-    sum_length_tested = lengths.sum()
-    sum_length_ref = evaluator.SumLength()
-    thresholds = (np.arange(1, 11, 1) * 0.001).tolist()
-    list_recall_ref, list_recall_tested = [], []
+    thresholds = [0.001, 0.005, 0.01]
+    list_recall, list_precision = [], []
     for threshold in thresholds:
-        recall_ref = evaluator.ComputeRecallRef(lines, threshold)
-        list_recall_ref.append(recall_ref)
-        recall_tested = evaluator.ComputeRecallTested(lines, threshold)
-        list_recall_tested.append(recall_tested)
-    print("th, ref, ref(%), test, test(%)")
+        ratios = np.array([evaluator.ComputeInlierRatio(line, threshold) for line in lines])
+        length_recall = (lengths * ratios).sum()
+        list_recall.append(length_recall)
+        precision = 100 * (ratios > 0).astype(int).sum() / ratios.shape[0]
+        list_precision.append(precision)
+    print("R: recall, P: precision")
     for idx, threshold in enumerate(thresholds):
-        print("{0}mm, {1:.2f}, {2:.2f}, {3:.2f}, {4:.2f}".format(int(threshold * 1000), list_recall_ref[idx], 100 * list_recall_ref[idx] / sum_length_ref, list_recall_tested[idx], 100 * list_recall_tested[idx] / sum_length_tested))
+        print("R / P at {0}mm: {1:.2f} / {2:.2f}".format(int(threshold * 1000), list_recall[idx], list_precision[idx]))
     return evaluator
 
 def read_ply(fname):
@@ -91,7 +66,7 @@ def report_error_to_point_cloud(points, lines, kdtree_dir=None):
         evaluator.Load(kdtree_dir)
     return report_error_to_GT(evaluator, lines)
 
-def eval_hypersim(cfg, lines, dataset_hypersim, scene_id, cam_id=0, ref_lines=None):
+def eval_hypersim(cfg, lines, dataset_hypersim, scene_id, cam_id=0):
     # set scene id
     dataset_hypersim.set_scene_id(scene_id)
     dataset_hypersim.set_max_dim(cfg["max_image_dim"])
@@ -101,11 +76,6 @@ def eval_hypersim(cfg, lines, dataset_hypersim, scene_id, cam_id=0, ref_lines=No
     index_list = np.arange(0, cfg["input_n_views"], cfg["input_stride"]).tolist()
     index_list = dataset_hypersim.filter_index_list(index_list, cam_id=cam_id)
 
-    # eval w.r.t psuedo gt lines
-    if ref_lines is not None:
-        evaluator = _eval.RefLineEvaluator(ref_lines)
-        report_error_to_ref_lines(evaluator, lines)
-        return
     if cfg["mesh_dir"] is not None:
         # eval w.r.t mesh
         evaluator = report_error_to_mesh(cfg["mesh_dir"], lines)
@@ -168,18 +138,15 @@ def main():
     if linetracks is not None:
         lines = [track.line for track in linetracks if track.count_images() >= cfg["n_visible_views"]]
         linetracks = [track for track in linetracks if track.count_images() >= cfg["n_visible_views"]]
-        sup_image_counts = np.array([track.count_images() for track in linetracks])
-        sup_line_counts = np.array([track.count_lines() for track in linetracks])
-        print("supporting images, {0}".format(sup_image_counts.mean()))
-        print("supporting lines, {0}".format(sup_line_counts.mean()))
-
     if cfg["noeval"]:
         return
-    ref_lines = None
-    if cfg["ref_dir"] is not None:
-        ref_lines, _, _ = read_lines_from_input(cfg["ref_dir"], n_visible_views=3)
+    eval_hypersim(cfg, lines, dataset_hypersim, cfg["scene_id"], cam_id=cfg["cam_id"])
 
-    eval_hypersim(cfg, lines, dataset_hypersim, cfg["scene_id"], cam_id=cfg["cam_id"], ref_lines=ref_lines)
+    # report track quality
+    if linetracks is not None:
+        sup_image_counts = np.array([track.count_images() for track in linetracks])
+        sup_line_counts = np.array([track.count_lines() for track in linetracks])
+        print("supporting images / lines: ({0:.2f} / {1:.2f})".format(sup_image_counts.mean(), sup_line_counts.mean()))
 
 if __name__ == '__main__':
     main()
