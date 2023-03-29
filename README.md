@@ -3,6 +3,8 @@
 <img src="./misc/media/supp_qualitative_5x3.png">
 </p>
 
+**Note**: More README and docs will be available soon.
+
 LIMAP is a toolbox for mapping and localization with line features. The system was initially described in the highlight paper [3D Line Mapping Revisited](./README.md) at CVPR 2023 in Vancouver, Canada. Contributors to this project are from the [Computer Vision and Geometry Group](https://cvg.ethz.ch/) at [ETH Zurich](https://ethz.ch/en.html).
 
 In this project, we provide interfaces for various geometric operations on 2D/3D lines. We support off-the-shelf SfM software including [VisualSfM](http://ccwu.me/vsfm/index.html), [Bundler](https://bundler.io/), and [COLMAP](https://colmap.github.io/) to initialize the camera poses to build 3D line maps on the database. The line detectors, matchers, and vanishing point estimators are abstracted to ensure flexibility to support recent advances and future development. 
