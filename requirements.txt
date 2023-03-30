@@ -31,4 +31,5 @@ python-json-logger
 ./third-party/pytlsd
 ./third-party/hawp
 -e ./third-party/Hierarchical-Localization
+-e ./third-party/DeepLSD
 

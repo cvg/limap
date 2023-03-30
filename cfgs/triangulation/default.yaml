@@ -42,7 +42,7 @@ line2d:
     save_l3dpp: False
     compute_descinfo: False
     detector: 
-        method: "lsd" # ["lsd", "sold2", "hawpv3", "tp_lsd"]
+        method: "deeplsd" # ["lsd", "sold2", "hawpv3", "tp_lsd", "deeplsd"]
         skip_exists: False
     extractor: 
         method: "sold2" # ["sold2", "lbd", "l2d2", "linetr", "superpoint_endpoints"]

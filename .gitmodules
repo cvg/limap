@@ -30,3 +30,6 @@
 [submodule "third-party/TP-LSD"]
 	path = third-party/TP-LSD
 	url = git@github.com:rpautrat/TP-LSD.git
+[submodule "third-party/DeepLSD"]
+	path = third-party/DeepLSD
+	url = git@github.com:cvg/DeepLSD.git

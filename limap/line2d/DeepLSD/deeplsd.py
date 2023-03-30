@@ -4,7 +4,7 @@ from base_detector import BaseDetector, BaseDetectorOptions
 import numpy as np
 import torch
 
-from deeplsd.models.deeplsd import DeepLSD
+from deeplsd.models.deeplsd_inference import DeepLSD
 
 
 class DeepLSDDetector(BaseDetector):
@@ -16,14 +16,8 @@ class DeepLSDDetector(BaseDetector):
             'line_detection_params': {
                 'merge': False,
                 'grad_nfa': True,
-                'optimize': False,
-                'use_vps': False,
-                'optimize_vps': False,
                 'filtering': 'normal',
                 'grad_thresh': 3,
-                'lambda_df': 1.,
-                'lambda_grad': 1.,
-                'lambda_vp': 0.5,
             },
         }
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'

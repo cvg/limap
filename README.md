@@ -96,7 +96,7 @@ If you wish to use the methods with **separate installation needed** you need to
 - [SOLD2](https://github.com/cvg/SOLD2)
 - [HAWPv3](https://github.com/cherubicXN/hawp)
 - [TP-LSD](https://github.com/Siyuada7/TP-LSD) (separate installation needed [[Guide](misc/install/tp_lsd.md)]) 
-- [DeepLSD](https://github.com/cvg/DeepLSD) (separate installation needed [[Guide](https://github.com/cvg/DeepLSD)])
+- [DeepLSD](https://github.com/cvg/DeepLSD)
 
 **The following line descriptors/matchers are currently supported:**
 - [LBD](https://github.com/iago-suarez/pytlbd) (separate installation needed [[Guide](misc/install/lbd.md)])
