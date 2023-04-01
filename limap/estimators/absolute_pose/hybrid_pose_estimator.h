@@ -87,9 +87,9 @@ public:
 
 private:
     std::vector<bool> solver_flags_;
-    int combination(int n, int m) const {
-        int num = 1;
-        int denom = 1;
+    unsigned long long combination(unsigned n, unsigned m) const {
+        unsigned long long num = 1;
+        unsigned long long denom = 1;
         for (int i = 0; i < m; i++) 
             num *= n - i;
         for (int i = 0; i < m; i++)
