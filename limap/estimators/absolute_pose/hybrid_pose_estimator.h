@@ -46,13 +46,18 @@ public:
         (*num_data)[1] = num_data_lines();
     }
 
-    void solver_probabilities(std::vector<double>* solver_probabilites) const {
-        solver_probabilites->resize(4);
+    void solver_probabilities(std::vector<double>* solver_probabilities) const {
+        std::vector<std::vector<int>> sample_sizes;
+        min_sample_sizes(&sample_sizes);
+        solver_probabilities->resize(4);
+
         for (int i = 0; i < 4; i++) {
             if (!solver_flags_[i])
-                (*solver_probabilites)[i] = 0.0;
-            else
-                (*solver_probabilites)[i] = 1.0;
+                solver_probabilities->at(i) = 0.0;
+            else {
+                solver_probabilities->at(i) = combination(num_data_points(), sample_sizes[i][0]) *
+                                              combination(num_data_lines(), sample_sizes[i][1]);
+            }
         }
     }
 
@@ -82,6 +87,15 @@ public:
 
 private:
     std::vector<bool> solver_flags_;
+    int combination(int n, int m) const {
+        int num = 1;
+        int denom = 1;
+        for (int i = 0; i < m; i++) 
+            num *= n - i;
+        for (int i = 0; i < m; i++)
+            denom *= i + 1;
+        return num / denom;
+    }
 };
 
 std::pair<CameraPose, ransac_lib::HybridRansacStatistics> 
