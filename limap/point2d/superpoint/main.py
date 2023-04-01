@@ -6,10 +6,26 @@ from pathlib import Path
 from typing import Dict, List, Union, Optional
 import pprint
 
+from torch._six import string_classes
+import collections.abc as collections
+
 from hloc import extract_features
 from hloc.utils.io import list_h5_names
-from hloc.utils.tools import map_tensor
 from .superpoint import SuperPoint
+
+# Copy from legacy hloc code
+def map_tensor(input_, func):
+    if isinstance(input_, torch.Tensor):
+        return func(input_)
+    elif isinstance(input_, string_classes):
+        return input_
+    elif isinstance(input_, collections.Mapping):
+        return {k: map_tensor(sample, func) for k, sample in input_.items()}
+    elif isinstance(input_, collections.Sequence):
+        return [map_tensor(sample, func) for sample in input_]
+    else:
+        raise TypeError(
+            f'input must be tensor, dict or list; found {type(input_)}')
 
 @torch.no_grad()
 def run_superpoint(conf: Dict,
@@ -23,23 +39,25 @@ def run_superpoint(conf: Dict,
     print('[SuperPoint] Extracting local features with configuration:'
                 f'\n{pprint.pformat(conf)}')
 
-    loader = extract_features.ImageDataset(image_dir, conf['preprocessing'], image_list)
-    loader = torch.utils.data.DataLoader(loader, num_workers=1)
+    dataset = extract_features.ImageDataset(image_dir, conf['preprocessing'], image_list)
 
     if feature_path is None:
         feature_path = Path(export_dir, conf['output']+'.h5')
     feature_path.parent.mkdir(exist_ok=True, parents=True)
     skip_names = set(list_h5_names(feature_path)
                      if feature_path.exists() and not overwrite else ())
-    if set(loader.dataset.names).issubset(set(skip_names)):
+    dataset.names = [n for n in dataset.names if n not in skip_names]
+    if len(dataset.names) == 0:
         print('[SuperPoint] Skipping the extraction.')
         return feature_path
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     model = SuperPoint(conf['model']).eval().to(device)
 
+    loader = torch.utils.data.DataLoader(
+        dataset, num_workers=1, shuffle=False, pin_memory=True)
     for img_id, data in enumerate(tqdm(loader)):
-        name = data['name'][0]  # remove batch dimension
+        name = dataset.names[img_id]
         if name in skip_names:
             continue
 
