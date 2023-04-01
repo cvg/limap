@@ -62,6 +62,8 @@ def update_config(cfg, unknown, shortcuts):
         else:
             v = unknown[idx+1]
             if val is not None:
+                if argtype == list and v.startswith('['):
+                    v = eval(v)
                 v = argtype(v)
 
         if isinstance(v, str) and (v.lower() == 'none' or v.lower() == 'null'):
