@@ -70,6 +70,14 @@ def main():
     final_pose, ransac_stats = _estimators.pl_estimate_absolute_pose(
                 cfg, l3ds, l3d_ids, l2ds, p3ds, p2ds, cam, silent=True, logger=logger)
     
+    # Let's Check some RANSAC status
+    log = "RANSAC stats: \n"
+    log += f"num_iterations_total: {ransac_stats.num_iterations_total}\n"
+    log += f"best_num_inliers: {ransac_stats.best_num_inliers}\n"
+    log += f"best_model_score: {ransac_stats.best_model_score}\n"
+    log += f"inlier_ratios (Points, Lines): {ransac_stats.inlier_ratios}\n"
+    logger.info(log)
+
     R_gt, t_gt = data['pose_gt'].R(), data['pose_gt'].tvec
     
     log = "Results: \n"
