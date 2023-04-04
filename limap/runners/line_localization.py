@@ -78,38 +78,24 @@ def line_localization(cfg, imagecols, linetracks, hloc_log_file, train_ids, quer
     calls :func:`~limap.estimators.absolute_pose.pl_estimate_absolute_pose` to estimate the absolute camera pose for all query images,
     and writes results in results file in `results_path`.
 
-    :param cfg:             Configuration, fields refer to :file:`cfgs/localization/default.yaml`
-    :type cfg:              dict
-    :param imagecols:       The image collection
-    :type imagecols:        :class:`limap.base.ImageCollection`
-    :param linetracks:      List of :class:`limap.base.LineTrack`, LIMAP triangulated/fitted line tracks
-    :type linetracks:       list
-    :param hloc_log_file:   Path to the log file of HLoc localization, for point correspondences and inlier indices
-    :type hloc_log_file:    str | Path
-    :param train_ids:       List of image IDs for training/database images
-    :type train_ids:        list
-    :param query_ids:       List of image IDs for query images
-    :type query_ids:        list
-    :param retrieval:       Mapping of query image file path to list of neighbor image file paths,
-                            e.g. returned from :func:`hloc.utils.parsers.parse_retrieval`
-    :type retrieval:        dict
-    :param results_path:    File path to write the localization results
-    :type results_path:     str | Path
-    :param coarse_poses:    Mapping of query image IDs to coarse poses, e.g. returned by hloc
-    :type coarse_poses:     dict, optional
-    :param img_name_dict:   Mapping of query image IDs to the image file path, by default the image names from `imagecols`
-    :type img_name_dict:    dict, optional
-    :param ref_sfm:         The referencing SfM model or the path to it
-    :type ref_sfm:          str | Path | :class:`pycolmap.Reconstruction`, optional
-    :param resize_scales:   Mapping of query image names to resize scales (two-tuples of float)
-    :type resize_scales:    dict
-    :param hloc_name_dict:  Similar to `img_name_dict`, used when the IDs map to different image file paths in HLoc log file
-    :type hloc_name_dict:   dict
-    :param logger:          Logger to print logs for information
-    :type logger:           :class:`logging.Logger`, optional
+    Args:
+        cfg (dict): Configuration, fields refer to :file:`cfgs/localization/default.yaml`
+        imagecols (:class:`limap.base.ImageCollection`): The image collection
+        linetracks (list): List of :class:`limap.base.LineTrack`, LIMAP triangulated/fitted line tracks
+        hloc_log_file (str | Path): Path to the log file of HLoc localization, for point correspondences and inlier indices
+        train_ids (list): List of image IDs for training/database images
+        query_ids (list): List of image IDs for query images
+        retrieval (dict): Mapping of query image file path to list of neighbor image file paths, e.g. returned from :func:`hloc.utils.parsers.parse_retrieval`
+        results_path (str | Path): File path to write the localization results
+        coarse_poses(dict, optional): Mapping of query image IDs to coarse poses, e.g. returned by hloc
+        img_name_dict(dict, optional): Mapping of query image IDs to the image file path, by default the image names from `imagecols`
+        ref_sfm (str | Path | :class:`pycolmap.Reconstruction`, optional): The referencing SfM model or the path to it
+        resize_scales (dict): Mapping of query image names to resize scales (two-tuples of float)
+        hloc_name_dict (dict): Similar to `img_name_dict`, used when the IDs map to different image file paths in HLoc log file
+        logger (:class:`logging.Logger`, optional): Logger to print logs for information
 
-    :rtype: List of :class:`limap.base.CameraPose`
-    :return: The localized camera poses for all query images.
+    Returns:
+        List of :class:`limap.base.CameraPose`: The localized camera poses for all query images.
     """ 
     if cfg['localization']['2d_matcher'] not in ['epipolar', 'sold2', 'superglue_endpoints', 'gluestick', 'linetr', 'lbd', 'l2d2']:
         raise ValueError("Unknown 2d line matcher: {}".format(cfg['localization']['2d_matcher']))

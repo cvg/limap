@@ -12,13 +12,13 @@ limap.runners.functions module
    :undoc-members:
    :show-inheritance:
 
-limap.runners.functions\_structures module
-------------------------------------------
+.. limap.runners.functions\_structures module
+.. ------------------------------------------
 
-.. automodule:: limap.runners.functions_structures
-   :members:
-   :undoc-members:
-   :show-inheritance:
+.. .. automodule:: limap.runners.functions_structures
+..    :members:
+..    :undoc-members:
+..    :show-inheritance:
 
 limap.runners.line\_fitnmerge module
 ------------------------------------
