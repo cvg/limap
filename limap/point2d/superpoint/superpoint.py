@@ -85,10 +85,9 @@ def sample_descriptors(keypoints, descriptors, s: int = 8):
     keypoints /= torch.tensor([(w*s - s/2 - 0.5), (h*s - s/2 - 0.5)],
                               ).to(keypoints)[None]
     keypoints = keypoints*2 - 1  # normalize to (-1, 1)
-    # TODO: this int(torch.__version__[2]) method needs to be updated 
-    args = {'align_corners': True} if int(torch.__version__[2]) > 2 else {'align_corners': False}
     descriptors = torch.nn.functional.grid_sample(
-        descriptors, keypoints.view(b, 1, -1, 2), mode='bilinear', **args)
+        descriptors, keypoints.view(b, 1, -1, 2), mode='bilinear',
+        align_corners=False)
     descriptors = torch.nn.functional.normalize(
         descriptors.reshape(b, c, -1), p=2, dim=1)
     return descriptors
@@ -204,6 +203,38 @@ class SuperPoint(nn.Module):
         descriptors = self.convDb(cDa)
         descriptors = torch.nn.functional.normalize(descriptors, p=2, dim=1)
         return keypoints, scores, descriptors
+
+    def compute_dense_descriptor_and_score(self, data):
+        """ Compute dense scores and descriptors for an image """
+        # Shared Encoder
+        x = self.relu(self.conv1a(data['image']))
+        x = self.relu(self.conv1b(x))
+        x = self.pool(x)
+        x = self.relu(self.conv2a(x))
+        x = self.relu(self.conv2b(x))
+        x = self.pool(x)
+        x = self.relu(self.conv3a(x))
+        x = self.relu(self.conv3b(x))
+        x = self.pool(x)
+        x = self.relu(self.conv4a(x))
+        x = self.relu(self.conv4b(x))
+
+        # Compute the dense keypoint scores
+        cPa = self.relu(self.convPa(x))
+        scores = self.convPb(cPa)
+        scores = torch.nn.functional.softmax(scores, 1)[:, :-1]
+        b, _, h, w = scores.shape
+        scores = scores.permute(0, 2, 3, 1).reshape(b, h, w, 8, 8)
+        scores = scores.permute(0, 1, 3, 2, 4).reshape(b, h*8, w*8)
+
+        # Compute the dense descriptors
+        cDa = self.relu(self.convDa(x))
+        descriptors = self.convDb(cDa)
+        dense_descriptor = torch.nn.functional.normalize(descriptors, p=2, dim=1)
+        return {
+            'dense_score': scores,
+            'dense_descriptor': dense_descriptor
+        }
 
     def sample_descriptors(self, data, keypoints):
         _, _, descriptors = self.compute_dense_descriptor(data)

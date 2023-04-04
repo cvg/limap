@@ -3,7 +3,7 @@
 	url = git@github.com:pybind/pybind11.git
 [submodule "third-party/Hierarchical-Localization"]
 	path = third-party/Hierarchical-Localization
-	url = git@github.com:B1ueber2y/Hierarchical-Localization.git
+	url = git@github.com:cvg/Hierarchical-Localization.git
 [submodule "third-party/JLinkage"]
 	path = third-party/JLinkage
 	url = git@github.com:B1ueber2y/JLinkage.git
@@ -30,3 +30,6 @@
 [submodule "third-party/TP-LSD"]
 	path = third-party/TP-LSD
 	url = git@github.com:rpautrat/TP-LSD.git
+[submodule "third-party/DeepLSD"]
+	path = third-party/DeepLSD
+	url = git@github.com:cvg/DeepLSD.git

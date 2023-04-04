@@ -1,15 +1,14 @@
 import numpy as np
 
-
-def nn_matcher_distmat(dist_mat, nn_thresh, is_mutual_NN=True):
+def nn_matcher_distmat(dist_mat, nn_thresh, is_mutual_NN = True):
     """ Nearest Neighbor Matching using a distance matrix """
     n0 = dist_mat.shape[1]
     n1 = dist_mat.shape[2]
     b = 1
-    mat_nn_ = np.zeros((b, n0, n1))
-    if n0 == 0 or n1 == 0:
+    mat_nn_ = np.zeros((b,n0,n1))
+    if n0==0 or n1==0:
         return mat_nn_
-
+        
     for b_idx in np.arange(b):
         dmat_tmp = dist_mat[b_idx].clip(min=0)
         # Get NN indices and scores.
@@ -30,7 +29,6 @@ def nn_matcher_distmat(dist_mat, nn_thresh, is_mutual_NN=True):
         mat_nn_[b_idx, m_idx1, m_idx2] = 1
 
     return mat_nn_
-
 
 def nn_matcher(desc0, desc1, nn_thresh=0.8, is_mutual_NN=True):
     """ Nearest Neighbor Matching using two descriptors """

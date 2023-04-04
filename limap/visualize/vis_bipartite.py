@@ -87,18 +87,11 @@ def open3d_draw_bipartite3d_pointline(bpt3d, ranges=None, draw_edges=True, image
             vert4 = point + base2 * scale * (-0.5)
             planes.append([vert1, vert2, vert3, vert4])
 
-    # open3d
-    ###########################################################################################
-    # TODO: known bug for open3d
-    # cannot cope with the new open3d. need modification here for open3d==0.16.0!!!!!
-    ###########################################################################################
     import open3d as o3d
     app = o3d.visualization.gui.Application.instance
     app.initialize()
-    w = o3d.visualization.O3DVisualizer(width=1600)
-    w.show_ground = False
-    w.show_axes = False
-    # w = open3d_add_points(w, points_deg0, color=(0.9, 0.9, 0.9), psize=1, name="pcd_deg0")
+    w = o3d.visualization.O3DVisualizer(height=1080, width=1920)
+    w.show_skybox(False)
     w = open3d_add_points(w, points_deg1, color=(0.0, 0.0, 1.0), psize=1, name="pcd_deg1")
     w = open3d_add_points(w, points_deg2, color=(1.0, 0.0, 0.0), psize=3, name="pcd_deg2")
     w = open3d_add_points(w, points_deg3p, color=(1.0, 0.0, 0.0), psize=5, name="pcd_deg3p")
@@ -114,7 +107,6 @@ def open3d_draw_bipartite3d_pointline(bpt3d, ranges=None, draw_edges=True, image
             np_triangles = np.array([[0, 1, 2], [0, 2, 3]]).astype(np.int32)
             mesh.vertices = o3d.utility.Vector3dVector(np_vertices)
             mesh.triangles = o3d.utility.Vector3iVector(np_triangles)
-            # mesh.colors = o3d.utility.Vector3dVector(np.array([plane_c, plane_c]))
             w.add_geometry("plane_{0}".format(plane_id), mesh)
 
     # optionally draw cameras
@@ -154,9 +146,8 @@ def open3d_draw_bipartite3d_vpline(bpt3d, ranges=None):
     import open3d as o3d
     app = o3d.visualization.gui.Application.instance
     app.initialize()
-    w = o3d.visualization.O3DVisualizer(width=1600)
-    w.show_ground = False
-    w.show_axes = False
+    w = o3d.visualization.O3DVisualizer(height=1080, width=1920)
+    w.show_skybox(False)
     for vp_id in vp_ids:
         if len(vp_line_sets[vp_id]) == 0:
             continue

@@ -207,7 +207,10 @@ void LineTrack::Read(const std::string& filename) {
     for (size_t i = 0; i < n_lines; ++i)
         file >> line_id_list[i];
     // row5: line2d_list
-    file >> str; THROW_CHECK_EQ(str, "line2d_list");
+    file >> str;
+    // adapt to the previous version for visualization
+    if (str != "line2d_list")
+        return;
     // row(5+i): line2d_list[i].start line2d_list[i].end
     for (size_t i = 0; i < n_lines; ++i) {
         Line2d& line2d = line2d_list[i];

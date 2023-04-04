@@ -65,7 +65,7 @@ def run_hloc_matches(cfg, image_path, db_path, keypoints=None, neighbors=None, i
     - imagecols: optionally use the id mapping from _base.ImageCollection to do the match
     '''
     image_path = Path(image_path)
-    from hloc import extract_features, match_features, reconstruction, triangulation
+    from hloc import extract_features, match_features, pairs_from_exhaustive, reconstruction, triangulation
     outputs = Path(os.path.join(os.path.dirname(db_path), 'hloc_outputs'))
     sfm_dir = Path(os.path.join(outputs, "sfm"))
     feature_conf = extract_features.confs[cfg["descriptor"]]
@@ -76,13 +76,14 @@ def run_hloc_matches(cfg, image_path, db_path, keypoints=None, neighbors=None, i
     feature_path = run_superpoint(feature_conf, image_path, outputs, keypoints=keypoints)
     if neighbors is None or imagecols is None:
         # run exhaustive matches
-        sfm_pairs = Path(os.path.join(outputs, "pairs-exhaustive.txt"))
-        match_path = match_features.main(matcher_conf, sfm_pairs, feature_conf["output"], outputs, exhaustive=True)
+        sfm_pairs = outputs / "pairs-exhaustive.txt"
+        features_path = outputs / (feature_conf["output"] + '.h5')
+        match_path = pairs_from_exhaustive.main(sfm_pairs, features=features_path)
     else:
         # run matches on neighbors
-        sfm_pairs = Path(os.path.join(outputs, "pairs-from-neighbors.txt"))
+        sfm_pairs = outputs / "pairs-from-neighbors.txt"
         write_pairs_from_neighbors(sfm_pairs, image_path, neighbors, imagecols.get_img_ids())
-        match_path = match_features.main(matcher_conf, sfm_pairs, feature_conf["output"], outputs, exhaustive=False)
+    match_path = match_features.main(matcher_conf, sfm_pairs, feature_conf["output"], outputs)
     sfm_dir.mkdir(parents=True, exist_ok=True)
     reconstruction.create_empty_db(db_path)
     if imagecols is None:

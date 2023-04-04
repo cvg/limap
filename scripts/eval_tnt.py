@@ -20,22 +20,15 @@ def report_error_to_GT(evaluator, lines):
     lengths = np.array([line.length() for line in lines])
     sum_length = lengths.sum()
     thresholds = np.array([0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0])
-    list_survived, list_fracs_05, list_fracs_02, list_fracs_00 = [], [], [], []
-    for threshold in thresholds.tolist():
-        ratios = np.array([evaluator.ComputeInlierRatio(line, threshold) for line in tqdm(lines)])
-        lengths_survived = (lengths * ratios).sum()
-        list_survived.append(lengths_survived)
-        fracs_05 = 100 * ratios[ratios >= 0.5].shape[0] / ratios.shape[0]
-        list_fracs_05.append(fracs_05)
-        fracs_02 = 100 * ratios[ratios >= 0.2].shape[0] / ratios.shape[0]
-        list_fracs_02.append(fracs_02)
-        fracs_00 = 100 * ratios[ratios > 0].shape[0] / ratios.shape[0]
-        list_fracs_00.append(fracs_00)
-    list_survived = np.array(list_survived)
-    list_survived_ratio = 100 * list_survived / sum_length
-    print("th, recall, precision, p50, p20, p0")
+    list_recall, list_precision = [], []
+    for threshold in thresholds:
+        ratios = np.array([evaluator.ComputeInlierRatio(line, threshold) for line in lines])
+        length_recall = (lengths * ratios).sum()
+        list_recall.append(length_recall)
+        precision = 100 * (ratios > 0).astype(int).sum() / ratios.shape[0]
+        list_precision.append(precision)
     for idx, threshold in enumerate(thresholds):
-        print("{0:.0f}mm, {1:.2f}, {2:.2f}, {3:.2f}, {4:.2f}, {5:.2f}".format(int(threshold * 1000), list_survived[idx], list_survived_ratio[idx], list_fracs_05[idx], list_fracs_02[idx], list_fracs_00[idx]))
+        print("R / P at {0}mm: {1:.2f} / {2:.2f}".format(int(threshold * 1000), list_recall[idx], list_precision[idx]))
     return evaluator
 
 def report_pc_recall_for_GT(evaluator, lines):
@@ -172,11 +165,6 @@ def main():
     if linetracks is not None:
         lines = [track.line for track in linetracks if track.count_images() >= cfg["n_visible_views"]]
         linetracks = [track for track in linetracks if track.count_images() >= cfg["n_visible_views"]]
-        sup_image_counts = np.array([track.count_images() for track in linetracks])
-        sup_line_counts = np.array([track.count_lines() for track in linetracks])
-        print("supporting images, {0}".format(sup_image_counts.mean()))
-        print("supporting lines, {0}".format(sup_line_counts.mean()))
-
     if cfg["transform_txt"]:
         lines = transform_lines(cfg["transform_txt"], lines)
         limapio.save_obj('tmp/lines_transform.obj', lines)
@@ -186,6 +174,12 @@ def main():
     if cfg["reference_dir"] is not None:
         ref_lines = read_lines_from_input(cfg["reference_dir"], n_visible_views=4)
     eval_tnt(cfg, lines, ref_lines=ref_lines)
+
+    # report track quality
+    if linetracks is not None:
+        sup_image_counts = np.array([track.count_images() for track in linetracks])
+        sup_line_counts = np.array([track.count_lines() for track in linetracks])
+        print("supporting images / lines: ({0:.2f} / {1:.2f})".format(sup_image_counts.mean(), sup_line_counts.mean()))
 
 if __name__ == '__main__':
     main()

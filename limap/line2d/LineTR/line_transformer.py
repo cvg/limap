@@ -1,63 +1,56 @@
-import os
 from copy import deepcopy
-
-from einops import repeat
+from pathlib import Path
+import torch
 from torch import nn
-
 from .line_attention import MultiHeadAttention, FeedForward
 from .line_process import *
+from einops import rearrange, repeat
 
-
-def MLP(channels: list, do_bn=True):  # channels [3, 32, 64, 128, 256, 256]
+def MLP(channels: list, do_bn=True):    # channels [3, 32, 64, 128, 256, 256]
     """ Multi-layer perceptron """
     n = len(channels)
     layers = []
     for i in range(1, n):
         layers.append(
             nn.Conv1d(channels[i - 1], channels[i], kernel_size=1, bias=True))
-        if i < (n - 1):
+        if i < (n-1):
             if do_bn:
                 layers.append(nn.BatchNorm1d(channels[i]))
             layers.append(nn.ReLU())
     return nn.Sequential(*layers)
 
-
 def normalize_keylines(klines, kplines, image_shape):
     """ Normalize keylines locations based on image shape"""
-    if len(image_shape) == 2:
+    if len(image_shape)==2:
         height, width = image_shape
     else:
-        _, _, height, width = image_shape  # height: 480, width: 640
+        _, _, height, width = image_shape    # height: 480, width: 640
     one = klines.new_tensor(1)
-    size = torch.stack([one * width, one * height])[None]
+    size = torch.stack([one*width, one*height])[None]
     center = size / 2
     scaling = size.max(1, keepdim=True).values * 0.7
 
     normalized_keylines = torch.zeros_like(klines)
-    normalized_keylines[:, :, 0] = (klines[:, :, 0] - center[:, None, :]) / scaling[:, None, :]
-    normalized_keylines[:, :, 1] = (klines[:, :, 1] - center[:, None, :]) / scaling[:, None, :]
+    normalized_keylines[:,:,0] = (klines[:,:,0] - center[:, None, :]) / scaling[:, None, :]
+    normalized_keylines[:,:,1] = (klines[:,:,1] - center[:, None, :]) / scaling[:, None, :]
 
-    normalized_kplines = (kplines - center[:, None, None, :]) / scaling[:, None, None, :]
+    normalized_kplines = (kplines - center[:, None, None,:]) / scaling[:, None, None,:]
     return normalized_keylines, normalized_kplines
-
 
 class LinePositionalEncoder(nn.Module):
     """ Joint encoding of visual appearance and location using MLPs"""
-
     def __init__(self, feature_dim, layers):
         super().__init__()
         self.encoder = MLP([5] + layers + [feature_dim])
-        nn.init.constant_(self.encoder[-1].bias, 0.0)  # Fills the input Tensor with the value
+        nn.init.constant_(self.encoder[-1].bias, 0.0)       # Fills the input Tensor with the value
 
     def forward(self, klines, responses, angles):
-        mid_points = (klines[:, :, 0] + klines[:, :, 1]) / 2.
+        mid_points = (klines[:,:,0] + klines[:,:,1]) / 2.
         inputs = [mid_points.transpose(1, 2), responses.transpose(1, 2), angles.transpose(1, 2)]
-        return self.encoder(torch.cat(inputs, dim=1))  # [3, 5, 128]
-
+        return self.encoder(torch.cat(inputs, dim=1))   # [3, 5, 128]
 
 class WordPositionalEncoder(nn.Module):
     """ Joint encoding of visual appearance and location using MLPs"""
-
     def __init__(self, feature_dim, layers):
         super().__init__()
         self.encoder = MLP([3] + layers + [feature_dim])
@@ -71,19 +64,16 @@ class WordPositionalEncoder(nn.Module):
         num_words = words_in_line.size(2)
         d_input = words_in_line.size(3) + scores_in_line.size(3)
 
-        inputs = torch.cat([words_in_line, scores_in_line], dim=-1)  # [1, 128, 21, 2+1]
-        inputs = inputs.transpose(-2, -1).reshape(num_batch * num_sublines, d_input, num_words)  # [128, 2+1, 21]
+        inputs = torch.cat([words_in_line, scores_in_line], dim=-1)                                 # [1, 128, 21, 2+1]
+        inputs = inputs.transpose(-2,-1).reshape(num_batch*num_sublines, d_input, num_words)        # [128, 2+1, 21]
 
         pos_enc = self.encoder(inputs)
-        pos_enc = pos_enc.transpose(-1, -2).reshape(num_batch, num_sublines, num_words,
-                                                    self.feature_dim)  # [batch, 128, 2+1, 256]
+        pos_enc = pos_enc.transpose(-1,-2).reshape(num_batch, num_sublines, num_words, self.feature_dim)    # [batch, 128, 2+1, 256]
 
         return pos_enc
 
-
 class LineDescriptiveEncoder(nn.Module):
     """ Line Descriptive Network using the transformer """
-
     def __init__(self, d_feature: int, n_heads: int, n_att_layers: int, d_inner: int, dropout=0.1):
         super().__init__()
         self.slf_attn = MultiHeadAttention(n_heads, d_feature)
@@ -100,10 +90,8 @@ class LineDescriptiveEncoder(nn.Module):
 
         return desc, enc_slf_attn
 
-
 class KeylineEncoder(nn.Module):
     """ Line Descriptive Networks & Positional Embedding for Tokens and Lines"""
-
     def __init__(self, feature_dim, mlp_layers, n_heads, n_att_layers, d_inner, dropout=0.1):
         super().__init__()
         self.feature_dim = feature_dim
@@ -129,7 +117,7 @@ class KeylineEncoder(nn.Module):
         desc = desc + self.word_position_enc(pnt, score)
 
         # CLS token
-        cls_tokens = repeat(self.cls_token, '() () w d -> b l w d', b=n_batches, l=n_klines)
+        cls_tokens = repeat(self.cls_token, '() () w d -> b l w d', b = n_batches, l = n_klines)
         desc = torch.cat((cls_tokens, desc), dim=2)
 
         for desc_layer in self.desc_layers:
@@ -137,49 +125,45 @@ class KeylineEncoder(nn.Module):
             enc_slf_attn_list += [enc_slf_attn] if return_attns else []
 
         # Positional embedding for Line Signature Networks
-        sentence = klines_pos + enc_output[:, :, 0, :].transpose(1, 2)
+        sentence = klines_pos + enc_output[:,:,0,:].transpose(1,2)
 
         return sentence
 
-
 def attention(query, key, value):
     dim = query.shape[1]
-    scores = torch.einsum('bdhn,bdhm->bhnm', query, key) / dim ** .5  # [3, 64, 4, 512] -> [3, 4, 512, 512]
+    scores = torch.einsum('bdhn,bdhm->bhnm', query, key) / dim**.5  # [3, 64, 4, 512] -> [3, 4, 512, 512]
     prob = torch.nn.functional.softmax(scores, dim=-1)
     return torch.einsum('bhnm,bdhm->bdhn', prob, value), prob
 
 
 class MultiHeadedAttention(nn.Module):
     """ Multi-head attention to increase model expressivitiy """
-
     def __init__(self, num_heads: int, d_model: int):
         super().__init__()
-        assert d_model % num_heads == 0  # d_model : 256, num_heads : 4
-        self.dim = d_model // num_heads  # dim: 64
+        assert d_model % num_heads == 0     # d_model : 256, num_heads : 4
+        self.dim = d_model // num_heads     # dim: 64
         self.num_heads = num_heads
-        self.merge = nn.Conv1d(d_model, d_model, kernel_size=1)  # 256x256
-        self.proj = nn.ModuleList([deepcopy(self.merge) for _ in range(3)])  # 256x256가 3개. query, key, value
+        self.merge = nn.Conv1d(d_model, d_model, kernel_size=1)     # 256x256
+        self.proj = nn.ModuleList([deepcopy(self.merge) for _ in range(3)]) # 256x256가 3개. query, key, value
 
     def forward(self, query, key, value):
         batch_dim = query.size(0)
-        query, key, value = [l(x).view(batch_dim, self.dim, self.num_heads, -1)  # [3, 64, 4, 512]
+        query, key, value = [l(x).view(batch_dim, self.dim, self.num_heads, -1) # [3, 64, 4, 512]
                              for l, x in zip(self.proj, (query, key, value))]
         x, prob = attention(query, key, value)
-        return self.merge(x.contiguous().view(batch_dim, self.dim * self.num_heads, -1)), prob
+        return self.merge(x.contiguous().view(batch_dim, self.dim*self.num_heads, -1)), prob
 
 
 class AttentionalPropagation(nn.Module):
     def __init__(self, feature_dim: int, num_heads: int):
         super().__init__()
         self.attn = MultiHeadedAttention(num_heads, feature_dim)
-        self.mlp = MLP([feature_dim * 2, feature_dim * 2, feature_dim])  # (512, 512, 256)
+        self.mlp = MLP([feature_dim*2, feature_dim*2, feature_dim]) #(512, 512, 256)
         nn.init.constant_(self.mlp[-1].bias, 0.0)
 
     def forward(self, x, source):
         message, prob = self.attn(x, source, source)  # query (x), key, value (source);  message: [3, 256, 512]
-        return self.mlp(
-            torch.cat([x, message], dim=1)), prob  # ([3, 256, 512], [3, 256, 512]) -> [3, 512, 512] -> [3, 256, 512]
-
+        return self.mlp(torch.cat([x, message], dim=1)), prob # ([3, 256, 512], [3, 256, 512]) -> [3, 512, 512] -> [3, 256, 512]
 
 class SelfAttentionalLayer(nn.Module):
     def __init__(self, feature_dim: int, layer_names: list):
@@ -198,7 +182,6 @@ class SelfAttentionalLayer(nn.Module):
 
         return kline_desc
 
-
 class LineTransformer(nn.Module):
     """ Line-Transformer Networks including Line Descriptive Nets and Line Signature Nets """
     default_config = {
@@ -209,12 +192,12 @@ class LineTransformer(nn.Module):
         'max_tokens': 21,
         'remove_borders': 8,
         'max_keylines': -1,
-        'nn_threshold': 0.8,
+
         'descriptor_dim': 256,
         'keyline_encoder': [32, 64, 128, 256],
         'n_heads': 4,
-        'n_line_descriptive_layers': 12,
-        'd_inner': 1024,  # d_inner at the Feed_Forward Layer
+        'n_line_descriptive_layers': 1,
+        'd_inner': 1024,    # d_inner at the Feed_Forward Layer
     }
 
     def __init__(self, config):
@@ -224,41 +207,39 @@ class LineTransformer(nn.Module):
 
         ## Line Descriptive Network
         self.klenc = KeylineEncoder(
-            self.config['descriptor_dim'], self.config['keyline_encoder'], self.config['n_heads'],
-            self.config['n_line_descriptive_layers'], self.config['d_inner'])
+            self.config['descriptor_dim'], self.config['keyline_encoder'], self.config['n_heads'], self.config['n_line_descriptive_layers'], self.config['d_inner'])
 
         ## Line Signature Network
-        self.selfattn = SelfAttentionalLayer(self.config['descriptor_dim'],
-                                             ['self', 'self', 'self', 'self', 'self', 'self', 'self'])
+        self.selfattn = SelfAttentionalLayer(self.config['descriptor_dim'], ['self','self','self','self','self','self','self'])
 
         self.final_proj = nn.Conv1d(
             self.config['descriptor_dim'], self.config['descriptor_dim'],
             kernel_size=1, bias=True)
 
+
         if self.config['mode'] == 'test':
-            path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                            'weights/LineTR_weight.pth')
-            if not os.path.isfile(path):
+            path = Path(__file__).parent / 'weights/LineTR_weight.pth'
+            if not path.is_file():
                 self.download_model(path)
-            self.load_state_dict(torch.load(path))
+            self.load_state_dict(torch.load(str(path)))
             print('Loaded Line-Transformer model')
 
     def download_model(self, path):
         import subprocess
-        if not os.path.exists(os.path.dirname(path)):
-            os.makedirs(os.path.dirname(path))
+        if not path.parent.is_dir():
+            path.parent.mkdir(parents=True, exist_ok=True)
         link = "https://github.com/yosungho/LineTR/blob/main/models/weights/LineTR_weight.pth?raw=true"
-        cmd = ["wget", link, "-O", path]
+        cmd = ["wget", link, "-O", str(path)]
         print("Downloading LineTR model...")
         subprocess.run(cmd, check=True)
 
     def forward(self, data):
-        if len(data['lines']) == 0:
+        if len(data['klines'])==0:
             return self.default_ret()
 
         klines = data['sublines']
         resp = data['resp_sublines']
-        angle = data['angle_sublines']
+        angle =  data['angle_sublines']
         pnt_sublines = data['pnt_sublines']
         desc_sublines = data['desc_sublines']
         score_sublines = data['score_sublines']
@@ -275,8 +256,7 @@ class LineTransformer(nn.Module):
         line_desc_ = self.final_proj(line_desc_)
         line_desc_ = torch.nn.functional.normalize(line_desc_, p=2, dim=1)
         data.update({'line_descriptors': line_desc_,
-                     'valid_lines': torch.ones(data['lines'].shape[:2], dtype=torch.bool, device=klines.device)})
-
+                     'valid_lines': torch.ones(data['klines'].shape[:2], dtype=torch.bool, device=klines.device)})
         return data
 
     def preprocess(self, klines_cv, image_shape, pred_superpoint, valid_mask=None):
@@ -284,7 +264,7 @@ class LineTransformer(nn.Module):
 
         # change line formats
         klines = {
-            'lines': klines_cv,
+            'klines': klines_cv,
             'length_klines': np.linalg.norm((klines_cv[:, 0] - klines_cv[:, 1]), axis=-1),
             'angles': get_angles(klines_cv),
         }
@@ -319,8 +299,8 @@ class LineTransformer(nn.Module):
     def default_ret(self):
         """ Default return dictionary for the exception """
         pred = {}
-        pred['lines'] = torch.empty((1, 0, 2, 2))
-        pred['sublines'] = torch.empty((1, 0, 2, 2))
-        pred['line_descriptors'] = torch.empty((1, 256, 0))
-        pred['mat_klines2sublines'] = torch.empty((1, 0, 0))
+        pred['klines'] = torch.empty((1,0,2,2))
+        pred['sublines'] = torch.empty((1,0,2,2))
+        pred['line_desc'] = torch.empty((1,256,0))
+        pred['mat_klines2sublines'] = torch.empty((1,0,0))
         return pred
