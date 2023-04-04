@@ -35,57 +35,18 @@ To run line mapping using **Fit&Merge** on Hypersim:
 
 In particular, ``skip_exists`` is a very useful option to avoid running point-based SfM and line detection/description repeatedly in each pass.
 
-------------------------------------
-Localization with Points and Lines
-------------------------------------
+-------------------------------------------------
+Hybrid Localization with Points and Lines
+-------------------------------------------------
 
-The improvement that could be achieved by integrating lines along with point features for visual localization is best demonstrated using the Stairs scene from the `7Scenes <https://www.microsoft.com/en-us/research/project/rgb-d-dataset-7-scenes/>`_ dataset, where traditionally point-based localization struggles in performance.
+We provide two query examples for localization from the Stairs scene in the `7Scenes <https://www.microsoft.com/en-us/research/project/rgb-d-dataset-7-scenes/>`_ Dataset, where traditional point-based methods normally struggle due to the repeated steps and lack of texture. The examples are provided in ``.npy`` files: ``runners/tests/localization/localization_test_data_stairs_[1|2].npy``, which contains the necessary 2D-3D point and line correspondences along with the necessary configurations.
 
-Follow `hloc <https://github.com/cvg/Hierarchical-Localization/tree/master/hloc/pipelines/7Scenes>`_, download the images from the project page:
-
-.. code-block:: bash
-
-    export dataset=datasets/7scenes
-    for scene in stairs; \
-    do wget http://download.microsoft.com/download/2/8/5/28564B23-0828-408F-8631-23B1EFF1DAC8/$scene.zip -P $dataset \
-    && unzip $dataset/$scene.zip -d $dataset && unzip $dataset/$scene/'*.zip' -d $dataset/$scene; done
-
-Download the SIFT SfM models and DenseVLAD image pairs, courtesy of Torsten Sattler:
-
-.. code-block:: bash
-    
-    function download {
-    wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate "https://docs.google.com/uc?export=download&id=$1" -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=$1" -O $2 && rm -rf /tmp/cookies.txt
-    unzip $2 -d $dataset && rm $2;
-    }
-    download 1cu6KUR7WHO7G4EO49Qi3HEKU6n_yYDjb $dataset/7scenes_sfm_triangulated.zip
-    download 1IbS2vLmxr1N0f3CEnd_wsYlgclwTyvB1 $dataset/7scenes_densevlad_retrieval_top_10.zip
-
-Download the rendered depth maps, courtesy of Eric Brachmann for `DSAC* <https://github.com/vislearn/dsacstar>`_:
+To run the examples, for instance the first one:
 
 .. code-block:: bash
 
-    wget https://heidata.uni-heidelberg.de/api/access/datafile/4037 -O $dataset/7scenes_rendered_depth.tar.gz
-    mkdir $dataset/depth/
-    tar xzf $dataset/7scenes_rendered_depth.tar.gz -C $dataset/depth/ && rm $dataset/7scenes_rendered_depth.tar.gz
+    python runners/tests/localization.py --data runners/tests/localization_test_data_stairs_1.npy
 
-The download could take some time as the compressed data files contain all 7Scenes. You could delete the other scenes since for this example we are only using the Stairs scene.
+The script will print the pose error estimated using point-only (hloc), and the pose error estimated by our hybrid point-line localization framework. In addition, two images will be created in the output folder (default to ``outputs/test/localization``) showing the inliers point and line correspondences in hybrid localization projected using the two estimated camera pose (by point-only and point+line) onto the query image with 2D point and line detections marked. 
 
-Now, to run the localization pipeline with points and lines. As shown above, the configs are passed in as command line arguments.
-
-.. code-block:: bash
-
-    python runners/7scenes/localization.py --dataset $dataset -s stairs --skip_exists \
-                                           --localization.optimize.loss_func TrivialLoss \
-                                           --localization.optimize.normalize_weight
-
-It is also possible to use the rendered depth with the ``--use_dense_depth`` flag, in which case the 3D line map will be built using LIMAP's Fit&Merge (enable merging by adding ``--merging.do_merging``) utilities instead of triangulation.
-
-.. code-block:: bash
-
-    python runners/7scenes/localization.py --dataset $dataset -s stairs --skip_exists \
-                                           --use_dense_depth \
-                                           --localization.optimize.loss_func TrivialLoss \
-                                           --localization.optimize.normalize_weight
-
-The runner scripts will also run `hloc <https://github.com/cvg/Hierarchical-Localization/tree/master/hloc/pipelines/7Scenes>`_ for extracting and matching the feature points and for compariing the results.
+An improved accuracy of the hybrid point-line method is expected to be observed.
