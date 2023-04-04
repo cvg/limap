@@ -214,12 +214,12 @@ void bind_linebase(py::module& m) {
         .def_readonly("d", &InfiniteLine3d::d)
         .def_readonly("m", &InfiniteLine3d::m)
         .def("point", &InfiniteLine3d::point)
-        .def("direction", &InfiniteLine3d::point)
-        .def("matrix", &InfiniteLine3d::point)
-        .def("point_projection", &InfiniteLine3d::point)
-        .def("point_distance", &InfiniteLine3d::point)
-        .def("projection", &InfiniteLine3d::point)
-        .def("unprojection", &InfiniteLine3d::point)
+        .def("direction", &InfiniteLine3d::direction)
+        .def("matrix", &InfiniteLine3d::matrix)
+        .def("point_projection", &InfiniteLine3d::point_projection)
+        .def("point_distance", &InfiniteLine3d::point_distance)
+        .def("projection", &InfiniteLine3d::projection)
+        .def("unprojection", &InfiniteLine3d::unprojection)
         .def("project_from_infinite_line", &InfiniteLine3d::project_from_infinite_line)
         .def("project_to_infinite_line", &InfiniteLine3d::project_to_infinite_line);
 
