@@ -140,11 +140,11 @@ void bind_transforms(py::module& m) {
 }
 
 void bind_linebase(py::module& m) {
-    py::class_<Line2d>(m, "Line2d", "2D Line")
-        .def(py::init<>())
-        .def(py::init<const Eigen::MatrixXd&>())
-        .def(py::init<V2D, V2D>(), py::arg("start"), py::arg("end"))
-        .def(py::init<V2D, V2D, double>(), py::arg("start"), py::arg("end"), py::kw_only(), py::arg("score"))
+    py::class_<Line2d>(m, "Line2d", "Class representing finite 2D line (segments)")
+        .def(py::init<>(), "Default constructor")
+        .def(py::init<const Eigen::MatrixXd&>(), "Constructor from :class:`np.array` of shape (2, 2) stacking the two 2D endpoints", py::arg("seg2d"))
+        .def(py::init<V2D, V2D>(), "Constructor from `start` and `end` endpoints, each a :class:`np.array` of shape (2,)", py::arg("start"), py::arg("end"))
+        .def(py::init<V2D, V2D, double>(), "Constructor from two endpoints and optionally the score", py::arg("start"), py::arg("end"), py::kw_only(), py::arg("score"))
         .def(py::pickle(
             [](const Line2d& input) { // dump
                 return input.as_array();
@@ -153,22 +153,51 @@ void bind_linebase(py::module& m) {
                 return Line2d(arr);
             }
         ))
-        .def_readonly("start", &Line2d::start, "2-dimensional :class:`np.array`, first endpoint")
-        .def_readonly("end", &Line2d::end, "2-dimensional :class:`np.array`, second endpoint")
-        .def_readonly("score", &Line2d::score, "score score score")
-        .def("length", &Line2d::length)
-        .def("coords", &Line2d::coords)
-        .def("as_array", &Line2d::as_array)
-        .def("midpoint", &Line2d::midpoint)
-        .def("direction", &Line2d::direction)
-        .def("point_projection", &Line2d::point_projection)
-        .def("point_distance", &Line2d::point_distance);
+        .def_readwrite("start", &Line2d::start, ":class:`np.array` of shape (2,)")
+        .def_readwrite("end", &Line2d::end, ":class:`np.array` of shape (2,)")
+        .def_readwrite("score", &Line2d::score, "float")
+        .def("length", &Line2d::length, R"(
+            Returns:
+                float: The length of the 2D line segment
+        )")
+        .def("coords", &Line2d::coords, R"(
+            Returns:
+                :class:`np.array` of shape (3,): Normalized homogeneous coordinate of the 2D line
+        )")
+        .def("as_array", &Line2d::as_array, R"(
+            Returns:
+                :class:`np.array` of shape (2, 2): Array stacking `start` and `end` endpoints
+        )")
+        .def("midpoint", &Line2d::midpoint, R"(
+            Returns:
+                :class:`np.array` of shape (2,): Coordinate of the midpoint of the 2D line segment
+        )")
+        .def("direction", &Line2d::direction, R"(
+            Returns:
+                :class:`np.array` of shape (2,): Direction vector of the 2D line from `start` to `end`
+        )")
+        .def("point_projection", &Line2d::point_projection, R"(
+            Args:
+                p (:class:`np.array`): Coordinate of a 2D point, of shape (2,)
 
-    py::class_<Line3d>(m, "Line3d")
-        .def(py::init<>())
-        .def(py::init<const Eigen::MatrixXd&>())
-        .def(py::init<V3D, V3D>(), py::arg("start"), py::arg("end"))
-        .def(py::init<V3D, V3D, double, double, double, double>(), py::arg("start"), py::arg("end"), py::kw_only(), py::arg("score"), py::arg("depth_start"), py::arg("depth_end"), py::arg("uncertainty"))
+            Returns:
+                :class:`np.array` of shape (2,): Coordinate of the projection of the point `p` on the 2D line
+        )", py::arg("p"))
+        .def("point_distance", &Line2d::point_distance, R"(
+            Args:
+                p (:class:`np.array`): Coordinate of a 2D point, of shape (2,)
+
+            Returns:
+                float: Distance from the point `p` to the 2D line
+        )", py::arg("p"));
+
+    py::class_<Line3d>(m, "Line3d", "Class representing finite 3D line (segments)")
+        .def(py::init<>(), "Default constructor")
+        .def(py::init<const Eigen::MatrixXd&>(), "Constructor from :class:`np.array` of shape (2, 3) stacking the two 3D endpoints", py::arg("seg3d"))
+        .def(py::init<V3D, V3D>(), "Constructor from `start` and `end` endpoints, each a :class:`np.array` of shape (3,)", py::arg("start"), py::arg("end"))
+        .def(py::init<V3D, V3D, double, double, double, double>(), R"(
+            Constructor from two endpoints, and optionally: the score, the start and/or end depth of the 3D segment, and the uncertainty value
+        )", py::arg("start"), py::arg("end"), py::kw_only(), py::arg("score"), py::arg("depth_start"), py::arg("depth_end"), py::arg("uncertainty"))
         .def(py::pickle(
             [](const Line3d& input) { // dump
                 return input.as_array();
@@ -177,21 +206,64 @@ void bind_linebase(py::module& m) {
                 return Line3d(arr);
             }
         ))
-        .def_readonly("start", &Line3d::start)
-        .def_readonly("end", &Line3d::end)
-        .def_readonly("score", &Line3d::score)
-        .def_readonly("depths", &Line3d::depths)
-        .def_readonly("uncertainty", &Line3d::uncertainty)
-        .def("set_uncertainty", &Line3d::set_uncertainty)
-        .def("length", &Line3d::length)
-        .def("as_array", &Line3d::as_array)
-        .def("projection", &Line3d::projection)
-        .def("sensitivity", &Line3d::sensitivity)
-        .def("computeUncertainty", &Line3d::computeUncertainty)
-        .def("midpoint", &Line3d::midpoint)
-        .def("direction", &Line3d::direction)
-        .def("point_projection", &Line3d::point_projection)
-        .def("point_distance", &Line3d::point_distance);
+        .def_readonly("start", &Line3d::start, ":class:`np.array` of shape (3,)")
+        .def_readonly("end", &Line3d::end, ":class:`np.array` of shape (3,)")
+        .def_readonly("score", &Line3d::score, "float")
+        .def_readonly("depths", &Line3d::depths, "float")
+        .def_readonly("uncertainty", &Line3d::uncertainty, "float")
+        .def("set_uncertainty", &Line3d::set_uncertainty, "Setter for the uncertainty value")
+        .def("length", &Line3d::length, R"(
+            Returns:
+                float: The length of the 3D line segment
+        )")
+        .def("as_array", &Line3d::as_array, R"(
+            Returns:
+                :class:`np.array` of shape (2, 3): Array stacking `start` and `end` endpoints
+        )")
+        .def("projection", &Line3d::projection, R"(
+            Args:
+                view (CameraView): :class:`~limap.base.CameraView` instance used to project the 3D line to 2D
+
+            Returns:
+                :class:`~limap.base.Line2d`: The 2D line segment projected from the 3D line segment
+        )", py::arg("view"))
+        .def("sensitivity", &Line3d::sensitivity, R"(
+            Args:
+                view (CameraView): :class:`~limap.base.CameraView` instance
+
+            Returns:
+                float: Sensitivity with respect to `view`
+        )", py::arg("view"))
+        .def("computeUncertainty", &Line3d::computeUncertainty, R"(
+            Args:
+                view (CameraView): :class:`~limap.base.CameraView` instance 
+                var2d (float): Variance in 2D
+
+            Returns:
+                float: The computed uncertainty value with respect to `view` and `var2d`
+        )")
+        .def("midpoint", &Line3d::midpoint, R"(
+            Returns:
+                :class:`np.array` of shape (3,): Coordinate of the midpoint of the 3D line segment
+        )")
+        .def("direction", &Line3d::direction, R"(
+            Returns:
+                :class:`np.array` of shape (3,): Direction vector of the 3D line from `start` to `end`
+        )")
+        .def("point_projection", &Line3d::point_projection, R"(
+            Args:
+                p (:class:`np.array`): Coordinate of a 3D point, of shape (3,)
+
+            Returns:
+                :class:`np.array` of shape (3,): Coordinate of the projection of the point `p` on the 3D line
+        )", py::arg("p"))
+        .def("point_distance", &Line3d::point_distance, R"(
+            Args:
+                p (:class:`np.array`): Coordinate of a 3D point, of shape (3,)
+
+            Returns:
+                float: Distance from the point `p` to the 3D line
+        )", py::arg("p"));
 
     m.def("_GetLine2dVectorFromArray", &GetLine2dVectorFromArray);
     m.def("_GetLine3dVectorFromArray", &GetLine3dVectorFromArray);
