@@ -140,7 +140,7 @@ void bind_transforms(py::module& m) {
 }
 
 void bind_linebase(py::module& m) {
-    py::class_<Line2d>(m, "Line2d", "Class representing finite 2D line (segments)")
+    py::class_<Line2d>(m, "Line2d", "A finite 2D line (segment).")
         .def(py::init<>(), R"(
             Default constructor
         )")
@@ -148,7 +148,7 @@ void bind_linebase(py::module& m) {
             Constructor from :class:`np.array` of shape (2, 2) stacking the two 2D endpoints
         )", py::arg("seg2d"))
         .def(py::init<V2D, V2D>(), R"(
-            Constructor from `start` and `end` endpoints, each a :class:`np.array` of shape (2,)
+            Constructor from `\start` and `end` endpoints, each a :class:`np.array` of shape (2,)
         )", py::arg("start"), py::arg("end"))
         .def(py::init<V2D, V2D, double>(), R"(
             Constructor from two endpoints and optionally the score
@@ -174,7 +174,7 @@ void bind_linebase(py::module& m) {
         )")
         .def("as_array", &Line2d::as_array, R"(
             Returns:
-                :class:`np.array` of shape (2, 2): Array stacking `start` and `end` endpoints
+                :class:`np.array` of shape (2, 2): Array stacking `\start` and `end` endpoints
         )")
         .def("midpoint", &Line2d::midpoint, R"(
             Returns:
@@ -182,7 +182,7 @@ void bind_linebase(py::module& m) {
         )")
         .def("direction", &Line2d::direction, R"(
             Returns:
-                :class:`np.array` of shape (2,): Direction vector of the 2D line from `start` to `end`
+                :class:`np.array` of shape (2,): Direction vector of the 2D line from `\start` to `end`
         )")
         .def("point_projection", &Line2d::point_projection, R"(
             Args:
@@ -199,7 +199,7 @@ void bind_linebase(py::module& m) {
                 float: Distance from the point `p` to the 2D line
         )", py::arg("p"));
 
-    py::class_<Line3d>(m, "Line3d", "Class representing finite 3D line (segments)")
+    py::class_<Line3d>(m, "Line3d", "A finite 3D line (segment).")
         .def(py::init<>(), R"(
             Default constructor
         )")
@@ -207,7 +207,7 @@ void bind_linebase(py::module& m) {
             Constructor from :class:`np.array` of shape (2, 3) stacking the two 3D endpoints
         )", py::arg("seg3d"))
         .def(py::init<V3D, V3D>(), R"(
-            Constructor from `start` and `end` endpoints, each a :class:`np.array` of shape (3,)
+            Constructor from `\start` and `end` endpoints, each a :class:`np.array` of shape (3,)
         )", py::arg("start"), py::arg("end"))
         .def(py::init<V3D, V3D, double, double, double, double>(), R"(
             Constructor from two endpoints, and optionally: the score, the start and/or end depth of the 3D segment, and the uncertainty value
@@ -232,7 +232,7 @@ void bind_linebase(py::module& m) {
         )")
         .def("as_array", &Line3d::as_array, R"(
             Returns:
-                :class:`np.array` of shape (2, 3): Array stacking `start` and `end` endpoints
+                :class:`np.array` of shape (2, 3): Array stacking `\start` and `end` endpoints
         )")
         .def("projection", &Line3d::projection, R"(
             Args:
@@ -262,7 +262,7 @@ void bind_linebase(py::module& m) {
         )")
         .def("direction", &Line3d::direction, R"(
             Returns:
-                :class:`np.array` of shape (3,): Direction vector of the 3D line from `start` to `end`
+                :class:`np.array` of shape (3,): Direction vector of the 3D line from `\start` to `end`
         )")
         .def("point_projection", &Line3d::point_projection, R"(
             Args:
@@ -282,7 +282,7 @@ void bind_linebase(py::module& m) {
     m.def("_GetLine2dVectorFromArray", &GetLine2dVectorFromArray);
     m.def("_GetLine3dVectorFromArray", &GetLine3dVectorFromArray);
 
-    py::class_<InfiniteLine2d>(m, "InfiniteLine2d", "Class representing infinite 2D lines")
+    py::class_<InfiniteLine2d>(m, "InfiniteLine2d", "An infinite 2D line.")
         .def(py::init<>(), R"(
             Default constructor
         )")
@@ -319,14 +319,14 @@ void bind_linebase(py::module& m) {
                 float: Distance from the point `p` to the 2D line
         )", py::arg("p"));
 
-    py::class_<InfiniteLine3d>(m, "InfiniteLine3d", "Class representing infinite 3D lines")
+    py::class_<InfiniteLine3d>(m, "InfiniteLine3d", "An infinite 3D line.")
         .def(py::init<>(), R"(
             Default constructor
         )")
         .def(py::init<const V3D&, const V3D&, bool>(), R"(
-            | Constructor using normal coordinate (a start point and direction) or Plücker coordinate 
-            | if `use_normal` is True -> (`a`, `b`) is (`p`, `direc`): normal coordinate with a point and a direction 
-            | if `use_normal` is False -> (`a`, `b`) is (`direc`, `m`): Plücker coordinate
+            | Constructor using normal coordinate (a start point and direction) or Plücker coordinate.
+            | if `use_normal` is True -> (`a`, `b`) is (`p`, `direc`): normal coordinate with a point and a direction;
+            | if `use_normal` is False -> (`a`, `b`) is (`direc`, `m`): Plücker coordinate.
         )", py::arg("a"), py::arg("b"), py::arg("use_normal"))
         .def(py::init<const Line3d&>(), R"(
             Constructor from a :class:`~limap.base.Line3d`
@@ -388,7 +388,7 @@ void bind_linebase(py::module& m) {
                 :class:`np.array` of shape (3,): The projected point on this 3D line from the other line
         )", py::arg("line"))
         .def("project_to_infinite_line", &InfiniteLine3d::project_to_infinite_line, R"(
-            Inverse of the previous function: finding the closest point on the other line to this line
+            Inverse of the previous function: finding the closest point on the other line to this line.
 
             Args:
                 line (:class:`~limap.base.InfiniteLine3d`): The other infinite line to project to
@@ -402,12 +402,24 @@ void bind_linebase(py::module& m) {
 }
 
 void bind_linetrack(py::module& m) {
-    py::class_<LineTrack>(m, "LineTrack", "The associated line track across multi-view")
-        .def(py::init<>())
-        .def(py::init<LineTrack>())
-        .def(py::init<const Line3d&, const std::vector<int>&, const std::vector<int>&, const std::vector<Line2d>&>())
-        .def(py::init<py::dict>())
-        .def("as_dict", &LineTrack::as_dict)
+    py::class_<LineTrack>(m, "LineTrack", "Associated line track across multi-view.")
+        .def(py::init<>(), R"(
+            Default constructor
+        )")
+        .def(py::init<LineTrack>(), R"(
+            Copy constructor
+        )", py::arg("track"))
+        .def(py::init<const Line3d&, const std::vector<int>&, const std::vector<int>&, const std::vector<Line2d>&>(), R"(
+            Constructor from a :class:`~limap.base.Line3d`, a list of associated image IDs, a list of supporting line IDs within each image, 
+            and a list of associated :class:`~limap.base.Line2d`\s
+        )", py::arg("line"), py::arg("image_id_list"), py::arg("line_id_list"), py::arg("line2d_list"))
+        .def(py::init<py::dict>(), R"(
+            Constructor from a Python dict
+        )", py::arg("dict"))
+        .def("as_dict", &LineTrack::as_dict, R"(
+            Returns:
+                dict: Python dict representation of this :class:`~limap.base.LineTrack`
+        )")
         .def(py::pickle(
             [](const LineTrack& input) { // dump
                 return input.as_dict();
@@ -416,25 +428,60 @@ void bind_linetrack(py::module& m) {
                 return LineTrack(dict);
             }
         ))
-        .def_readwrite("line", &LineTrack::line)
-        .def_readonly("node_id_list", &LineTrack::node_id_list)
-        .def_readonly("image_id_list", &LineTrack::image_id_list)
-        .def_readonly("line_id_list", &LineTrack::line_id_list)
-        .def_readonly("line3d_list", &LineTrack::line3d_list)
-        .def_readonly("line2d_list", &LineTrack::line2d_list)
-        .def_readonly("score_list", &LineTrack::score_list)
-        .def_readonly("active", &LineTrack::active)
-        .def("count_lines", &LineTrack::count_lines)
-        .def("GetSortedImageIds", &LineTrack::GetSortedImageIds)
-        .def("count_images", &LineTrack::count_images)
-        .def("projection", &LineTrack::projection)
-        .def("HasImage", &LineTrack::HasImage)
-        .def("Read", &LineTrack::Read)
-        .def("Write", &LineTrack::Write);
+        .def_readwrite("line", &LineTrack::line, ":class:`~limap.base.Line3d`, the 3D line")
+        // .def_readonly("node_id_list", &LineTrack::node_id_list)
+        .def_readonly("image_id_list", &LineTrack::image_id_list, "list[int], the associated image IDs")
+        .def_readonly("line_id_list", &LineTrack::line_id_list, "list[int], IDs of supporting 2D lines within each image")
+        // .def_readonly("line3d_list", &LineTrack::line3d_list)
+        .def_readonly("line2d_list", &LineTrack::line2d_list, "list[:class:`~limap.base.Line2d`], the supporting 2D line segments")
+        // .def_readonly("score_list", &LineTrack::score_list)
+        .def_readonly("active", &LineTrack::active, "bool, active status for recursive merging")
+        .def("count_lines", &LineTrack::count_lines, R"(
+            Returns:
+                int: The number of supporting 2D lines
+        )")
+        .def("GetSortedImageIds", &LineTrack::GetSortedImageIds, R"(
+            Returns:
+                list[int]: Sorted (and deduplicated) list of the associated image IDs
+        )")
+        .def("count_images", &LineTrack::count_images, R"(
+            Returns:
+                int: Number of unique associated images
+        )")
+        .def("projection", &LineTrack::projection, R"(
+            Project the 3D line to 2D using a list of :class:`~limap.base.CameraView`\s.
+
+            Args:
+                views (list[:class:`~limap.base.CameraView`]): Camera views to project the 3D line
+            
+            Returns:
+                list[:class:`~limap.base.Line2d`]: The 2D projection segments of the 3D line
+        )", py::arg("views"))
+        .def("HasImage", &LineTrack::HasImage, R"(
+            Check whether the 3D line has a 2D support from a certain image.
+
+            Args:
+                image_id (int): The image ID
+            
+            Returns:
+                bool: True if there is a supporting 2D line from this image
+        )", py::arg("image_id"))
+        .def("Read", &LineTrack::Read, R"(
+            Read the line track information from a file.
+
+            Args:
+                filename (str): The file to read from
+        )", py::arg("filename"))
+        .def("Write", &LineTrack::Write, R"(
+            Write the line track information to a file.
+
+            Args:
+                filename (str): The file to read from
+        )", py::arg("filename"));
 }
 
 void bind_line_dists(py::module& m) {
-    py::enum_<LineDistType>(m, "LineDistType", "Enum of supported line distance types")
+    py::enum_<LineDistType>(m, "LineDistType", "Enum of supported line distance types.")
         .value("ANGULAR", LineDistType::ANGULAR)
         .value("ANGULAR_DIST", LineDistType::ANGULAR_DIST)
         .value("ENDPOINTS", LineDistType::ENDPOINTS)
@@ -455,7 +502,7 @@ void bind_line_dists(py::module& m) {
         [](const Line2d& l1, const Line2d& l2, const LineDistType& type) {
             return compute_distance<Line2d>(l1, l2, type);
         }, R"(
-            Compute distance between two :class:`~limap.base.Line2d` using the specified line distance type
+            Compute distance between two :class:`~limap.base.Line2d` using the specified line distance type.
 
             Args:
                 l1 (:class:`~limap.base.Line2d`): First 2D line segment
@@ -470,7 +517,7 @@ void bind_line_dists(py::module& m) {
         [](const Line3d& l1, const Line3d& l2, const LineDistType& type) {
             return compute_distance<Line3d>(l1, l2, type);
         }, R"(
-            Compute distance between two :class:`~limap.base.Line3d` using the specified line distance type
+            Compute distance between two :class:`~limap.base.Line3d` using the specified line distance type.
 
             Args:
                 l1 (:class:`~limap.base.Line3d`): First 3D line segment
@@ -485,10 +532,10 @@ void bind_line_dists(py::module& m) {
         [](const std::vector<Line2d>& lines, const LineDistType& type) {
             return compute_pairwise_distance<Line2d>(lines, type);
         }, R"(
-            Compute pairwise distance among a list of :class:`~limap.base.Line2d`s using the specified line distance type
+            Compute pairwise distance among a list of :class:`~limap.base.Line2d`\s using the specified line distance type.
 
             Args:
-                lines (list): List of :class:`~limap.base.Line2d`
+                lines (list[:class:`~limap.base.Line2d`]): List of 2D line segments
                 type (:class:`~limap.base.LineDistType`): Line distance type
             
             Returns:
@@ -499,10 +546,10 @@ void bind_line_dists(py::module& m) {
         [](const std::vector<Line3d>& lines, const LineDistType& type) {
             return compute_pairwise_distance<Line3d>(lines, type);
         }, R"(
-            Compute pairwise distance among a list of :class:`~limap.base.Line2d`s using the specified line distance type
+            Compute pairwise distance among a list of :class:`~limap.base.Line3d`\s using the specified line distance type.
 
             Args:
-                lines (list): List of :class:`~limap.base.Line2d`
+                 lines (list[:class:`~limap.base.Line3d`]): List of 3D line segments
                 type (:class:`~limap.base.LineDistType`): Line distance type
             
             Returns:
@@ -578,15 +625,29 @@ void bind_line_linker(py::module& m) {
 }
 
 void bind_camera(py::module& m) {
-    py::class_<Camera>(m, "Camera")
+    py::class_<Camera>(m, "Camera", R"(
+            | Camera model, inherits `COLMAP's camera model <https://colmap.github.io/cameras.html>`_.
+            | COLMAP camera models:
+            | 0, SIMPLE_PINHOLE
+            | 1, PINHOLE
+            | 2, SIMPLE_RADIAL
+            | 3, RADIAL
+            | 4, OPENCV
+            | 5, OPENCV_FISHEYE
+            | 6, FULL_OPENCV
+            | 7, FOV
+            | 8, SIMPLE_RADIAL_FISHEYE
+            | 9, RADIAL_FISHEYE
+            | 10, THIN_PRISM_FISHEYE
+        )")
         .def(py::init<>())
         .def(py::init<int, const std::vector<double>&, int, std::pair<int, int>>(), py::arg("model_id"), py::arg("params"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1))
         .def(py::init<const std::string&, const std::vector<double>&, int, std::pair<int, int>>(), py::arg("model_name"), py::arg("params"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1))
         .def(py::init<M3D, int, std::pair<int, int>>(), py::arg("K"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1))
         .def(py::init<int, M3D, int, std::pair<int, int>>(), py::arg("model_id"), py::arg("K"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1))
         .def(py::init<const std::string&, M3D, int, std::pair<int, int>>(), py::arg("model_name"), py::arg("K"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1))
-        .def(py::init<py::dict>())
-        .def(py::init<const Camera&>())
+        .def(py::init<py::dict>(), py::arg("dict"))
+        .def(py::init<const Camera&>(), py::arg("cam"))
         .def(py::init<int, int, std::pair<int, int>>(), py::arg("model_id"), py::arg("cam_id"), py::arg("hw")=std::make_pair<int, int>(-1, -1)) // empty camera
         .def(py::pickle(
             [](const Camera& input) { // dump
@@ -596,26 +657,82 @@ void bind_camera(py::module& m) {
                 return Camera(dict);
             }
         ))
-        .def("as_dict", &Camera::as_dict)
-        .def("h", &Camera::h)
-        .def("w", &Camera::w)
-        .def("K", &Camera::K)
-        .def("K_inv", &Camera::K_inv)
-        .def("cam_id", &Camera::CameraId)
-        .def("model_id", &Camera::ModelId)
-        .def("params", &Camera::params)
-        .def("num_params", &Camera::NumParams)
-        .def("resize", &Camera::resize)
-        .def("set_max_image_dim", &Camera::set_max_image_dim)
-        .def("set_cam_id", &Camera::SetCameraId)
-        .def("IsUndistorted", &Camera::IsUndistorted);
+        .def("as_dict", &Camera::as_dict, R"(
+            Returns:
+                dict: Python dict representation of this :class:`~limap.base.Camera`
+        )")
+        .def("h", &Camera::h, R"(
+            Returns:
+                int: Image height in pixels
+        )")
+        .def("w", &Camera::w, R"(
+            Returns:
+                int: Image width in pixels
+        )")
+        .def("K", &Camera::K, R"(
+            Returns:
+                :class:`np.array` of shape (3, 3): Camera's intrinsic matrix
+        )")
+        .def("K_inv", &Camera::K_inv, R"(
+            Returns:
+                :class:`np.array` of shape (3, 3): Inverse of the intrinsic matrix
+        )")
+        .def("cam_id", &Camera::CameraId, R"(
+            Returns:
+                int: Camera ID
+        )")
+        .def("model_id", &Camera::ModelId, R"(
+            Returns:
+                int: COLMAP camera model ID
+        )")
+        .def("params", &Camera::params, R"(
+            Returns:
+                list (float): Minimal representation of intrinsic paramters, length varies according to camera model
+        )")
+        .def("num_params", &Camera::NumParams, R"(
+            Returns:
+                int: Number of the paramters for minimal representation of intrinsic 
+        )")
+        .def("resize", &Camera::resize, R"(
+            Resize camera's width and height.
 
-    py::class_<CameraPose>(m, "CameraPose")
-        .def(py::init<>())
-        .def(py::init<V4D, V3D>())
-        .def(py::init<M3D, V3D>())
-        .def(py::init<py::dict>())
-        .def(py::init<const CameraPose&>())
+            Args:
+                width (int)
+                height (int)
+        )", py::arg("width"), py::arg("height"))
+        .def("set_max_image_dim", &Camera::set_max_image_dim, R"(
+            Set the maximum image dimension, the camera will be resized if the longer dimension of width or height is larger than this value.
+
+            Args:
+                val (int)
+        )", py::arg("val"))
+        .def("set_cam_id", &Camera::SetCameraId, R"(
+            Set the camera ID.
+
+            Args:
+                camera_id (int)
+        )", py::arg("camera_id"))
+        .def("IsUndistorted", &Camera::IsUndistorted, R"(
+            Returns:
+                bool: True if the camera model is without distortion
+        )");
+
+    py::class_<CameraPose>(m, "CameraPose", "Representing the pose of a camera. The quaternion convention is `(w, x, y, z)` (real part first).")
+        .def(py::init<>(), R"(
+            Default constructor: identity pose
+        )")
+        .def(py::init<const CameraPose&>(), R"(
+            Copy constructor
+        )", py::arg("campose"))
+        .def(py::init<V4D, V3D>(), R"(
+            Constructor from a quaternion vector and a translation vector
+        )", py::arg("qvec"), py::arg("tvec"))
+        .def(py::init<M3D, V3D>(), R"(
+            Constructor from a rotation matrix and a translation vector
+        )")
+        .def(py::init<py::dict>(), R"(
+            Constructor from a Python dict
+        )", py::arg("dict"))
         .def(py::pickle(
             [](const CameraPose& input) { // dump
                 return input.as_dict();
@@ -624,20 +741,44 @@ void bind_camera(py::module& m) {
                 return CameraPose(dict);
             }
         ))
-        .def("as_dict", &CameraPose::as_dict)
-        .def_readonly("qvec", &CameraPose::qvec)
-        .def_readonly("tvec", &CameraPose::tvec)
-        .def("R", &CameraPose::R)
-        .def("T", &CameraPose::T)
-        .def("center", &CameraPose::center)
-        .def("projdepth", &CameraPose::projdepth);
+        .def("as_dict", &CameraPose::as_dict, R"(
+            Returns:
+                dict: Python dict representation of this :class:`~limap.base.CameraPose`
+        )")
+        .def_readonly("qvec", &CameraPose::qvec, R"(
+            Returns:
+                :class:`np.array` of shape (4,): The quaternion vector `(w, x, y, z)`
+        )")
+        .def_readonly("tvec", &CameraPose::tvec, R"(
+            Returns:
+                :class:`np.array` of shape (3,): The translation vector
+        )")
+        .def("R", &CameraPose::R, R"(
+            Returns:
+                :class:`np.array` of shape (3, 3): The rotation matrix
+        )")
+        .def("T", &CameraPose::T, R"(
+            Returns:
+                :class:`np.array` of shape (3,): The translation vector
+        )")
+        .def("center", &CameraPose::center, R"(
+            Returns:
+                :class:`np.array` of shape (3,): World-space coordinate of the camera
+        )")
+        .def("projdepth", &CameraPose::projdepth, R"(
+            Args:
+                p3d (:class:`np.array`): World-space coordinate of a 3D point
+            
+            Returns:
+                float: The projection depth of the 3D point viewed from this camera pose
+        )", py::arg("p3d"));
 
-    py::class_<CameraImage>(m, "CameraImage")
+    py::class_<CameraImage>(m, "CameraImage", "This class associates the ID of a :class:`~limap.base.Camera`, a :class:`~limap.base.CameraPose`, and an image file")
         .def(py::init<>())
         .def(py::init<const int&, const CameraPose&, const std::string&>(), py::arg("cam_id"), py::arg("pose"), py::arg("image_name") = "none")
         .def(py::init<const Camera&, const CameraPose&, const std::string&>(), py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
-        .def(py::init<py::dict>())
-        .def(py::init<const CameraImage&>())
+        .def(py::init<py::dict>(), py::arg("dict"))
+        .def(py::init<const CameraImage&>(), py::arg("camimage"))
         .def(py::init<const int&, const std::string&>(), py::arg("cam_id"), py::arg("image_name") = "none") // empty image
         .def(py::pickle(
             [](const CameraImage& input) { // dump
@@ -647,20 +788,42 @@ void bind_camera(py::module& m) {
                 return CameraImage(dict);
             }
         ))
-        .def("as_dict", &CameraImage::as_dict)
-        .def_readonly("cam_id", &CameraImage::cam_id)
-        .def_readonly("pose", &CameraImage::pose)
-        .def("R", &CameraImage::R)
-        .def("T", &CameraImage::T)
-        .def("set_camera_id", &CameraImage::SetCameraId)
-        .def("image_name", &CameraImage::image_name)
-        .def("set_image_name", &CameraImage::SetImageName);
+        .def("as_dict", &CameraImage::as_dict, R"(
+            Returns:
+                dict: Python dict representation of this :class:`~limap.base.CameraImage`
+        )")
+        .def_readonly("cam_id", &CameraImage::cam_id, "int, the camera ID")
+        .def_readonly("pose", &CameraImage::pose, ":class:`~limap.base.CameraPose`, the camera pose")
+        .def("R", &CameraImage::R, R"(
+            Returns:
+                :class:`np.array` of shape (3, 3): The rotation matrix of the camera pose
+        )")
+        .def("T", &CameraImage::T, R"(
+            Returns:
+                :class:`np.array` of shape (3,): The translation vector of the camera pose
+        )")
+        .def("set_camera_id", &CameraImage::SetCameraId, R"(
+            Set the camera ID.
 
-    py::class_<CameraView>(m, "CameraView")
+            Args:
+                cam_id (int)
+        )", py::arg("cam_id"))
+        .def("image_name", &CameraImage::image_name, R"(
+            Returns:
+                str: The image file name
+        )")
+        .def("set_image_name", &CameraImage::SetImageName, R"(
+            Set the name of the image file.
+
+            Args:
+                image_name (str)
+        )", py::arg("image_name"));
+
+    py::class_<CameraView>(m, "CameraView", "Inherits :class:`~limap.base.CameraImage`, incorporating the :class:`~limap.base.Camera` model for project/unproject between 2D and 3D.")
         .def(py::init<>())
         .def(py::init<const Camera&, const CameraPose&, const std::string&>(), py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
-        .def(py::init<py::dict>())
-        .def(py::init<const CameraView&>())
+        .def(py::init<py::dict>(), py::arg("dict"))
+        .def(py::init<const CameraView&>(), py::arg("camview"))
         .def(py::pickle(
             [](const CameraView& input) { // dump
                 return input.as_dict();
@@ -669,32 +832,94 @@ void bind_camera(py::module& m) {
                 return CameraView(dict);
             }
         ))
-        .def_readonly("cam", &CameraView::cam)
-        .def_readonly("pose", &CameraView::pose)
-        .def("as_dict", &CameraView::as_dict)
-        .def("read_image", &CameraView::read_image, py::arg("set_gray")=false)
-        .def("K", &CameraView::K)
-        .def("K_inv", &CameraView::K_inv)
-        .def("h", &CameraView::h)
-        .def("w", &CameraView::w)
-        .def("R", &CameraView::R)
-        .def("T", &CameraView::T)
-        .def("matrix", &CameraView::matrix)
-        .def("projection", &CameraView::projection)
-        .def("ray_direction", &CameraView::ray_direction)
-        .def("get_direction_from_vp", &CameraView::get_direction_from_vp)
-        .def("image_name", &CameraView::image_name)
-        .def("set_image_name", &CameraView::SetImageName);
+        .def_readonly("cam", &CameraView::cam, ":class:`~limap.base.Camera`, the camera model")
+        .def_readonly("pose", &CameraView::pose, ":class:`~limap.base.CameraPose`, the camera pose")
+        .def("as_dict", &CameraView::as_dict, R"(
+            Returns:
+                dict: Python dict representation of this :class:`~limap.base.CameraView`
+        )")
+        .def("read_image", &CameraView::read_image, R"(
+            Read image data from the image file.
 
-    py::class_<ImageCollection>(m, "ImageCollection")
+            Args:
+                set_gray (bool): Whether to convert the image to gray. Default False.
+
+            Returns:
+                :class:`np.array`: The image data matrix
+        )", py::arg("set_gray")=false)
+        .def("K", &CameraView::K, R"(
+            Returns:
+                :class:`np.array` of shape (3, 3): The intrinsic matrix of the camera
+        )")
+        .def("K_inv", &CameraView::K_inv, R"(
+            Returns:
+                :class:`np.array` of shape (3, 3): The inverse of the camera's intrinsic matrix
+        )")
+        .def("h", &CameraView::h, R"(
+            Returns:
+                int: Image height in pixels
+        )")
+        .def("w", &CameraView::w, R"(
+            Returns:
+                int: Image width in pixels
+        )")
+        .def("R", &CameraView::R, R"(
+            Returns:
+                :class:`np.array` of shape (3, 3): The rotation matrix of the camera pose
+        )")
+        .def("T", &CameraView::T, R"(
+            Returns:
+                :class:`np.array` of shape (3,): The translation vector of the camera pose
+        )")
+        .def("matrix", &CameraView::matrix, R"(
+            Returns:
+                :class:`np.array` of shape (3, 4): The projection matrix `P = K[R|T]`
+        )")
+        .def("projection", &CameraView::projection, R"(
+            Args:
+                p3d (:class:`np.array`): World-space coordinate of a 3D point
+            
+            Returns:
+                :class:`np.array` of shape (2,): The 2D pixel-space coordinate of the point's projection on image 
+        )", py::arg("p3d"))
+        .def("ray_direction", &CameraView::ray_direction, R"(
+            Args:
+                p2d (:class:`np.array`): Pixel-space coordinate of a 2D point on the image
+            
+            Returns:
+                :class:`np.array` of shape (3,): The world-space direction of the camera ray passing the 2D point
+        )", py::arg("p2d"))
+        .def("get_direction_from_vp", &CameraView::get_direction_from_vp, R"(
+            Args:
+                vp (:class:`np.array`): The coordinate of a vanishing point
+            
+            Returns:
+                :class:`np.array` of shape (3,): The direction from the vanishing point
+        )", py::arg("vp"))
+        .def("image_name", &CameraView::image_name, R"(
+            Returns:
+                str: The image file name
+        )")
+        .def("set_image_name", &CameraView::SetImageName, R"(
+            Set the name of the image file.
+
+            Args:
+                image_name (str)
+        )", py::arg("image_name"));
+
+    py::class_<ImageCollection>(m, "ImageCollection", R"(
+            Collection of cameras and images in a scene or dataset. The arguments `input_cameras` and `input_images` of varies constructors 
+            below are either list of :class:`~limap.base.Camera` and :class:`~limap.base.CameraImage` or python dict mapping integer IDs to 
+            :class:`~limap.base.Camera` and :class:`~limap.base.CameraImage`.
+        )")
         .def(py::init<>())
-        .def(py::init<const std::map<int, Camera>&, const std::map<int, CameraImage>&>())
-        .def(py::init<const std::vector<Camera>&, const std::map<int, CameraImage>&>())
-        .def(py::init<const std::map<int, Camera>&, const std::vector<CameraImage>&>())
-        .def(py::init<const std::vector<Camera>&, const std::vector<CameraImage>&>())
-        .def(py::init<const std::vector<CameraView>&>())
-        .def(py::init<py::dict>())
-        .def(py::init<const ImageCollection&>())
+        .def(py::init<const std::map<int, Camera>&, const std::map<int, CameraImage>&>(), py::arg("input_cameras"), py::arg("input_images"))
+        .def(py::init<const std::vector<Camera>&, const std::map<int, CameraImage>&>(), py::arg("input_cameras"), py::arg("input_images"))
+        .def(py::init<const std::map<int, Camera>&, const std::vector<CameraImage>&>(), py::arg("input_cameras"), py::arg("input_images"))
+        .def(py::init<const std::vector<Camera>&, const std::vector<CameraImage>&>(), py::arg("input_cameras"), py::arg("input_images"))
+        .def(py::init<const std::vector<CameraView>&>(), py::arg("camviews"))
+        .def(py::init<py::dict>(), py::arg("dict"))
+        .def(py::init<const ImageCollection&>(), py::arg("imagecols"))
         .def(py::pickle(
             [](const ImageCollection& input) { // dump
                 return input.as_dict();
@@ -703,36 +928,181 @@ void bind_camera(py::module& m) {
                 return ImageCollection(dict);
             }
         ))
-        .def("as_dict", &ImageCollection::as_dict)
-        .def("subset_by_camera_ids", &ImageCollection::subset_by_camera_ids)
-        .def("subset_by_image_ids", &ImageCollection::subset_by_image_ids)
-        .def("update_neighbors", &ImageCollection::update_neighbors)
-        .def("get_cameras", &ImageCollection::get_cameras)
-        .def("get_cam_ids", &ImageCollection::get_cam_ids)
-        .def("get_images", &ImageCollection::get_images)
-        .def("get_img_ids", &ImageCollection::get_img_ids)
-        .def("get_camviews", &ImageCollection::get_camviews)
-        .def("get_map_camviews", &ImageCollection::get_map_camviews)
-        .def("get_locations", &ImageCollection::get_locations)
-        .def("get_map_locations", &ImageCollection::get_map_locations)
-        .def("exist_cam", &ImageCollection::exist_cam)
-        .def("exist_image", &ImageCollection::exist_image)
-        .def("cam", &ImageCollection::cam)
-        .def("camimage", &ImageCollection::camimage)
-        .def("campose", &ImageCollection::campose)
-        .def("camview", &ImageCollection::camview)
-        .def("image_name", &ImageCollection::image_name)
-        .def("get_image_name_list", &ImageCollection::get_image_name_list)
-        .def("get_image_name_dict", &ImageCollection::get_image_name_dict)
-        .def("NumCameras", &ImageCollection::NumCameras)
-        .def("NumImages", &ImageCollection::NumImages)
-        .def("set_max_image_dim", &ImageCollection::set_max_image_dim)
-        .def("change_camera", &ImageCollection::change_camera)
-        .def("change_image", &ImageCollection::change_image)
-        .def("change_image_name", &ImageCollection::change_image_name)
-        .def("IsUndistorted", &ImageCollection::IsUndistorted)
-        .def("read_image", &ImageCollection::read_image, py::arg("img_id"), py::arg("set_gray")=false)
-        .def("apply_similarity_transform", &ImageCollection::apply_similarity_transform);
+        .def("as_dict", &ImageCollection::as_dict, R"(
+            Returns:
+                dict: Python dict representation of this :class:`~limap.base.ImageCollection`
+        )")
+        .def("subset_by_camera_ids", &ImageCollection::subset_by_camera_ids, R"(
+            Filter the images using camera IDs.
+
+            Args:
+                valid_camera_ids (list[int]): Images from camera with these IDs are kept in the filtered subset
+
+            Returns:
+                :class:`~limap.base.ImageCollection`: The filtered subset collection
+        )", py::arg("valid_camera_ids"))
+        .def("subset_by_image_ids", &ImageCollection::subset_by_image_ids, R"(
+            Filter the images using image IDs.
+
+            Args:
+                valid_image_ids (list[int]): IDs of images to be kept in the filtered subset
+
+            Returns:
+                :class:`~limap.base.ImageCollection`: The filtered subset collection
+        )", py::arg("valid_image_ids"))
+        .def("update_neighbors", &ImageCollection::update_neighbors, R"(
+            Update the neighbor information among images (e.g. after filtering).
+
+            Args:
+                neighbors (dict[int -> list[int]]): The input neighbor information
+
+            Returns:
+                dict[int -> list[int]]: Updated neighbor information
+        )")
+        .def("get_cameras", &ImageCollection::get_cameras, R"(
+            Returns:
+                list[:class:`~limap.base.Camera`]: All cameras in the collection
+        )")
+        .def("get_cam_ids", &ImageCollection::get_cam_ids, R"(
+            Returns:
+                list[int]: IDs of all cameras in the collection
+        )")
+        .def("get_images", &ImageCollection::get_images, R"(
+            Returns:
+                list[:class:`~limap.base.CameraImage`]: All images in the collection
+        )")
+        .def("get_img_ids", &ImageCollection::get_img_ids, R"(
+            Returns:
+                list[int]: IDs of all images in the collection
+        )")
+        .def("get_camviews", &ImageCollection::get_camviews, R"(
+            Returns:
+                list[:class:`~limap.base.CameraView`]: The associated :class:`~limap.base.CameraView`\s from all the images and their cameras in the collection
+        )")
+        .def("get_map_camviews", &ImageCollection::get_map_camviews, R"(
+            Returns:
+                dict[int -> :class:`~limap.base.CameraView`]: Mapping of image IDs to their associated :class:`~limap.base.CameraView`\s
+        )")
+        .def("get_locations", &ImageCollection::get_locations, R"(
+            Returns:
+                list[:class:`np.array`]: The world-space locations of the camera for all images in the collection, each of shape (3, )
+        )")
+        .def("get_map_locations", &ImageCollection::get_map_locations, R"(
+            Returns:
+                dict[int -> :class:`np.array`]: Mapping of image IDs to their camera locations in world-space
+        )")
+        .def("exist_cam", &ImageCollection::exist_cam, R"(
+            Args:
+                cam_id (int)
+
+            Returns:
+                bool: True if the camera with `cam_id` exists in the collection
+        )", py::arg("cam_id"))
+        .def("exist_image", &ImageCollection::exist_image, R"(
+            Args:
+                img_id (int)
+
+            Returns:
+                bool: True if the image with `img_id` exists in the collection
+        )", py::arg("img_id"))
+        .def("cam", &ImageCollection::cam, R"(
+            Args:
+                cam_id (int)
+
+            Returns:
+                :class:`~limap.base.Camera`: The camera with `cam_id`
+        )", py::arg("cam_id"))
+        .def("camimage", &ImageCollection::camimage, R"(
+            Args:
+                img_id (int)
+
+            Returns:
+                :class:`~limap.base.CameraImage`: The image with `img_id`
+        )", py::arg("img_id"))
+        .def("campose", &ImageCollection::campose, R"(
+            Args:
+                img_id (int)
+
+            Returns:
+                :class:`~limap.base.CameraPose`: The camera pose of the image
+        )", py::arg("img_id"))
+        .def("camview", &ImageCollection::camview, R"(
+            Args:
+                img_id (int)
+
+            Returns:
+                :class:`~limap.base.CameraView`: The :class:`~limap.base.CameraView` from the image
+        )", py::arg("img_id"))
+        .def("image_name", &ImageCollection::image_name, R"(
+            Args:
+                img_id (int)
+
+            Returns:
+                str: The file name of the image
+        )", py::arg("img_id"))
+        .def("get_image_name_list", &ImageCollection::get_image_name_list, R"(
+            Returns:
+                list[str]: All the image file names
+        )")
+        .def("get_image_name_dict", &ImageCollection::get_image_name_dict, R"(
+            Returns:
+                dict[int -> str]: Mapping of image IDs to the file names
+        )")
+        .def("NumCameras", &ImageCollection::NumCameras, R"(
+            Returns:
+                int: The number of cameras in the collection
+        )")
+        .def("NumImages", &ImageCollection::NumImages, R"(
+            Returns:
+                int: The number of images in the collection
+        )")
+        .def("set_max_image_dim", &ImageCollection::set_max_image_dim, R"(
+            Set the maximum image dimension for all cameras using :py:meth:`~limap.base.Camera.set_max_image_dim`.
+
+            Args:
+                val (int)
+        )", py::arg("val"))
+        .def("change_camera", &ImageCollection::change_camera, R"(
+            Change the camera model of a specific camera.
+
+            Args:
+                cam_id (int)
+                cam (:class:`~limap.base.Camera`)
+        )", py::arg("cam_id"), py::arg("cam"))
+        .def("change_image", &ImageCollection::change_image, R"(
+            Change an image.
+
+            Args:
+                img_id (int)
+                camimage (:class:`~limap.base.CameraImage`)
+        )", py::arg("img_id"), py::arg("camimage"))
+        .def("change_image_name", &ImageCollection::change_image_name, R"(
+            Change the file name of an image.
+
+            Args:
+                img_id (int)
+                new_name (str)
+        )", py::arg("img_id"), py::arg("new_name"))
+        .def("IsUndistorted", &ImageCollection::IsUndistorted, R"(
+            Returns:
+                bool: True if all cameras in the collection are without distortion, see :py:meth:`~limap.base.Camera.IsUndistorted`.
+        )")
+        .def("read_image", &ImageCollection::read_image, R"(
+            Read an image, calls :py:meth:`~limap.base.CameraView.read_image`.
+
+            Args:
+                img_id (int): The image ID
+                set_gray (bool): Whether to convert the image to gray. Default False.
+
+            Returns:
+                :class:`np.array`: The image data matrix
+        )", py::arg("img_id"), py::arg("set_gray")=false)
+        .def("apply_similarity_transform", &ImageCollection::apply_similarity_transform, R"(
+            Apply similarity transform to all image poses.
+
+            Args:
+                transform (:class:`limap.base.SimilarityTransform3`)
+        )", py::arg("transform"));
 }
 
 void bind_pointtrack(py::module& m) {
@@ -777,11 +1147,11 @@ void bind_base(py::module& m) {
     bind_graph(m);
     bind_transforms(m);
     bind_pointtrack(m);
+    bind_camera(m);
     bind_linebase(m);
     bind_linetrack(m);
     bind_line_dists(m);
     bind_line_linker(m);
-    bind_camera(m);
 
     m.def("get_effective_num_threads", &colmap::GetEffectiveNumThreads);
 }

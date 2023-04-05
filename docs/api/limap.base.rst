@@ -3,10 +3,18 @@ limap.base package
 
 .. toctree::
    :maxdepth: 3
-   :caption: Contents: 
+   :caption: Module Contents: 
 
    limap.base.lines
    limap.base.line_dists
+   limap.base.linetrack
+   limap.base.camera
+
+.. toctree::
+   :maxdepth: 3
+   :caption: Submodules: 
+
+   limap.base.functions
 
 .. Submodules
 .. ----------
@@ -19,28 +27,20 @@ limap.base package
 ..    :undoc-members:
 ..    :show-inheritance:
 
-limap.base.depth\_reader\_base module
--------------------------------------
+.. limap.base.depth\_reader\_base module
+.. -------------------------------------
 
-.. automodule:: limap.base.depth_reader_base
-   :members:
-   :undoc-members:
-   :show-inheritance:
+.. .. automodule:: limap.base.depth_reader_base
+..    :members:
+..    :undoc-members:
+..    :show-inheritance:
 
-limap.base.functions module
----------------------------
+.. limap.base.p3d\_reader\_base module
+.. -----------------------------------
 
-.. automodule:: limap.base.functions
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-limap.base.p3d\_reader\_base module
------------------------------------
-
-.. automodule:: limap.base.p3d_reader_base
-   :members:
-   :undoc-members:
+.. .. automodule:: limap.base.p3d_reader_base
+..    :members:
+..    :undoc-members:
 
 .. limap.base.unit\_test module
 .. ----------------------------
