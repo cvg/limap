@@ -81,10 +81,10 @@ def line_localization(cfg, imagecols, linetracks, hloc_log_file, train_ids, quer
     Args:
         cfg (dict): Configuration, fields refer to :file:`cfgs/localization/default.yaml`
         imagecols (:class:`limap.base.ImageCollection`): The image collection
-        linetracks (list): List of :class:`limap.base.LineTrack`, LIMAP triangulated/fitted line tracks
+        linetracks (list[:class:`limap.base.LineTrack`]): LIMAP triangulated/fitted line tracks
         hloc_log_file (str | Path): Path to the log file of HLoc localization, for point correspondences and inlier indices
-        train_ids (list): List of image IDs for training/database images
-        query_ids (list): List of image IDs for query images
+        train_ids (list[int]): Image IDs for training/database images
+        query_ids (list[int]): Image IDs for query images
         retrieval (dict): Mapping of query image file path to list of neighbor image file paths, e.g. returned from :func:`hloc.utils.parsers.parse_retrieval`
         results_path (str | Path): File path to write the localization results
         coarse_poses(dict, optional): Mapping of query image IDs to coarse poses, e.g. returned by hloc
@@ -95,7 +95,7 @@ def line_localization(cfg, imagecols, linetracks, hloc_log_file, train_ids, quer
         logger (:class:`logging.Logger`, optional): Logger to print logs for information
 
     Returns:
-        List of :class:`limap.base.CameraPose`: The localized camera poses for all query images.
+        List[:class:`limap.base.CameraPose`]: The localized camera poses for all query images.
     """ 
     if cfg['localization']['2d_matcher'] not in ['epipolar', 'sold2', 'superglue_endpoints', 'gluestick', 'linetr', 'lbd', 'l2d2']:
         raise ValueError("Unknown 2d line matcher: {}".format(cfg['localization']['2d_matcher']))
