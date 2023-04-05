@@ -43,3 +43,6 @@ html_theme_options = {}
 
 # Add any paths that contain custom themes here, relative to this directory.
 html_theme_path = ["_themes"]
+html_css_files = [
+    'css/fix-rtd-property.css' # workaround readthedocs/sphinx_rtd_theme#1301
+]
