@@ -141,10 +141,18 @@ void bind_transforms(py::module& m) {
 
 void bind_linebase(py::module& m) {
     py::class_<Line2d>(m, "Line2d", "Class representing finite 2D line (segments)")
-        .def(py::init<>(), "Default constructor")
-        .def(py::init<const Eigen::MatrixXd&>(), "Constructor from :class:`np.array` of shape (2, 2) stacking the two 2D endpoints", py::arg("seg2d"))
-        .def(py::init<V2D, V2D>(), "Constructor from `start` and `end` endpoints, each a :class:`np.array` of shape (2,)", py::arg("start"), py::arg("end"))
-        .def(py::init<V2D, V2D, double>(), "Constructor from two endpoints and optionally the score", py::arg("start"), py::arg("end"), py::kw_only(), py::arg("score"))
+        .def(py::init<>(), R"(
+            Default constructor
+        )")
+        .def(py::init<const Eigen::MatrixXd&>(), R"(
+            Constructor from :class:`np.array` of shape (2, 2) stacking the two 2D endpoints
+        )", py::arg("seg2d"))
+        .def(py::init<V2D, V2D>(), R"(
+            Constructor from `start` and `end` endpoints, each a :class:`np.array` of shape (2,)
+        )", py::arg("start"), py::arg("end"))
+        .def(py::init<V2D, V2D, double>(), R"(
+            Constructor from two endpoints and optionally the score
+        )", py::arg("start"), py::arg("end"), py::kw_only(), py::arg("score"))
         .def(py::pickle(
             [](const Line2d& input) { // dump
                 return input.as_array();
@@ -192,9 +200,15 @@ void bind_linebase(py::module& m) {
         )", py::arg("p"));
 
     py::class_<Line3d>(m, "Line3d", "Class representing finite 3D line (segments)")
-        .def(py::init<>(), "Default constructor")
-        .def(py::init<const Eigen::MatrixXd&>(), "Constructor from :class:`np.array` of shape (2, 3) stacking the two 3D endpoints", py::arg("seg3d"))
-        .def(py::init<V3D, V3D>(), "Constructor from `start` and `end` endpoints, each a :class:`np.array` of shape (3,)", py::arg("start"), py::arg("end"))
+        .def(py::init<>(), R"(
+            Default constructor
+        )")
+        .def(py::init<const Eigen::MatrixXd&>(), R"(
+            Constructor from :class:`np.array` of shape (2, 3) stacking the two 3D endpoints
+        )", py::arg("seg3d"))
+        .def(py::init<V3D, V3D>(), R"(
+            Constructor from `start` and `end` endpoints, each a :class:`np.array` of shape (3,)
+        )", py::arg("start"), py::arg("end"))
         .def(py::init<V3D, V3D, double, double, double, double>(), R"(
             Constructor from two endpoints, and optionally: the score, the start and/or end depth of the 3D segment, and the uncertainty value
         )", py::arg("start"), py::arg("end"), py::kw_only(), py::arg("score"), py::arg("depth_start"), py::arg("depth_end"), py::arg("uncertainty"))
@@ -222,7 +236,7 @@ void bind_linebase(py::module& m) {
         )")
         .def("projection", &Line3d::projection, R"(
             Args:
-                view (CameraView): :class:`~limap.base.CameraView` instance used to project the 3D line to 2D
+                view (CameraView): :class:`~limap.base.CameraView` instance used to project the 3D line segment to 2D
 
             Returns:
                 :class:`~limap.base.Line2d`: The 2D line segment projected from the 3D line segment
@@ -268,39 +282,127 @@ void bind_linebase(py::module& m) {
     m.def("_GetLine2dVectorFromArray", &GetLine2dVectorFromArray);
     m.def("_GetLine3dVectorFromArray", &GetLine3dVectorFromArray);
 
-    py::class_<InfiniteLine2d>(m, "InfiniteLine2d")
-        .def(py::init<>())
-        .def(py::init<const V3D&>()) // coords
-        .def(py::init<const V2D&, const V2D&>()) // point + direction
-        .def(py::init<const Line2d&>())
-        .def_readonly("coords", &InfiniteLine2d::coords)
-        .def("point", &InfiniteLine2d::point)
-        .def("direction", &InfiniteLine2d::direction)
-        .def("point_projection", &InfiniteLine2d::point_projection)
-        .def("point_distance", &InfiniteLine2d::point_distance);
+    py::class_<InfiniteLine2d>(m, "InfiniteLine2d", "Class representing infinite 2D lines")
+        .def(py::init<>(), R"(
+            Default constructor
+        )")
+        .def(py::init<const V3D&>(), R"(
+            Constructor from homogeneous coordinate (:class:`np.array` of shape (3,))
+        )", py::arg("coords")) // coords
+        .def(py::init<const V2D&, const V2D&>(), R"(
+            Constructor from a start point and a direction, both :class:`np.array` of shape (2,)
+        )", py::arg("p"), py::arg("direc")) // point + direction
+        .def(py::init<const Line2d&>(), R"(
+            Constructor from a :class:`~limap.base.Line2d`
+        )", py::arg("line"))
+        .def_readonly("coords", &InfiniteLine2d::coords, "Homogeneous coordinate, :class:`np.array` of shape (3,)")
+        .def("point", &InfiniteLine2d::point, R"(
+            Returns:
+                :class:`np.array` of shape (2,): A point on the line (in fact the projection of (0, 0))
+        )")
+        .def("direction", &InfiniteLine2d::direction, R"(
+            Returns:
+                :class:`np.array` of shape (2,): The direction of the line
+        )")
+        .def("point_projection", &InfiniteLine2d::point_projection, R"(
+            Args:
+                p (:class:`np.array`): Coordinate of a 2D point, of shape (2,)
 
-    py::class_<InfiniteLine3d>(m, "InfiniteLine3d")
-        .def(py::init<>())
-        .def(py::init<const V3D&, const V3D&, bool>())
-        .def(py::init<const Line3d&>())
-        .def_readonly("d", &InfiniteLine3d::d)
-        .def_readonly("m", &InfiniteLine3d::m)
-        .def("point", &InfiniteLine3d::point)
-        .def("direction", &InfiniteLine3d::point)
-        .def("matrix", &InfiniteLine3d::point)
-        .def("point_projection", &InfiniteLine3d::point)
-        .def("point_distance", &InfiniteLine3d::point)
-        .def("projection", &InfiniteLine3d::point)
-        .def("unprojection", &InfiniteLine3d::point)
-        .def("project_from_infinite_line", &InfiniteLine3d::project_from_infinite_line)
-        .def("project_to_infinite_line", &InfiniteLine3d::project_to_infinite_line);
+            Returns:
+                :class:`np.array` of shape (2,): Coordinate of the projection of the point `p` on the 2D line
+        )", py::arg("p"))
+        .def("point_distance", &InfiniteLine2d::point_distance, R"(
+            Args:
+                p (:class:`np.array`): Coordinate of a 2D point, of shape (2,)
+
+            Returns:
+                float: Distance from the point `p` to the 2D line
+        )", py::arg("p"));
+
+    py::class_<InfiniteLine3d>(m, "InfiniteLine3d", "Class representing infinite 3D lines")
+        .def(py::init<>(), R"(
+            Default constructor
+        )")
+        .def(py::init<const V3D&, const V3D&, bool>(), R"(
+            | Constructor using normal coordinate (a start point and direction) or Plücker coordinate 
+            | if `use_normal` is True -> (`a`, `b`) is (`p`, `direc`): normal coordinate with a point and a direction 
+            | if `use_normal` is False -> (`a`, `b`) is (`direc`, `m`): Plücker coordinate
+        )", py::arg("a"), py::arg("b"), py::arg("use_normal"))
+        .def(py::init<const Line3d&>(), R"(
+            Constructor from a :class:`~limap.base.Line3d`
+        )", py::arg("line"))
+        .def_readonly("d", &InfiniteLine3d::d, "Direction, :class:`np.array` of shape (3,)")
+        .def_readonly("m", &InfiniteLine3d::m, "Moment, :class:`np.array` of shape (3,)")
+        .def("point", &InfiniteLine3d::point, R"(
+            Returns:
+                :class:`np.array` of shape (3,): A point on the line (in fact the projection of (0, 0, 0))
+        )")
+        .def("direction", &InfiniteLine3d::direction, R"(
+            Returns:
+                :class:`np.array` of shape (3,): The direction of the line (`d`)
+        )")
+        .def("matrix", &InfiniteLine3d::matrix, R"(
+            Returns:
+                :class:`np.array` of shape (4, 4): The `Plücker matrix <https://en.wikipedia.org/wiki/Pl%C3%BCcker_matrix>`_
+        )")
+        .def("point_projection", &InfiniteLine3d::point_projection, R"(
+            Args:
+                p (:class:`np.array`): Coordinate of a 3D point, of shape (3,)
+
+            Returns:
+                :class:`np.array` of shape (3,): Coordinate of the projection of the point `p` on the 3D line
+        )", py::arg("p"))
+        .def("point_distance", &InfiniteLine3d::point_distance, R"(
+            Args:
+                p (:class:`np.array`): Coordinate of a 3D point, of shape (3,)
+
+            Returns:
+                float: Distance from the point `p` to the 3D line
+        )", py::arg("p"))
+        .def("projection", &InfiniteLine3d::projection, R"(
+            Projection from Plücker coordinate to 2D homogeneous line coordinate. 
+
+            Args:
+                view (CameraView): :class:`~limap.base.CameraView` instance used to project the 3D infinite line to 2D
+            
+            Returns:
+                :class:`~limap.base.InfiniteLine2D`: The 2D infinite line projected from the 3D infinite line
+        )", py::arg("view"))
+        .def("unprojection", &InfiniteLine3d::unprojection, R"(
+            Unproject a 2D point by finding the closest point on the 3D line from the camera ray of the 2D point.
+
+            Args:
+                p2d (:class:`np.array`): The 2D point to unproject, of shape (2,)
+                view (CameraView): :class:`~limap.base.CameraView` instance to unproject the point
+            
+            Returns:
+                :class:`np.array` of shape (3,): The closest point on the 3D line from the unprojected camera ray of the 2D point
+        )", py::arg("p2d"), py::arg("view"))
+        .def("project_from_infinite_line", &InfiniteLine3d::project_from_infinite_line, R"(
+            Projection from another infinite 3D line by finding the closest point on this 3D line to the other line.
+
+            Args:
+                line (:class:`~limap.base.InfiniteLine3d`): The other infinite line to project from
+            
+            Returns:
+                :class:`np.array` of shape (3,): The projected point on this 3D line from the other line
+        )", py::arg("line"))
+        .def("project_to_infinite_line", &InfiniteLine3d::project_to_infinite_line, R"(
+            Inverse of the previous function: finding the closest point on the other line to this line
+
+            Args:
+                line (:class:`~limap.base.InfiniteLine3d`): The other infinite line to project to
+            
+            Returns:
+                :class:`np.array` of shape (3,): The projected point on the other line from this line
+        )", py::arg("line"));
 
     m.def("_GetLineSegmentFromInfiniteLine3d", py::overload_cast<const InfiniteLine3d&, const std::vector<CameraView>&, const std::vector<Line2d>&, const int>(&GetLineSegmentFromInfiniteLine3d), py::arg("inf_line"), py::arg("camviews"), py::arg("line2ds"), py::arg("num_outliers") = 2);
     m.def("_GetLineSegmentFromInfiniteLine3d", py::overload_cast<const InfiniteLine3d&, const std::vector<Line3d>&, const int>(&GetLineSegmentFromInfiniteLine3d), py::arg("inf_line"), py::arg("line3ds"), py::arg("num_outliers") = 2);
 }
 
 void bind_linetrack(py::module& m) {
-    py::class_<LineTrack>(m, "LineTrack")
+    py::class_<LineTrack>(m, "LineTrack", "The associated line track across multi-view")
         .def(py::init<>())
         .def(py::init<LineTrack>())
         .def(py::init<const Line3d&, const std::vector<int>&, const std::vector<int>&, const std::vector<Line2d>&>())
@@ -332,7 +434,7 @@ void bind_linetrack(py::module& m) {
 }
 
 void bind_line_dists(py::module& m) {
-    py::enum_<LineDistType>(m, "LineDistType")
+    py::enum_<LineDistType>(m, "LineDistType", "Enum of supported line distance types")
         .value("ANGULAR", LineDistType::ANGULAR)
         .value("ANGULAR_DIST", LineDistType::ANGULAR_DIST)
         .value("ENDPOINTS", LineDistType::ENDPOINTS)
@@ -352,22 +454,60 @@ void bind_line_dists(py::module& m) {
     m.def("compute_distance_2d", 
         [](const Line2d& l1, const Line2d& l2, const LineDistType& type) {
             return compute_distance<Line2d>(l1, l2, type);
-        }
+        }, R"(
+            Compute distance between two :class:`~limap.base.Line2d` using the specified line distance type
+
+            Args:
+                l1 (:class:`~limap.base.Line2d`): First 2D line segment
+                l2 (:class:`~limap.base.Line2d`): Second 2D line segment
+                type (:class:`~limap.base.LineDistType`): Line distance type
+            
+            Returns:
+                `float`: The computed distance
+        )", py::arg("l1"), py::arg("l2"), py::arg("type")
     );
     m.def("compute_distance_3d", 
         [](const Line3d& l1, const Line3d& l2, const LineDistType& type) {
             return compute_distance<Line3d>(l1, l2, type);
-        }
+        }, R"(
+            Compute distance between two :class:`~limap.base.Line3d` using the specified line distance type
+
+            Args:
+                l1 (:class:`~limap.base.Line3d`): First 3D line segment
+                l2 (:class:`~limap.base.Line3d`): Second 3D line segment
+                type (:class:`~limap.base.LineDistType`): Line distance type
+            
+            Returns:
+                `float`: The computed distance
+        )", py::arg("l1"), py::arg("l2"), py::arg("type")
     );
     m.def("compute_pairwise_distance_2d", 
         [](const std::vector<Line2d>& lines, const LineDistType& type) {
             return compute_pairwise_distance<Line2d>(lines, type);
-        }
+        }, R"(
+            Compute pairwise distance among a list of :class:`~limap.base.Line2d`s using the specified line distance type
+
+            Args:
+                lines (list): List of :class:`~limap.base.Line2d`
+                type (:class:`~limap.base.LineDistType`): Line distance type
+            
+            Returns:
+                :class:`np.array`: The computed pairwise distance matrix
+        )", py::arg("lines"), py::arg("type")
     );
     m.def("compute_pairwise_distance_3d", 
         [](const std::vector<Line3d>& lines, const LineDistType& type) {
             return compute_pairwise_distance<Line3d>(lines, type);
-        }
+        }, R"(
+            Compute pairwise distance among a list of :class:`~limap.base.Line2d`s using the specified line distance type
+
+            Args:
+                lines (list): List of :class:`~limap.base.Line2d`
+                type (:class:`~limap.base.LineDistType`): Line distance type
+            
+            Returns:
+                :class:`np.array`: The computed pairwise distance matrix
+        )", py::arg("lines"), py::arg("type")
     );
 }
 

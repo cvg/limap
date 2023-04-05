@@ -1,34 +1,15 @@
 limap.base package
 ==================
 
-Module contents
----------------
+.. toctree::
+   :maxdepth: 3
+   :caption: Contents: 
 
-.. automodule:: limap.base
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   limap.base.lines
+   limap.base.line_dists
 
-limap.base.Line2d
-----------------------------
-
-.. autoclass:: limap.base.Line2d
-   :members:
-   :undoc-members: 
-   :special-members: __init__
-   :member-order: groupwise
-
-limap.base.Line3d
-----------------------------
-
-.. autoclass:: limap.base.Line3d
-   :members:
-   :undoc-members: 
-   :special-members: __init__
-   :member-order: groupwise
-   
-Submodules
-----------
+.. Submodules
+.. ----------
 
 .. limap.base.align module
 .. -----------------------

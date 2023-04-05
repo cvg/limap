@@ -20,7 +20,7 @@ LIMAP is a toolbox for mapping and localization with line features.
    tutorials/localization
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: API references: 
 
    api/limap.base
