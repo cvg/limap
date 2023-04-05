@@ -24,7 +24,7 @@ LIMAP is a toolbox for mapping and localization with line features.
    :caption: API references: 
 
    api/limap.base
-   api/limap.estimators.absolute_pose
+   api/limap.estimators
    api/limap.runners
 
 .. toctree::

@@ -48,7 +48,7 @@ def _pl_estimate_absolute_pose(cfg, l3ds, l3d_ids, l2ds, p3ds, p2ds, camera, cam
     jointloc_config.cost_function = func
 
     if ransac_cfg['method'] == 'hybrid':
-        options = _estimators.ExtendedHybridLORansacOptions()
+        options = _estimators.HybridLORansacOptions()
         options.squared_inlier_thresholds_ = [pow(ransac_cfg['thres_point'], 2), pow(ransac_cfg['thres_line'], 2)]
         options.data_type_weights_ = np.array([ransac_cfg['weight_point'], ransac_cfg['weight_line']])
         options.data_type_weights_ *= np.array([options.squared_inlier_thresholds_[1], options.squared_inlier_thresholds_[0]]) / np.sum(options.squared_inlier_thresholds_)
