@@ -3,7 +3,7 @@ import os
 import sys
 import subprocess
 
-from setuptools import setup, Extension
+from setuptools import setup, Extension, find_packages
 from setuptools.command.build_ext import build_ext
 
 # Cores used for building the project
@@ -72,6 +72,7 @@ setup(
     author_email="b1ueber2y@gmail.com",
     description="A toolbox for mapping and localization with line features",
     long_description="",
+    packages=find_packages(),
     ext_modules=[CMakeExtension("_limap")],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
