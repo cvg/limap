@@ -32,7 +32,7 @@ sudo apt-get install libhdf5-dev
 git submodule update --init --recursive
 
 # Refer to https://pytorch.org/get-started/previous-versions/ to install pytorch compatible with your CUDA
-python -m pip install torch==1.11.0 torchvision==0.12.0 
+python -m pip install torch==1.12.0 torchvision==0.13.0 
 python -m pip install -r requirements.txt
 ```
 
@@ -105,6 +105,7 @@ If you wish to use the methods with **separate installation needed** you need to
 - [L2D2](https://github.com/hichem-abdellali/L2D2)
 - Endpoint matching with [SuperPoint](https://github.com/magicleap/SuperPointPretrainedNetwork) + Nearest Neighbors
 - Endpoint matching with [SuperPoint](https://github.com/magicleap/SuperPointPretrainedNetwork) + [SuperGlue](https://github.com/magicleap/SuperGluePretrainedNetwork)
+- [GlueStick](https://github.com/cvg/GlueStick)
 
 **The following vanishing point estimators are currently supported:**
 - [JLinkage](https://github.com/B1ueber2y/JLinkage)
