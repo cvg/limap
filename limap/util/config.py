@@ -24,8 +24,7 @@ def load_config(config_file, default_path=None):
     if base_config_file is not None:
         cfg = load_config(base_config_file)
     elif (default_path is not None) and (config_file != default_path):
-        with open(default_path, 'r') as f:
-            cfg = yaml.load(f, Loader=yaml.Loader)
+        cfg = load_config(default_path)
     else:
         cfg = dict()
     update_recursive(cfg, cfg_loaded)
