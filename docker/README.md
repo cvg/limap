@@ -9,7 +9,7 @@ This document explains how to build docker image for LIMAP. This document assume
 - [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#setting-up-nvidia-container-toolkit)
 
 ### Github ssh setting
-As LIMAP is currently a private repository, you need to set up a ssh key for Github account to clone the LIMAP when building the image. Follow [this instruction](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) to generate a key, and then [this instruction](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account) to register the key to your Github account.
+You need to set up a ssh key for Github account to clone the LIMAP when building the image. Follow [this instruction](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) to generate a key, and then [this instruction](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account) to register the key to your Github account.
 
 ### Building Docker Image
 Download the attached Dockerfile and run the below command at where the Dockerfile is.

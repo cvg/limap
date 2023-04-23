@@ -15,7 +15,7 @@ RUN chmod 600 /root/.ssh/id_ed25519
 RUN touch /root/.ssh/known_hosts
 RUN ssh-keyscan github.com >> /root/.ssh/known_hosts
 
-RUN git clone --recursive git@github.com:B1ueber2y/limap-internal.git
+RUN git clone --recursive git@github.com:cvg/limap.git
 
 # From here, final image
 FROM nvidia/cuda:11.5.2-devel-ubuntu20.04
@@ -117,11 +117,12 @@ RUN /usr/bin/python3.9 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Copy the repository from the first image
-COPY --from=intermediate /limap-internal /limap-internal
-RUN python -m pip install torch==1.11.0 torchvision==0.12.0 --index-url https://download.pytorch.org/whl/cu115
+COPY --from=intermediate /limap /limap
+RUN python -m pip install torch==1.12.0 torchvision==0.13.0 --index-url https://download.pytorch.org/whl/cu115
 RUN python -m pip install --upgrade pip setuptools && \
-    cd limap-internal && \
+    cd limap && \
     python --version && \
     pip --version && \
     python -m pip install -r requirements.txt && \
     python -m pip install -Ive .
+
