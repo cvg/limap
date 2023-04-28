@@ -1,3 +1,4 @@
+import torch
 import os, sys
 import numpy as np
 import shutil
@@ -28,7 +29,7 @@ def check_makedirs(folder):
 def save_npy(fname, nparray):
     check_directory(fname)
     with open(fname, 'wb') as f:
-        np.save(f, nparray)
+        np.save(f, np.array(nparray, dtype=object))
 
 def read_npy(fname):
     check_path(fname)
