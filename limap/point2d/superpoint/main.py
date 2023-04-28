@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Dict, List, Union, Optional
 import pprint
 
-from torch._six import string_classes
+string_classes = str
 import collections.abc as collections
 
 from hloc import extract_features

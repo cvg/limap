@@ -2,7 +2,7 @@ pyyaml
 tqdm
 attrdict
 h5py
-numpy==1.21.6
+numpy
 scipy
 matplotlib
 seaborn
