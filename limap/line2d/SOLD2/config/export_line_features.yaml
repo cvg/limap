@@ -51,6 +51,11 @@ model_cfg:
     margin: 1
     policy: "dynamic"
 
+### [Multiscale option]
+multiscale_cfg:
+  multiscale: False
+  scales: [1., 2.]
+
 ### [Line detector config]
 line_detector_cfg:
   detect_thresh: 0.5
