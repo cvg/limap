@@ -57,32 +57,34 @@ def pl_estimate_absolute_pose(cfg, l3ds, l3d_ids, l2ds, p3ds, p2ds, camera, camp
         final_q = jointloc.GetFinalQ().copy()
         return _base.CameraPose(final_q, final_t), None
 
-    jointloc_config = _optimize.LineLocConfig(jointloc_cfg)
+    options = _estimators.HybridPoseEstimatorOptions() if ransac_cfg['method'] == 'hybrid' else _estimators.JointPoseEstimatorOptions()
+    options.lineloc_config = _optimize.LineLocConfig(jointloc_cfg)
     if 'solver_options' not in jointloc_cfg or 'minimizer_progress_to_stdout' not in jointloc_cfg['solver_options']:
-        jointloc_config.solver_options.minimizer_progress_to_stdout = False
+        options.lineloc_config.solver_options.minimizer_progress_to_stdout = False
     if silent:
-        jointloc_config.print_summary = False
-        jointloc_config.solver_options.minimizer_progress_to_stdout = False
-        jointloc_config.solver_options.logging_type = _ceresbase.LoggingType.SILENT
+        options.lineloc_config.print_summary = False
+        options.lineloc_config.solver_options.minimizer_progress_to_stdout = False
+        options.lineloc_config.solver_options.logging_type = _ceresbase.LoggingType.SILENT
     func = _optimize.get_lineloc_cost_func(cfg['line_cost_func'])
-    jointloc_config.cost_function = func
+    options.lineloc_config.cost_function = func
 
     if ransac_cfg['method'] == 'hybrid':
-        options = _estimators.ExtendedHybridLORansacOptions()
-        options.squared_inlier_thresholds_ = [pow(ransac_cfg['thres_point'], 2), pow(ransac_cfg['thres_line'], 2)]
-        options.data_type_weights_ = np.array([ransac_cfg['weight_point'], ransac_cfg['weight_line']])
-        options.data_type_weights_ *= np.array([options.squared_inlier_thresholds_[1], options.squared_inlier_thresholds_[0]]) / np.sum(options.squared_inlier_thresholds_)
-        options.min_num_iterations_ = ransac_cfg['min_num_iterations']
-        options.final_least_squares_ = ransac_cfg['final_least_squares']
-        result = _estimators.EstimateAbsolutePose_PointLine_Hybrid(l3ds, l3d_ids, l2ds, p3ds, p2ds,
-                                                camera, options, jointloc_config, ransac_cfg['solver_flags'])
+        options.solver_flags = ransac_cfg['solver_flags']
+
+        ransac_options = options.ransac_options
+        ransac_options.squared_inlier_thresholds_ = [pow(ransac_cfg['thres_point'], 2), pow(ransac_cfg['thres_line'], 2)]
+        ransac_options.data_type_weights_ = np.array([ransac_cfg['weight_point'], ransac_cfg['weight_line']])
+        ransac_options.data_type_weights_ *= np.array([ransac_options.squared_inlier_thresholds_[1], ransac_options.squared_inlier_thresholds_[0]]) / np.sum(ransac_options.squared_inlier_thresholds_)
+        ransac_options.min_num_iterations_ = ransac_cfg['min_num_iterations']
+        ransac_options.final_least_squares_ = ransac_cfg['final_least_squares']
+
+        result = _estimators.EstimateAbsolutePose_PointLine_Hybrid(l3ds, l3d_ids, l2ds, p3ds, p2ds, camera, options)
     else:
-        options = _estimators.LORansacOptions()
-        options.squared_inlier_threshold_ = pow(ransac_cfg['thres'], 2)
-        options.min_num_iterations_ = ransac_cfg['min_num_iterations']
-        options.final_least_squares_ = ransac_cfg['final_least_squares']
-        result = _estimators.EstimateAbsolutePose_PointLine(l3ds, l3d_ids, l2ds, p3ds, p2ds,
-                                                camera, options, jointloc_config, ransac_cfg['method'] == 'solver')
+        options.sample_solve_first = (ransac_cfg['method'] == 'solver')
+        options.ransac_options.squared_inlier_threshold_ = pow(ransac_cfg['thres'], 2)
+        options.ransac_options.min_num_iterations_ = ransac_cfg['min_num_iterations']
+        options.ransac_options.final_least_squares_ = ransac_cfg['final_least_squares']
+        result = _estimators.EstimateAbsolutePose_PointLine(l3ds, l3d_ids, l2ds, p3ds, p2ds, camera, options)
     return result
 
 
