@@ -210,9 +210,12 @@ bool JointPoseEstimator::cheirality_test_line(const Line2d& l2d, const Line3d& l
     if (!cheirality_test_point(p_end, pose))
         return false;
 
-    // Check backprojected length
-    double len2d = l3d.projection(CameraView(cam_, pose)).length();
-    if (len2d < line_min_projected_length_) 
+    // check 2D overlap
+    CameraView camview(cam_, pose);
+    Line2d proj_l2d = l3d.projection(camview);
+    V2D p1 = proj_l2d.point_projection(l2d.start);
+    V2D p2 = proj_l2d.point_projection(l2d.end);
+    if (Line2d(p1, p2).length < 10)
         return false;
 
     return true;
