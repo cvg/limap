@@ -29,10 +29,10 @@ public:
 
     ransac_lib::LORansacOptions ransac_options;
     LineLocConfig lineloc_config;
-    double cheirality_min_depth;
-    double cheirality_overlap_pixels;
-    bool sample_solver_first;
-    bool random;
+    double cheirality_min_depth = 0.0;
+    double cheirality_overlap_pixels = 10.0;
+    bool sample_solver_first = false;
+    bool random = true;
 };
 
 class JointPoseEstimator {

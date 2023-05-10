@@ -24,16 +24,16 @@ public:
     HybridPoseEstimatorOptions() : 
         ransac_options(ExtendedHybridLORansacOptions()),
         lineloc_config(LineLocConfig()),
-        solver_flags(std::vector<bool>{true, true, true, true}),
+        solver_flags({true, true, true, true}),
         cheirality_min_depth(0.0),
         cheirality_overlap_pixels(10.0),
         random(true) {}
 
     ExtendedHybridLORansacOptions ransac_options;
     LineLocConfig lineloc_config;
-    std::vector<bool> solver_flags;
-    double cheirality_min_depth;
-    double cheirality_overlap_pixels;
+    std::vector<bool> solver_flags = {true, true, true, true};
+    double cheirality_min_depth = 0.0;
+    double cheirality_overlap_pixels = 10.0;
     bool random = true;
 };
 
