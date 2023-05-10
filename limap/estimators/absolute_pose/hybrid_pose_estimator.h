@@ -19,14 +19,32 @@ namespace estimators {
 
 namespace absolute_pose {
 
+class HybridPoseEstimatorOptions {
+public:
+    HybridPoseEstimatorOptions() : 
+        ransac_options(ExtendedHybridLORansacOptions()),
+        lineloc_config(LineLocConfig()),
+        solver_flags(std::vector<bool>{true, true, true, true}),
+        cheirality_min_depth(0.0),
+        cheirality_overlap_pixels(10.0),
+        random(true) {}
+
+    ExtendedHybridLORansacOptions ransac_options;
+    LineLocConfig lineloc_config;
+    std::vector<bool> solver_flags;
+    double cheirality_min_depth;
+    double cheirality_overlap_pixels;
+    bool random = true;
+};
+
 class HybridPoseEstimator : public JointPoseEstimator {
 public:
     HybridPoseEstimator(const std::vector<Line3d>& l3ds, const std::vector<int>& l3d_ids, const std::vector<Line2d>& l2ds, 
                         const std::vector<V3D>& p3ds, const std::vector<V2D>& p2ds, 
                         const Camera& cam, const LineLocConfig& cfg,
                         const double cheirality_min_depth = 0.0, 
-                        const double line_min_projected_length = 1) :
-                        JointPoseEstimator(l3ds, l3d_ids, l2ds, p3ds, p2ds, cam, cfg, cheirality_min_depth, line_min_projected_length) {}
+                        const double cheirality_overlap_pixels = 10.0) :
+                        JointPoseEstimator(l3ds, l3d_ids, l2ds, p3ds, p2ds, cam, cfg, cheirality_min_depth, cheirality_overlap_pixels) {}
 
     inline int num_minimal_solvers() const { return 4; }
 
@@ -102,11 +120,7 @@ std::pair<CameraPose, ransac_lib::HybridRansacStatistics>
 EstimateAbsolutePose_PointLine_Hybrid(const std::vector<Line3d>& l3ds, const std::vector<int>& l3d_ids, 
                                       const std::vector<Line2d>& l2ds, const std::vector<V3D>& p3ds, 
                                       const std::vector<V2D>& p2ds, const Camera& cam, 
-                                      const ExtendedHybridLORansacOptions& options_ = ExtendedHybridLORansacOptions(), 
-                                      const LineLocConfig& cfg = LineLocConfig(),
-                                      const std::vector<bool>& solver_flags = std::vector<bool>{true, true, true, true},
-                                      const double cheirality_min_depth = 0.0, 
-                                      const double line_min_projected_length = 1);
+                                      const HybridPoseEstimatorOptions& options);
 
 } // namespace pose
 
