@@ -20,8 +20,8 @@ EstimateAbsolutePose_PointLine_Hybrid(const std::vector<Line3d>& l3ds, const std
     if (options.random)
         ransac_options.random_seed_ = rand_dev();
     
-    assert(ransac_options.data_type_weights_.size() == 2);
-    assert(ransac_options.squared_inlier_thresholds_.size() == 2);
+    THROW_CHECK_EQ(ransac_options.data_type_weights_.size(), 2);
+    THROW_CHECK_EQ(ransac_options.squared_inlier_thresholds_.size(), 2);
 
     HybridPoseEstimator solver(l3ds, l3d_ids, l2ds, p3ds, p2ds, cam, options.lineloc_config, options.cheirality_min_depth, options.cheirality_overlap_pixels);
     solver.set_solver_flags(options.solver_flags);
