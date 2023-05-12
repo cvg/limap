@@ -25,7 +25,11 @@ public:
         cheirality_min_depth(0.0),
         cheirality_overlap_pixels(10.0),
         sample_solver_first(false),
-        random(true) {}
+        random(true) {
+            lineloc_config.print_summary = false;
+            lineloc_config.solver_options.minimizer_progress_to_stdout = false;
+            lineloc_config.solver_options.logging_type = ceres::LoggingType::SILENT;
+        }
 
     ransac_lib::LORansacOptions ransac_options;
     LineLocConfig lineloc_config;

@@ -27,7 +27,15 @@ public:
         solver_flags({true, true, true, true}),
         cheirality_min_depth(0.0),
         cheirality_overlap_pixels(10.0),
-        random(true) {}
+        random(true) {
+            lineloc_config.print_summary = false;
+            lineloc_config.solver_options.minimizer_progress_to_stdout = false;
+            lineloc_config.solver_options.logging_type = ceres::LoggingType::SILENT;
+
+            // Default values, should be changed depend on the data
+            ransac_options.squared_inlier_thresholds_ = {1.0, 1.0};
+            ransac_options.data_type_weights_ = {1.0, 1.0};
+        }
 
     ExtendedHybridLORansacOptions ransac_options;
     LineLocConfig lineloc_config;
