@@ -13,8 +13,11 @@ class GlueStickMatcher(BaseMatcher):
         super(GlueStickMatcher, self).__init__(extractor, options)
         self.device = "cuda" if device is None else device
         self.gs = GlueStick({}).eval().to(self.device)
-        ckpt = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+        if self.weight_path is None:
+            ckpt = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                             'weights/checkpoint_GlueStick_MD.tar')
+        else:
+            ckpt = os.path.join(self.weight_path, "line2d", "GlueStick", 'weights/checkpoint_GlueStick_MD.tar')
         if not os.path.isfile(ckpt):
             self.download_model(ckpt)
         ckpt = torch.load(ckpt, map_location='cpu')['model']
@@ -27,7 +30,7 @@ class GlueStickMatcher(BaseMatcher):
             os.makedirs(os.path.dirname(path))
         link = "https://github.com/cvg/GlueStick/releases/download/v0.1_arxiv/checkpoint_GlueStick_MD.tar"
         cmd = ["wget", link, "-O", path]
-        print("Downloading SuperPoint model...")
+        print("Downloading GlueStick model...")
         subprocess.run(cmd, check=True)
 
     def get_module_name(self):

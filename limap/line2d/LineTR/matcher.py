@@ -14,7 +14,7 @@ class LineTRMatcher(BaseMatcher):
                  topk=0, device=None):
         super(LineTRMatcher, self).__init__(extractor, options)
         self.device = "cuda" if device is None else device
-        self.linetr = LineTransformer({}).eval().to(self.device)
+        self.linetr = LineTransformer({'weight_path': self.weight_path}).eval().to(self.device)
 
     def get_module_name(self):
         return "linetr"

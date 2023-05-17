@@ -67,7 +67,7 @@ def get_hloc_keypoints_from_log(logs, query_img_name, ref_sfm=None, resize_scale
     if resize_scales is not None and query_img_name in resize_scales:
         scale = resize_scales[query_img_name]
         p2ds = (p2ds + .5) * scale - .5
-        
+
     return p2ds, p3ds, inliers
 
 def line_localization(cfg, imagecols, linetracks, hloc_log_file, train_ids, query_ids, retrieval, results_path,
@@ -95,7 +95,7 @@ def line_localization(cfg, imagecols, linetracks, hloc_log_file, train_ids, quer
     :param logger:          logging.Logger (optional), print logs for information
 
     :return: list<limap.base.CameraPose>, the localized camera poses for all query images.
-    """ 
+    """
     if cfg['localization']['2d_matcher'] not in ['epipolar', 'sold2', 'superglue_endpoints', 'gluestick', 'linetr', 'lbd', 'l2d2']:
         raise ValueError("Unknown 2d line matcher: {}".format(cfg['localization']['2d_matcher']))
     if img_name_dict is None:
@@ -108,7 +108,7 @@ def line_localization(cfg, imagecols, linetracks, hloc_log_file, train_ids, quer
         hloc_logs = pickle.load(f)
     if ref_sfm is not None and not isinstance(ref_sfm, pycolmap.Reconstruction):
         ref_sfm = pycolmap.Reconstruction(ref_sfm)
-    
+
      # GT for queries
     poses_gt = {img_id: imagecols.camimage(img_id).pose for img_id in imagecols.get_img_ids()}
 
@@ -128,6 +128,7 @@ def line_localization(cfg, imagecols, linetracks, hloc_log_file, train_ids, quer
 
     # Do matches for query images and retrieved neighbors for superglue endpoints matcher
     if cfg['localization']['2d_matcher'] != 'epipolar':
+        weight_path = None if "weight_path" not in cfg else cfg["weight_path"]
         if cfg['localization']['2d_matcher'] == 'superglue_endpoints':
             extractor_name = 'superpoint_endpoints'
             matcher_name = 'superglue_endpoints'
@@ -137,11 +138,11 @@ def line_localization(cfg, imagecols, linetracks, hloc_log_file, train_ids, quer
         ma_cfg = {"method": matcher_name, "topk": 0, "n_jobs": cfg["n_jobs"], "superglue": {"weights": cfg["line2d"]["matcher"]["superglue"]["weights"]}}
         basedir = os.path.join("line_detections", cfg["line2d"]["detector"]["method"])
         folder_save = os.path.join(cfg["dir_save"], basedir)
-        extractor = limap.line2d.get_extractor(ex_cfg)
+        extractor = limap.line2d.get_extractor(ex_cfg, weight_path=weight_path)
         se_descinfo_dir = extractor.extract_all_images(folder_save, imagecols, all_2d_segs, skip_exists=cfg['skip_exists'])
-        
+
         basedir = os.path.join("line_matchings", cfg["line2d"]["detector"]["method"], "feats_{0}".format(matcher_name))
-        matcher = limap.line2d.get_matcher(ma_cfg, extractor, n_neighbors=cfg['n_neighbors_loc'] )
+        matcher = limap.line2d.get_matcher(ma_cfg, extractor, n_neighbors=cfg['n_neighbors_loc'], weight_path=weight_path)
         folder_save = os.path.join(cfg["dir_save"], basedir)
         retrieved_neighbors = {qid: [ name_to_id[n] for n in retrieval[id_to_name[qid]] ] for qid in query_ids}
         se_matches_dir = matcher.match_all_neighbors(folder_save, query_ids, retrieved_neighbors, se_descinfo_dir, skip_exists=cfg['skip_exists'])
@@ -227,7 +228,7 @@ def line_localization(cfg, imagecols, linetracks, hloc_log_file, train_ids, quer
                 fq, ft = final_pose.qvec, final_pose.tvec
                 line = ' '.join([name] + [str(x) for x in fq] + [str(x) for x in ft]) + '\n'
                 f.writelines([line])
-            
+
         final_poses.append(final_pose)
 
     lines = []

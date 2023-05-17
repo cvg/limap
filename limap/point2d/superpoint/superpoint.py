@@ -107,6 +107,7 @@ class SuperPoint(nn.Module):
         'keypoint_threshold': 0.005,
         'max_keypoints': -1,
         'remove_borders': 4,
+        'weight_path': None
     }
 
     def __init__(self, config):
@@ -134,7 +135,10 @@ class SuperPoint(nn.Module):
             c5, self.config['descriptor_dim'],
             kernel_size=1, stride=1, padding=0)
 
-        path = Path(__file__).parent / 'weights/superpoint_v1.pth'
+        if self.config["weight_path"] is None:
+            path = Path(__file__).parent / 'weights/superpoint_v1.pth'
+        else:
+            path = os.path.join(self.config["weight_path"], "point2d", "superpoint", "weights/superpoint_v1.pth")
         if not os.path.isfile(path):
             self.download_model(path)
         self.load_state_dict(torch.load(str(path)))

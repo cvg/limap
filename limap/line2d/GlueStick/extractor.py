@@ -18,7 +18,7 @@ class WireframeExtractor(BaseDetector):
     def __init__(self, options = BaseDetectorOptions(), device=None):
         super(WireframeExtractor, self).__init__(options)
         self.device = "cuda" if device is None else device
-        self.sp = SuperPoint({}).eval().to(self.device)
+        self.sp = SuperPoint({'weight_path': self.weight_path}).eval().to(self.device)
         self.wireframe_params = OmegaConf.create({
             'nms_radius': 3,
             'force_num_junctions': False,

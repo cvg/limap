@@ -198,6 +198,7 @@ class LineTransformer(nn.Module):
         'n_heads': 4,
         'n_line_descriptive_layers': 1,
         'd_inner': 1024,    # d_inner at the Feed_Forward Layer
+        'weight_path': None,
     }
 
     def __init__(self, config):
@@ -218,7 +219,10 @@ class LineTransformer(nn.Module):
 
 
         if self.config['mode'] == 'test':
-            path = Path(__file__).parent / 'weights/LineTR_weight.pth'
+            if self.config['weight_path'] is None:
+                path = Path(__file__).parent / 'weights/LineTR_weight.pth'
+            else:
+                path = Path(os.path.join(self.config["weight_path"], "line2d", "LineTR")) / 'weights/LineTR_weight.pth'
             if not path.is_file():
                 self.download_model(path)
             self.load_state_dict(torch.load(str(path)))

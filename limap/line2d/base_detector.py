@@ -9,8 +9,8 @@ import limap.visualize as limapvis
 
 from collections import namedtuple
 BaseDetectorOptions = namedtuple("BaseDetectorOptions",
-                                 ["set_gray", "max_num_2d_segs", "do_merge_lines", "visualize"],
-                                 defaults=[True, 3000, False, False])
+                                 ["set_gray", "max_num_2d_segs", "do_merge_lines", "visualize", "weight_path"],
+                                 defaults=[True, 3000, False, False, None])
 
 class BaseDetector():
     def __init__(self, options = BaseDetectorOptions()):
@@ -18,6 +18,7 @@ class BaseDetector():
         self.max_num_2d_segs = options.max_num_2d_segs
         self.do_merge_lines = options.do_merge_lines
         self.visualize = options.visualize
+        self.weight_path = options.weight_path
 
     # Module name needs to be set
     def get_module_name(self):

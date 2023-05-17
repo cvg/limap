@@ -11,15 +11,15 @@ from SOLD2.model.line_matcher import LineMatcher
 
 
 class SOLD2LineDetector():
-    def __init__(self, device=None, cfg_path=None, ckpt_path=None):
-        import os
+    def __init__(self, device=None, cfg_path=None, weight_path=None):
         nowpath = os.path.dirname(os.path.abspath(__file__))
         if cfg_path is None:
             cfg_path = 'config/export_line_features.yaml'
         self.cfg = load_config(os.path.join(nowpath, cfg_path))
-        if ckpt_path is None:
-            ckpt_path = 'pretrained_models/sold2_wireframe.tar'
-        self.ckpt_path = os.path.join(nowpath, ckpt_path)
+        if weight_path is None:
+            self.ckpt_path = os.path.join(nowpath, 'pretrained_models/sold2_wireframe.tar')
+        else:
+            self.ckpt_path = os.path.join(weight_path, "line2d", "SOLD2", "pretrained_models/sold2_wireframe.tar")
         if device is None:
             device = 'cuda'
         self.device = device

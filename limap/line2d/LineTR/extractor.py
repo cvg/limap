@@ -18,7 +18,7 @@ class LineTRExtractor(BaseDetector):
         super(LineTRExtractor, self).__init__(options)
         self.device = "cuda" if device is None else device
         self.sp = SuperPoint({}).eval().to(self.device)
-        self.linetr = LineTransformer({}).eval().to(self.device)
+        self.linetr = LineTransformer({'weight_path': self.weight_path}).eval().to(self.device)
 
     def get_module_name(self):
         return "linetr"

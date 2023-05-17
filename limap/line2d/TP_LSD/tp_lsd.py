@@ -15,10 +15,23 @@ class TPLSDDetector(BaseDetector):
         super(TPLSDDetector, self).__init__(options)
         # Load the TP-LSD model
         head = {'center': 1, 'dis': 4, 'line': 1}
-        ckpt = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
-                            'third-party/TP-LSD/pretraineds/Res512.pth')
+        if self.weight_path is None:
+            ckpt = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'pretraineds/Res512.pth')
+        else:
+            ckpt = os.path.join(self.weight_path, "line2d", "TP_LSD", "pretrained/Res512.pth")
+        if not os.path.isfile(ckpt):
+            self.download_model(ckpt)
         self.net = load_model(Res320(head), ckpt)
         self.net = self.net.cuda().eval()
+
+    def download_model(self, path):
+        import subprocess
+        if not os.path.exists(os.path.dirname(path)):
+            os.makedirs(os.path.dirname(path))
+        link = "https://github.com/Siyuada7/TP-LSD/blob/master/pretraineds/Res512.pth?raw=true"
+        cmd = ["wget", link, "-O", path]
+        print("Downloading TP_LSD model...")
+        subprocess.run(cmd, check=True)
 
     def get_module_name(self):
         return "tp_lsd"
