@@ -127,10 +127,22 @@ void LineTrack::Write(const std::string& filename) const {
     file.open(filename.c_str());
     file << std::fixed << std::setprecision(10);
     // row1: line
-    for (int i = 0; i < 3; ++i)
-        file << line.start[i] << " ";
-    for (int i = 0; i < 3; ++i)
-        file << line.end[i] << " ";
+    for (int i = 0; i < 3; ++i) {
+        if (std::isnan(line.start[i])) {
+            std::cout<<"Warning! NaN values detected."<<std::endl;;
+            file << 0.0 << " ";
+        }
+        else
+            file << line.start[i] << " ";
+    }
+    for (int i = 0; i < 3; ++i) {
+        if (std::isnan(line.end[i])) {
+            std::cout<<"Warning! NaN values detected."<<std::endl;;
+            file << 0.0 << " ";
+        }
+        else
+            file << line.end[i] << " ";
+    }
     file << "\n";
     // row2: counts
     size_t n_lines = count_lines();
