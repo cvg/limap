@@ -8,8 +8,8 @@ import limap.util.io as limapio
 
 from collections import namedtuple
 BaseMatcherOptions = namedtuple("BaseMatcherOptions",
-                                ["topk", "n_neighbors", "n_jobs"],
-                                defaults=[10, 20, 1])
+                                ["topk", "n_neighbors", "n_jobs", "weight_path"],
+                                defaults=[10, 20, 1, None])
 
 class BaseMatcher():
     def __init__(self, extractor, options = BaseMatcherOptions()):
@@ -17,6 +17,7 @@ class BaseMatcher():
         self.topk = options.topk
         self.n_neighbors = options.n_neighbors
         self.n_jobs = options.n_jobs
+        self.weight_path = options.weight_path
 
     # The functions below are required for matchers
     def get_module_name(self):

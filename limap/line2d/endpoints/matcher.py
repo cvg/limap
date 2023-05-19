@@ -15,7 +15,7 @@ class NNEndpointsMatcher(BaseMatcher):
         super(NNEndpointsMatcher, self).__init__(extractor, options)
         assert self.extractor.get_module_name() == "superpoint_endpoints"
         self.device = "cuda" if device is None else device
-        self.sg = SuperGlue(dict()).eval().to(self.device)
+        self.sg = SuperGlue({'weight_path': self.weight_path}).eval().to(self.device)
 
     def get_module_name(self):
         return "nn_endpoints"
