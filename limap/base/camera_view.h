@@ -20,11 +20,12 @@ namespace limap {
 class CameraImage {
 public:
     CameraImage() {}
+    CameraImage(const int& input_cam_id, const std::string& image_name = "none"): cam_id(input_cam_id), pose(CameraPose(false)), image_name_(image_name) {} // empty image
+    CameraImage(const Camera& input_cam, const std::string& image_name = "none"): cam_id(input_cam.CameraId()), pose(CameraPose(false)), image_name_(image_name) {} // empty image
     CameraImage(const int& input_cam_id, const CameraPose& input_pose, const std::string& image_name = "none"): cam_id(input_cam_id), pose(input_pose), image_name_(image_name) {}
     CameraImage(const Camera& input_cam, const CameraPose& input_pose, const std::string& image_name = "none"): cam_id(input_cam.CameraId()), pose(input_pose), image_name_(image_name) {}
     CameraImage(py::dict dict);
     CameraImage(const CameraImage& camimage): cam_id(camimage.cam_id), pose(camimage.pose) {SetImageName(camimage.image_name());}
-    CameraImage(const int& input_cam_id, const std::string& image_name = "none"): cam_id(input_cam_id), image_name_(image_name) {} // empty image
 
     int cam_id;
     CameraPose pose;
@@ -35,6 +36,7 @@ public:
 
     void SetCameraId(const int input_cam_id) { cam_id = input_cam_id; }
     void SetImageName(const std::string& image_name) { image_name_ = image_name; }
+    void SetInitFlag(const bool flag) { pose.initialized = flag; }
     std::string image_name() const { return image_name_; }
 
 private:
@@ -44,6 +46,7 @@ private:
 class CameraView: public CameraImage {
 public:
     CameraView() {}
+    CameraView(const Camera& input_cam, const std::string& image_name = "none"): CameraImage(input_cam, image_name), cam(input_cam) {} // empty view 
     CameraView(const Camera& input_cam, const CameraPose& input_pose, const std::string& image_name = "none"): CameraImage(input_cam, input_pose, image_name), cam(input_cam) {}
     CameraView(py::dict dict);
     CameraView(const CameraView& camview): CameraImage(camview), cam(camview.cam) {}
@@ -62,6 +65,9 @@ public:
     V3D ray_direction(const V2D& p2d) const;
     std::pair<V3D, V3D> ray_direction_gradient(const V2D& p2d) const;
     V3D get_direction_from_vp(const V3D& vp) const;
+
+    // get focal length for initialization
+    std::pair<double, bool> get_initial_focal_length() const; // return: (focal_length, is_prior)
 };
 
 } // namespace limap

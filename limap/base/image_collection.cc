@@ -51,8 +51,9 @@ ImageCollection::ImageCollection(const std::vector<CameraView>& camviews) {
 ImageCollection::ImageCollection(py::dict dict) {
     // load cameras
     std::map<int, py::dict> dictvec_cameras;
-    if (dict.contains("cameras"))
+    if (dict.contains("cameras")) {
         dictvec_cameras = dict["cameras"].cast<std::map<int, py::dict>>();
+    }
     else
         throw std::runtime_error("Error! Key \"cameras\" does not exist!");
     for (auto it = dictvec_cameras.begin(); it != dictvec_cameras.end(); ++it) {
@@ -63,8 +64,9 @@ ImageCollection::ImageCollection(py::dict dict) {
     }
     // load images
     std::map<int, py::dict> dictvec_images;
-    if (dict.contains("images"))
+    if (dict.contains("images")) {
         dictvec_images = dict["images"].cast<std::map<int, py::dict>>();
+    }
     else
         throw std::runtime_error("Error! Key \"images\" does not exist!");
     for (auto it = dictvec_images.begin(); it != dictvec_images.end(); ++it) {
@@ -164,7 +166,7 @@ py::dict ImageCollection::as_dict() const {
     return output;
 }
 
-ImageCollection ImageCollection::subset_by_camera_ids(const std::vector<int> valid_camera_ids) const {
+ImageCollection ImageCollection::subset_by_camera_ids_set(const std::set<int>& valid_camera_ids) const {
     std::map<int, Camera> valid_cameras;
     std::map<int, CameraImage> valid_images;
     std::set<int> cam_ids_set;
@@ -185,7 +187,49 @@ ImageCollection ImageCollection::subset_by_camera_ids(const std::vector<int> val
     return ImageCollection(valid_cameras, valid_images);
 }
 
-ImageCollection ImageCollection::subset_by_image_ids(const std::vector<int> valid_image_ids) const {
+ImageCollection ImageCollection::subset_by_camera_ids_set(const std::unordered_set<int>& valid_camera_ids) const {
+    std::map<int, Camera> valid_cameras;
+    std::map<int, CameraImage> valid_images;
+    std::set<int> cam_ids_set;
+    for (const int& cam_id: valid_camera_ids) {
+        if (!exist_cam(cam_id)) {
+            std::cout<<"Warning! Camera "<<cam_id<<" in the valid subset does not exist in the image collection."<<std::endl;
+            continue;
+        }
+        cam_ids_set.insert(cam_id);
+        valid_cameras.insert(std::make_pair(cam_id, cameras.at(cam_id)));
+    }
+    for (auto it = images.begin(); it != images.end(); ++it) {
+        int cam_id = it->second.cam_id;
+        if (cam_ids_set.find(cam_id) == cam_ids_set.end())
+            continue;
+        valid_images.insert(*it);
+    }
+    return ImageCollection(valid_cameras, valid_images);
+}
+
+ImageCollection ImageCollection::subset_by_camera_ids(const std::vector<int>& valid_camera_ids) const {
+    std::map<int, Camera> valid_cameras;
+    std::map<int, CameraImage> valid_images;
+    std::set<int> cam_ids_set;
+    for (const int& cam_id: valid_camera_ids) {
+        if (!exist_cam(cam_id)) {
+            std::cout<<"Warning! Camera "<<cam_id<<" in the valid subset does not exist in the image collection."<<std::endl;
+            continue;
+        }
+        cam_ids_set.insert(cam_id);
+        valid_cameras.insert(std::make_pair(cam_id, cameras.at(cam_id)));
+    }
+    for (auto it = images.begin(); it != images.end(); ++it) {
+        int cam_id = it->second.cam_id;
+        if (cam_ids_set.find(cam_id) == cam_ids_set.end())
+            continue;
+        valid_images.insert(*it);
+    }
+    return ImageCollection(valid_cameras, valid_images);
+}
+
+ImageCollection ImageCollection::subset_by_image_ids_set(const std::set<int>& valid_image_ids) const {
     std::map<int, Camera> valid_cameras;
     std::map<int, CameraImage> valid_images;
     for (const int& img_id: valid_image_ids) {
@@ -193,6 +237,52 @@ ImageCollection ImageCollection::subset_by_image_ids(const std::vector<int> vali
             std::cout<<"Warning! Image "<<img_id<<" in the valid subset does not exist in the image collection."<<std::endl;
             continue;
         }
+        valid_images.insert(std::make_pair(img_id, images.at(img_id)));
+        int cam_id = images.at(img_id).cam_id;
+        if (valid_cameras.find(cam_id) == valid_cameras.end())
+            valid_cameras.insert(std::make_pair(cam_id, cameras.at(cam_id)));
+    }
+    return ImageCollection(valid_cameras, valid_images);
+}
+
+ImageCollection ImageCollection::subset_by_image_ids_set(const std::unordered_set<int>& valid_image_ids) const {
+    std::map<int, Camera> valid_cameras;
+    std::map<int, CameraImage> valid_images;
+    for (const int& img_id: valid_image_ids) {
+        if (!exist_image(img_id)) {
+            std::cout<<"Warning! Image "<<img_id<<" in the valid subset does not exist in the image collection."<<std::endl;
+            continue;
+        }
+        valid_images.insert(std::make_pair(img_id, images.at(img_id)));
+        int cam_id = images.at(img_id).cam_id;
+        if (valid_cameras.find(cam_id) == valid_cameras.end())
+            valid_cameras.insert(std::make_pair(cam_id, cameras.at(cam_id)));
+    }
+    return ImageCollection(valid_cameras, valid_images);
+}
+
+ImageCollection ImageCollection::subset_by_image_ids(const std::vector<int>& valid_image_ids) const {
+    std::map<int, Camera> valid_cameras;
+    std::map<int, CameraImage> valid_images;
+    for (const int& img_id: valid_image_ids) {
+        if (!exist_image(img_id)) {
+            std::cout<<"Warning! Image "<<img_id<<" in the valid subset does not exist in the image collection."<<std::endl;
+            continue;
+        }
+        valid_images.insert(std::make_pair(img_id, images.at(img_id)));
+        int cam_id = images.at(img_id).cam_id;
+        if (valid_cameras.find(cam_id) == valid_cameras.end())
+            valid_cameras.insert(std::make_pair(cam_id, cameras.at(cam_id)));
+    }
+    return ImageCollection(valid_cameras, valid_images);
+}
+
+ImageCollection ImageCollection::subset_initialized() const {
+    std::map<int, Camera> valid_cameras;
+    std::map<int, CameraImage> valid_images;
+    for (const int& img_id: get_img_ids()) {
+        if (!camimage(img_id).pose.initialized)
+            continue;
         valid_images.insert(std::make_pair(img_id, images.at(img_id)));
         int cam_id = images.at(img_id).cam_id;
         if (valid_cameras.find(cam_id) == valid_cameras.end())
@@ -279,9 +369,25 @@ void ImageCollection::set_max_image_dim(const int& val) {
     }
 }
 
+void ImageCollection::set_camera_params(const int cam_id, const std::vector<double>& params) {
+    THROW_CHECK_EQ(exist_cam(cam_id), true);
+    cameras[cam_id].SetParams(params);
+}
+
 void ImageCollection::change_camera(const int cam_id, const Camera cam) {
     THROW_CHECK_EQ(exist_cam(cam_id), true);
     cameras[cam_id] = cam;
+}
+
+void ImageCollection::set_camera_pose(const int img_id, const CameraPose pose) {
+    THROW_CHECK_EQ(exist_image(img_id), true);
+    images[img_id].pose = pose;
+    images[img_id].SetInitFlag(true);
+}
+
+CameraPose ImageCollection::get_camera_pose(const int img_id) const {
+    THROW_CHECK_EQ(exist_image(img_id), true);
+    return images.at(img_id).pose;
 }
 
 void ImageCollection::change_image(const int img_id, const CameraImage camimage) {
@@ -324,6 +430,30 @@ ImageCollection ImageCollection::apply_similarity_transform(const SimilarityTran
         it->second.pose = pose_similarity_transform(it->second.pose, transform);
     }
     return imagecols;
+}
+
+int ImageCollection::get_first_image_id_by_camera_id(const int cam_id) const {
+    THROW_CHECK_EQ(exist_cam(cam_id), true);
+    for (auto it = images.begin(); it != images.end(); ++it) {
+        if (it->second.cam_id == cam_id)
+            return it->first;
+    }
+    return -1;
+}
+
+void ImageCollection::init_uninitialized_cameras() {
+    for (auto it = cameras.begin(); it != cameras.end(); ++it) {
+        if (it->second.IsInitialized())
+            continue;
+        int img_id = get_first_image_id_by_camera_id(it->first);
+        CameraView view = camview(img_id);
+        auto res = view.get_initial_focal_length();
+        it->second.InitializeParams(res.first, view.w(), view.h());
+        if (res.second)
+            it->second.SetPriorFocalLength(true);
+        else
+            it->second.SetPriorFocalLength(false);
+    }
 }
 
 } // namespace limap
