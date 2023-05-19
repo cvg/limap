@@ -48,7 +48,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     limapio.save_txt_metainfos(os.path.join(cfg["dir_save"], "metainfos.txt"), neighbors, ranges)
 
     ##########################################################
-    # [B] get 2D line segments and line heatmaps for each image
+    # [B] get 2D line segments for each image
     ##########################################################
     compute_descinfo = (not cfg["triangulation"]["use_exhaustive_matcher"])
     compute_descinfo = (compute_descinfo and (not cfg["load_match"]) and (not cfg["load_det"])) or cfg["line2d"]["compute_descinfo"]
