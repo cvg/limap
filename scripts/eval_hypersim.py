@@ -20,7 +20,27 @@ def plot_curve(fname, thresholds, data):
     plt.plot(thresholds, data)
     plt.savefig(fname)
 
-def report_error_to_GT(evaluator, lines):
+def visualize_error_to_GT(evaluator, lines, threshold):
+    # get inlier and outlier segments
+    inlier_lines = evaluator.ComputeInlierSegs(lines, threshold)
+    outlier_lines = evaluator.ComputeOutlierSegs(lines, threshold)
+
+    # visualize
+    import limap.visualize as limapvis
+    import open3d as o3d
+    vis = o3d.visualization.Visualizer()
+    vis.create_window(height=1080, width=1920)
+    inlier_line_set = limapvis.open3d_get_line_set(inlier_lines, color=[0., 1., 0.])
+    vis.add_geometry(inlier_line_set)
+    outlier_line_set = limapvis.open3d_get_line_set(outlier_lines, color=[1., 0., 0.])
+    vis.add_geometry(outlier_line_set)
+    vis.run()
+    vis.destroy_window()
+
+def report_error_to_GT(evaluator, lines, vis_err_th=None):
+    # [optional] visualize
+    if vis_err_th is not None:
+        visualize_error_to_GT(evaluator, lines, vis_err_th)
     lengths = np.array([line.length() for line in lines])
     sum_length = lengths.sum()
     thresholds = [0.001, 0.005, 0.01]
@@ -53,12 +73,12 @@ def write_ply(fname, points):
     el = PlyElement.describe(vertex, 'vertex', comments=['vertices'])
     PlyData([el], text=True).write(fname)
 
-def report_error_to_mesh(mesh_fname, lines):
+def report_error_to_mesh(mesh_fname, lines, vis_err_th=None):
     evaluator = _eval.MeshEvaluator(mesh_fname, MPAU)
-    return report_error_to_GT(evaluator, lines)
+    return report_error_to_GT(evaluator, lines, vis_err_th=vis_err_th)
 
-def report_error_to_point_cloud(points, lines, kdtree_dir=None):
-    evaluator = _eval.PointCloudEvaluator(points)
+def report_error_to_point_cloud(points, lines, kdtree_dir=None, vis_err_th=None):
+    evaluator = _eval.PointCloudEvaluator(points, vis_err_th=vis_err_th)
     if kdtree_dir is None:
         evaluator.Build()
         evaluator.Save('tmp/kdtree.bin')
@@ -66,7 +86,7 @@ def report_error_to_point_cloud(points, lines, kdtree_dir=None):
         evaluator.Load(kdtree_dir)
     return report_error_to_GT(evaluator, lines)
 
-def eval_hypersim(cfg, lines, dataset_hypersim, scene_id, cam_id=0):
+def eval_hypersim(cfg, lines, dataset_hypersim, scene_id, cam_id=0, vis_err_th=None):
     # set scene id
     dataset_hypersim.set_scene_id(scene_id)
     dataset_hypersim.set_max_dim(cfg["max_image_dim"])
@@ -78,14 +98,14 @@ def eval_hypersim(cfg, lines, dataset_hypersim, scene_id, cam_id=0):
 
     if cfg["mesh_dir"] is not None:
         # eval w.r.t mesh
-        evaluator = report_error_to_mesh(cfg["mesh_dir"], lines)
+        evaluator = report_error_to_mesh(cfg["mesh_dir"], lines, vis_err_th=vis_err_th)
     elif cfg["pc_dir"] is not None:
         points = read_ply(cfg["pc_dir"])
-        evaluator = report_error_to_point_cloud(points, lines, kdtree_dir=cfg["kdtree_dir"])
+        evaluator = report_error_to_point_cloud(points, lines, kdtree_dir=cfg["kdtree_dir"], vis_err_th=vis_err_th)
     else:
         # eval w.r.t point cloud
         points = dataset_hypersim.get_point_cloud_from_list(index_list, cam_id=cam_id)
-        evaluator = report_error_to_point_cloud(points, lines, kdtree_dir=cfg["kdtree_dir"])
+        evaluator = report_error_to_point_cloud(points, lines, kdtree_dir=cfg["kdtree_dir"], vis_err_th=vis_err_th)
     if cfg["visualize"]:
         thresholds = np.arange(1, 11, 1) * 0.001
         for threshold in tqdm(thresholds.tolist()):
@@ -106,7 +126,8 @@ def parse_config():
     arg_parser.add_argument('--mesh_dir', type=str, default=None, help='path to the .obj file')
     arg_parser.add_argument('--pc_dir', type=str, default=None, help='path to the .ply file')
     arg_parser.add_argument('--kdtree_dir', type=str, default=None, help='path to the saved index for kd tree')
-    arg_parser.add_argument('--noeval', action='store_true', help='if enabled, the evaluation is not performed')
+    arg_parser.add_argument('--visualize_error', action='store_true', help="whether to visualize accurate lines")
+    arg_parser.add_argument('--visualize_error_threshold', type=float, default=0.001, help="visualize threshold")
 
     args, unknown = arg_parser.parse_known_args()
     cfg = cfgutils.load_config(args.config_file, default_path=args.default_config_file)
@@ -120,8 +141,8 @@ def parse_config():
     cfg["pc_dir"] = args.pc_dir
     cfg["kdtree_dir"] = args.kdtree_dir
     cfg["folder_to_load"] = os.path.join("precomputed", "hypersim", cfg["scene_id"])
-    cfg["noeval"] = args.noeval
-    # print(cfg)
+    cfg["visualize_error"] = args.visualize_error
+    cfg["visualize_error_threshold"] = args.visualize_error_threshold
     return cfg
 
 def init_workspace():
@@ -138,9 +159,10 @@ def main():
     if linetracks is not None:
         lines = [track.line for track in linetracks if track.count_images() >= cfg["n_visible_views"]]
         linetracks = [track for track in linetracks if track.count_images() >= cfg["n_visible_views"]]
-    if cfg["noeval"]:
-        return
-    eval_hypersim(cfg, lines, dataset_hypersim, cfg["scene_id"], cam_id=cfg["cam_id"])
+
+    # evaluation
+    visualize_error_threshold = None if not cfg["visualize_error"] else cfg["visualize_error_threshold"]
+    eval_hypersim(cfg, lines, dataset_hypersim, cfg["scene_id"], cam_id=cfg["cam_id"], vis_err_th = visualize_error_threshold)
 
     # report track quality
     if linetracks is not None:

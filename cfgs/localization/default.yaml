@@ -2,6 +2,7 @@
 ##############################
 # global config
 cfg_type: "lineloc"
+weight_path: "~/.limap/models" 
 load_meta: False
 load_det: False 
 load_match: False

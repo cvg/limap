@@ -375,7 +375,8 @@ void bind_camera(py::module& m) {
         .def(py::init<const std::string&, M3D, int, std::pair<int, int>>(), py::arg("model_name"), py::arg("K"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1))
         .def(py::init<py::dict>())
         .def(py::init<const Camera&>())
-        .def(py::init<int, int, std::pair<int, int>>(), py::arg("model_id"), py::arg("cam_id"), py::arg("hw")=std::make_pair<int, int>(-1, -1)) // empty camera
+        .def(py::init<int, int, std::pair<int, int>>(), py::arg("model_id"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1)) // empty camera
+        .def(py::init<const std::string&, int, std::pair<int, int>>(), py::arg("model_name"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1)) // empty camera
         .def(py::pickle(
             [](const Camera& input) { // dump
                 return input.as_dict();
@@ -396,12 +397,14 @@ void bind_camera(py::module& m) {
         .def("resize", &Camera::resize)
         .def("set_max_image_dim", &Camera::set_max_image_dim)
         .def("set_cam_id", &Camera::SetCameraId)
-        .def("IsUndistorted", &Camera::IsUndistorted);
+        .def("InitializeParams", &Camera::InitializeParams)
+        .def("IsUndistorted", &Camera::IsUndistorted)
+        .def("IsInitialized", &Camera::IsInitialized);
 
     py::class_<CameraPose>(m, "CameraPose")
-        .def(py::init<>())
-        .def(py::init<V4D, V3D>())
-        .def(py::init<M3D, V3D>())
+        .def(py::init<bool>(), py::arg("initialized")=false)
+        .def(py::init<V4D, V3D, bool>(), py::arg("qvec"), py::arg("tvec"), py::arg("initialized")=true)
+        .def(py::init<M3D, V3D, bool>(), py::arg("R"), py::arg("tvec"), py::arg("initialized")=true)
         .def(py::init<py::dict>())
         .def(py::init<const CameraPose&>())
         .def(py::pickle(
@@ -415,6 +418,7 @@ void bind_camera(py::module& m) {
         .def("as_dict", &CameraPose::as_dict)
         .def_readonly("qvec", &CameraPose::qvec)
         .def_readonly("tvec", &CameraPose::tvec)
+        .def_readwrite("initialized", &CameraPose::initialized)
         .def("R", &CameraPose::R)
         .def("T", &CameraPose::T)
         .def("center", &CameraPose::center)
@@ -422,11 +426,12 @@ void bind_camera(py::module& m) {
 
     py::class_<CameraImage>(m, "CameraImage")
         .def(py::init<>())
+        .def(py::init<const int&, const std::string&>(), py::arg("cam_id"), py::arg("image_name") = "none") // empty image
+        .def(py::init<const Camera&, const std::string&>(), py::arg("camera"), py::arg("image_name") = "none") // empty image
         .def(py::init<const int&, const CameraPose&, const std::string&>(), py::arg("cam_id"), py::arg("pose"), py::arg("image_name") = "none")
         .def(py::init<const Camera&, const CameraPose&, const std::string&>(), py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
         .def(py::init<py::dict>())
         .def(py::init<const CameraImage&>())
-        .def(py::init<const int&, const std::string&>(), py::arg("cam_id"), py::arg("image_name") = "none") // empty image
         .def(py::pickle(
             [](const CameraImage& input) { // dump
                 return input.as_dict();
@@ -446,6 +451,7 @@ void bind_camera(py::module& m) {
 
     py::class_<CameraView>(m, "CameraView")
         .def(py::init<>())
+        .def(py::init<const Camera&, const std::string&>(), py::arg("camera"), py::arg("image_name") = "none") // empty view
         .def(py::init<const Camera&, const CameraPose&, const std::string&>(), py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
         .def(py::init<py::dict>())
         .def(py::init<const CameraView&>())
@@ -472,7 +478,8 @@ void bind_camera(py::module& m) {
         .def("ray_direction", &CameraView::ray_direction)
         .def("get_direction_from_vp", &CameraView::get_direction_from_vp)
         .def("image_name", &CameraView::image_name)
-        .def("set_image_name", &CameraView::SetImageName);
+        .def("set_image_name", &CameraView::SetImageName)
+        .def("get_initial_focal_length", &CameraView::get_initial_focal_length);
 
     py::class_<ImageCollection>(m, "ImageCollection")
         .def(py::init<>())
@@ -494,6 +501,7 @@ void bind_camera(py::module& m) {
         .def("as_dict", &ImageCollection::as_dict)
         .def("subset_by_camera_ids", &ImageCollection::subset_by_camera_ids)
         .def("subset_by_image_ids", &ImageCollection::subset_by_image_ids)
+        .def("subset_initialized", &ImageCollection::subset_initialized)
         .def("update_neighbors", &ImageCollection::update_neighbors)
         .def("get_cameras", &ImageCollection::get_cameras)
         .def("get_cam_ids", &ImageCollection::get_cam_ids)
@@ -516,11 +524,15 @@ void bind_camera(py::module& m) {
         .def("NumImages", &ImageCollection::NumImages)
         .def("set_max_image_dim", &ImageCollection::set_max_image_dim)
         .def("change_camera", &ImageCollection::change_camera)
+        .def("set_camera_pose", &ImageCollection::set_camera_pose)
+        .def("get_camera_pose", &ImageCollection::get_camera_pose)
         .def("change_image", &ImageCollection::change_image)
         .def("change_image_name", &ImageCollection::change_image_name)
         .def("IsUndistorted", &ImageCollection::IsUndistorted)
         .def("read_image", &ImageCollection::read_image, py::arg("img_id"), py::arg("set_gray")=false)
-        .def("apply_similarity_transform", &ImageCollection::apply_similarity_transform);
+        .def("apply_similarity_transform", &ImageCollection::apply_similarity_transform)
+        .def("get_first_image_id_by_camera_id", &ImageCollection::get_first_image_id_by_camera_id)
+        .def("init_uninitialized_cameras", &ImageCollection::init_uninitialized_cameras);
 }
 
 void bind_pointtrack(py::module& m) {

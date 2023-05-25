@@ -170,6 +170,7 @@ class SuperGlue(nn.Module):
         'GNN_layers': ['self', 'cross'] * 9,
         'sinkhorn_iterations': 100,
         'match_threshold': 0.2,
+        'weight_path': None
     }
 
     def __init__(self, config):
@@ -190,7 +191,10 @@ class SuperGlue(nn.Module):
         self.register_parameter('bin_score', bin_score)
 
         assert self.config['weights'] in ['indoor', 'outdoor']
-        path = Path(__file__).parent
+        if self.config["weight_path"] is None:
+            path = Path(__file__).parent
+        else:
+            path = Path(os.path.join(self.config["weight_path"], "point2d", "superglue"))
         path = path / 'weights/superglue_{}.pth'.format(self.config['weights'])
         if not os.path.isfile(path):
             self.download_model(path)
