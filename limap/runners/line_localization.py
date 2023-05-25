@@ -71,7 +71,7 @@ def get_hloc_keypoints_from_log(logs, query_img_name, ref_sfm=None, resize_scale
     return p2ds, p3ds, inliers
 
 def line_localization(cfg, imagecols, train_ids, query_ids, point_corresp, linemap_db, retrieval, results_path,
-                      coarse_poses=None, img_name_dict=None, logger=None):
+                      img_name_dict=None, logger=None):
     """
     Run visual localization on query images with `imagecols`, it takes 2D-3D point correspondences from HLoc;
     runs line matching using 2D line matcher ("epipolar" for Gao et al. "Pose Refinement with Joint Optimization of Visual Points and Lines");
@@ -88,7 +88,6 @@ def line_localization(cfg, imagecols, train_ids, query_ids, point_corresp, linem
     :param retrieval:       dict, map query image file path to list of neighbor image file paths,
                             e.g. returned from hloc.utils.parsers.parse_retrieval
     :param results_path:    str or Path, file path to write the localization results
-    :param coarse_poses:    dict (optional), map query image IDs to coarse poses, e.g. returned by HLoc
     :param img_name_dict:   dict (optional), map query image IDs to the image file path, by default the image names from `imagecols`
     :param logger:          logging.Logger (optional), print logs for more information
 
@@ -151,7 +150,7 @@ def line_localization(cfg, imagecols, train_ids, query_ids, point_corresp, linem
 
         query_lines = all_query_lines[qid]
         qname = id_to_name[qid]
-        query_pose = coarse_poses[qname]
+        query_pose = imagecols.get_camera_pose(qid)
         query_cam = imagecols.cam(imagecols.camimage(qid).cam_id)
         query_camview = _base.CameraView(query_cam, query_pose)
         targets = retrieval[qname]

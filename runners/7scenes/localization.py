@@ -139,6 +139,13 @@ def main():
     # Instantiate ref_sfm
     ref_sfm = pycolmap.Reconstruction(ref_sfm_path)
 
+    # Update coarse poses for epipolar methods
+    if cfg['localization']['2d_matcher'] == 'epipolar' or cfg['localization']['epipolar_filter']:
+        name_to_id = {img_id_to_name[img_id]: img_id for img_id in query_ids}
+        for qname in poses:
+            qid = name_to_id[qname]
+            imagecols.set_camera_pose(qid, poses[qid])
+
     # Retrieve point correspondences from hloc
     with open(hloc_log_file, 'rb') as f:
         hloc_logs = pickle.load(f)
@@ -148,8 +155,7 @@ def main():
         point_correspondences[qid] = {'p2ds': p2ds, 'p3ds': p3ds, 'inliers': inliers}
 
     final_poses = _runners.line_localization(
-        cfg, imagecols, train_ids, query_ids, point_correspondences, linetracks_db, retrieval, results_joint,
-        coarse_poses=poses, img_name_dict=img_id_to_name)
+        cfg, imagecols, train_ids, query_ids, point_correspondences, linetracks_db, retrieval, results_joint, img_name_dict=img_id_to_name)
 
     evaluate(gt_dir, results_joint, test_list, only_localized=True)
 
