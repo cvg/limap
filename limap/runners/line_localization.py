@@ -70,8 +70,8 @@ def get_hloc_keypoints_from_log(logs, query_img_name, ref_sfm=None, resize_scale
         
     return p2ds, p3ds, inliers
 
-def line_localization(cfg, imagecols, linetracks, hloc_log_file, train_ids, query_ids, retrieval, results_path,
-                      coarse_poses=None, img_name_dict=None, ref_sfm=None, resize_scales=None, hloc_name_dict=None, logger=None):
+def line_localization(cfg, imagecols, train_ids, query_ids, point_corresp, linemap_db, retrieval, results_path,
+                      coarse_poses=None, img_name_dict=None, logger=None):
     """
     Run visual localization on query images with `imagecols`, it takes 2D-3D point correspondences from HLoc;
     runs line matching using 2D line matcher ("epipolar" for Gao et al. "Pose Refinement with Joint Optimization of Visual Points and Lines");
@@ -79,20 +79,18 @@ def line_localization(cfg, imagecols, linetracks, hloc_log_file, train_ids, quer
     and writes results in results file in `results_path`.
 
     :param cfg:             dict, configurations which fields refer to `cfgs/localization/default.yaml`
-    :param imagecols:       limap.base.ImageCollection
-    :param linetracks:      iterable of limap.base.LineTrack, LIMAP triangulated/fitted line tracks
-    :param hloc_log_file:   str or Path, path to the log file of HLoc localization, for point correspondences and inlier indices
+    :param imagecols:       limap.base.ImageCollection of database and query images
     :param train_ids:       iterable of int, image IDs for training/database images
     :param query_ids:       iterable of int, image IDs for query images
+    :param point_corresp:   dict, map query image IDs to extracted point correspondences for the query image,
+                            point correspondences for each image ID stored as a dict with keys 'p2ds', 'p3ds', and optionally 'inliers'
+    :param linemap_db:      iterable of limap.base.LineTrack, LIMAP triangulated/fitted database line tracks
     :param retrieval:       dict, map query image file path to list of neighbor image file paths,
                             e.g. returned from hloc.utils.parsers.parse_retrieval
     :param results_path:    str or Path, file path to write the localization results
     :param coarse_poses:    dict (optional), map query image IDs to coarse poses, e.g. returned by HLoc
     :param img_name_dict:   dict (optional), map query image IDs to the image file path, by default the image names from `imagecols`
-    :param ref_sfm:         str or Path or pycolmap.Reconstruction (optional)
-    :param resize_scales:   dict (optional), map query image names to resize scales
-    :param hloc_name_dict:  dict (optional), if the IDs map to different image file paths in HLoc log file
-    :param logger:          logging.Logger (optional), print logs for information
+    :param logger:          logging.Logger (optional), print logs for more information
 
     :return: list<limap.base.CameraPose>, the localized camera poses for all query images.
     """ 
@@ -102,21 +100,9 @@ def line_localization(cfg, imagecols, linetracks, hloc_log_file, train_ids, quer
         img_name_dict = {img_id: imagecols.image_name(img_id) for img_id in imagecols.get_img_ids()}
     id_to_name = img_name_dict
     name_to_id = {img_name_dict[img_id]: img_id for img_id in imagecols.get_img_ids()}
-    hloc_id_to_name = hloc_name_dict or id_to_name
-
-    with open(hloc_log_file, 'rb') as f:
-        hloc_logs = pickle.load(f)
-    if ref_sfm is not None and not isinstance(ref_sfm, pycolmap.Reconstruction):
-        ref_sfm = pycolmap.Reconstruction(ref_sfm)
     
      # GT for queries
-    poses_gt = {img_id: imagecols.camimage(img_id).pose for img_id in imagecols.get_img_ids()}
-
-    # Point-only coarse poses is only required for epipolar method, and will only be used when ransac.method is none
-    if coarse_poses is None:
-        if cfg['localization']['2d_matcher'] == 'epipolar':
-            raise ValueError("Epipolar matcher requires coarse poses but none provided!")
-        coarse_poses = {id_to_name[qid]: _base.CameraPose() for qid in query_ids}
+    poses_db = {img_id: imagecols.camimage(img_id).pose for img_id in train_ids}
 
     # line detection of query images, fetch detection of db images
     all_2d_segs, _ = _runners.compute_2d_segs(cfg, imagecols, compute_descinfo=False)
@@ -124,7 +110,7 @@ def line_localization(cfg, imagecols, linetracks, hloc_log_file, train_ids, quer
     all_db_segs = {id: all_2d_segs[id] for id in train_ids}
     all_query_lines = _base.get_all_lines_2d(all_query_segs)
     all_db_lines = _base.get_all_lines_2d(all_db_segs)
-    line2track = _base.get_invert_idmap_from_linetracks(all_db_lines, linetracks)
+    line2track = _base.get_invert_idmap_from_linetracks(all_db_lines, linemap_db)
 
     # Do matches for query images and retrieved neighbors for superglue endpoints matcher
     if cfg['localization']['2d_matcher'] != 'epipolar':
@@ -164,9 +150,9 @@ def line_localization(cfg, imagecols, linetracks, hloc_log_file, train_ids, quer
 
         query_lines = all_query_lines[qid]
         qname = id_to_name[qid]
-        ref_pose = coarse_poses[qname]
-        ref_cam = imagecols.cam(imagecols.camimage(qid).cam_id)
-        ref_camview = _base.CameraView(ref_cam, ref_pose)
+        query_pose = coarse_poses[qname]
+        query_cam = imagecols.cam(imagecols.camimage(qid).cam_id)
+        query_camview = _base.CameraView(query_cam, query_pose)
         targets = retrieval[qname]
 
         if cfg['localization']['2d_matcher'] != 'epipolar':
@@ -178,32 +164,32 @@ def line_localization(cfg, imagecols, linetracks, hloc_log_file, train_ids, quer
         for tgt_img_name in targets:
             tgt_id = name_to_id[tgt_img_name]
             tgt_lines = all_db_lines[tgt_id]
-            tgt_pose = poses_gt[tgt_id]
+            tgt_pose = poses_db[tgt_id]
             tgt_cam = imagecols.cam(imagecols.camimage(tgt_id).cam_id)
 
             if cfg['localization']['2d_matcher'] == 'epipolar':
                 line_pairs_2to2 = match_line_2to2_epipolarIoU(
-                    query_lines, tgt_lines, ref_cam, ref_pose, tgt_cam, tgt_pose, cfg['localization']['IoU_threshold'])
+                    query_lines, tgt_lines, query_cam, query_pose, tgt_cam, tgt_pose, cfg['localization']['IoU_threshold'])
                 line_pairs_2to3 = match_line_2to3(line_pairs_2to2, line2track, tgt_id)
                 for pair in line_pairs_2to3:
-                    ref_line_id, track_id = pair
-                    all_line_pairs_2to3[ref_line_id].append(track_id)
+                    query_line_id, track_id = pair
+                    all_line_pairs_2to3[query_line_id].append(track_id)
             else:
                 # Optionally filter matching results based on epipolar IoU
                 if cfg['localization']['epipolar_filter']:
                     filtered_line_pairs_2to2 = filter_line_2to2_epipolarIoU(
-                        all_line_pairs_2to2[tgt_id], query_lines, tgt_lines, ref_cam, ref_pose, tgt_cam, tgt_pose, cfg['localization']['IoU_threshold'])
+                        all_line_pairs_2to2[tgt_id], query_lines, tgt_lines, query_cam, query_pose, tgt_cam, tgt_pose, cfg['localization']['IoU_threshold'])
                 else:
                     filtered_line_pairs_2to2 = all_line_pairs_2to2[tgt_id]
                 line_pairs_2to3 = match_line_2to3(filtered_line_pairs_2to2, line2track, tgt_id)
                 for pair in line_pairs_2to3:
-                    ref_line_id, track_id = pair
-                    all_line_pairs_2to3[ref_line_id].append(track_id)
+                    query_line_id, track_id = pair
+                    all_line_pairs_2to3[query_line_id].append(track_id)
 
         # filter based on reprojection distance (to 1-1 correspondences), mainly for "OPPO method"
         if cfg['localization']['reprojection_filter'] is not None:
             line_matches_2to3 = reprojection_filter_matches_2to3(
-                query_lines, ref_camview, all_line_pairs_2to3, linetracks, dist_thres=2,
+                query_lines, query_camview, all_line_pairs_2to3, linemap_db, dist_thres=2,
                 dist_func=get_reprojection_dist_func(cfg['localization']['reprojection_filter']))
         else:
             line_matches_2to3 = [(x, y) for x in all_line_pairs_2to3 for y in all_line_pairs_2to3[x]]
@@ -212,14 +198,15 @@ def line_localization(cfg, imagecols, linetracks, hloc_log_file, train_ids, quer
         if logger:
             logger.info(f'{num_matches_line} line matches found for {len(query_lines)} 2D lines')
 
-        p2ds, p3ds, inliers_p = _runners.get_hloc_keypoints_from_log(hloc_logs, hloc_id_to_name[qid], ref_sfm, resize_scales=resize_scales)
-        l3ds = [track.line for track in linetracks]
+        l3ds = [track.line for track in linemap_db]
         l2ds = [query_lines[pair[0]] for pair in line_matches_2to3]
         l3d_ids = [pair[1] for pair in line_matches_2to3]
 
+        p3ds, p2ds = point_corresp[qid]['p3ds'], point_corresp[qid]['p2ds']
+        inliers_point = point_corresp[qid].get('inliers') # default None
         final_pose, ransac_stats = _estimators.pl_estimate_absolute_pose(
-                cfg['localization'], l3ds, l3d_ids, l2ds, p3ds, p2ds, ref_cam, ref_pose, # ref_pose not used for ransac methods
-                inliers_point=inliers_p, silent=True, logger=logger)
+                cfg['localization'], l3ds, l3d_ids, l2ds, p3ds, p2ds, query_cam, query_pose, # query_pose not used for ransac methods
+                inliers_point=inliers_point, silent=True, logger=logger)
 
         if cfg['localization']['skip_exists']:
             with open(os.path.join(pose_dir, f'{qid}.txt'), 'w') as f:

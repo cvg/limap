@@ -7,6 +7,7 @@ import limap.util.config as cfgutils
 import limap.runners as _runners
 import argparse
 import logging
+import pickle
 from tqdm import tqdm
 from pathlib import Path
 from utils import InLocP3DReader, read_dataset_inloc, get_result_filenames, run_hloc_inloc, parse_retrieval
@@ -100,9 +101,17 @@ def main():
     ##########################################################
     retrieval = parse_retrieval(loc_pairs)
     img_id_to_name = {id: img_rel_names[id] for id in imagecols.get_img_ids()}
+
+    with open(hloc_log_file, 'rb') as f:
+        hloc_logs = pickle.load(f)
+    point_correspondences = {}
+    for qid in query_ids:
+        p2ds, p3ds, inliers = _runners.get_hloc_keypoints_from_log(hloc_logs, img_id_to_name[qid], resize_scales=scales)
+        point_correspondences[qid] = {'p2ds': p2ds, 'p3ds': p3ds, 'inliers': inliers}
+
     final_poses = _runners.line_localization(
-        cfg, imagecols, linetracks_db, hloc_log_file, train_ids, query_ids, retrieval, results_joint, 
-        poses, img_id_to_name, resize_scales=scales)
+        cfg, imagecols, train_ids, query_ids, point_correspondences, linetracks_db, retrieval, results_joint, 
+        coarse_poses=poses, img_name_dict=img_id_to_name)
 
     # Overwrite results with filename without prefix path
     lines = []
