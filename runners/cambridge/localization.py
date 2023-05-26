@@ -120,6 +120,8 @@ def main():
     # [C] Localization with points and lines
     ##########################################################
     _retrieval = parse_retrieval(loc_pairs)
+    imagecols_query = imagecols.subset_by_image_ids(query_ids)
+
     retrieval = {}
     for name in _retrieval:
         qid = img_name_to_id[name]
@@ -133,7 +135,7 @@ def main():
         name_to_id = {hloc_name_dict[img_id]: img_id for img_id in query_ids}
         for qname in poses:
             qid = name_to_id[qname]
-            imagecols.set_camera_pose(qid, poses[qid])
+            imagecols_query.set_camera_pose(qid, poses[qname])
 
     with open(hloc_log_file, 'rb') as f:
         hloc_logs = pickle.load(f)
@@ -143,7 +145,7 @@ def main():
         point_correspondences[qid] = {'p2ds': p2ds, 'p3ds': p3ds, 'inliers': inliers}
 
     final_poses = _runners.line_localization(
-        cfg, imagecols, train_ids, query_ids, point_correspondences, linetracks_db, retrieval, results_joint, img_name_dict=id_to_origin_name)
+        cfg, imagecols_train, imagecols_query, point_correspondences, linetracks_db, retrieval, results_joint, img_name_dict=id_to_origin_name)
 
     # Evaluate
     eval(results_joint, poses_gt, query_ids, id_to_origin_name, logger)

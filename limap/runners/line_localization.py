@@ -70,7 +70,7 @@ def get_hloc_keypoints_from_log(logs, query_img_name, ref_sfm=None, resize_scale
 
     return p2ds, p3ds, inliers
 
-def line_localization(cfg, imagecols, train_ids, query_ids, point_corresp, linemap_db, retrieval, results_path,
+def line_localization(cfg, imagecols_db, imagecols_query, point_corresp, linemap_db, retrieval, results_path,
                       img_name_dict=None, logger=None):
     """
     Run visual localization on query images with `imagecols`, it takes 2D-3D point correspondences from HLoc;
@@ -79,9 +79,8 @@ def line_localization(cfg, imagecols, train_ids, query_ids, point_corresp, linem
     and writes results in results file in `results_path`.
 
     :param cfg:             dict, configurations which fields refer to `cfgs/localization/default.yaml`
-    :param imagecols:       limap.base.ImageCollection of database and query images
-    :param train_ids:       iterable of int, image IDs for training/database images
-    :param query_ids:       iterable of int, image IDs for query images
+    :param imagecols_db:    limap.base.ImageCollection of database images
+    :param imagecols_query: limap.base.ImageCollection of query images
     :param point_corresp:   dict, map query image IDs to extracted point correspondences for the query image,
                             point correspondences for each image ID stored as a dict with keys 'p2ds', 'p3ds', and optionally 'inliers'
     :param linemap_db:      iterable of limap.base.LineTrack, LIMAP triangulated/fitted database line tracks
@@ -95,20 +94,24 @@ def line_localization(cfg, imagecols, train_ids, query_ids, point_corresp, linem
     """
     if cfg['localization']['2d_matcher'] not in ['epipolar', 'sold2', 'superglue_endpoints', 'gluestick', 'linetr', 'lbd', 'l2d2']:
         raise ValueError("Unknown 2d line matcher: {}".format(cfg['localization']['2d_matcher']))
+    
+    train_ids = imagecols_db.get_img_ids()
+    query_ids = imagecols_query.get_img_ids()
+
     if img_name_dict is None:
-        img_name_dict = {img_id: imagecols.image_name(img_id) for img_id in imagecols.get_img_ids()}
+        img_name_dict = {img_id: imagecols_db.image_name(img_id) for img_id in train_ids}
+        img_name_dict.update({img_id: imagecols_query.image_name(img_id) for img_id in query_ids})
     id_to_name = img_name_dict
-    name_to_id = {img_name_dict[img_id]: img_id for img_id in imagecols.get_img_ids()}
+    name_to_id = {img_name_dict[img_id]: img_id for img_id in train_ids + query_ids}
     
      # GT for queries
-    poses_db = {img_id: imagecols.camimage(img_id).pose for img_id in train_ids}
+    poses_db = {img_id: imagecols_db.camimage(img_id).pose for img_id in train_ids}
 
-    # line detection of query images, fetch detection of db images
-    all_2d_segs, _ = _runners.compute_2d_segs(cfg, imagecols, compute_descinfo=False)
-    all_query_segs = {id: all_2d_segs[id] for id in query_ids}
-    all_db_segs = {id: all_2d_segs[id] for id in train_ids}
-    all_query_lines = _base.get_all_lines_2d(all_query_segs)
+    # line detection of query images, fetch detection of db images (generally already be detected during triangulation)
+    all_db_segs, _ = _runners.compute_2d_segs(cfg, imagecols_db, compute_descinfo=False)
+    all_query_segs, _ = _runners.compute_2d_segs(cfg, imagecols_query, compute_descinfo=False)
     all_db_lines = _base.get_all_lines_2d(all_db_segs)
+    all_query_lines = _base.get_all_lines_2d(all_query_segs)
     line2track = _base.get_invert_idmap_from_linetracks(all_db_lines, linemap_db)
 
     # Do matches for query images and retrieved neighbors for superglue endpoints matcher
@@ -124,7 +127,8 @@ def line_localization(cfg, imagecols, train_ids, query_ids, point_corresp, linem
         basedir = os.path.join("line_detections", cfg["line2d"]["detector"]["method"])
         folder_save = os.path.join(cfg["dir_save"], basedir)
         extractor = limap.line2d.get_extractor(ex_cfg, weight_path=weight_path)
-        se_descinfo_dir = extractor.extract_all_images(folder_save, imagecols, all_2d_segs, skip_exists=cfg['skip_exists'])
+        se_descinfo_dir = extractor.extract_all_images(folder_save, imagecols_db, all_db_segs, skip_exists=cfg['skip_exists'])
+        se_descinfo_dir = extractor.extract_all_images(folder_save, imagecols_query, all_query_segs, skip_exists=True)
 
         basedir = os.path.join("line_matchings", cfg["line2d"]["detector"]["method"], "feats_{0}".format(matcher_name))
         matcher = limap.line2d.get_matcher(ma_cfg, extractor, n_neighbors=cfg['n_neighbors_loc'], weight_path=weight_path)
@@ -150,8 +154,8 @@ def line_localization(cfg, imagecols, train_ids, query_ids, point_corresp, linem
 
         query_lines = all_query_lines[qid]
         qname = id_to_name[qid]
-        query_pose = imagecols.get_camera_pose(qid)
-        query_cam = imagecols.cam(imagecols.camimage(qid).cam_id)
+        query_pose = imagecols_query.get_camera_pose(qid)
+        query_cam = imagecols_query.cam(imagecols_query.camimage(qid).cam_id)
         query_camview = _base.CameraView(query_cam, query_pose)
         targets = retrieval[qname]
 
@@ -165,7 +169,7 @@ def line_localization(cfg, imagecols, train_ids, query_ids, point_corresp, linem
             tgt_id = name_to_id[tgt_img_name]
             tgt_lines = all_db_lines[tgt_id]
             tgt_pose = poses_db[tgt_id]
-            tgt_cam = imagecols.cam(imagecols.camimage(tgt_id).cam_id)
+            tgt_cam = imagecols_db.cam(imagecols_db.camimage(tgt_id).cam_id)
 
             if cfg['localization']['2d_matcher'] == 'epipolar':
                 line_pairs_2to2 = match_line_2to2_epipolarIoU(

@@ -135,7 +135,8 @@ def main():
     ##########################################################
     retrieval = parse_retrieval(retrieval_path)
     img_id_to_name = {img_id: all_images[img_id].name for img_id in all_images}
-    
+    imagecols_query = imagecols.subset_by_image_ids(query_ids)
+
     # Instantiate ref_sfm
     ref_sfm = pycolmap.Reconstruction(ref_sfm_path)
 
@@ -144,7 +145,7 @@ def main():
         name_to_id = {img_id_to_name[img_id]: img_id for img_id in query_ids}
         for qname in poses:
             qid = name_to_id[qname]
-            imagecols.set_camera_pose(qid, poses[qid])
+            imagecols_query.set_camera_pose(qid, poses[qname])
 
     # Retrieve point correspondences from hloc
     with open(hloc_log_file, 'rb') as f:
@@ -155,7 +156,7 @@ def main():
         point_correspondences[qid] = {'p2ds': p2ds, 'p3ds': p3ds, 'inliers': inliers}
 
     final_poses = _runners.line_localization(
-        cfg, imagecols, train_ids, query_ids, point_correspondences, linetracks_db, retrieval, results_joint, img_name_dict=img_id_to_name)
+        cfg, imagecols_train, imagecols_query, point_correspondences, linetracks_db, retrieval, results_joint, img_name_dict=img_id_to_name)
 
     evaluate(gt_dir, results_joint, test_list, only_localized=True)
 
