@@ -15,7 +15,7 @@ import limap.pointsfm.read_write_model as colmap_utils
 from pathlib import Path
 
 from utils import DepthReader, read_scene_7scenes, get_result_filenames, run_hloc_7scenes
-from hloc_utils import image_path_to_rendered_depth_path, evaluate
+from utils import image_path_to_rendered_depth_path, evaluate
 from hloc.utils.parsers import parse_retrieval
 
 formatter = logging.Formatter(
