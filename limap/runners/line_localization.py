@@ -91,7 +91,7 @@ def line_localization(cfg, imagecols_db, imagecols_query, point_corresp, linemap
     :param img_name_dict:   dict (optional), map query image IDs to the image file path, by default the image names from `imagecols`
     :param logger:          logging.Logger (optional), print logs for more information
 
-    :return: list<limap.base.CameraPose>, the localized camera poses for all query images.
+    :return: Dict<int: limap.base.CameraPose>, mapping of query image IDs to the localized camera poses for all query images.
     """
     if cfg['localization']['2d_matcher'] not in ['epipolar', 'sold2', 'superglue_endpoints', 'gluestick', 'linetr', 'lbd', 'l2d2']:
         raise ValueError("Unknown 2d line matcher: {}".format(cfg['localization']['2d_matcher']))
@@ -139,7 +139,7 @@ def line_localization(cfg, imagecols_db, imagecols_query, point_corresp, linemap
 
     # Localization
     print("[LOG] Starting localization with points+lines...")
-    final_poses = []
+    final_poses = {}
     pose_dir = results_path.parent / 'poses_{}'.format(cfg['localization']['2d_matcher'])
     for qid in tqdm(query_ids):
         if cfg['localization']['skip_exists']:
@@ -148,7 +148,7 @@ def line_localization(cfg, imagecols_db, imagecols_query, point_corresp, linemap
                 with open(os.path.join(pose_dir, f'{qid}.txt'), 'r') as f:
                     data = f.read().rstrip().split('\n')[0].split()
                     q, t = np.split(np.array(data[1:], float), [4])
-                    final_poses.append(_base.CameraPose(q, t))
+                    final_poses[qid] = _base.CameraPose(q, t)
                     continue
         if logger:
             logger.info(f"Query Image ID: {qid}")
@@ -220,11 +220,12 @@ def line_localization(cfg, imagecols_db, imagecols_query, point_corresp, linemap
                 line = ' '.join([name] + [str(x) for x in fq] + [str(x) for x in ft]) + '\n'
                 f.writelines([line])
 
-        final_poses.append(final_pose)
+        final_poses[qid] = final_pose
 
     lines = []
-    for qid, fpose in zip(query_ids, final_poses):
+    for qid in query_ids:
         name = id_to_name[qid]
+        fpose = final_poses[qid]
         fq, ft = fpose.qvec, fpose.tvec
         line = ' '.join([name] + [str(x) for x in fq] + [str(x) for x in ft]) + '\n'
         lines.append(line)
@@ -232,4 +233,5 @@ def line_localization(cfg, imagecols_db, imagecols_query, point_corresp, linemap
     # write results
     with open(results_path, 'w') as f:
         f.writelines(lines)
+
     return final_poses
