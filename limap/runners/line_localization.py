@@ -79,8 +79,9 @@ def line_localization(cfg, imagecols_db, imagecols_query, point_corresp, linemap
     and writes results in results file in `results_path`.
 
     :param cfg:             dict, configurations which fields refer to `cfgs/localization/default.yaml`
-    :param imagecols_db:    limap.base.ImageCollection of database images
-    :param imagecols_query: limap.base.ImageCollection of query images
+    :param imagecols_db:    limap.base.ImageCollection of database images, with triangulated camera poses
+    :param imagecols_query: limap.base.ImageCollection of query images, camera poses only used for epipolar matcher/filter as coarse poses, 
+                            can be left uninitialized otherwise
     :param point_corresp:   dict, map query image IDs to extracted point correspondences for the query image,
                             point correspondences for each image ID stored as a dict with keys 'p2ds', 'p3ds', and optionally 'inliers'
     :param linemap_db:      iterable of limap.base.LineTrack, LIMAP triangulated/fitted database line tracks
