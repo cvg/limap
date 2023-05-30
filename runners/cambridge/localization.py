@@ -11,6 +11,7 @@ import limap.runners as _runners
 import argparse
 import logging
 import pycolmap
+import pickle
 from pathlib import Path
 
 from hloc.utils.parsers import parse_retrieval
@@ -95,7 +96,7 @@ def main():
     ##########################################################
     # [A] hloc point-based localization
     ##########################################################
-    ref_sfm, poses, hloc_log_file = run_hloc_cambridge(
+    ref_sfm_path, poses, hloc_log_file = run_hloc_cambridge(
         cfg, image_dir, imagecols, neighbors, train_ids, query_ids, id_to_origin_name,
         results_point, args.num_loc, logger
     )
@@ -119,14 +120,32 @@ def main():
     # [C] Localization with points and lines
     ##########################################################
     _retrieval = parse_retrieval(loc_pairs)
+    imagecols_query = imagecols.subset_by_image_ids(query_ids)
+
     retrieval = {}
     for name in _retrieval:
         qid = img_name_to_id[name]
         retrieval[id_to_origin_name[qid]] = [id_to_origin_name[img_name_to_id[n]] for n in _retrieval[name]]
     hloc_name_dict = {id: "image{0:08d}.png".format(id) for id in (train_ids + query_ids)}
+
+    ref_sfm = pycolmap.Reconstruction(ref_sfm_path)
+
+     # Update coarse poses for epipolar methods
+    if cfg['localization']['2d_matcher'] == 'epipolar' or cfg['localization']['epipolar_filter']:
+        name_to_id = {hloc_name_dict[img_id]: img_id for img_id in query_ids}
+        for qname in poses:
+            qid = name_to_id[qname]
+            imagecols_query.set_camera_pose(qid, poses[qname])
+
+    with open(hloc_log_file, 'rb') as f:
+        hloc_logs = pickle.load(f)
+    point_correspondences = {}
+    for qid in query_ids:
+        p2ds, p3ds, inliers = _runners.get_hloc_keypoints_from_log(hloc_logs, hloc_name_dict[qid], ref_sfm)
+        point_correspondences[qid] = {'p2ds': p2ds, 'p3ds': p3ds, 'inliers': inliers}
+
     final_poses = _runners.line_localization(
-        cfg, imagecols, linetracks_db, hloc_log_file, train_ids, query_ids, retrieval, results_joint,
-        poses, id_to_origin_name, ref_sfm, hloc_name_dict=hloc_name_dict)
+        cfg, imagecols_train, imagecols_query, point_correspondences, linetracks_db, retrieval, results_joint, img_name_dict=id_to_origin_name)
 
     # Evaluate
     eval(results_joint, poses_gt, query_ids, id_to_origin_name, logger)

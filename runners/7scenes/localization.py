@@ -9,12 +9,13 @@ import limap.util.config as cfgutils
 import limap.runners as _runners
 import argparse
 import logging
+import pickle
 import pycolmap
 import limap.pointsfm.read_write_model as colmap_utils
 from pathlib import Path
 
 from utils import DepthReader, read_scene_7scenes, get_result_filenames, run_hloc_7scenes
-from hloc_utils import image_path_to_rendered_depth_path, evaluate
+from utils import image_path_to_rendered_depth_path, evaluate
 from hloc.utils.parsers import parse_retrieval
 
 formatter = logging.Formatter(
@@ -102,7 +103,7 @@ def main():
     train_ids, query_ids = ids['train'], ids['query']
     
     # Some paths useful for LIMAP localization too
-    ref_sfm = outputs / ('sfm_superpoint+superglue' + ('+depth' if args.use_dense_depth else ''))
+    ref_sfm_path = outputs / ('sfm_superpoint+superglue' + ('+depth' if args.use_dense_depth else ''))
     depth_dir = args.dataset / f'depth/7scenes_{args.scene}/train/depth'
     retrieval_path = args.dataset / '7scenes_densevlad_retrieval_top_10' / f'{args.scene}_top10.txt'
 
@@ -134,9 +135,28 @@ def main():
     ##########################################################
     retrieval = parse_retrieval(retrieval_path)
     img_id_to_name = {img_id: all_images[img_id].name for img_id in all_images}
+    imagecols_query = imagecols.subset_by_image_ids(query_ids)
+
+    # Instantiate ref_sfm
+    ref_sfm = pycolmap.Reconstruction(ref_sfm_path)
+
+    # Update coarse poses for epipolar methods
+    if cfg['localization']['2d_matcher'] == 'epipolar' or cfg['localization']['epipolar_filter']:
+        name_to_id = {img_id_to_name[img_id]: img_id for img_id in query_ids}
+        for qname in poses:
+            qid = name_to_id[qname]
+            imagecols_query.set_camera_pose(qid, poses[qname])
+
+    # Retrieve point correspondences from hloc
+    with open(hloc_log_file, 'rb') as f:
+        hloc_logs = pickle.load(f)
+    point_correspondences = {}
+    for qid in query_ids:
+        p2ds, p3ds, inliers = _runners.get_hloc_keypoints_from_log(hloc_logs, img_id_to_name[qid], ref_sfm)
+        point_correspondences[qid] = {'p2ds': p2ds, 'p3ds': p3ds, 'inliers': inliers}
+
     final_poses = _runners.line_localization(
-        cfg, imagecols, linetracks_db, hloc_log_file, train_ids, query_ids, retrieval, results_joint,
-        poses, img_id_to_name, ref_sfm)
+        cfg, imagecols_train, imagecols_query, point_correspondences, linetracks_db, retrieval, results_joint, img_name_dict=img_id_to_name)
 
     evaluate(gt_dir, results_joint, test_list, only_localized=True)
 
