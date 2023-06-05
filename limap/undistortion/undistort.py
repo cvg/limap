@@ -10,11 +10,18 @@ def UndistortImageCamera(camera, imname_in, imname_out):
         cv2.imwrite(imname_out, img)
         if camera.model_id() == 0 or camera.model_id() == 1:
             return camera
-        # else change to pinhole
-        new_camera = _base.Camera("PINHOLE", camera.K(), cam_id = camera.cam_id(), hw=[camera.h(), camera.w()])
+        # if "SIMPLE_RADIAL", update to "SIMPLE_PINHOLE"
+        if camera.model_id() == 2:
+            new_camera = _base.Camera("SIMPLE_PINHOLE", camera.K(), cam_id = camera.cam_id(), hw=[camera.h(), camera.w()])
+        else:
+            # else change to pinhole
+            new_camera = _base.Camera("PINHOLE", camera.K(), cam_id = camera.cam_id(), hw=[camera.h(), camera.w()])
         return new_camera
 
     # undistort
     camera_undistorted = _undistortion._UndistortCamera(imname_in, camera, imname_out)
     return camera_undistorted
+
+def UndistortPoints(points, distorted_camera, undistorted_camera):
+    return _undistortion._UndistortPoints(points, distorted_camera, undistorted_camera)
 

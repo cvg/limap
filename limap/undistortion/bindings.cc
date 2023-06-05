@@ -27,6 +27,8 @@ void bind_undistortion(py::module &m) {
 
     m.def("_UndistortCamera", &UndistortCamera);
     m.def("_UndistortCameraView", &UndistortCameraView);
+    m.def("_UndistortPoint", &UndistortPoint);
+    m.def("_UndistortPoints", &UndistortPoints);
 }
 
 } // namespace limap
