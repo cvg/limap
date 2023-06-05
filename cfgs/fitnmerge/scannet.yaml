@@ -5,7 +5,4 @@ data_dir: "/local/home/shaoliu/data/ScanNet"
 scene_id: "scene0678_01"
 max_image_dim: 800 
 stride: 5 
-line2d:
-    detector: 
-        method: "sold2"
 
