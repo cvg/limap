@@ -162,8 +162,7 @@ def line_localization(cfg, imagecols_db, imagecols_query, point_corresp, linemap
 
         if cfg['localization']['2d_matcher'] != 'epipolar':
             # Read from the pre-computed matches
-            matches = limapio.read_npy(os.path.join(se_matches_dir, "matches_{0}.npy".format(qid))).item()
-            all_line_pairs_2to2 = {name_to_id[tgt_img_name]: matches[i] for i, tgt_img_name in enumerate(targets)}
+            all_line_pairs_2to2 = limapio.read_npy(os.path.join(se_matches_dir, "matches_{0}.npy".format(qid))).item()
 
         all_line_pairs_2to3 = defaultdict(list)
         for tgt_img_name in targets:
