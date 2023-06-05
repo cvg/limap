@@ -170,3 +170,18 @@ def compute_matches(cfg, descinfo_folder, image_ids, neighbors):
         matches_folder = matcher.get_matches_folder(folder_load)
     return matches_folder
 
+def compute_exhausive_matches(cfg, descinfo_folder, image_ids):
+    print("[LOG] Start exhausive matching 2D lines... (extractor = {0}, matcher = {1}, n_images = {2})".format(cfg["line2d"]["extractor"]["method"], cfg["line2d"]["matcher"]["method"], len(image_ids)))
+    import limap.line2d
+    basedir = os.path.join("line_matchings", cfg["line2d"]["detector"]["method"], "feats_{0}".format(cfg["line2d"]["extractor"]["method"]))
+    extractor = limap.line2d.get_extractor(cfg["line2d"]["extractor"])
+    se_match = cfg["skip_exists"] or cfg["line2d"]["matcher"]["skip_exists"]
+    matcher = limap.line2d.get_matcher(cfg["line2d"]["matcher"], extractor, n_neighbors=cfg["n_neighbors"])
+    if not cfg["load_match"]:
+        folder_save = os.path.join(cfg["dir_save"], basedir)
+        matches_folder = matcher.match_all_exhaustive_pairs(folder_save, image_ids, descinfo_folder, skip_exists=se_match)
+    else:
+        folder_load = os.path.join(cfg["dir_load"], basedir)
+        matches_folder = matcher.get_matches_folder(folder_load)
+    return matches_folder
+

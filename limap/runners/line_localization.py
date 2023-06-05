@@ -80,7 +80,7 @@ def line_localization(cfg, imagecols_db, imagecols_query, point_corresp, linemap
 
     :param cfg:             dict, configurations which fields refer to `cfgs/localization/default.yaml`
     :param imagecols_db:    limap.base.ImageCollection of database images, with triangulated camera poses
-    :param imagecols_query: limap.base.ImageCollection of query images, camera poses only used for epipolar matcher/filter as coarse poses, 
+    :param imagecols_query: limap.base.ImageCollection of query images, camera poses only used for epipolar matcher/filter as coarse poses,
                             can be left uninitialized otherwise
     :param point_corresp:   dict, map query image IDs to extracted point correspondences for the query image,
                             point correspondences for each image ID stored as a dict with keys 'p2ds', 'p3ds', and optionally 'inliers'
@@ -95,7 +95,7 @@ def line_localization(cfg, imagecols_db, imagecols_query, point_corresp, linemap
     """
     if cfg['localization']['2d_matcher'] not in ['epipolar', 'sold2', 'superglue_endpoints', 'gluestick', 'linetr', 'lbd', 'l2d2']:
         raise ValueError("Unknown 2d line matcher: {}".format(cfg['localization']['2d_matcher']))
-    
+
     train_ids = imagecols_db.get_img_ids()
     query_ids = imagecols_query.get_img_ids()
 
@@ -104,7 +104,7 @@ def line_localization(cfg, imagecols_db, imagecols_query, point_corresp, linemap
         img_name_dict.update({img_id: imagecols_query.image_name(img_id) for img_id in query_ids})
     id_to_name = img_name_dict
     name_to_id = {img_name_dict[img_id]: img_id for img_id in train_ids + query_ids}
-    
+
      # GT for queries
     poses_db = {img_id: imagecols_db.camimage(img_id).pose for img_id in train_ids}
 
@@ -162,7 +162,7 @@ def line_localization(cfg, imagecols_db, imagecols_query, point_corresp, linemap
 
         if cfg['localization']['2d_matcher'] != 'epipolar':
             # Read from the pre-computed matches
-            matches = limapio.read_npy(os.path.join(se_matches_dir, "matches_{0}.npy".format(qid)))
+            matches = limapio.read_npy(os.path.join(se_matches_dir, "matches_{0}.npy".format(qid))).item()
             all_line_pairs_2to2 = {name_to_id[tgt_img_name]: matches[i] for i, tgt_img_name in enumerate(targets)}
 
         all_line_pairs_2to3 = defaultdict(list)

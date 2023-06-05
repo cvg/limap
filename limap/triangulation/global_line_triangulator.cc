@@ -62,7 +62,7 @@ void GlobalLineTriangulator::scoreOneNode(const int img_id, const int line_id, c
         const Line3d& l1 = std::get<0>(tris[i]);
         int img_id = std::get<2>(tris[i]).first;
         int line_id = std::get<2>(tris[i]).second;
-        const CameraView& view1 = imagecols_.camview(img_id);
+        const CameraView& view1 = imagecols_->camview(img_id);
         for (size_t j = 0; j < n_tris; ++j) {
             if (i == j)
                 continue;
@@ -71,7 +71,7 @@ void GlobalLineTriangulator::scoreOneNode(const int img_id, const int line_id, c
             int ng_line_id = std::get<2>(tris[j]).second;
             if (ng_img_id == img_id)
                 continue;
-            const CameraView& view2 = imagecols_.camview(ng_img_id);
+            const CameraView& view2 = imagecols_->camview(ng_img_id);
             double score3d = linker.compute_score_3d(l1, l2);
             if (score3d == 0)
                 continue;
@@ -140,7 +140,7 @@ const TriTuple& GlobalLineTriangulator::getBestTri(const int img_id, const int l
 
 void GlobalLineTriangulator::filterNodeByNumOuterEdges(const std::map<int, std::vector<std::vector<NeighborLineNode>>>& valid_edges, 
                                              std::map<int, std::vector<bool>>& flags) {
-    for (const int& img_id: imagecols_.get_img_ids()) {
+    for (const int& img_id: imagecols_->get_img_ids()) {
         size_t n_lines = CountLines(img_id);
         flags.insert(std::make_pair(img_id, std::vector<bool>()));
         flags[img_id].resize(n_lines);
@@ -150,7 +150,7 @@ void GlobalLineTriangulator::filterNodeByNumOuterEdges(const std::map<int, std::
     // build checktable with all edges pointing to the node
     std::map<int, std::vector<std::vector<LineNode>>> parent_neighbors;
     std::map<int, std::vector<int>> counters;
-    for (const int& img_id: imagecols_.get_img_ids()) {
+    for (const int& img_id: imagecols_->get_img_ids()) {
         parent_neighbors.insert(std::make_pair(img_id, std::vector<std::vector<LineNode>>()));
         counters.insert(std::make_pair(img_id, std::vector<int>()));
         size_t n_lines = CountLines(img_id);
@@ -160,7 +160,7 @@ void GlobalLineTriangulator::filterNodeByNumOuterEdges(const std::map<int, std::
             counters[img_id][line_id] = valid_edges.at(img_id)[line_id].size();
         }
     }
-    for (const int& img_id: imagecols_.get_img_ids()) {
+    for (const int& img_id: imagecols_->get_img_ids()) {
         for (size_t line_id = 0; line_id < CountLines(img_id); ++line_id) {
             auto& nodes = valid_edges.at(img_id)[line_id];
             for (auto it = nodes.begin(); it != nodes.end(); ++it) {
@@ -176,7 +176,7 @@ void GlobalLineTriangulator::filterNodeByNumOuterEdges(const std::map<int, std::
 
     // iteratively filter node
     std::queue<LineNode> q;
-    for (const int& img_id: imagecols_.get_img_ids()) {
+    for (const int& img_id: imagecols_->get_img_ids()) {
         for (size_t line_id = 0; line_id < CountLines(img_id); line_id++) {
             if (flags[img_id][line_id])
                 continue;
@@ -210,7 +210,7 @@ void GlobalLineTriangulator::run_clustering(Graph* graph) {
 
     // collect undirected edges
     std::set<std::pair<LineNode, LineNode>> edges;
-    for (const int& img_id: imagecols_.get_img_ids()) {
+    for (const int& img_id: imagecols_->get_img_ids()) {
         for (size_t line_id = 0; line_id < CountLines(img_id); ++line_id) {
             auto& nodes = valid_edges_[img_id][line_id];
             for (auto it = nodes.begin(); it != nodes.end(); ++it) {
@@ -231,8 +231,8 @@ void GlobalLineTriangulator::run_clustering(Graph* graph) {
     for (auto it = edges.begin(); it != edges.end(); ++it) {
         int img_id1 = it->first.first; int line_id1 = it->first.second;
         int img_id2 = it->second.first; int line_id2 = it->second.second;
-        const CameraView& view1 = imagecols_.camview(img_id1);
-        const CameraView& view2 = imagecols_.camview(img_id2);
+        const CameraView& view1 = imagecols_->camview(img_id1);
+        const CameraView& view2 = imagecols_->camview(img_id2);
         const Line3d& line1 = std::get<0>(getBestTri(img_id1, line_id1));
         const Line3d& line2 = std::get<0>(getBestTri(img_id2, line_id2));
         Line2d& line2d1 = all_lines_2d_[img_id1][line_id1];
@@ -319,7 +319,7 @@ std::vector<LineTrack> GlobalLineTriangulator::ComputeLineTracks() {
 int GlobalLineTriangulator::CountAllTris() const {
     int counter = 0;
     size_t n_images = CountImages();
-    for (const int& img_id: imagecols_.get_img_ids()) {
+    for (const int& img_id: imagecols_->get_img_ids()) {
         size_t n_lines = CountLines(img_id);
         for (size_t line_id = 0; line_id < n_lines; ++line_id) {
             int n_tris = tris_.at(img_id)[line_id].size();
@@ -365,7 +365,7 @@ std::vector<TriTuple> GlobalLineTriangulator::GetValidScoredTrisNodeSet(const in
 int GlobalLineTriangulator::CountAllValidTris() const {
     int counter = 0;
     size_t n_images = CountImages();
-    for (const int& img_id: imagecols_.get_img_ids()) {
+    for (const int& img_id: imagecols_->get_img_ids()) {
         size_t n_lines = CountLines(img_id);
         for (size_t line_id = 0; line_id < n_lines; ++line_id) {
             int n_tris = valid_tris_.at(img_id)[line_id].size();
@@ -378,7 +378,7 @@ int GlobalLineTriangulator::CountAllValidTris() const {
 std::vector<Line3d> GlobalLineTriangulator::GetAllValidTris() const {
     std::vector<Line3d> res;
     size_t n_images = CountImages();
-    for (const int& img_id: imagecols_.get_img_ids()) {
+    for (const int& img_id: imagecols_->get_img_ids()) {
         size_t n_lines = CountLines(img_id);
         for (size_t line_id = 0; line_id < n_lines; ++line_id) {
             auto& tris = valid_tris_.at(img_id)[line_id];
@@ -444,7 +444,7 @@ std::vector<Line3d> GlobalLineTriangulator::GetValidTrisNodeSet(const int& img_i
 std::vector<Line3d> GlobalLineTriangulator::GetAllBestTris() const {
     std::vector<Line3d> res;
     size_t n_images = CountImages();
-    for (const int& img_id: imagecols_.get_img_ids()) {
+    for (const int& img_id: imagecols_->get_img_ids()) {
         size_t n_lines = CountLines(img_id);
         for (size_t line_id = 0; line_id < n_lines; ++line_id) {
             res.push_back(std::get<0>(getBestTri(img_id, line_id)));
@@ -456,7 +456,7 @@ std::vector<Line3d> GlobalLineTriangulator::GetAllBestTris() const {
 std::vector<Line3d> GlobalLineTriangulator::GetAllValidBestTris() const {
     std::vector<Line3d> res;
     size_t n_images = CountImages();
-    for (const int& img_id: imagecols_.get_img_ids()) {
+    for (const int& img_id: imagecols_->get_img_ids()) {
         size_t n_lines = CountLines(img_id);
         for (size_t line_id = 0; line_id < n_lines; ++line_id) {
             if (!valid_flags_.at(img_id)[line_id])
