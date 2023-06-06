@@ -36,7 +36,6 @@ public:
 
     void SetCameraId(const int input_cam_id) { cam_id = input_cam_id; }
     void SetImageName(const std::string& image_name) { image_name_ = image_name; }
-    void SetInitFlag(const bool flag) { pose.initialized = flag; }
     std::string image_name() const { return image_name_; }
 
 private:

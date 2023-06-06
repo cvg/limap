@@ -52,6 +52,7 @@ public:
     std::vector<V3D> get_locations() const;
     std::map<int, V3D> get_map_locations() const;
     bool IsUndistorted() const;
+    bool IsUndistortedCameraModel() const;
 
     Camera cam(const int cam_id) const;
     bool exist_cam(const int cam_id) const;
@@ -85,6 +86,10 @@ public:
 
     // init uninitialized cameras
     void init_uninitialized_cameras();
+
+    // unintialization
+    void uninitialize_poses();
+    void uninitialize_intrinsics();
 
 private:
     std::map<int, Camera> cameras;

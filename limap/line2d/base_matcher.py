@@ -51,12 +51,35 @@ class BaseMatcher():
             if skip_exists and os.path.exists(fname_save):
                 return
             descinfo1 = self.read_descinfo(descinfo_folder, img_id)
-            matches_idx = []
+            matches_idx = {}
             for ng_img_id in ng_img_id_list:
                 descinfo2 = self.read_descinfo(descinfo_folder, ng_img_id)
                 matches = self.match_pair(descinfo1, descinfo2)
-                matches_idx.append(matches)
+                matches_idx.update({ng_img_id: matches})
             self.save_match(matches_folder, img_id, matches_idx)
         joblib.Parallel(n_jobs=self.n_jobs)(joblib.delayed(process)(self, matches_folder, descinfo_folder, img_id, neighbors[img_id], skip_exists) for img_id in tqdm(image_ids))
+        return matches_folder
+
+    def match_all_exhaustive_pairs(self, output_folder, image_ids, descinfo_folder, skip_exists=False):
+        matches_folder = self.get_matches_folder(output_folder)
+        if not skip_exists:
+            limapio.delete_folder(matches_folder)
+        limapio.check_makedirs(matches_folder)
+
+        # multiprocessing unit
+        def process(self, matches_folder, descinfo_folder, img_id, ng_img_id_list, skip_exists):
+            fname_save = self.get_match_filename(matches_folder, img_id)
+            if skip_exists and os.path.exists(fname_save):
+                return
+            descinfo1 = self.read_descinfo(descinfo_folder, img_id)
+            matches_idx = {}
+            for ng_img_id in ng_img_id_list:
+                if ng_img_id == img_id:
+                    continue
+                descinfo2 = self.read_descinfo(descinfo_folder, ng_img_id)
+                matches = self.match_pair(descinfo1, descinfo2)
+                matches_idx.update({ng_img_id: matches})
+            self.save_match(matches_folder, img_id, matches_idx)
+        joblib.Parallel(n_jobs=self.n_jobs)(joblib.delayed(process)(self, matches_folder, descinfo_folder, img_id, image_ids, skip_exists) for img_id in tqdm(image_ids))
         return matches_folder
 

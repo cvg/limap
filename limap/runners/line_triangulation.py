@@ -101,8 +101,8 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
         if cfg["triangulation"]["use_exhaustive_matcher"]:
             Triangulator.TriangulateImageExhaustiveMatch(img_id, neighbors[img_id])
         else:
-            matches = limapio.read_npy(os.path.join(matches_dir, "matches_{0}.npy".format(img_id)))
-            Triangulator.TriangulateImage(img_id, matches, neighbors[img_id])
+            matches = limapio.read_npy(os.path.join(matches_dir, "matches_{0}.npy".format(img_id))).item()
+            Triangulator.TriangulateImage(img_id, matches)
     linetracks = Triangulator.ComputeLineTracks()
 
     # filtering 2d supports

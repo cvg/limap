@@ -10,7 +10,7 @@ namespace limap {
 namespace triangulation {
 
 void BaseLineTriangulator::offsetHalfPixel() {
-    std::vector<int> image_ids = imagecols_.get_img_ids();
+    std::vector<int> image_ids = imagecols_->get_img_ids();
     for (auto it = image_ids.begin(); it != image_ids.end(); ++it) {
         int img_id = *it;
         for (size_t line_id = 0; line_id < CountLines(img_id); ++line_id) {
@@ -22,16 +22,16 @@ void BaseLineTriangulator::offsetHalfPixel() {
 }
 
 void BaseLineTriangulator::Init(const std::map<int, std::vector<Line2d>>& all_2d_segs,
-                            const ImageCollection& imagecols) 
+                            const ImageCollection* imagecols) 
 {
     all_lines_2d_ = all_2d_segs;
     if (config_.add_halfpix)
         offsetHalfPixel();
-    THROW_CHECK_EQ(imagecols.IsUndistorted(), true);
+    THROW_CHECK_EQ(imagecols->IsUndistorted(), true);
     imagecols_ = imagecols;
     
     // initialize empty containers
-    for (const int& img_id: imagecols.get_img_ids()) {
+    for (const int& img_id: imagecols->get_img_ids()) {
         size_t n_lines = all_2d_segs.at(img_id).size();
         neighbors_.insert(std::make_pair(img_id, std::vector<int>()));
         edges_.insert(std::make_pair(img_id, std::vector<std::vector<LineNode>>()));
@@ -41,15 +41,20 @@ void BaseLineTriangulator::Init(const std::map<int, std::vector<Line2d>>& all_2d
     }
 }
 
-void BaseLineTriangulator::TriangulateImage(const int img_id,
-                                        const std::vector<Eigen::MatrixXi>& matches,
-                                        const std::vector<int>& neighbors) 
+void BaseLineTriangulator::Init(const std::map<int, std::vector<Line2d>>& all_2d_segs,
+                            const ImageCollection& imagecols) 
 {
-    neighbors_[img_id].clear(); neighbors_[img_id] = neighbors;
-    size_t n_neighbors = neighbors.size();
-    for (size_t neighbor_id = 0; neighbor_id < n_neighbors; ++neighbor_id) {
-        int ng_img_id = neighbors[neighbor_id];
-        const auto& match_info = matches[neighbor_id];
+    return Init(all_2d_segs, &imagecols);
+}
+
+void BaseLineTriangulator::TriangulateImage(const int img_id,
+                                            const std::map<int, Eigen::MatrixXi>& matches)
+{
+    neighbors_[img_id].clear();
+    for (auto it = matches.begin(); it != matches.end(); ++it) {
+        int ng_img_id = it->first;
+        const auto& match_info = it->second;
+        neighbors_[img_id].push_back(ng_img_id);
         if (match_info.rows() != 0) {
             THROW_CHECK_EQ(match_info.cols(), 2);
         }
@@ -74,7 +79,7 @@ void BaseLineTriangulator::TriangulateImage(const int img_id,
 }
 
 void BaseLineTriangulator::TriangulateImageExhaustiveMatch(const int img_id,
-                                                       const std::vector<int>& neighbors)
+                                                           const std::vector<int>& neighbors)
 {
     neighbors_[img_id].clear(); neighbors_[img_id] = neighbors;
     size_t n_neighbors = neighbors.size();
@@ -102,7 +107,7 @@ void BaseLineTriangulator::clearEdgesOneNode(const int img_id, const int line_id
 }
 
 void BaseLineTriangulator::clearEdges() {
-    for (const int& img_id: imagecols_.get_img_ids()) {
+    for (const int& img_id: imagecols_->get_img_ids()) {
         for (int line_id = 0; line_id < CountLines(img_id); ++line_id) {
             clearEdgesOneNode(img_id, line_id);
         }
@@ -111,7 +116,7 @@ void BaseLineTriangulator::clearEdges() {
 
 int BaseLineTriangulator::countEdges() const {
     int counter = 0;
-    for (const int& img_id: imagecols_.get_img_ids()) {
+    for (const int& img_id: imagecols_->get_img_ids()) {
         for (int line_id = 0; line_id < CountLines(img_id); ++line_id) {
             counter += edges_.at(img_id)[line_id].size();
         }
@@ -120,12 +125,12 @@ int BaseLineTriangulator::countEdges() const {
 }
 
 void BaseLineTriangulator::triangulateOneNode(const int img_id, const int line_id) {
-    THROW_CHECK_EQ(imagecols_.exist_image(img_id), true);
+    THROW_CHECK_EQ(imagecols_->exist_image(img_id), true);
     auto& connections = edges_[img_id][line_id];
     const Line2d& l1 = all_lines_2d_[img_id][line_id];
     if (l1.length() <= config_.min_length_2d)
         return;
-    const CameraView& view1 = imagecols_.camview(img_id);
+    const CameraView& view1 = imagecols_->camview(img_id);
     size_t n_conns = connections.size();
     std::vector<std::vector<TriTuple>> results(n_conns);
 
@@ -136,7 +141,7 @@ void BaseLineTriangulator::triangulateOneNode(const int img_id, const int line_i
         const Line2d& l2 = all_lines_2d_[ng_img_id][ng_line_id];
         if (l2.length() <= config_.min_length_2d)
             continue;
-        const CameraView& view2 = imagecols_.camview(ng_img_id);
+        const CameraView& view2 = imagecols_->camview(ng_img_id);
 
         // Step 1.1: many points: connect points
         // Step 1.2: one point: point-based triangulation

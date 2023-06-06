@@ -382,7 +382,7 @@ void ImageCollection::change_camera(const int cam_id, const Camera cam) {
 void ImageCollection::set_camera_pose(const int img_id, const CameraPose pose) {
     THROW_CHECK_EQ(exist_image(img_id), true);
     images[img_id].pose = pose;
-    images[img_id].SetInitFlag(true);
+    images[img_id].pose.SetInitFlag(true);
 }
 
 CameraPose ImageCollection::get_camera_pose(const int img_id) const {
@@ -454,6 +454,34 @@ void ImageCollection::init_uninitialized_cameras() {
         else
             it->second.SetPriorFocalLength(false);
     }
+}
+
+void ImageCollection::uninitialize_intrinsics() {
+    for (auto it = cameras.begin(); it != cameras.end(); ++it) {
+        int img_id = get_first_image_id_by_camera_id(it->first);
+        CameraView view = camview(img_id);
+        auto res = view.get_initial_focal_length();
+        it->second.InitializeParams(res.first, view.w(), view.h());
+        if (res.second)
+            it->second.SetPriorFocalLength(true);
+        else
+            it->second.SetPriorFocalLength(false);
+    }
+}
+
+void ImageCollection::uninitialize_poses() {
+    for (auto it = images.begin(); it != images.end(); ++it) {
+        set_camera_pose(it->first, CameraPose(false));
+        it->second.pose.SetInitFlag(false);
+    }
+}
+
+bool ImageCollection::IsUndistortedCameraModel() const {
+    for (auto it = cameras.begin(); it != cameras.end(); ++it) {
+        if (it->second.ModelId() != 0 and it->second.ModelId() != 1)
+            return false;
+    }
+    return true;
 }
 
 } // namespace limap

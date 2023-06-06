@@ -86,6 +86,7 @@ public:
 
     V3D center() const { return -R().transpose() * T(); }
     double projdepth(const V3D& p3d) const;
+    void SetInitFlag(bool flag) { initialized = flag; }
 };
 
 } // namespace limap

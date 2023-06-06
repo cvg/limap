@@ -399,6 +399,8 @@ void bind_camera(py::module& m) {
         .def("set_cam_id", &Camera::SetCameraId)
         .def("InitializeParams", &Camera::InitializeParams)
         .def("IsUndistorted", &Camera::IsUndistorted)
+        .def("ImageToWorld", &Camera::ImageToWorld)
+        .def("WorldToImage", &Camera::WorldToImage)
         .def("IsInitialized", &Camera::IsInitialized);
 
     py::class_<CameraPose>(m, "CameraPose")
@@ -532,7 +534,10 @@ void bind_camera(py::module& m) {
         .def("read_image", &ImageCollection::read_image, py::arg("img_id"), py::arg("set_gray")=false)
         .def("apply_similarity_transform", &ImageCollection::apply_similarity_transform)
         .def("get_first_image_id_by_camera_id", &ImageCollection::get_first_image_id_by_camera_id)
-        .def("init_uninitialized_cameras", &ImageCollection::init_uninitialized_cameras);
+        .def("init_uninitialized_cameras", &ImageCollection::init_uninitialized_cameras)
+        .def("uninitialize_poses", &ImageCollection::uninitialize_poses)
+        .def("uninitialize_intrinsics", &ImageCollection::uninitialize_intrinsics)
+        .def("IsUndistortedCameraModel", &ImageCollection::IsUndistortedCameraModel);
 }
 
 void bind_pointtrack(py::module& m) {
