@@ -723,7 +723,7 @@ void bind_camera(py::module& m) {
         .def("IsInitialized", &Camera::IsInitialized, R"(
             Returns:
                 bool: True if the camera parameters are initialized
-        )");
+        )")
         .def("IsUndistorted", &Camera::IsUndistorted, R"(
             Returns:
                 bool: True if the camera model is without distortion
@@ -759,7 +759,7 @@ void bind_camera(py::module& m) {
         )")
         .def_readonly("qvec", &CameraPose::qvec, ":class:`np.array` of shape (4,): The quaternion vector `(w, x, y, z)`")
         .def_readonly("tvec", &CameraPose::tvec, ":class:`np.array` of shape (3,): The translation vector")
-        .def_readwrite("initialized", &CameraPose::initialized)
+        .def_readwrite("initialized", &CameraPose::initialized, "bool: Flag indicating whether the pose has been initialized")
         .def("R", &CameraPose::R, R"(
             Returns:
                 :class:`np.array` of shape (3, 3): The rotation matrix
@@ -802,8 +802,6 @@ void bind_camera(py::module& m) {
         )")
         .def_readonly("cam_id", &CameraImage::cam_id, "int, the camera ID")
         .def_readonly("pose", &CameraImage::pose, ":class:`~limap.base.CameraPose`, the camera pose")
-        .def_readonly("qvec", &CameraPose::qvec, ":class:`np.array` of shape (4,): The quaternion vector of the camera pose")
-        .def_readonly("tvec", &CameraPose::tvec, ":class:`np.array` of shape (3,): The translation vector of the camera pose")
         .def("R", &CameraImage::R, R"(
             Returns:
                 :class:`np.array` of shape (3, 3): The rotation matrix of the camera pose
@@ -827,18 +825,7 @@ void bind_camera(py::module& m) {
 
             Args:
                 image_name (str)
-        )", py::arg("image_name"))
-        .def("center", &CameraPose::center, R"(
-            Returns:
-                :class:`np.array` of shape (3,): World-space coordinate of the camera according to the camera pose
-        )")
-        .def("projdepth", &CameraPose::projdepth, R"(
-            Args:
-                p3d (:class:`np.array`): World-space coordinate of a 3D point
-            
-            Returns:
-                float: The projection depth of the 3D point viewed from this camera pose
-        )", py::arg("p3d"));
+        )", py::arg("image_name"));
 
     py::class_<CameraView>(m, "CameraView", "Inherits :class:`~limap.base.CameraImage`, incorporating the :class:`~limap.base.Camera` model for project/unproject between 2D and 3D.")
         .def(py::init<>())
@@ -1168,7 +1155,7 @@ void bind_camera(py::module& m) {
             Initialize all uninitialized cameras by :func:`~limap.base.Camera.InitializeParams`.
         )")
         .def("uninitialize_poses", &ImageCollection::uninitialize_poses, R"(
-            Uninitialize camera poses for all images, set them to identity poses and remove the `initialized` flag.
+            Uninitialize camera poses for all images, set them to identity poses and remove the :attr:`~limap.base.CameraPose.initialized` flag.
         )")
         .def("uninitialize_intrinsics", &ImageCollection::uninitialize_intrinsics, R"(
             Uninitialize intrinsics for all cameras.

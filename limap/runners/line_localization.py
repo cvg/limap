@@ -88,7 +88,7 @@ def line_localization(cfg, imagecols_db, imagecols_query, point_corresp, linemap
         logger (:class:`logging.Logger`, optional): Logger to print logs for information
 
     Returns:
-        Dict<int, :class:`limap.base.CameraPose`>: Mapping of query image IDs to the localized camera poses for all query images.
+        Dict[int -> :class:`limap.base.CameraPose`]: Mapping of query image IDs to the localized camera poses for all query images.
     """ 
 
     if cfg['localization']['2d_matcher'] not in ['epipolar', 'sold2', 'superglue_endpoints', 'gluestick', 'linetr', 'lbd', 'l2d2']:
