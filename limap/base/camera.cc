@@ -2,6 +2,37 @@
 
 namespace limap {
 
+void Camera::SetModelId(const int model_id) {
+    colmap::Camera::SetModelId(model_id);
+    initialized.resize(NumParams());
+    std::fill(initialized.begin(), initialized.end(), false);
+}
+
+void Camera::SetModelIdFromName(const std::string& model_name) {
+    colmap::Camera::SetModelIdFromName(model_name);
+    initialized.resize(NumParams());
+    std::fill(initialized.begin(), initialized.end(), false);
+}
+
+void Camera::SetParams(const std::vector<double>& params) {
+    THROW_CHECK_EQ(params.size(), NumParams());
+    colmap::Camera::SetParams(params);
+    std::fill(initialized.begin(), initialized.end(), true);
+}
+
+void Camera::InitializeParams(const double focal_length, const int width, const int height) {
+    InitializeWithId(ModelId(), focal_length, width, height);
+    std::fill(initialized.begin(), initialized.end(), true);
+}
+
+bool Camera::IsInitialized() const {
+    for (auto it = initialized.begin(); it != initialized.end(); ++it) {
+        if (!*it)
+            return false;
+    }
+    return true;
+}
+
 Camera::Camera(const colmap::Camera& cam) {
     SetCameraId(cam.CameraId());
     SetModelId(cam.ModelId());
@@ -18,9 +49,16 @@ Camera::Camera(int model_id, int cam_id, std::pair<int, int> hw) {
     SetWidth(hw.second);
 }
 
+// empty camera
+Camera::Camera(const std::string& model_name, int cam_id, std::pair<int, int> hw) {
+    SetModelIdFromName(model_name);
+    SetCameraId(cam_id);
+    SetHeight(hw.first);
+    SetWidth(hw.second);
+}
+
 Camera::Camera(int model_id, const std::vector<double>& params, int cam_id, std::pair<int, int> hw) {
     SetModelId(model_id);
-    THROW_CHECK_EQ(params.size(), NumParams());
     SetParams(params);
     if (cam_id != -1)
         SetCameraId(cam_id);
@@ -32,7 +70,6 @@ Camera::Camera(int model_id, const std::vector<double>& params, int cam_id, std:
 
 Camera::Camera(const std::string& model_name, const std::vector<double>& params, int cam_id, std::pair<int, int> hw) {
     SetModelIdFromName(model_name);
-    THROW_CHECK_EQ(params.size(), NumParams());
     SetParams(params);
     if (cam_id != -1)
         SetCameraId(cam_id);
@@ -61,7 +98,6 @@ Camera::Camera(M3D K, int cam_id, std::pair<int, int> hw) {
         params.push_back(K(0, 2));
         params.push_back(K(1, 2));
     }
-    THROW_CHECK_EQ(params.size(), NumParams());
     SetParams(params);
     if (cam_id != -1)
         SetCameraId(cam_id);
@@ -95,7 +131,6 @@ Camera::Camera(int model_id, M3D K, int cam_id, std::pair<int, int> hw) {
     }
     else
         throw std::runtime_error("model initialized with K should be either SIMPLE_PINHOLE or PINHOLE");
-    THROW_CHECK_EQ(params.size(), NumParams());
     SetParams(params);
     if (cam_id != -1)
         SetCameraId(cam_id);
@@ -129,7 +164,6 @@ Camera::Camera(const std::string& model_name, M3D K, int cam_id, std::pair<int, 
     }
     else
         throw std::runtime_error("Error! The model initialized with K should be either SIMPLE_PINHOLE (id=0) or PINHOLE (id=1).");
-    THROW_CHECK_EQ(params.size(), NumParams());
     SetParams(params);
     if (cam_id != -1)
         SetCameraId(cam_id);
@@ -145,6 +179,7 @@ Camera::Camera(const Camera& cam) {
     SetParams(cam.Params());
     SetHeight(cam.Height());
     SetWidth(cam.Width());
+    initialized = cam.initialized;
 }
 
 bool Camera::operator ==(const Camera& cam) {
@@ -214,6 +249,9 @@ Camera::Camera(py::dict dict) {
     SetCameraId(cam_id);
     SetHeight(height);
     SetWidth(width);
+
+    // set initialized
+    ASSIGN_PYDICT_ITEM(dict, initialized, std::vector<bool>);
 }
 
 py::dict Camera::as_dict() const {
@@ -223,6 +261,7 @@ py::dict Camera::as_dict() const {
     output["cam_id"] = CameraId();
     output["height"] = h();
     output["width"] = w();
+    output["initialized"] = initialized;
     return output;
 }
 
@@ -235,12 +274,14 @@ CameraPose::CameraPose(py::dict dict) {
     ASSIGN_PYDICT_ITEM(dict, qvec, V4D);
     qvec = qvec.normalized();
     ASSIGN_PYDICT_ITEM(dict, tvec, V3D);
+    ASSIGN_PYDICT_ITEM(dict, initialized, bool);
 }
 
 py::dict CameraPose::as_dict() const {
     py::dict output;
     output["qvec"] = qvec;
     output["tvec"] = tvec;
+    output["initialized"] = initialized;
     return output;
 }
 

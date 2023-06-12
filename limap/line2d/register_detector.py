@@ -1,8 +1,11 @@
 from .base_detector import BaseDetectorOptions
 
-def get_detector(cfg_detector, max_num_2d_segs=3000, do_merge_lines=False, visualize=False):
+def get_detector(cfg_detector, max_num_2d_segs=3000,
+                 do_merge_lines=False, visualize=False, weight_path=None):
     options = BaseDetectorOptions()
-    options = options._replace(set_gray = True, max_num_2d_segs = max_num_2d_segs, do_merge_lines = do_merge_lines, visualize = visualize)
+    options = options._replace(
+        set_gray=True, max_num_2d_segs=max_num_2d_segs,
+        do_merge_lines=do_merge_lines, visualize=visualize, weight_path=weight_path)
 
     method = cfg_detector["method"]
     if method == "lsd":
@@ -23,9 +26,9 @@ def get_detector(cfg_detector, max_num_2d_segs=3000, do_merge_lines=False, visua
     else:
         raise NotImplementedError
 
-def get_extractor(cfg_extractor):
+def get_extractor(cfg_extractor, weight_path=None):
     options = BaseDetectorOptions()
-    options = options._replace(set_gray = True)
+    options = options._replace(set_gray=True, weight_path=weight_path)
 
     method = cfg_extractor["method"]
     if method == "sold2":
@@ -43,6 +46,9 @@ def get_extractor(cfg_extractor):
     elif method == "superpoint_endpoints":
         from .endpoints import SuperPointEndpointsExtractor
         return SuperPointEndpointsExtractor(options)
+    elif method == "wireframe":
+        from .GlueStick import WireframeExtractor
+        return WireframeExtractor(options)
     else:
         raise NotImplementedError
 

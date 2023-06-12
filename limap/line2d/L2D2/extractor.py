@@ -18,8 +18,11 @@ class L2D2Extractor(BaseDetector):
         super(L2D2Extractor, self).__init__(options)
         self.mini_batch = 20
         self.device = 'cuda' if device is None else device
-        ckpt = os.path.join(os.path.dirname(__file__),
+        if self.weight_path is None:
+            ckpt = os.path.join(os.path.dirname(__file__),
                             'checkpoint_line_descriptor.th')
+        else:
+            ckpt = os.path.join(self.weight_path, "line2d", "L2D2", 'checkpoint_line_descriptor.th')
         if not os.path.isfile(ckpt):
             self.download_model(ckpt)
         self.model = torch.load(ckpt).to(self.device)

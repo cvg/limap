@@ -2,6 +2,7 @@
 ##############################
 # global config
 cfg_type: "fitnmerge"
+weight_path: "~/.limap/models" 
 load_meta: False
 load_det: False 
 load_fit: False 
@@ -10,6 +11,7 @@ n_visible_views: 4
 n_neighbors: 100 
 use_cuda: True
 visualize: True
+max_image_dim: 1600
 skip_exists: False
 output_dir: null 
 output_folder: "fitnmerge_finaltracks"

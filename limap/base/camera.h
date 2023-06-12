@@ -45,6 +45,7 @@ public:
     Camera(py::dict dict);
     Camera(const Camera& cam);
     Camera(int model_id, int cam_id, std::pair<int, int> hw=std::make_pair<int, int>(-1, -1)); // empty camera
+    Camera(const std::string& model_name, int cam_id, std::pair<int, int> hw=std::make_pair<int, int>(-1, -1)); // empty camera
     bool operator ==(const Camera&);
 
     py::dict as_dict() const;
@@ -57,18 +58,27 @@ public:
     std::vector<double> params() const { return Params(); }
     
     double uncertainty(double depth, double var2d = 5.0) const;
+
+    // initialized
+    void SetModelId(const int model_id); // override
+    void SetModelIdFromName(const std::string& model_name); // override
+    void SetParams(const std::vector<double>& params); // override
+    void InitializeParams(const double focal_length, const int width, const int height);
+    std::vector<bool> initialized;
+    bool IsInitialized() const;
 };
 
 class CameraPose {
 public:
-    CameraPose() {}
-    CameraPose(V4D qqvec, V3D ttvec): qvec(qqvec.normalized()), tvec(ttvec) {}
-    CameraPose(M3D R, V3D T): tvec(T) { qvec = colmap::RotationMatrixToQuaternion(R); }
+    CameraPose(bool initialized = false): initialized(initialized) {}
+    CameraPose(V4D qvec, V3D tvec, bool initialized = true): qvec(qvec.normalized()), tvec(tvec), initialized(initialized) {}
+    CameraPose(M3D R, V3D T, bool initiallized = true): tvec(T), initialized(initialized) { qvec = colmap::RotationMatrixToQuaternion(R); }
     CameraPose(py::dict dict);
-    CameraPose(const CameraPose& campose): qvec(campose.qvec), tvec(campose.tvec) {}
+    CameraPose(const CameraPose& campose): qvec(campose.qvec), tvec(campose.tvec), initialized(campose.initialized) {}
 
     V4D qvec = V4D(1., 0., 0., 0.);
     V3D tvec = V3D::Zero();
+    bool initialized = false;
 
     py::dict as_dict() const;
     M3D R() const { return colmap::QuaternionToRotationMatrix(qvec); }
@@ -76,6 +86,7 @@ public:
 
     V3D center() const { return -R().transpose() * T(); }
     double projdepth(const V3D& p3d) const;
+    void SetInitFlag(bool flag) { initialized = flag; }
 };
 
 } // namespace limap

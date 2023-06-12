@@ -7,6 +7,8 @@
 #include <pybind11/stl.h>
 #include <cmath>
 #include <fstream>
+#include <set>
+#include <unordered_set>
 
 namespace py = pybind11;
 
@@ -30,8 +32,13 @@ public:
     ImageCollection(py::dict dict);
     ImageCollection(const ImageCollection& imagecols);
     py::dict as_dict() const;
-    ImageCollection subset_by_camera_ids(const std::vector<int> valid_camera_ids) const;
-    ImageCollection subset_by_image_ids(const std::vector<int> valid_image_ids) const;
+    ImageCollection subset_by_camera_ids_set(const std::set<int>& valid_camera_ids) const;
+    ImageCollection subset_by_camera_ids_set(const std::unordered_set<int>& valid_camera_ids) const;
+    ImageCollection subset_by_camera_ids(const std::vector<int>& valid_camera_ids) const;
+    ImageCollection subset_by_image_ids_set(const std::set<int>& valid_image_ids) const;
+    ImageCollection subset_by_image_ids_set(const std::unordered_set<int>& valid_image_ids) const;
+    ImageCollection subset_by_image_ids(const std::vector<int>& valid_image_ids) const;
+    ImageCollection subset_initialized() const;
     std::map<int, std::vector<int>> update_neighbors(const std::map<int, std::vector<int>>& neighbors) const;
 
     size_t NumCameras() const { return cameras.size(); }
@@ -45,6 +52,7 @@ public:
     std::vector<V3D> get_locations() const;
     std::map<int, V3D> get_map_locations() const;
     bool IsUndistorted() const;
+    bool IsUndistortedCameraModel() const;
 
     Camera cam(const int cam_id) const;
     bool exist_cam(const int cam_id) const;
@@ -58,7 +66,12 @@ public:
 
     py::array_t<uint8_t> read_image(const int img_id, const bool set_gray) const;
     void set_max_image_dim(const int& val);
+    void set_camera_params(const int cam_id, const std::vector<double>& params);
     void change_camera(const int cam_id, const Camera cam);
+
+    void set_camera_pose(const int img_id, const CameraPose pose);   // load new poses into imagecols
+    CameraPose get_camera_pose(const int img_id) const;               // get poses from imagecols
+    
     void change_image(const int img_id, const CameraImage camimage);
     void change_image_name(const int img_id, const std::string new_name);
 
@@ -67,6 +80,16 @@ public:
     double* tvec_data(const int img_id);
     
     ImageCollection apply_similarity_transform(const SimilarityTransform3& transform) const;
+
+    // inverse indexing
+    int get_first_image_id_by_camera_id(const int cam_id) const;
+
+    // init uninitialized cameras
+    void init_uninitialized_cameras();
+
+    // unintialization
+    void uninitialize_poses();
+    void uninitialize_intrinsics();
 
 private:
     std::map<int, Camera> cameras;

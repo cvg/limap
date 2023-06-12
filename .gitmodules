@@ -33,3 +33,6 @@
 [submodule "third-party/DeepLSD"]
 	path = third-party/DeepLSD
 	url = git@github.com:cvg/DeepLSD.git
+[submodule "third-party/GlueStick"]
+	path = third-party/GlueStick
+	url = git@github.com:cvg/GlueStick.git

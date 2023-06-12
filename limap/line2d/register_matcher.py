@@ -1,8 +1,10 @@
 from .base_matcher import BaseMatcherOptions
 
-def get_matcher(cfg_matcher, extractor, n_neighbors=20):
+def get_matcher(cfg_matcher, extractor, n_neighbors=20, weight_path=None):
     options = BaseMatcherOptions()
-    options = options._replace(n_neighbors = n_neighbors, topk = cfg_matcher["topk"], n_jobs = cfg_matcher["n_jobs"])
+    options = options._replace(
+        n_neighbors=n_neighbors, topk=cfg_matcher["topk"],
+        n_jobs=cfg_matcher["n_jobs"], weight_path=weight_path)
 
     method = cfg_matcher["method"]
     if method == "sold2":
@@ -22,6 +24,10 @@ def get_matcher(cfg_matcher, extractor, n_neighbors=20):
         return NNEndpointsMatcher(extractor, options)
     elif method == "superglue_endpoints":
         from .endpoints import SuperGlueEndpointsMatcher
-        return SuperGlueEndpointsMatcher(extractor, options, weights=cfg_matcher["superglue"]["weights"])
+        return SuperGlueEndpointsMatcher(
+            extractor, options, weights=cfg_matcher["superglue"]["weights"])
+    elif method == "gluestick":
+        from .GlueStick import GlueStickMatcher
+        return GlueStickMatcher(extractor, options)
     else:
         raise NotImplementedError

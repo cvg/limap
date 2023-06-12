@@ -7,10 +7,4 @@ cam_id: 0
 max_image_dim: 800
 input_n_views: 100
 input_stride: 1
-line2d:
-    detector: 
-        method: "sold2"
-    matcher:
-        superglue:
-            weights: "indoor"
 

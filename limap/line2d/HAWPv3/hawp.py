@@ -14,8 +14,11 @@ class HAWPv3Detector(BaseDetector):
     def __init__(self, options = BaseDetectorOptions()):
         super(HAWPv3Detector, self).__init__(options)
         # Load the HAWPv3 model
-        ckpt = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+        if self.weight_path is None:
+            ckpt = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                             'weights/hawpv3_wireframe.pth')
+        else:
+            ckpt = os.path.join(self.weight_path, "line2d", "HAWPv3", 'weights/hawpv3_wireframe.pth')
         config = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               'hawpv3.yaml')
         model_config.merge_from_file(config)

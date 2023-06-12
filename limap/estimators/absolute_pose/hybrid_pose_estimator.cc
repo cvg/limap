@@ -14,21 +14,23 @@ namespace lineloc = optimize::line_localization;
 std::pair<CameraPose, ransac_lib::HybridRansacStatistics> 
 EstimateAbsolutePose_PointLine_Hybrid(const std::vector<Line3d>& l3ds, const std::vector<int>& l3d_ids, const std::vector<Line2d>& l2ds, 
                                       const std::vector<V3D>& p3ds, const std::vector<V2D>& p2ds, const Camera& cam, 
-                                      const ExtendedHybridLORansacOptions& options_, const lineloc::LineLocConfig& cfg, 
-                                      const std::vector<bool>& solver_flags, const double cheirality_min_depth, 
-                                      const double line_min_projected_length) {
-    ExtendedHybridLORansacOptions options = options_;
+                                      const HybridPoseEstimatorOptions &options) {
+    ExtendedHybridLORansacOptions ransac_options = options.ransac_options;
     std::random_device rand_dev;
-    options.random_seed_ = rand_dev();
+    if (options.random)
+        ransac_options.random_seed_ = rand_dev();
+    
+    THROW_CHECK_EQ(ransac_options.data_type_weights_.size(), 2);
+    THROW_CHECK_EQ(ransac_options.squared_inlier_thresholds_.size(), 2);
 
-    HybridPoseEstimator solver(l3ds, l3d_ids, l2ds, p3ds, p2ds, cam, cfg);
-    solver.set_solver_flags(solver_flags);
+    HybridPoseEstimator solver(l3ds, l3d_ids, l2ds, p3ds, p2ds, cam, options.lineloc_config, options.cheirality_min_depth, options.cheirality_overlap_pixels);
+    solver.set_solver_flags(options.solver_flags);
 
     PointLineAbsolutePoseHybridRansac<CameraPose, std::vector<CameraPose>, HybridPoseEstimator> hybrid_lomsac;
     CameraPose best_model;
     ransac_lib::HybridRansacStatistics ransac_stats;
 
-    hybrid_lomsac.EstimateModel(options, solver, &best_model, &ransac_stats);
+    hybrid_lomsac.EstimateModel(ransac_options, solver, &best_model, &ransac_stats);
     return std::make_pair(best_model, ransac_stats);
 }
 

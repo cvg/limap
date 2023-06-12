@@ -18,6 +18,9 @@ def setup(cfg):
     cfg["dir_load"] = folder_load
     print("[LOG] Output dir: {0}".format(cfg["dir_save"]))
     print("[LOG] Loading dir: {0}".format(cfg["dir_load"]))
+    if "weight_path" in cfg and cfg["weight_path"] is not None:
+        cfg["weight_path"] = os.path.expanduser(cfg["weight_path"])
+        print("[LOG] weight dir: {0}".format(cfg["weight_path"]))
     return cfg
 
 def undistort_images(imagecols, output_dir, fname="image_collection_undistorted.npy", load_undistort=False, n_jobs=-1):
@@ -116,6 +119,7 @@ def compute_sfminfos(cfg, imagecols, fname="metainfos.txt"):
     return colmap_output_path, neighbors, ranges
 
 def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
+    weight_path = None if "weight_path" not in cfg else cfg["weight_path"]
     if "extractor" in cfg["line2d"]:
         print("[LOG] Start 2D line detection and description (detector = {0}, extractor = {1}, n_images = {2})...".format(cfg["line2d"]["detector"]["method"], cfg["line2d"]["extractor"]["method"], imagecols.NumImages()))
     else:
@@ -129,14 +133,14 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
     se_det = cfg["skip_exists"] or cfg["line2d"]["detector"]["skip_exists"]
     if compute_descinfo:
         se_ext = cfg["skip_exists"] or cfg["line2d"]["extractor"]["skip_exists"]
-    detector = limap.line2d.get_detector(cfg["line2d"]["detector"], max_num_2d_segs=cfg["line2d"]["max_num_2d_segs"], do_merge_lines=cfg["line2d"]["do_merge_lines"], visualize=cfg["line2d"]["visualize"])
+    detector = limap.line2d.get_detector(cfg["line2d"]["detector"], max_num_2d_segs=cfg["line2d"]["max_num_2d_segs"], do_merge_lines=cfg["line2d"]["do_merge_lines"], visualize=cfg["line2d"]["visualize"], weight_path=weight_path)
     if not cfg["load_det"]:
         if compute_descinfo and cfg["line2d"]["detector"]["method"] == cfg["line2d"]["extractor"]["method"] and (not cfg["line2d"]["do_merge_lines"]):
             all_2d_segs, descinfo_folder = detector.detect_and_extract_all_images(folder_save, imagecols, skip_exists=(se_det and se_ext))
         else:
             all_2d_segs = detector.detect_all_images(folder_save, imagecols, skip_exists=se_det)
             if compute_descinfo:
-                extractor = limap.line2d.get_extractor(cfg["line2d"]["extractor"])
+                extractor = limap.line2d.get_extractor(cfg["line2d"]["extractor"], weight_path=weight_path)
                 descinfo_folder = extractor.extract_all_images(folder_save, imagecols, all_2d_segs, skip_exists=se_ext)
     else:
         folder_load = os.path.join(cfg["dir_load"], basedir)
@@ -144,14 +148,30 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
         all_2d_segs = {id: all_2d_segs[id] for id in imagecols.get_img_ids()}
         descinfo_folder = None
         if compute_descinfo:
-            extractor = limap.line2d.get_extractor(cfg["line2d"]["extractor"])
+            extractor = limap.line2d.get_extractor(cfg["line2d"]["extractor"], weight_path=weight_path)
             descinfo_folder = extractor.extract_all_images(folder_save, imagecols, all_2d_segs, skip_exists=se_ext)
     if cfg["line2d"]["save_l3dpp"]:
         limapio.save_l3dpp(os.path.join(folder_save, "l3dpp_format"), imagecols, all_2d_segs)
     return all_2d_segs, descinfo_folder
 
 def compute_matches(cfg, descinfo_folder, image_ids, neighbors):
+    weight_path = None if "weight_path" not in cfg else cfg["weight_path"]
     print("[LOG] Start matching 2D lines... (extractor = {0}, matcher = {1}, n_images = {2}, n_neighbors = {3})".format(cfg["line2d"]["extractor"]["method"], cfg["line2d"]["matcher"]["method"], len(image_ids), cfg["n_neighbors"]))
+    import limap.line2d
+    basedir = os.path.join("line_matchings", cfg["line2d"]["detector"]["method"], "feats_{0}".format(cfg["line2d"]["extractor"]["method"]))
+    extractor = limap.line2d.get_extractor(cfg["line2d"]["extractor"], weight_path=weight_path)
+    se_match = cfg["skip_exists"] or cfg["line2d"]["matcher"]["skip_exists"]
+    matcher = limap.line2d.get_matcher(cfg["line2d"]["matcher"], extractor, n_neighbors=cfg["n_neighbors"], weight_path=weight_path)
+    if not cfg["load_match"]:
+        folder_save = os.path.join(cfg["dir_save"], basedir)
+        matches_folder = matcher.match_all_neighbors(folder_save, image_ids, neighbors, descinfo_folder, skip_exists=se_match)
+    else:
+        folder_load = os.path.join(cfg["dir_load"], basedir)
+        matches_folder = matcher.get_matches_folder(folder_load)
+    return matches_folder
+
+def compute_exhausive_matches(cfg, descinfo_folder, image_ids):
+    print("[LOG] Start exhausive matching 2D lines... (extractor = {0}, matcher = {1}, n_images = {2})".format(cfg["line2d"]["extractor"]["method"], cfg["line2d"]["matcher"]["method"], len(image_ids)))
     import limap.line2d
     basedir = os.path.join("line_matchings", cfg["line2d"]["detector"]["method"], "feats_{0}".format(cfg["line2d"]["extractor"]["method"]))
     extractor = limap.line2d.get_extractor(cfg["line2d"]["extractor"])
@@ -159,7 +179,7 @@ def compute_matches(cfg, descinfo_folder, image_ids, neighbors):
     matcher = limap.line2d.get_matcher(cfg["line2d"]["matcher"], extractor, n_neighbors=cfg["n_neighbors"])
     if not cfg["load_match"]:
         folder_save = os.path.join(cfg["dir_save"], basedir)
-        matches_folder = matcher.match_all_neighbors(folder_save, image_ids, neighbors, descinfo_folder, skip_exists=se_match)
+        matches_folder = matcher.match_all_exhaustive_pairs(folder_save, image_ids, descinfo_folder, skip_exists=se_match)
     else:
         folder_load = os.path.join(cfg["dir_load"], basedir)
         matches_folder = matcher.get_matches_folder(folder_load)

@@ -648,7 +648,8 @@ void bind_camera(py::module& m) {
         .def(py::init<const std::string&, M3D, int, std::pair<int, int>>(), py::arg("model_name"), py::arg("K"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1))
         .def(py::init<py::dict>(), py::arg("dict"))
         .def(py::init<const Camera&>(), py::arg("cam"))
-        .def(py::init<int, int, std::pair<int, int>>(), py::arg("model_id"), py::arg("cam_id"), py::arg("hw")=std::make_pair<int, int>(-1, -1)) // empty camera
+        .def(py::init<int, int, std::pair<int, int>>(), py::arg("model_id"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1)) // empty camera
+        .def(py::init<const std::string&, int, std::pair<int, int>>(), py::arg("model_name"), py::arg("cam_id")=-1, py::arg("hw")=std::make_pair<int, int>(-1, -1)) // empty camera
         .def(py::pickle(
             [](const Camera& input) { // dump
                 return input.as_dict();
@@ -708,28 +709,39 @@ void bind_camera(py::module& m) {
         )", py::arg("val"))
         .def("set_cam_id", &Camera::SetCameraId, R"(
             Set the camera ID.
+        )", py::arg("camera_id"))
+        .def("InitializeParams", &Camera::InitializeParams, R"(
+            Initialize the intrinsics using focal length, width, and height
 
             Args:
-                camera_id (int)
-        )", py::arg("camera_id"))
+                focal_length (double)
+                width (int)
+                height (int)
+        )", py::arg("focal_length"), py::arg("width"), py::arg("height"))
+        .def("ImageToWorld", &Camera::ImageToWorld)
+        .def("WorldToImage", &Camera::WorldToImage)
+        .def("IsInitialized", &Camera::IsInitialized, R"(
+            Returns:
+                bool: True if the camera parameters are initialized
+        )");
         .def("IsUndistorted", &Camera::IsUndistorted, R"(
             Returns:
                 bool: True if the camera model is without distortion
         )");
 
     py::class_<CameraPose>(m, "CameraPose", "Representing the pose of a camera. The quaternion convention is `(w, x, y, z)` (real part first).")
-        .def(py::init<>(), R"(
+        .def(py::init<bool>(), R"(
             Default constructor: identity pose
-        )")
+        )", py::arg("initialized")=false)
         .def(py::init<const CameraPose&>(), R"(
             Copy constructor
         )", py::arg("campose"))
-        .def(py::init<V4D, V3D>(), R"(
+        .def(py::init<V4D, V3D, bool>(), R"(
             Constructor from a quaternion vector and a translation vector
-        )", py::arg("qvec"), py::arg("tvec"))
-        .def(py::init<M3D, V3D>(), R"(
+        )", py::arg("qvec"), py::arg("tvec"), py::arg("initialized")=true)
+        .def(py::init<M3D, V3D, bool>(), R"(
             Constructor from a rotation matrix and a translation vector
-        )")
+        )", py::arg("R"), py::arg("tvec"), py::arg("initialized")=true)
         .def(py::init<py::dict>(), R"(
             Constructor from a Python dict
         )", py::arg("dict"))
@@ -745,14 +757,9 @@ void bind_camera(py::module& m) {
             Returns:
                 dict: Python dict representation of this :class:`~limap.base.CameraPose`
         )")
-        .def_readonly("qvec", &CameraPose::qvec, R"(
-            Returns:
-                :class:`np.array` of shape (4,): The quaternion vector `(w, x, y, z)`
-        )")
-        .def_readonly("tvec", &CameraPose::tvec, R"(
-            Returns:
-                :class:`np.array` of shape (3,): The translation vector
-        )")
+        .def_readonly("qvec", &CameraPose::qvec, ":class:`np.array` of shape (4,): The quaternion vector `(w, x, y, z)`")
+        .def_readonly("tvec", &CameraPose::tvec, ":class:`np.array` of shape (3,): The translation vector")
+        .def_readwrite("initialized", &CameraPose::initialized)
         .def("R", &CameraPose::R, R"(
             Returns:
                 :class:`np.array` of shape (3, 3): The rotation matrix
@@ -775,11 +782,12 @@ void bind_camera(py::module& m) {
 
     py::class_<CameraImage>(m, "CameraImage", "This class associates the ID of a :class:`~limap.base.Camera`, a :class:`~limap.base.CameraPose`, and an image file")
         .def(py::init<>())
+        .def(py::init<const int&, const std::string&>(), py::arg("cam_id"), py::arg("image_name") = "none") // empty image
+        .def(py::init<const Camera&, const std::string&>(), py::arg("camera"), py::arg("image_name") = "none") // empty image
         .def(py::init<const int&, const CameraPose&, const std::string&>(), py::arg("cam_id"), py::arg("pose"), py::arg("image_name") = "none")
         .def(py::init<const Camera&, const CameraPose&, const std::string&>(), py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
         .def(py::init<py::dict>(), py::arg("dict"))
         .def(py::init<const CameraImage&>(), py::arg("camimage"))
-        .def(py::init<const int&, const std::string&>(), py::arg("cam_id"), py::arg("image_name") = "none") // empty image
         .def(py::pickle(
             [](const CameraImage& input) { // dump
                 return input.as_dict();
@@ -794,6 +802,8 @@ void bind_camera(py::module& m) {
         )")
         .def_readonly("cam_id", &CameraImage::cam_id, "int, the camera ID")
         .def_readonly("pose", &CameraImage::pose, ":class:`~limap.base.CameraPose`, the camera pose")
+        .def_readonly("qvec", &CameraPose::qvec, ":class:`np.array` of shape (4,): The quaternion vector of the camera pose")
+        .def_readonly("tvec", &CameraPose::tvec, ":class:`np.array` of shape (3,): The translation vector of the camera pose")
         .def("R", &CameraImage::R, R"(
             Returns:
                 :class:`np.array` of shape (3, 3): The rotation matrix of the camera pose
@@ -817,10 +827,22 @@ void bind_camera(py::module& m) {
 
             Args:
                 image_name (str)
-        )", py::arg("image_name"));
+        )", py::arg("image_name"))
+        .def("center", &CameraPose::center, R"(
+            Returns:
+                :class:`np.array` of shape (3,): World-space coordinate of the camera according to the camera pose
+        )")
+        .def("projdepth", &CameraPose::projdepth, R"(
+            Args:
+                p3d (:class:`np.array`): World-space coordinate of a 3D point
+            
+            Returns:
+                float: The projection depth of the 3D point viewed from this camera pose
+        )", py::arg("p3d"));
 
     py::class_<CameraView>(m, "CameraView", "Inherits :class:`~limap.base.CameraImage`, incorporating the :class:`~limap.base.Camera` model for project/unproject between 2D and 3D.")
         .def(py::init<>())
+        .def(py::init<const Camera&, const std::string&>(), py::arg("camera"), py::arg("image_name") = "none") // empty view
         .def(py::init<const Camera&, const CameraPose&, const std::string&>(), py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
         .def(py::init<py::dict>(), py::arg("dict"))
         .def(py::init<const CameraView&>(), py::arg("camview"))
@@ -905,7 +927,15 @@ void bind_camera(py::module& m) {
 
             Args:
                 image_name (str)
-        )", py::arg("image_name"));
+        )", py::arg("image_name"))
+        .def("get_initial_focal_length", &CameraView::get_initial_focal_length, R"(
+            Try to get the focal length information from the image's EXIF data.
+            If not available in image EXIF, the focal length is estimated by the max dimension of the image.
+
+            Returns:
+                tuple[double, bool]: Initial focal length and a flag indicating if the value is read from image's EXIF data.
+        )");
+
 
     py::class_<ImageCollection>(m, "ImageCollection", R"(
             Collection of cameras and images in a scene or dataset. The arguments `input_cameras` and `input_images` of varies constructors 
@@ -950,6 +980,12 @@ void bind_camera(py::module& m) {
             Returns:
                 :class:`~limap.base.ImageCollection`: The filtered subset collection
         )", py::arg("valid_image_ids"))
+        .def("subset_initialized", &ImageCollection::subset_initialized, R"(
+            Filter the images to create a subset collection containing only images with initialized camera poses.
+
+            Returns:
+                :class:`~limap.base.ImageCollection`: The filtered subset collection
+        )")
         .def("update_neighbors", &ImageCollection::update_neighbors, R"(
             Update the neighbor information among images (e.g. after filtering).
 
@@ -1069,6 +1105,22 @@ void bind_camera(py::module& m) {
                 cam_id (int)
                 cam (:class:`~limap.base.Camera`)
         )", py::arg("cam_id"), py::arg("cam"))
+        .def("set_camera_pose", &ImageCollection::set_camera_pose, R"(
+            Set the camera pose for a specific image.
+
+            Args:
+                img_id (int)
+                pose (:class:`~limap.base.CameraPose`)
+        )", py::arg("img_id"), py::arg("pose"))
+        .def("get_camera_pose", &ImageCollection::get_camera_pose, R"(
+            Get the camera pose of a specific image.
+
+            Args:
+                img_id (int)
+
+            Returns:
+                :class:`~limap.base.CameraPose`
+        )", py::arg("img_id"))
         .def("change_image", &ImageCollection::change_image, R"(
             Change an image.
 
@@ -1102,7 +1154,29 @@ void bind_camera(py::module& m) {
 
             Args:
                 transform (:class:`limap.base.SimilarityTransform3`)
-        )", py::arg("transform"));
+        )", py::arg("transform"))
+        .def("get_first_image_id_by_camera_id", &ImageCollection::get_first_image_id_by_camera_id, R"(
+            Get the ID of the first image captured with a specific camera.
+
+            Args:
+                cam_id (int): The camera ID
+            
+            Return:
+                int: The image ID.
+        )", py::arg("cam_id"))
+        .def("init_uninitialized_cameras", &ImageCollection::init_uninitialized_cameras, R"(
+            Initialize all uninitialized cameras by :func:`~limap.base.Camera.InitializeParams`.
+        )")
+        .def("uninitialize_poses", &ImageCollection::uninitialize_poses, R"(
+            Uninitialize camera poses for all images, set them to identity poses and remove the `initialized` flag.
+        )")
+        .def("uninitialize_intrinsics", &ImageCollection::uninitialize_intrinsics, R"(
+            Uninitialize intrinsics for all cameras.
+        )")
+        .def("IsUndistortedCameraModel", &ImageCollection::IsUndistortedCameraModel, R"(
+            Returns:
+                bool: True if all camera models are undistorted.
+        )");
 }
 
 void bind_pointtrack(py::module& m) {

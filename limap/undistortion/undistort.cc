@@ -39,6 +39,18 @@ CameraView UndistortCameraView(const std::string& imname_in, const CameraView& v
     return new_view;
 }
 
+V2D UndistortPoint(const V2D& point, const Camera& distorted_camera, const Camera& undistorted_camera) {
+    return undistorted_camera.WorldToImage(distorted_camera.ImageToWorld(point));
+}
+
+std::vector<V2D> UndistortPoints(const std::vector<V2D>& points, const Camera& distorted_camera, const Camera& undistorted_camera) {
+    std::vector<V2D> new_points;
+    for (auto it = points.begin(); it != points.end(); ++it) {
+        new_points.push_back(UndistortPoint(*it, distorted_camera, undistorted_camera));
+    }
+    return new_points;
+}
+
 } // namespace undistortion
 
 } // namespace limap

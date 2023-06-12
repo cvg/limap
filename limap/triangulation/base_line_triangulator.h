@@ -64,11 +64,12 @@ public:
 
     // interfaces
     void Init(const std::map<int, std::vector<Line2d>>& all_2d_segs,
+              const ImageCollection* imagecols);
+    void Init(const std::map<int, std::vector<Line2d>>& all_2d_segs,
               const ImageCollection& imagecols);
     void InitVPResults(const std::map<int, vplib::VPResult>& vpresults) { vpresults_ = vpresults; }
     void TriangulateImage(const int img_id,
-                          const std::vector<Eigen::MatrixXi>& matches,
-                          const std::vector<int>& neighbors);
+                          const std::map<int, Eigen::MatrixXi>& matches);
     void TriangulateImageExhaustiveMatch(const int img_id, 
                                          const std::vector<int>& neighbors);
     virtual std::vector<LineTrack> ComputeLineTracks() = 0;
@@ -98,7 +99,7 @@ protected:
     // initialization
     void offsetHalfPixel();
     std::map<int, std::vector<Line2d>> all_lines_2d_;
-    ImageCollection imagecols_;
+    const ImageCollection* imagecols_;
     std::map<int, std::vector<int>> neighbors_; // visual neighbors for each image, initialized with InitMatch interfaces
     std::map<int, vplib::VPResult> vpresults_; // vp results
 

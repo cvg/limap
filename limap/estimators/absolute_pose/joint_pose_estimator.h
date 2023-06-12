@@ -17,13 +17,35 @@ namespace estimators {
 
 namespace absolute_pose {
 
+class JointPoseEstimatorOptions {
+public:
+    JointPoseEstimatorOptions() : 
+        ransac_options(ransac_lib::LORansacOptions()),
+        lineloc_config(LineLocConfig()),
+        cheirality_min_depth(0.0),
+        cheirality_overlap_pixels(10.0),
+        sample_solver_first(false),
+        random(true) {
+            lineloc_config.print_summary = false;
+            lineloc_config.solver_options.minimizer_progress_to_stdout = false;
+            lineloc_config.solver_options.logging_type = ceres::LoggingType::SILENT;
+        }
+
+    ransac_lib::LORansacOptions ransac_options;
+    LineLocConfig lineloc_config;
+    double cheirality_min_depth = 0.0;
+    double cheirality_overlap_pixels = 10.0;
+    bool sample_solver_first = false;
+    bool random = true;
+};
+
 class JointPoseEstimator {
 public:
     JointPoseEstimator(const std::vector<Line3d>& l3ds, const std::vector<int>& l3d_ids, const std::vector<Line2d>& l2ds, 
                        const std::vector<V3D>& p3ds, const std::vector<V2D>& p2ds, 
                        const Camera& cam, const LineLocConfig& cfg,
                        const double cheirality_min_depth = 0.0, 
-                       const double line_min_projected_length = 1);
+                       const double cheirality_overlap_pixels = 10.0);
 
     inline int min_sample_size() const { return 3; }
 
@@ -61,7 +83,7 @@ protected:
 
     // Cheirality and filtering options
     double cheirality_min_depth_;
-    double line_min_projected_length_;
+    double cheirality_overlap_pixels_;
 
 private:
     bool cheirality_test_point(const V3D& p3d, const CameraPose& pose) const;
@@ -72,9 +94,7 @@ std::pair<CameraPose, ransac_lib::RansacStatistics>
 EstimateAbsolutePose_PointLine(const std::vector<Line3d>& l3ds, const std::vector<int>& l3d_ids, 
                                const std::vector<Line2d>& l2ds, const std::vector<V3D>& p3ds, 
                                const std::vector<V2D>& p2ds, const Camera& cam, 
-                               const ransac_lib::LORansacOptions& options_ = ransac_lib::LORansacOptions(),
-                               const LineLocConfig& cfg = LineLocConfig(), bool sample_solver_first = true,
-                               const double cheirality_min_depth = 0.0, const double line_min_projected_length = 1);
+                               const JointPoseEstimatorOptions& options);
 
 } // namespace pose
 

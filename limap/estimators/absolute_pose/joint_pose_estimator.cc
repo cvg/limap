@@ -23,19 +23,18 @@ namespace lineloc = optimize::line_localization;
 std::pair<CameraPose, ransac_lib::RansacStatistics> 
 EstimateAbsolutePose_PointLine(const std::vector<Line3d>& l3ds, const std::vector<int>& l3d_ids, const std::vector<Line2d>& l2ds, 
                                const std::vector<V3D>& p3ds, const std::vector<V2D>& p2ds, const Camera& cam, 
-                               const ransac_lib::LORansacOptions& options, const lineloc::LineLocConfig& cfg, 
-                               bool sample_solver_first, const double cheirality_min_depth, 
-                               const double line_min_projected_length) {
-    ransac_lib::LORansacOptions ransac_options = options;
+                               const JointPoseEstimatorOptions& options) {
+    ransac_lib::LORansacOptions ransac_options = options.ransac_options;
     std::random_device rand_dev;
-    ransac_options.random_seed_ = rand_dev();
+    if (options.random)
+        ransac_options.random_seed_ = rand_dev();
 
-    JointPoseEstimator solver(l3ds, l3d_ids, l2ds, p3ds, p2ds, cam, cfg, cheirality_min_depth, line_min_projected_length);
+    JointPoseEstimator solver(l3ds, l3d_ids, l2ds, p3ds, p2ds, cam, options.lineloc_config, options.cheirality_min_depth, options.cheirality_overlap_pixels);
 
     CameraPose best_model;
     ransac_lib::RansacStatistics ransac_stats;
 
-    if (sample_solver_first) {
+    if (options.sample_solver_first) {
         PointLineAbsolutePoseRansac<CameraPose, std::vector<CameraPose>, JointPoseEstimator> lomsac_solver_first;
         lomsac_solver_first.EstimateModel(ransac_options, solver, &best_model, &ransac_stats);
     }
@@ -49,9 +48,9 @@ EstimateAbsolutePose_PointLine(const std::vector<Line3d>& l3ds, const std::vecto
 JointPoseEstimator::JointPoseEstimator(const std::vector<Line3d>& l3ds, const std::vector<int>& l3d_ids, const std::vector<Line2d>& l2ds, 
                                        const std::vector<V3D>& p3ds, const std::vector<V2D>& p2ds, 
                                        const Camera& cam, const lineloc::LineLocConfig& cfg, 
-                                       const double cheirality_min_depth, const double line_min_projected_length) : 
+                                       const double cheirality_min_depth, const double cheirality_overlap_pixels) : 
                                        loc_config_(cfg), cheirality_min_depth_(cheirality_min_depth),
-                                       line_min_projected_length_(line_min_projected_length) {
+                                       cheirality_overlap_pixels_(cheirality_overlap_pixels) {
     l3ds_ = &l3ds;
     l3d_ids_ = &l3d_ids;
     l2ds_ = &l2ds;
@@ -210,9 +209,12 @@ bool JointPoseEstimator::cheirality_test_line(const Line2d& l2d, const Line3d& l
     if (!cheirality_test_point(p_end, pose))
         return false;
 
-    // Check backprojected length
-    double len2d = l3d.projection(CameraView(cam_, pose)).length();
-    if (len2d < line_min_projected_length_) 
+    // check 2D overlap
+    CameraView camview(cam_, pose);
+    Line2d proj_l2d = l3d.projection(camview);
+    V2D p1 = proj_l2d.point_projection(l2d.start);
+    V2D p2 = proj_l2d.point_projection(l2d.end);
+    if (Line2d(p1, p2).length() < cheirality_overlap_pixels_)
         return false;
 
     return true;

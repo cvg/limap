@@ -21,7 +21,10 @@ class DeepLSDDetector(BaseDetector):
             },
         }
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        ckpt = os.path.join(os.path.dirname(__file__), 'deeplsd_md.tar')
+        if self.weight_path is None:
+            ckpt = os.path.join(os.path.dirname(__file__), 'deeplsd_md.tar')
+        else:
+            ckpt = os.path.join(self.weight_path, "line2d", "DeepLSD", 'deeplsd_md.tar')
         if not os.path.isfile(ckpt):
             self.download_model(ckpt)
         ckpt = torch.load(ckpt, map_location='cpu')

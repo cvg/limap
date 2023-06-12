@@ -1,4 +1,5 @@
 #include "base/camera_view.h"
+#include <colmap/util/bitmap.h>
 
 namespace limap {
 
@@ -17,6 +18,7 @@ py::dict CameraImage::as_dict() const {
     output["cam_id"] = cam_id;
     output["qvec"] = pose.qvec;
     output["tvec"] = pose.tvec;
+    output["initialized"] = pose.initialized;
     output["image_name"] = image_name_;
     return output;
 }
@@ -40,6 +42,7 @@ py::dict CameraView::as_dict() const {
     output["width"] = cam.w();
     output["qvec"] = pose.qvec;
     output["tvec"] = pose.tvec;
+    output["initialized"] = pose.initialized;
     output["image_name"] = image_name();
     return output;
 }
@@ -83,6 +86,22 @@ std::pair<V3D, V3D> CameraView::ray_direction_gradient(const V2D& p2d) const {
 
 V3D CameraView::get_direction_from_vp(const V3D& vp) const {
     return (R().transpose() * K_inv() * vp).normalized();
+}
+
+std::pair<double, bool> CameraView::get_initial_focal_length() const {
+    colmap::Bitmap bitmap;
+    double max_dim = std::max(w(), h());
+    bitmap.Read(image_name());
+    double ratio = max_dim / std::max(bitmap.Width(), bitmap.Height());
+    double focal_length = 0.0;
+    if (bitmap.ExifFocalLength(&focal_length)) {
+        return std::make_pair(ratio * focal_length, true);
+    } 
+    else {
+        const double default_focal_length_factor = 1.2; // from COLMAP
+        focal_length = default_focal_length_factor * max_dim;
+        return std::make_pair(focal_length, false);
+    }
 }
 
 } // namespace limap

@@ -9,16 +9,17 @@ import subprocess
 from SOLD2.experiment import load_config
 from SOLD2.model.line_matcher import LineMatcher
 
+
 class SOLD2LineDetector():
-    def __init__(self, device=None, cfg_path=None, ckpt_path=None):
-        import os
+    def __init__(self, device=None, cfg_path=None, weight_path=None):
         nowpath = os.path.dirname(os.path.abspath(__file__))
         if cfg_path is None:
             cfg_path = 'config/export_line_features.yaml'
         self.cfg = load_config(os.path.join(nowpath, cfg_path))
-        if ckpt_path is None:
-            ckpt_path = 'pretrained_models/sold2_wireframe.tar'
-        self.ckpt_path = os.path.join(nowpath, ckpt_path)
+        if weight_path is None:
+            self.ckpt_path = os.path.join(nowpath, 'pretrained_models/sold2_wireframe.tar')
+        else:
+            self.ckpt_path = os.path.join(weight_path, "line2d", "SOLD2", "pretrained_models/sold2_wireframe.tar")
         if device is None:
             device = 'cuda'
         self.device = device
@@ -34,7 +35,11 @@ class SOLD2LineDetector():
             cmd = ['wget', link, '-O', self.ckpt_path]
             print("Downloading SOLD2 model...")
             subprocess.run(cmd, check=True)
-        self.line_matcher = LineMatcher(self.cfg['model_cfg'], self.ckpt_path, self.device, self.cfg['line_detector_cfg'], self.cfg['line_matcher_cfg'], False)
+        self.line_matcher = LineMatcher(
+            self.cfg['model_cfg'], self.ckpt_path, self.device,
+            self.cfg['line_detector_cfg'], self.cfg['line_matcher_cfg'],
+            self.cfg['multiscale_cfg']['multiscale'],
+            self.cfg['multiscale_cfg']['scales'])
 
     def sold2segstosegs(self, segs_sold2):
         return np.flip(segs_sold2, axis=2).reshape(len(segs_sold2), 4)
@@ -54,7 +59,11 @@ class SOLD2LineDetector():
 
         # forward
         with torch.no_grad():
-            net_outputs = self.line_matcher.multiscale_line_detection(input_image)
+            if self.cfg['multiscale_cfg']['multiscale']:
+                net_outputs = self.line_matcher.multiscale_line_detection(
+                    input_image, scales=self.cfg['multiscale_cfg']['scales'])
+            else:
+                net_outputs = self.line_matcher.line_detection(input_image)
         segs_sold2 = net_outputs['line_segments']
         descriptor = net_outputs['descriptor']
         with torch.no_grad():
@@ -149,4 +158,3 @@ class SOLD2LineDetector():
         if len(descinfo) != 0:
             descinfo[0] = descinfo[0].cpu().numpy()
         return descinfo
-
