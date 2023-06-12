@@ -1,9 +1,6 @@
-import os, sys
+import os
 import numpy as np
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from base_matcher import BaseMatcher, BaseMatcherOptions
-
+from ..base_matcher import BaseMatcher, BaseMatcherOptions
 
 class L2D2Matcher(BaseMatcher):
     def __init__(self, extractor, options = BaseMatcherOptions()):

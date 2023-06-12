@@ -1,11 +1,8 @@
-import os, sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from base_detector import BaseDetector, BaseDetectorOptions
+import os
 import numpy as np
 import torch
-
 from deeplsd.models.deeplsd_inference import DeepLSD
-
+from ..base_detector import BaseDetector, BaseDetectorOptions
 
 class DeepLSDDetector(BaseDetector):
     def __init__(self, options = BaseDetectorOptions()):

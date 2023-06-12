@@ -40,7 +40,7 @@
 # --------------------------------------------------------------------*/
 # %BANNER_END%
 
-import os, sys
+import os
 from copy import deepcopy
 from pathlib import Path
 from typing import List, Tuple

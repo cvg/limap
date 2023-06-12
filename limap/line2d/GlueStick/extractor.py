@@ -1,18 +1,13 @@
-import os, sys
+import os
 import numpy as np
 from sklearn.cluster import DBSCAN
 import torch
 from omegaconf import OmegaConf
-
 from gluestick.models.wireframe import lines_to_wireframe
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from point2d.superpoint.superpoint import SuperPoint, sample_descriptors
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from base_detector import BaseDetector, BaseDetectorOptions
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import limap.util.io as limapio
+from limap.point2d.superpoint.superpoint import SuperPoint, sample_descriptors
+from ..base_detector import BaseDetector, BaseDetectorOptions
 
 class WireframeExtractor(BaseDetector):
     def __init__(self, options = BaseDetectorOptions(), device=None):

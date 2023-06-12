@@ -1,16 +1,10 @@
-import os, sys
+import os
 import numpy as np
 import cv2
-
 import pytlsd
 import pytlbd
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from base_detector import BaseDetector, BaseDetectorOptions
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import limap.util.io as limapio
-
+from ..base_detector import BaseDetector, BaseDetectorOptions
 
 def process_pyramid(img, detector, n_levels=5, level_scale=np.sqrt(2), presmooth=True):
     octave_img = img.copy()

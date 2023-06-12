@@ -13,9 +13,9 @@ import torch.utils.data.dataloader as torch_loader
 # from dataset.dataset_util import get_dataset
 # from model.model_util import get_model
 # from model.loss import TotalLoss, get_loss_and_weights
-from SOLD2.model.metrics import AverageMeter, Metrics, super_nms
+from .model.metrics import AverageMeter, Metrics, super_nms
 # from model.lr_scheduler import get_lr_scheduler
-from SOLD2.misc.train_utils import (convert_image, get_latest_checkpoint,
+from .misc.train_utils import (convert_image, get_latest_checkpoint,
                               remove_old_checkpoints)
 
 
@@ -41,7 +41,7 @@ def restore_weights(model, state_dict, strict=True):
     # Deal with some version compatibility issue (catch version incompatible)
     except:
         err = model.load_state_dict(state_dict, strict=False)
-        
+
         # missing keys are those in model but not in state_dict
         missing_keys = err.missing_keys
         # Unexpected keys are those in state_dict but not in model
@@ -53,7 +53,7 @@ def restore_weights(model, state_dict, strict=True):
             dict_keys = [_ for _ in unexpected_keys if not "tracked" in _]
             model_dict[key] = state_dict[dict_keys[idx]]
         model.load_state_dict(model_dict)
-    
+
     return model
 
 
@@ -263,12 +263,12 @@ def train_single_epoch(model, model_cfg, optimizer, loss_func, metric_func,
                 outputs["junctions"], junc_map,
                 outputs["heatmap"], heatmap,
                 valid_mask)
-        
+
         total_loss = losses["total_loss"]
 
         # Update the model
         optimizer.zero_grad()
-        total_loss.backward()                     
+        total_loss.backward()
         optimizer.step()
 
         # Compute the global step
@@ -290,7 +290,7 @@ def train_single_epoch(model, model_cfg, optimizer, loss_func, metric_func,
             else:
                 heatmap_np = torch.sigmoid(outputs["heatmap"].detach())
                 heatmap_np = heatmap_np.cpu().numpy().transpose(0, 2, 3, 1)
-            
+
             heatmap_gt_np = heatmap.cpu().numpy().transpose(0, 2, 3, 1)
             valid_mask_np = valid_mask.cpu().numpy().transpose(0, 2, 3, 1)
 
@@ -575,13 +575,13 @@ def record_train_summaries(writer, global_step, scalars, images):
         writer.add_scalar("Train_loss/%s"%(key), scalars[key], global_step)
         writer.add_scalar("Train_loss_average/%s"%(key), average[key],
                           global_step)
-    
+
     # Record weighting
     for key in scalars.keys():
         if "w_" in key:
             writer.add_scalar("Train_weight/%s"%(key), scalars[key],
                               global_step)
-    
+
     # Smoothed loss
     writer.add_scalar("Train_loss_average/junc_loss", average["junc_loss"],
                       global_step)

@@ -1,10 +1,7 @@
-import os, sys
+import os
 import numpy as np
-
 import pytlbd
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from base_matcher import BaseMatcher, BaseMatcherOptions
+from ..base_matcher import BaseMatcher, BaseMatcherOptions
 
 class LBDMatcher(BaseMatcher):
     def __init__(self, extractor, options = BaseMatcherOptions()):

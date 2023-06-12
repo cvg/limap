@@ -1,8 +1,7 @@
-import os, sys
+import os
 import numpy as np
 import warnings
 from tqdm import tqdm
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import limap.util.io as limapio
 
 def setup(cfg):

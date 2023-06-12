@@ -1,9 +1,7 @@
-import os, sys
+import os
 import numpy as np
 from tqdm import tqdm
 import joblib
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 import limap.base as _base
 import limap.fitting as _fit

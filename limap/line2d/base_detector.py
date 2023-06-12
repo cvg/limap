@@ -1,9 +1,8 @@
-import os, sys
+import os
 import numpy as np
 from tqdm import tqdm
 import cv2
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import limap.util.io as limapio
 import limap.visualize as limapvis
 

@@ -1,5 +1,4 @@
 from _limap import _base, _undistortion
-import os, sys
 import cv2
 import numpy as np
 import copy

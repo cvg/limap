@@ -1,13 +1,11 @@
-import os, sys
+import os
 import numpy as np
 import torch
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from base_matcher import BaseMatcher, BaseMatcherOptions
-from LineTR.line_transformer import LineTransformer
-from LineTR.line_process import get_dist_matrix
-from LineTR.nn_matcher import nn_matcher_distmat
-
+from ..base_matcher import BaseMatcher, BaseMatcherOptions
+from .line_transformer import LineTransformer
+from .line_process import get_dist_matrix
+from .nn_matcher import nn_matcher_distmat
 
 class LineTRMatcher(BaseMatcher):
     def __init__(self, extractor, options = BaseMatcherOptions(),

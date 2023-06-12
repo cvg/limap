@@ -1,8 +1,5 @@
-from _limap import _base
-from _limap import _estimators
-from _limap import _fitting
-
-import os, sys
+from _limap import _base, _estimators, _fitting
+import os
 import numpy as np
 from bresenham import bresenham
 from hloc.localize_inloc import interpolate_scan
@@ -63,7 +60,7 @@ def estimate_seg3d_from_points3d(seg2d, p3ds, camview, image_name, inloc_dataset
 
     if points.shape[1] <= 6:
         return None
-    
+
     # TODO: test the best way to estimate uncertainty here
     uncertainty = var2d * np.median(seg1_ray_depths) / (0.7 * max(h, w))
     ransac_th = ransac_th * uncertainty

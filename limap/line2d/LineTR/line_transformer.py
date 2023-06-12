@@ -222,6 +222,7 @@ class LineTransformer(nn.Module):
             if self.config['weight_path'] is None:
                 path = Path(__file__).parent / 'weights/LineTR_weight.pth'
             else:
+                import os
                 path = Path(os.path.join(self.config["weight_path"], "line2d", "LineTR")) / 'weights/LineTR_weight.pth'
             if not path.is_file():
                 self.download_model(path)

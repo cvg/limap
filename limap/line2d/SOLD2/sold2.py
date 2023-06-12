@@ -1,14 +1,9 @@
-import os, sys
+import os
 import copy
-
-from .sold2_wrapper import SOLD2LineDetector
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from base_detector import BaseDetector, BaseDetectorOptions
-from base_matcher import BaseMatcher, BaseMatcherOptions
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import limap.util.io as limapio
+from .sold2_wrapper import SOLD2LineDetector
+from ..base_detector import BaseDetector, BaseDetectorOptions
+from ..base_matcher import BaseMatcher, BaseMatcherOptions
 
 class SOLD2Detector(BaseDetector):
     def __init__(self, options = BaseDetectorOptions()):

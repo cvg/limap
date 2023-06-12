@@ -1,7 +1,6 @@
-import os, sys
+import os
 import numpy as np
 from tqdm import tqdm
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import limap.structures as _structures
 import limap.pointsfm as _psfm
 

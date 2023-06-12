@@ -1,6 +1,4 @@
-import os, sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from vis_utils import *
+from ..vis_utils import *
 
 class BaseTrackVisualizer(object):
     def __init__(self, tracks):

@@ -1,6 +1,5 @@
-import os, sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from base_detector import BaseDetector, BaseDetectorOptions
+import os
+from ..base_detector import BaseDetector, BaseDetectorOptions
 
 import cv2
 import numpy as np
@@ -8,7 +7,6 @@ import torch
 from tp_lsd.utils.reconstruct import TPS_line
 from tp_lsd.utils.utils import load_model
 from tp_lsd.modeling.TP_Net import Res320
-
 
 class TPLSDDetector(BaseDetector):
     def __init__(self, options = BaseDetectorOptions()):
