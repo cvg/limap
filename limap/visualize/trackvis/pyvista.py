@@ -1,6 +1,4 @@
 from .base import BaseTrackVisualizer
-import os, sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 class PyVistaTrackVisualizer(BaseTrackVisualizer):
     def __init__(self, tracks):

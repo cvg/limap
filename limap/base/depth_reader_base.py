@@ -1,4 +1,3 @@
-import os, sys
 import cv2
 
 class BaseDepthReader():

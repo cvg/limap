@@ -1,11 +1,9 @@
 from _limap import _base, _pointsfm
 
-import os, sys
+import os
 import numpy as np
 import imagesize
 from tqdm import tqdm
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from limap.util.geometry import rotation_from_quaternion
 
 def ReadModelVisualSfM(vsfm_path, nvm_file="reconstruction.nvm"):

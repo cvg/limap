@@ -1,17 +1,9 @@
-import os, sys
+import os
 import numpy as np
 import cv2
 import torch
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from base_detector import BaseDetector, BaseDetectorOptions
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import limap.util.io as limapio
-
-sys.path.append(os.path.dirname(__file__))
-from .RAL_net_cov import get_net
-
+from ..base_detector import BaseDetector, BaseDetectorOptions
 
 class L2D2Extractor(BaseDetector):
     def __init__(self, options = BaseDetectorOptions(), device=None):
@@ -25,6 +17,8 @@ class L2D2Extractor(BaseDetector):
             ckpt = os.path.join(self.weight_path, "line2d", "L2D2", 'checkpoint_line_descriptor.th')
         if not os.path.isfile(ckpt):
             self.download_model(ckpt)
+        import sys
+        sys.path.append(os.path.dirname(__file__))
         self.model = torch.load(ckpt).to(self.device)
         self.model.eval()
 
@@ -119,3 +113,4 @@ class L2D2Extractor(BaseDetector):
                 patches = []
         line_desc = torch.cat(line_desc, dim=0)  # [n_lines, 128]
         return {'line_descriptors': line_desc.cpu().numpy()}
+

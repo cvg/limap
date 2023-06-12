@@ -1,14 +1,10 @@
-import os, sys
+import os
 import numpy as np
 import torch
 
-from ...point2d.superglue.superglue import SuperGlue
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from base_matcher import BaseMatcher, BaseMatcherOptions
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import limap.util.io as limapio
-
+from limap.point2d.superglue.superglue import SuperGlue
+from ..base_matcher import BaseMatcher, BaseMatcherOptions
 
 class NNEndpointsMatcher(BaseMatcher):
     def __init__(self, extractor, options = BaseMatcherOptions(), device=None):

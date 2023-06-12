@@ -1,7 +1,5 @@
-import os, sys
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import numpy as np
-from vis_utils import test_point_inside_ranges, test_line_inside_ranges
+from .vis_utils import test_point_inside_ranges, test_line_inside_ranges
 
 def pyvista_vis_3d_lines(lines, img_hw=(600, 800), width=2, ranges=None, scale=1.0):
     '''

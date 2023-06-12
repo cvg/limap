@@ -6,14 +6,14 @@ import numpy as np
 import torch
 from torch.nn.functional import softmax
 
-from SOLD2.model.model_util import get_model
-from SOLD2.model.loss import get_loss_and_weights
-from SOLD2.model.line_detection import LineSegmentDetectionModule
-from SOLD2.train import convert_junc_predictions
+from .model_util import get_model
+from .loss import get_loss_and_weights
+from .line_detection import LineSegmentDetectionModule
+from ..train import convert_junc_predictions
 
 
 def line_map_to_segments(junctions, line_map):
-    """ Convert a line map to a Nx2x2 list of segments. """ 
+    """ Convert a line map to a Nx2x2 list of segments. """
     line_map_tmp = line_map.copy()
 
     output_segments = np.zeros([0, 2, 2])
@@ -30,11 +30,11 @@ def line_map_to_segments(junctions, line_map):
                                             axis=0)
                 output_segments = np.concatenate(
                     (output_segments, single_seg[None, ...]), axis=0)
-                
+
                 # Update line_map
                 line_map_tmp[idx, idx2] = 0
                 line_map_tmp[idx2, idx] = 0
-    
+
     return output_segments
 
 
@@ -50,7 +50,7 @@ class LineDetector(object):
         # Get loss weights if dynamic weighting
         _, loss_weights = get_loss_and_weights(model_cfg, device)
         self.device = device
-        
+
         # Initialize the cnn backbone
         self.model = get_model(model_cfg, loss_weights)
         checkpoint = torch.load(ckpt_path, map_location=self.device)
@@ -69,7 +69,7 @@ class LineDetector(object):
         # Initialize the line detector
         self.line_detector_cfg = line_detector_cfg
         self.line_detector = LineSegmentDetectionModule(**line_detector_cfg)
-    
+
     def __call__(self, input_image, valid_mask=None,
                  return_heatmap=False, profile=False):
         # Now we restrict input_image to 4D torch tensor
@@ -121,5 +121,5 @@ class LineDetector(object):
             outputs["heatmap"] = heatmap
         if profile:
             outputs["time"] = end_time - start_time
-        
+
         return outputs

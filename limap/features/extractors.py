@@ -1,5 +1,6 @@
 # [NOTE] modified from the pixel-perfect-sfm project
 
+import os, sys
 import torch
 import numpy as np
 import PIL

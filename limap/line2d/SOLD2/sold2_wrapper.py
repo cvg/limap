@@ -6,9 +6,8 @@ import torch
 from skimage.draw import line
 import subprocess
 
-from SOLD2.experiment import load_config
-from SOLD2.model.line_matcher import LineMatcher
-
+from .experiment import load_config
+from .model.line_matcher import LineMatcher
 
 class SOLD2LineDetector():
     def __init__(self, device=None, cfg_path=None, weight_path=None):

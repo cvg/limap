@@ -1,6 +1,5 @@
-import os, sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from base_detector import BaseDetector, BaseDetectorOptions
+import os
+from ..base_detector import BaseDetector, BaseDetectorOptions
 
 import cv2
 import numpy as np
@@ -8,7 +7,6 @@ import torch
 
 from hawp.fsl.config import cfg as model_config
 from hawp.ssl.models import MODELS
-
 
 class HAWPv3Detector(BaseDetector):
     def __init__(self, options = BaseDetectorOptions()):

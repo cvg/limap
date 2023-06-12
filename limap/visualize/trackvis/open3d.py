@@ -1,9 +1,7 @@
-from .base import BaseTrackVisualizer
-import os, sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from vis_utils import compute_robust_range_lines
-from vis_lines import open3d_get_line_set, open3d_get_cameras
 import open3d as o3d
+from .base import BaseTrackVisualizer
+from ..vis_utils import compute_robust_range_lines
+from ..vis_lines import open3d_get_line_set, open3d_get_cameras
 
 class Open3DTrackVisualizer(BaseTrackVisualizer):
     def __init__(self, tracks):

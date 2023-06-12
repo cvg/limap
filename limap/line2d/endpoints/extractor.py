@@ -1,14 +1,9 @@
-import os, sys
+import os
 import numpy as np
 import torch
-
-from ...point2d.superpoint.superpoint import SuperPoint
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from base_detector import BaseDetector, BaseDetectorOptions
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 import limap.util.io as limapio
-
+from limap.point2d.superpoint.superpoint import SuperPoint
+from ..base_detector import BaseDetector, BaseDetectorOptions
 
 class SuperPointEndpointsExtractor(BaseDetector):
     def __init__(self, options = BaseDetectorOptions(), device=None):

@@ -1,11 +1,8 @@
-import os, sys
+import os
 import numpy as np
 import torch
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from base_matcher import BaseMatcher, BaseMatcherOptions
 from gluestick.models.gluestick import GlueStick
-
+from ..base_matcher import BaseMatcher, BaseMatcherOptions
 
 class GlueStickMatcher(BaseMatcher):
     def __init__(self, extractor, options = BaseMatcherOptions(),

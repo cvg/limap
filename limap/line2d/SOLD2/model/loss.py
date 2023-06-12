@@ -5,7 +5,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from SOLD2.misc.geometry_utils import (keypoints_to_grid, get_dist_mask, get_common_line_mask)
+from ..misc.geometry_utils import (keypoints_to_grid, get_dist_mask, get_common_line_mask)
 
 
 def get_loss_and_weights(model_cfg, device=torch.device("cuda")):
@@ -14,7 +14,7 @@ def get_loss_and_weights(model_cfg, device=torch.device("cuda")):
     w_policy = model_cfg.get("weighting_policy", "static")
     if not w_policy in ["static", "dynamic"]:
         raise ValueError("[Error] Not supported weighting policy.")
-    
+
     loss_func = {}
     loss_weight = {}
     # Get junction loss function and weight
@@ -41,7 +41,7 @@ def get_loss_and_weights(model_cfg, device=torch.device("cuda")):
 def get_junction_loss_and_weight(model_cfg, global_w_policy):
     """ Get the junction loss function and weight. """
     junction_loss_cfg = model_cfg.get("junction_loss_cfg", {})
-    
+
     # Get the junction loss weight
     w_policy = junction_loss_cfg.get("policy", global_w_policy)
     if w_policy == "static":
@@ -75,7 +75,7 @@ def get_heatmap_loss_and_weight(model_cfg, global_w_policy, device):
         w_heatmap = torch.tensor(model_cfg["w_heatmap"], dtype=torch.float32)
     elif w_policy == "dynamic":
         w_heatmap = nn.Parameter(
-            torch.tensor(model_cfg["w_heatmap"], dtype=torch.float32), 
+            torch.tensor(model_cfg["w_heatmap"], dtype=torch.float32),
             requires_grad=True)
     else:
         raise ValueError(
@@ -98,7 +98,7 @@ def get_heatmap_loss_and_weight(model_cfg, global_w_policy, device):
 def get_descriptor_loss_and_weight(model_cfg, global_w_policy):
     """ Get the descriptor loss function and weight. """
     descriptor_loss_cfg = model_cfg.get("descriptor_loss_cfg", {})
-    
+
     # Get the descriptor loss weight
     w_policy = descriptor_loss_cfg.get("policy", global_w_policy)
     if w_policy == "static":
@@ -156,7 +156,7 @@ def junction_detection_loss(junction_map, junc_predictions, valid_mask=None,
     valid_mask = (torch.ones(junction_map.shape) if valid_mask is None
                   else valid_mask)
     valid_mask = space_to_depth(valid_mask, grid_size)
-    
+
     # Compute junction loss on the border patch or not
     if keep_border:
         valid_mask = torch.sum(valid_mask.to(torch.bool).to(torch.int),
@@ -170,7 +170,7 @@ def junction_detection_loss(junction_map, junc_predictions, valid_mask=None,
     # The loss still need NCHW format
     loss = loss_func(input=junc_predictions,
                      target=labels.to(torch.long))
-    
+
     # Weighted sum by the valid mask
     loss_ = torch.sum(loss * torch.squeeze(valid_mask.to(torch.float),
                                            dim=1), dim=[0, 1, 2])
@@ -239,7 +239,7 @@ class RegularizationLoss(nn.Module):
         for _, val in loss_weights.items():
             if isinstance(val, nn.Parameter):
                 loss += val
-        
+
         return loss
 
 
@@ -351,7 +351,7 @@ class TotalLoss(nn.Module):
             total_loss = junc_loss * torch.exp(-self.loss_weights["w_junc"]) + \
                          heatmap_loss * torch.exp(-self.loss_weights["w_heatmap"]) + \
                          reg_loss
-            
+
             return {
                 "total_loss": total_loss,
                 "junc_loss": junc_loss,
@@ -360,11 +360,11 @@ class TotalLoss(nn.Module):
                 "w_junc": torch.exp(-self.loss_weights["w_junc"]).item(),
                 "w_heatmap": torch.exp(-self.loss_weights["w_heatmap"]).item(),
             }
-        
+
         elif self.weighting_policy == "static":
             total_loss = junc_loss * self.loss_weights["w_junc"] + \
                          heatmap_loss * self.loss_weights["w_heatmap"]
-            
+
             return {
                 "total_loss": total_loss,
                 "junc_loss": junc_loss,
@@ -373,8 +373,8 @@ class TotalLoss(nn.Module):
 
         else:
             raise ValueError("[Error] Unknown weighting policy.")
-    
-    def forward_descriptors(self, 
+
+    def forward_descriptors(self,
             junc_map_pred1, junc_map_pred2, junc_map_target1,
             junc_map_target2, heatmap_pred1, heatmap_pred2, heatmap_target1,
             heatmap_target2, line_points1, line_points2, line_indices,
@@ -383,7 +383,7 @@ class TotalLoss(nn.Module):
         """ Loss for detection + description. """
         # Compute junction loss
         junc_loss = self.loss_funcs["junc_loss"](
-            torch.cat([junc_map_pred1, junc_map_pred2], dim=0), 
+            torch.cat([junc_map_pred1, junc_map_pred2], dim=0),
             torch.cat([junc_map_target1, junc_map_target2], dim=0),
             torch.cat([valid_mask1, valid_mask2], dim=0)
         )
@@ -395,7 +395,7 @@ class TotalLoss(nn.Module):
 
         # Compute heatmap loss
         heatmap_loss = self.loss_funcs["heatmap_loss"](
-            torch.cat([heatmap_pred1, heatmap_pred2], dim=0), 
+            torch.cat([heatmap_pred1, heatmap_pred2], dim=0),
             torch.cat([heatmap_target1, heatmap_target2], dim=0),
             torch.cat([valid_mask1, valid_mask2], dim=0)
         )
@@ -430,7 +430,7 @@ class TotalLoss(nn.Module):
             "w_desc": w_descriptor.item() \
                 if isinstance(w_descriptor, nn.Parameter) else w_descriptor
         }
-        
+
         # Compute the regularization loss
         reg_loss = self.loss_funcs["reg_loss"](self.loss_weights)
         total_loss += reg_loss

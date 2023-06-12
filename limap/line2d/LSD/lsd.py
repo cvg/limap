@@ -1,9 +1,7 @@
-import os, sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from base_detector import BaseDetector, BaseDetectorOptions
-
+import os
 import pytlsd
 import numpy as np
+from ..base_detector import BaseDetector, BaseDetectorOptions
 
 class LSDDetector(BaseDetector):
     def __init__(self, options = BaseDetectorOptions()):

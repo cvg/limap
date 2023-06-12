@@ -1,4 +1,4 @@
-import os, sys
+import os
 import numpy as np
 import pycolmap
 import pickle
@@ -12,8 +12,6 @@ from tqdm import tqdm
 from collections import defaultdict
 from hloc.utils.io import get_keypoints, get_matches
 from limap.optimize.line_localization.functions import *
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 def get_hloc_keypoints(ref_sfm, features_path, matches_path, query_img_name, target_img_ids, logger=None):
     if ref_sfm is None or features_path is None or matches_path is None:

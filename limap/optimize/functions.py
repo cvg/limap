@@ -1,9 +1,6 @@
-import os, sys
+import os
 import numpy as np
 from tqdm import tqdm
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-
 import limap.visualize as limapvis
 
 def visualize_heatmap_intersections(prefix, imname_list, image_ids, p_heatmaps, ht_intersections, max_image_dim=None):
