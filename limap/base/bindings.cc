@@ -189,14 +189,14 @@ void bind_linebase(py::module& m) {
                 p (:class:`np.array`): Coordinate of a 2D point, of shape (2,)
 
             Returns:
-                :class:`np.array` of shape (2,): Coordinate of the projection of the point `p` on the 2D line
+                :class:`np.array` of shape (2,): Coordinate of the projection of the point `p` on the 2D line segment
         )", py::arg("p"))
         .def("point_distance", &Line2d::point_distance, R"(
             Args:
                 p (:class:`np.array`): Coordinate of a 2D point, of shape (2,)
 
             Returns:
-                float: Distance from the point `p` to the 2D line
+                float: Distance from the point `p` to the 2D line segment
         )", py::arg("p"));
 
     py::class_<Line3d>(m, "Line3d", "A finite 3D line (segment).")
@@ -269,14 +269,14 @@ void bind_linebase(py::module& m) {
                 p (:class:`np.array`): Coordinate of a 3D point, of shape (3,)
 
             Returns:
-                :class:`np.array` of shape (3,): Coordinate of the projection of the point `p` on the 3D line
+                :class:`np.array` of shape (3,): Coordinate of the projection of the point `p` on the 3D line segment
         )", py::arg("p"))
         .def("point_distance", &Line3d::point_distance, R"(
             Args:
                 p (:class:`np.array`): Coordinate of a 3D point, of shape (3,)
 
             Returns:
-                float: Distance from the point `p` to the 3D line
+                float: Distance from the point `p` to the 3D line segment
         )", py::arg("p"));
 
     m.def("_GetLine2dVectorFromArray", &GetLine2dVectorFromArray);
@@ -309,14 +309,14 @@ void bind_linebase(py::module& m) {
                 p (:class:`np.array`): Coordinate of a 2D point, of shape (2,)
 
             Returns:
-                :class:`np.array` of shape (2,): Coordinate of the projection of the point `p` on the 2D line
+                :class:`np.array` of shape (2,): Coordinate of the projection of the point `p` on the 2D infinite line
         )", py::arg("p"))
         .def("point_distance", &InfiniteLine2d::point_distance, R"(
             Args:
                 p (:class:`np.array`): Coordinate of a 2D point, of shape (2,)
 
             Returns:
-                float: Distance from the point `p` to the 2D line
+                float: Distance from the point `p` to the 2D infinite line
         )", py::arg("p"));
 
     py::class_<InfiniteLine3d>(m, "InfiniteLine3d", "An infinite 3D line.")
@@ -350,14 +350,14 @@ void bind_linebase(py::module& m) {
                 p (:class:`np.array`): Coordinate of a 3D point, of shape (3,)
 
             Returns:
-                :class:`np.array` of shape (3,): Coordinate of the projection of the point `p` on the 3D line
+                :class:`np.array` of shape (3,): Coordinate of the projection of the point `p` on the 3D infinite line
         )", py::arg("p"))
         .def("point_distance", &InfiniteLine3d::point_distance, R"(
             Args:
                 p (:class:`np.array`): Coordinate of a 3D point, of shape (3,)
 
             Returns:
-                float: Distance from the point `p` to the 3D line
+                float: Distance from the point `p` to the 3D infinite line
         )", py::arg("p"))
         .def("projection", &InfiniteLine3d::projection, R"(
             Projection from Plücker coordinate to 2D homogeneous line coordinate. 
@@ -729,7 +729,7 @@ void bind_camera(py::module& m) {
                 bool: True if the camera model is without distortion
         )");
 
-    py::class_<CameraPose>(m, "CameraPose", "Representing the pose of a camera. The quaternion convention is `(w, x, y, z)` (real part first).")
+    py::class_<CameraPose>(m, "CameraPose", "Representing the world-to-cam pose (R, t) with a quaternion and a translation vector. The quaternion convention is `(w, x, y, z)` (real part first).")
         .def(py::init<bool>(), R"(
             Default constructor: identity pose
         )", py::arg("initialized")=false)
@@ -827,7 +827,7 @@ void bind_camera(py::module& m) {
                 image_name (str)
         )", py::arg("image_name"));
 
-    py::class_<CameraView>(m, "CameraView", "Inherits :class:`~limap.base.CameraImage`, incorporating the :class:`~limap.base.Camera` model for project/unproject between 2D and 3D.")
+    py::class_<CameraView>(m, "CameraView", "Inherits :class:`~limap.base.CameraImage`, incorporating the :class:`~limap.base.Camera` model and its parameters for projection/unprojection between 2D and 3D.")
         .def(py::init<>())
         .def(py::init<const Camera&, const std::string&>(), py::arg("camera"), py::arg("image_name") = "none") // empty view
         .def(py::init<const Camera&, const CameraPose&, const std::string&>(), py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
@@ -925,9 +925,9 @@ void bind_camera(py::module& m) {
 
 
     py::class_<ImageCollection>(m, "ImageCollection", R"(
-            Collection of cameras and images in a scene or dataset. The arguments `input_cameras` and `input_images` of varies constructors 
-            below are either list of :class:`~limap.base.Camera` and :class:`~limap.base.CameraImage` or python dict mapping integer IDs to 
-            :class:`~limap.base.Camera` and :class:`~limap.base.CameraImage`.
+            A flexible class that consists of cameras and images in a scene or dataset. In each image stores the corresponding ID of the camera, making it easy to extend to single/multiple sequences or unstructured image collections. 
+            The constructor arguments `input_cameras` and `input_images` can be either list of :class:`~limap.base.Camera` and :class:`~limap.base.CameraImage` 
+            or python dict mapping integer IDs to :class:`~limap.base.Camera` and :class:`~limap.base.CameraImage`.
         )")
         .def(py::init<>())
         .def(py::init<const std::map<int, Camera>&, const std::map<int, CameraImage>&>(), py::arg("input_cameras"), py::arg("input_images"))
