@@ -34,13 +34,13 @@ Dependencies
 
 * Python 3.9 + required packages
 
-  Install PyTorch >= 1.11.0 (Note: LIMAP has not been tested with PyTorch 2)
+  Install PyTorch >= 1.12.0 (Note: LIMAP has not been tested with PyTorch 2)
 
   * CPU version
   
   .. code-block:: bash
 
-    pip install torch==1.11.0 torchvision==0.12.0
+    pip install torch==1.12.0 torchvision==0.13.0
 
 
   * Or refer to https://pytorch.org/get-started/previous-versions/ to install PyTorch compatible with your CUDA version
