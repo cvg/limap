@@ -35,6 +35,8 @@ To run line mapping using **Fit&Merge** on Hypersim:
 
 In particular, ``skip_exists`` is a very useful option to avoid running point-based SfM and line detection/description repeatedly in each pass.
 
+Also, the combination  ``LSD detector + Endpoints NN matcher`` can be enabled with ``--default_config_file cfgs/triangulation/default_fast.yaml`` for high efficiency (while with non-negligible performance degradation).
+
 -------------------------------------------------
 Hybrid Localization with Points and Lines
 -------------------------------------------------
