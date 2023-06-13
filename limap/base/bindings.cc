@@ -429,12 +429,9 @@ void bind_linetrack(py::module& m) {
             }
         ))
         .def_readwrite("line", &LineTrack::line, ":class:`~limap.base.Line3d`, the 3D line")
-        // .def_readonly("node_id_list", &LineTrack::node_id_list)
         .def_readonly("image_id_list", &LineTrack::image_id_list, "list[int], the associated image IDs")
         .def_readonly("line_id_list", &LineTrack::line_id_list, "list[int], IDs of supporting 2D lines within each image")
-        // .def_readonly("line3d_list", &LineTrack::line3d_list)
         .def_readonly("line2d_list", &LineTrack::line2d_list, "list[:class:`~limap.base.Line2d`], the supporting 2D line segments")
-        // .def_readonly("score_list", &LineTrack::score_list)
         .def_readonly("active", &LineTrack::active, "bool, active status for recursive merging")
         .def("count_lines", &LineTrack::count_lines, R"(
             Returns:
@@ -476,7 +473,7 @@ void bind_linetrack(py::module& m) {
             Write the line track information to a file.
 
             Args:
-                filename (str): The file to read from
+                filename (str): The file to write to
         )", py::arg("filename"));
 }
 

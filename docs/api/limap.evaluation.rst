@@ -1,10 +1,10 @@
 limap.evaluation package
 ========================
 
-Module contents
----------------
+.. toctree::
+   :maxdepth: 3
+   :caption: Module Contents: 
 
-.. automodule:: limap.evaluation
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   limap.evaluation.mesh_evaluator
+   limap.evaluation.point_cloud_evaluator
+
