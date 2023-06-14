@@ -1,4 +1,4 @@
-Camera, Image, View, and Pose
+Cameras, Poses, and Images
 ==============================
 
 .. autoclass:: limap.base.Camera
