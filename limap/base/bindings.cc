@@ -148,11 +148,11 @@ void bind_linebase(py::module& m) {
             Constructor from :class:`np.array` of shape (2, 2) stacking the two 2D endpoints
         )", py::arg("seg2d"))
         .def(py::init<V2D, V2D>(), R"(
-            Constructor from `\start` and `end` endpoints, each a :class:`np.array` of shape (2,)
+            Constructor from `start` and `end` endpoints, each a :class:`np.array` of shape (2,)
         )", py::arg("start"), py::arg("end"))
         .def(py::init<V2D, V2D, double>(), R"(
             Constructor from two endpoints and optionally the score
-        )", py::arg("start"), py::arg("end"), py::kw_only(), py::arg("score"))
+        )", py::arg("start"), py::arg("end"), py::arg("score"))
         .def(py::pickle(
             [](const Line2d& input) { // dump
                 return input.as_array();
@@ -174,7 +174,7 @@ void bind_linebase(py::module& m) {
         )")
         .def("as_array", &Line2d::as_array, R"(
             Returns:
-                :class:`np.array` of shape (2, 2): Array stacking `\start` and `end` endpoints
+                :class:`np.array` of shape (2, 2): Array stacking `start` and `end` endpoints
         )")
         .def("midpoint", &Line2d::midpoint, R"(
             Returns:
@@ -182,7 +182,7 @@ void bind_linebase(py::module& m) {
         )")
         .def("direction", &Line2d::direction, R"(
             Returns:
-                :class:`np.array` of shape (2,): Direction vector of the 2D line from `\start` to `end`
+                :class:`np.array` of shape (2,): Direction vector of the 2D line from `start` to `end`
         )")
         .def("point_projection", &Line2d::point_projection, R"(
             Args:
@@ -207,11 +207,11 @@ void bind_linebase(py::module& m) {
             Constructor from :class:`np.array` of shape (2, 3) stacking the two 3D endpoints
         )", py::arg("seg3d"))
         .def(py::init<V3D, V3D>(), R"(
-            Constructor from `\start` and `end` endpoints, each a :class:`np.array` of shape (3,)
+            Constructor from `start` and `end` endpoints, each a :class:`np.array` of shape (3,)
         )", py::arg("start"), py::arg("end"))
         .def(py::init<V3D, V3D, double, double, double, double>(), R"(
             Constructor from two endpoints, and optionally: the score, the start and/or end depth of the 3D segment, and the uncertainty value
-        )", py::arg("start"), py::arg("end"), py::kw_only(), py::arg("score"), py::arg("depth_start"), py::arg("depth_end"), py::arg("uncertainty"))
+        )", py::arg("start"), py::arg("end"), py::arg("score"), py::arg("depth_start"), py::arg("depth_end"), py::arg("uncertainty"))
         .def(py::pickle(
             [](const Line3d& input) { // dump
                 return input.as_array();
@@ -232,7 +232,7 @@ void bind_linebase(py::module& m) {
         )")
         .def("as_array", &Line3d::as_array, R"(
             Returns:
-                :class:`np.array` of shape (2, 3): Array stacking `\start` and `end` endpoints
+                :class:`np.array` of shape (2, 3): Array stacking `start` and `end` endpoints
         )")
         .def("projection", &Line3d::projection, R"(
             Args:
@@ -262,7 +262,7 @@ void bind_linebase(py::module& m) {
         )")
         .def("direction", &Line3d::direction, R"(
             Returns:
-                :class:`np.array` of shape (3,): Direction vector of the 3D line from `\start` to `end`
+                :class:`np.array` of shape (3,): Direction vector of the 3D line from `start` to `end`
         )")
         .def("point_projection", &Line3d::point_projection, R"(
             Args:
@@ -411,7 +411,7 @@ void bind_linetrack(py::module& m) {
         )", py::arg("track"))
         .def(py::init<const Line3d&, const std::vector<int>&, const std::vector<int>&, const std::vector<Line2d>&>(), R"(
             Constructor from a :class:`~limap.base.Line3d`, a list of associated image IDs, a list of supporting line IDs within each image, 
-            and a list of associated :class:`~limap.base.Line2d`\s
+            and a list of associated :class:`~limap.base.Line2d`
         )", py::arg("line"), py::arg("image_id_list"), py::arg("line_id_list"), py::arg("line2d_list"))
         .def(py::init<py::dict>(), R"(
             Constructor from a Python dict
@@ -446,7 +446,7 @@ void bind_linetrack(py::module& m) {
                 int: Number of unique associated images
         )")
         .def("projection", &LineTrack::projection, R"(
-            Project the 3D line to 2D using a list of :class:`~limap.base.CameraView`\s.
+            Project the 3D line to 2D using a list of :class:`~limap.base.CameraView`.
 
             Args:
                 views (list[:class:`~limap.base.CameraView`]): Camera views to project the 3D line
@@ -529,7 +529,7 @@ void bind_line_dists(py::module& m) {
         [](const std::vector<Line2d>& lines, const LineDistType& type) {
             return compute_pairwise_distance<Line2d>(lines, type);
         }, R"(
-            Compute pairwise distance among a list of :class:`~limap.base.Line2d`\s using the specified line distance type.
+            Compute pairwise distance among a list of :class:`~limap.base.Line2d` using the specified line distance type.
 
             Args:
                 lines (list[:class:`~limap.base.Line2d`]): List of 2D line segments
@@ -543,7 +543,7 @@ void bind_line_dists(py::module& m) {
         [](const std::vector<Line3d>& lines, const LineDistType& type) {
             return compute_pairwise_distance<Line3d>(lines, type);
         }, R"(
-            Compute pairwise distance among a list of :class:`~limap.base.Line3d`\s using the specified line distance type.
+            Compute pairwise distance among a list of :class:`~limap.base.Line3d` using the specified line distance type.
 
             Args:
                  lines (list[:class:`~limap.base.Line3d`]): List of 3D line segments
@@ -997,11 +997,11 @@ void bind_camera(py::module& m) {
         )")
         .def("get_camviews", &ImageCollection::get_camviews, R"(
             Returns:
-                list[:class:`~limap.base.CameraView`]: The associated :class:`~limap.base.CameraView`\s from all the images and their cameras in the collection
+                list[:class:`~limap.base.CameraView`]: The associated :class:`~limap.base.CameraView` from all the images and their cameras in the collection
         )")
         .def("get_map_camviews", &ImageCollection::get_map_camviews, R"(
             Returns:
-                dict[int -> :class:`~limap.base.CameraView`]: Mapping of image IDs to their associated :class:`~limap.base.CameraView`\s
+                dict[int -> :class:`~limap.base.CameraView`]: Mapping of image IDs to their associated :class:`~limap.base.CameraView`
         )")
         .def("get_locations", &ImageCollection::get_locations, R"(
             Returns:
