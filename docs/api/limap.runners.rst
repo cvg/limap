@@ -1,9 +1,6 @@
 limap.runners package
 =====================
 
-Submodules
-----------
-
 limap.runners.functions module
 ------------------------------
 

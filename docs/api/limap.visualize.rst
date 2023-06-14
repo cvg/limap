@@ -1,8 +1,8 @@
 limap.visualize package
 =======================
 
-Subpackages
------------
+limap.visualize.vis\_lines module
+-----------------------------------
 
 .. toctree::
    :maxdepth: 4

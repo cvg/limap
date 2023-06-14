@@ -1,9 +1,6 @@
 limap.undistortion package
 ==========================
 
-Submodules
-----------
-
 limap.undistortion.undistort module
 -----------------------------------
 
