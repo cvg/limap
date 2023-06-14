@@ -22,12 +22,23 @@ def setup(cfg):
         print("[LOG] weight dir: {0}".format(cfg["weight_path"]))
     return cfg
 
-def undistort_images(imagecols, output_dir, fname="image_collection_undistorted.npy", load_undistort=False, n_jobs=-1):
+def undistort_images(imagecols, output_dir, fname="image_collection_undistorted.npy", skip_exists=False, n_jobs=-1):
+    """
+    Run undistortion on the images stored in the :class:`limap.base.ImageCollection` instance `imagecols` (only distorted images are undistorted), and store the undistorted images into `output_dir`. The function will return a corresponding `limap.base.ImageCollection` instance for the undistorted images.
+
+    Args:
+        imagecols (:class:`limap.base.ImageCollection`): Image collection of the images to be undistorted.
+        output_dir (str): output folder for storing the undistorted images
+        skip_exists (bool): whether to skip already undistorted images in the output folder.
+
+    Returns:
+        :class:`limap.base.ImageCollection`: New image collection for the undistorted images
+    """
     import limap.base as _base
 
     loaded_ids = []
     unload_ids = imagecols.get_img_ids()
-    if load_undistort:
+    if skip_exists:
         print("[LOG] Loading undistorted images (n_images = {0})...".format(imagecols.NumImages()))
         fname_in = os.path.join(output_dir, fname)
         if os.path.isfile(fname_in):
@@ -96,6 +107,11 @@ def undistort_images(imagecols, output_dir, fname="image_collection_undistorted.
     return imagecols_undistorted
 
 def compute_sfminfos(cfg, imagecols, fname="metainfos.txt"):
+    """
+    Compute visual neighbors and robust 3D ranges from COLMAP point triangulation.
+
+    Args:
+    """
     import limap.pointsfm as _psfm
     if not cfg["load_meta"]:
         # run colmap sfm and compute neighbors, ranges

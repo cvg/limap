@@ -63,7 +63,7 @@ def undistort_and_resize(cfg, imagecols, logger=None):
     # undistort images
     logger.info('Performing undistortion...')
     if not imagecols.IsUndistorted():
-        imagecols = _runners.undistort_images(imagecols, os.path.join(cfg['output_dir'], cfg['undistortion_output_dir']), load_undistort=cfg['load_undistort'] or cfg['skip_exists'], n_jobs=cfg['n_jobs'])
+        imagecols = _runners.undistort_images(imagecols, os.path.join(cfg['output_dir'], cfg['undistortion_output_dir']), skip_exists=cfg['load_undistort'] or cfg['skip_exists'], n_jobs=cfg['n_jobs'])
     image_dir = cfg['undistortion_output_dir']
     if cfg['max_image_dim'] != -1 and cfg['max_image_dim'] is not None:
         image_dir = cfg['resized_output_dir']
@@ -169,7 +169,7 @@ def eval(filename, poses_gt, query_ids, id_to_name, logger):
         out += f'\n\t{th_t*100:.0f}cm, {th_R:.0f}deg : {ratio*100:.2f}%'
     logger.info(out)
 
-def run_hloc_cambridge(cfg, image_dir, imagecols, neighbors, train_ids, query_ids, id_to_origin_name, 
+def run_hloc_cambridge(cfg, image_dir, imagecols, neighbors, train_ids, query_ids, id_to_origin_name,
                        results_file, num_loc=10, logger=None):
     feature_conf = {
         'output': 'feats-superpoint-n4096-r1024',
@@ -219,7 +219,7 @@ def run_hloc_cambridge(cfg, image_dir, imagecols, neighbors, train_ids, query_id
     neighbors_train = imagecols_train.update_neighbors(neighbors)
 
     ref_sfm_path = _psfm.run_colmap_sfm_with_known_poses(
-        cfg['sfm'], imagecols_train, os.path.join(cfg['output_dir'], 'tmp_colmap'), neighbors=neighbors_train, 
+        cfg['sfm'], imagecols_train, os.path.join(cfg['output_dir'], 'tmp_colmap'), neighbors=neighbors_train,
         map_to_original_image_names=False, skip_exists=cfg['skip_exists']
     )
     ref_sfm = pycolmap.Reconstruction(ref_sfm_path)
