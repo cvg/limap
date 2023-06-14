@@ -3,9 +3,9 @@ Localization with Points & Lines
 
 Currently, runner scripts are provided to run visual localization integrating line along with point features on the following Datasets: 
 
-* `7Scenes <https://www.microsoft.com/en-us/research/project/rgb-d-dataset-7-scenes/>`_
-* `Cambridge Landmarks <https://www.repository.cam.ac.uk/handle/1810/251342>`_
-* `InLoc <http://www.ok.sc.e.titech.ac.jp/INLOC/>`_
+* `7Scenes Dataset <https://www.microsoft.com/en-us/research/project/rgb-d-dataset-7-scenes/>`_
+* `Cambridge Landmarks Dataset <https://www.repository.cam.ac.uk/handle/1810/251342>`_
+* `InLoc Dataset <http://www.ok.sc.e.titech.ac.jp/INLOC/>`_
 
 Please follow hloc's guide for downloading and preparing Cambridge and 7Scenes dataset:
 
