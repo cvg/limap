@@ -20,9 +20,15 @@ void bind_evaluator(py::module& m) {
     using namespace evaluation;
 
     py::class_<PointCloudEvaluator>(m, "PointCloudEvaluator", "The evaluator for line maps with respect to a GT point cloud (using a K-D Tree).")
-        .def(py::init<>())
-        .def(py::init<const std::vector<V3D>&>())
-        .def(py::init<const Eigen::MatrixXd&>())
+        .def(py::init<>(), R"(
+            Default constructor
+        )")
+        .def(py::init<const std::vector<V3D>&>(), R"(
+            Constructor from list[:class:`np.array`] of shape (3,)
+        )")
+        .def(py::init<const Eigen::MatrixXd&>(), R"(
+            Constructor from :class:`np.array` of shape (N, 3)
+        )")
         .def("Build", &PointCloudEvaluator::Build, R"(Build the indexes of the K-D Tree)")
         .def("Save", &PointCloudEvaluator::Save, R"(
             Save the built K-D Tree into a file
@@ -137,8 +143,12 @@ void bind_evaluator(py::module& m) {
         .def("ComputeDistsforEachPoint_KDTree", &PointCloudEvaluator::ComputeDistsforEachPoint_KDTree);
 
     py::class_<MeshEvaluator>(m, "MeshEvaluator")
-        .def(py::init<>())
-        .def(py::init<const std::string&, const double&>())
+        .def(py::init<>(), R"(
+            Default constructor
+        )")
+        .def(py::init<const std::string&, const double&>(), R"(
+           Constructor from a mesh file (str) and a scale (float)
+        )")
         .def("ComputeDistPoint", &MeshEvaluator::ComputeDistPoint, R"(
             Compute the distance from a query point to the mesh
 

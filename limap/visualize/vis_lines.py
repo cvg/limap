@@ -2,10 +2,13 @@ import numpy as np
 from .vis_utils import test_point_inside_ranges, test_line_inside_ranges
 
 def pyvista_vis_3d_lines(lines, img_hw=(600, 800), width=2, ranges=None, scale=1.0):
-    '''
-    Input:
-    - lines: list of _base.Line3d
-    '''
+    """
+    Visualize a 3D line map with `PyVista <https://docs.pyvista.org/version/stable/>`_
+
+    Args:
+        lines (list[:class:`limap.base.Line3d`]): The 3D line map
+        width (float, optional): width of the line
+    """
     import pyvista as pv
     plotter = pv.Plotter(window_size=[img_hw[1], img_hw[0]])
     for line in lines:
@@ -122,6 +125,13 @@ def open3d_add_cameras(w, imagecols, color=[1.0, 0.0, 0.0], ranges=None, scale_c
     return w
 
 def open3d_vis_3d_lines(lines, width=2, ranges=None, scale=1.0):
+    """
+    Visualize a 3D line map with `Open3D <http://www.open3d.org/>`_
+
+    Args:
+        lines (list[:class:`limap.base.Line3d`]): The 3D line map
+        width (float, optional): width of the line
+    """
     import open3d as o3d
     vis = o3d.visualization.Visualizer()
     vis.create_window(height=1080, width=1920)

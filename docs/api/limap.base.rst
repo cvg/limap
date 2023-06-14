@@ -14,7 +14,7 @@ limap.base package
    :maxdepth: 3
    :caption: Submodules: 
 
-   limap.base.functions
+.. limap.base.functions
 
 .. Submodules
 .. ----------
