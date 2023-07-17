@@ -29,10 +29,3 @@ limap.vplib.register\_vp\_detector module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
-
-.. automodule:: limap.vplib
-   :members:
-   :undoc-members:
-   :show-inheritance:

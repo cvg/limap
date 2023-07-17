@@ -1,9 +1,6 @@
 limap.vplib.JLinkage package
 ============================
 
-Submodules
-----------
-
 limap.vplib.JLinkage.JLinkage module
 ------------------------------------
 
@@ -12,10 +9,3 @@ limap.vplib.JLinkage.JLinkage module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
-
-.. automodule:: limap.vplib.JLinkage
-   :members:
-   :undoc-members:
-   :show-inheritance:

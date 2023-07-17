@@ -42,7 +42,7 @@ def UndistortPoints(points, distorted_camera, undistorted_camera):
         undistorted_camera (:class:`limap.base.Camera`): The camera after undistortion
 
     Returns:
-        (list[:class:`np.array`]): List of the corresponding 2D keypoints on the undistorted image
+        list[:class:`np.array`]: List of the corresponding 2D keypoints on the undistorted image
     """
     return _undistortion._UndistortPoints(points, distorted_camera, undistorted_camera)
 

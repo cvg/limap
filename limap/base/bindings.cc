@@ -971,7 +971,7 @@ void bind_camera(py::module& m) {
                 :class:`~limap.base.ImageCollection`: The filtered subset collection
         )")
         .def("update_neighbors", &ImageCollection::update_neighbors, R"(
-            Update the neighbor information among images (e.g. after filtering).
+            Update the neighbor information among images (e.g. after filtering). Remove neighboring images that are not in the image collection.
 
             Args:
                 neighbors (dict[int -> list[int]]): The input neighbor information

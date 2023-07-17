@@ -2,6 +2,12 @@ from .base_detector import BaseDetectorOptions
 
 def get_detector(cfg_detector, max_num_2d_segs=3000,
                  do_merge_lines=False, visualize=False, weight_path=None):
+    """
+    Get a line detector specified by cfg_detector["method"]
+
+    Args:
+        cfg_detector: config for the line detector
+    """
     options = BaseDetectorOptions()
     options = options._replace(
         set_gray=True, max_num_2d_segs=max_num_2d_segs,
@@ -27,6 +33,12 @@ def get_detector(cfg_detector, max_num_2d_segs=3000,
         raise NotImplementedError
 
 def get_extractor(cfg_extractor, weight_path=None):
+    """
+    Get a line descriptor speicified by cfg_extractor["method"]
+
+    Args:
+        cfg_extractor: config for the line extractor
+    """
     options = BaseDetectorOptions()
     options = options._replace(set_gray=True, weight_path=weight_path)
 

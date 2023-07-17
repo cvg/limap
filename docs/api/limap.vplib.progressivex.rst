@@ -1,9 +1,6 @@
 limap.vplib.progressivex package
 ================================
 
-Submodules
-----------
-
 limap.vplib.progressivex.progressivex module
 --------------------------------------------
 
@@ -12,10 +9,3 @@ limap.vplib.progressivex.progressivex module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
-
-.. automodule:: limap.vplib.progressivex
-   :members:
-   :undoc-members:
-   :show-inheritance:

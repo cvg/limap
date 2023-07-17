@@ -19,7 +19,8 @@ release = version
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = ['sphinx.ext.autodoc',
-              'sphinx.ext.napoleon']
+              'sphinx.ext.napoleon',
+              'sphinx_toolbox.more_autodoc.autonamedtuple']
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
@@ -46,3 +47,4 @@ html_theme_path = ["_themes"]
 html_css_files = [
     'css/fix-rtd-property.css' # workaround readthedocs/sphinx_rtd_theme#1301
 ]
+

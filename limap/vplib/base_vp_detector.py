@@ -2,10 +2,15 @@ import numpy as np
 import joblib
 from tqdm import tqdm
 
-from collections import namedtuple
-BaseVPDetectorOptions = namedtuple("BaseVPDetectorOptions",
-                                   ["n_jobs"],
-                                   defaults = [1])
+import collections
+from typing import NamedTuple
+class BaseVPDetectorOptions(NamedTuple):
+    """
+    Base options for the vanishing point detector
+
+    :param n_jobs: number of jobs at multi-processing (please make sure not to exceed the GPU memory limit with learning methods)
+    """
+    n_jobs: int = 1
 
 class BaseVPDetector():
     def __init__(self, options = BaseVPDetectorOptions()):
@@ -13,18 +18,31 @@ class BaseVPDetector():
 
     # Module name needs to be set
     def get_module_name(self):
+        """
+        Virtual method (need to be implemented) - return the name of the module
+        """
         raise NotImplementedError
     # The functions below are required for VP detectors
     def detect_vp(self, lines, camview=None):
         '''
-        Input:
-        - lines     type: std::vector<limap.base.Line2d>
-        Output:
-        - vpresult  type: limap.vplib.VPResult
+        Virtual method - detect vanishing points
+
+        Args:
+            lines (list[:class:`limap.base.Line2d`]): list of input 2D lines.
+            camview (:class:`limap.base.CameraView`): optional, the `limap.base.CameraView` instance corresponding to the image.
+        Returns:
+            vpresult  type: list[:class:`limap.vplib.VPResult`]
         '''
         raise NotImplementedError
 
     def detect_vp_all_images(self, all_lines, camviews=None):
+        '''
+        Detect vanishing points on multiple images with multiple processes
+
+        Args:
+            all_lines (dict[int, list[:class:`limap.base.Line2d`]]): map storing all the lines for each image
+            camviews (dict[int, :class:`limap.base.CameraView`]): optional, the `limap.base.CameraView` instances, each corresponding to one image
+        '''
         def process(self, lines):
             return self.detect_vp(lines)
         def process_camview(self, lines, camview):
