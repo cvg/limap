@@ -1,0 +1,22 @@
+# global config
+dir_save: "tmp" 
+n_neighbors: 20
+
+# loading config 
+load_meta: False
+dir_load: null
+skip_exists: False
+
+# sfm config
+sfm: 
+    colmap_output_path: "colmap_outputs"
+    reuse: False
+    min_triangulation_angle: 1.0
+    neighbor_type: "dice" # ["overlap", "iou", "dice"]
+    ranges:
+        range_robust: [0.05, 0.95]
+        k_stretch: 1.25
+    hloc:
+        descriptor: "superpoint_aachen"
+        matcher: "NN-superpoint"
+
