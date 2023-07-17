@@ -1,5 +1,5 @@
 python -m pip install -Ive ..
-touch index.rst
+touch *.rst
 touch tutorials/*
 touch api/*
 # touch api/*.rst
