@@ -27,17 +27,17 @@ logger.propagate = False
 
 def parse_args():
     arg_parser = argparse.ArgumentParser(description='minimal test for visual localization with points and lines')
-    arg_parser.add_argument('--data', type=Path, default='runners/tests/localization_test_data_stairs_1.npy',
+    arg_parser.add_argument('--data', type=Path, default='runners/tests/data/localization/localization_test_data_stairs_1.npy',
                             help='Path to test data file, default: %(default)s')
     arg_parser.add_argument('--outputs', type=Path, default='outputs/test/localization',
                             help='Path to the output directory, default: %(default)s')
-    arg_parser.add_argument('--ransac_method', choices=['ransac', 'solver', 'hybrid'], default='hybrid', 
+    arg_parser.add_argument('--ransac_method', choices=['ransac', 'solver', 'hybrid'], default='hybrid',
                             help='RANSAC method')
-    arg_parser.add_argument('--thres', type=float, default=5.0, 
+    arg_parser.add_argument('--thres', type=float, default=5.0,
                             help='Threshold for RANSAC/Solver first RANSAC, default: %(default)s')
-    arg_parser.add_argument('--thres_point', type=float, default=5.0, 
+    arg_parser.add_argument('--thres_point', type=float, default=5.0,
                             help='Threshold for points in hybrid RANSAC, default: %(default)s')
-    arg_parser.add_argument('--thres_line', type=float, default=5.0, 
+    arg_parser.add_argument('--thres_line', type=float, default=5.0,
                             help='Threshold for lines in hybrid RANSAC, default: %(default)s')
     arg_parser.add_argument('--line2d_matcher', type=str, default='sold2',
                             help='2D matcher for lines, default: %(default)s')
@@ -69,7 +69,7 @@ def main():
 
     final_pose, ransac_stats = _estimators.pl_estimate_absolute_pose(
                 cfg, l3ds, l3d_ids, l2ds, p3ds, p2ds, cam, silent=True, logger=logger)
-    
+
     # Let's Check some RANSAC status
     log = "RANSAC stats: \n"
     log += f"num_iterations_total: {ransac_stats.num_iterations_total}\n"
@@ -79,7 +79,7 @@ def main():
     logger.info(log)
 
     R_gt, t_gt = data['pose_gt'].R(), data['pose_gt'].tvec
-    
+
     log = "Results: \n"
     log += f"Result(P+L) Pose (qvec, tvec): {final_pose.qvec}, {final_pose.tvec}\n"
     log += f"HLoc(Point) Pose (qvec, tvec): {data['pose_point'].qvec}, {data['pose_point'].tvec}\n"
@@ -96,7 +96,7 @@ def main():
     cos = np.clip((np.trace(np.dot(R_gt.T, R)) - 1) / 2, -1., 1.)
     e_R = np.rad2deg(np.abs(np.arccos(cos)))
     log += f'HLoc(Point) Pose errors: {e_t:.3f}m, {e_R:.3f}deg'
-    
+
     logger.info(log)
 
     inlier_indices = ransac_stats.inlier_indices
@@ -134,3 +134,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
