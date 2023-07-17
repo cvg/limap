@@ -13,10 +13,15 @@ import limap.visualize as limapvis
 
 def fit_3d_segs(all_2d_segs, imagecols, depths, fitting_config):
     '''
+    Fit 3D line segments over points produced by depth unprojection
+
     Args:
-    - all_2d_segs: map<int, np.adarray>
-    - imagecols: limap.base.ImageCollection
-    - depths: map<int, CustomizedDepthReader>, where CustomizedDepthReader inherits _base.BaseDepthReader
+        all_2d_segs (dict[int -> :class:`np.adarray`]): All the 2D line segments for each image
+        imagecols (:class:`limap.base.ImageCollection`): The image collection of all images of interest
+        depths (dict[int -> :class:`CustomizedDepthReader`], where :class:`CustomizedDepthReader` inherits :class:`limap.base.depth_reader_base.BaseDepthReader`): The depth map readers for each image
+        fitting_config (dict): Configuration, fields refer to :file:`cfgs/examples/fitting_3Dline.yaml`
+    Returns:
+        output (dict[int -> list[(:class:`np.array`, :class:`np.array`)]]): for each image, output a list of :class:`np.array` pair, representing two endpoints
     '''
     n_images = len(all_2d_segs)
     seg3d_list = []
@@ -40,10 +45,15 @@ def fit_3d_segs(all_2d_segs, imagecols, depths, fitting_config):
 
 def fit_3d_segs_with_points3d(all_2d_segs, imagecols, p3d_reader, fitting_config, inloc_dataset=None):
     '''
+    Fit 3D line segments over a set of 3D points
+
     Args:
-    - all_2d_segs: map<int, np.adarray>
-    - imagecols: limap.base.ImageCollection
-    - p3d_reader: CustomizedP3Dreader inherits _base.BaseP3Dreader
+        all_2d_segs (dict[int -> :class:`np.adarray`]): All the 2D line segments for each image
+        imagecols (:class:`limap.base.ImageCollection`): The image collection of all images of interest
+        p3d_reader (dict[int -> :class:`CustomizedP3DReader`], where :class:`CustomizedP3DReader` inherits :class:`limap.base.p3d_reader_base.BaseP3DReader`): The point cloud readers for each image
+        fitting_config (dict): Configuration, fields refer to :file:`cfgs/examples/fitting_3Dline.yaml`
+    Returns:
+        output (dict[int -> list[(:class:`np.array`, :class:`np.array`)]]): for each image, output a list of :class:`np.array` pair, representing two endpoints
     '''
     seg3d_list = []
     def process(all_2d_segs, imagecols, p3d_reader, fitting_config, img_id):
@@ -66,9 +76,16 @@ def fit_3d_segs_with_points3d(all_2d_segs, imagecols, p3d_reader, fitting_config
 
 def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     '''
+    Line reconstruction over multi-view RGB images given depths
+
     Args:
-    - imagecols: limap.base.ImageCollection
-    - depths: map<int, CustomizedDepthReader>, where CustomizedDepthReader inherits _base.BaseDepthReader
+        cfg (dict): Configuration. Fields refer to :file:`cfgs/fitnmerge/default.yaml` as an example
+        imagecols (:class:`limap.base.ImageCollection`): The image collection corresponding to all the images of interest
+        depths (dict[int -> :class:`CustomizedDepthReader`], where :class:`CustomizedDepthReader` inherits :class:`limap.base.depth_reader_base.BaseDepthReader`): The depth map readers for each image
+        neighbors (dict[int -> list[int]], optional): visual neighbors for each image. By default we compute neighbor information from the covisibility of COLMAP triangulation.
+        ranges (pair of :class:`np.array` each of shape (3,), optional): robust 3D ranges for the scene. By default we compute range information from the COLMAP triangulation.
+    Returns:
+        list[:class:`limap.base.LineTrack`]: list of output 3D line tracks
     '''
     # assertion check
     assert imagecols.IsUndistorted() == True
@@ -165,9 +182,16 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
 
 def line_fitting_with_3Dpoints(cfg, imagecols, p3d_readers, inloc_read_transformations=False):
     '''
+    Line reconstruction over multi-view images with its point cloud
+
     Args:
-    - imagecols: limap.base.ImageCollection
-    - p3d_readers: map<int, CustomizedP3DReader>, where CustomizedP3DReader inherits _base.P3DReader
+        cfg (dict): Configuration. Fields refer to :file:`cfgs/fitnmerge/default.yaml` as an example
+        imagecols (:class:`limap.base.ImageCollection`): The image collection corresponding to all the images of interest
+        p3d_reader (dict[int -> :class:`CustomizedP3DReader`], where :class:`CustomizedP3DReader` inherits :class:`limap.base.p3d_reader_base.BaseP3DReader`): The point cloud readers for each image
+        neighbors (dict[int -> list[int]], optional): visual neighbors for each image. By default we compute neighbor information from the covisibility of COLMAP triangulation.
+        ranges (pair of :class:`np.array` each of shape (3,), optional): robust 3D ranges for the scene. By default we compute range information from the COLMAP triangulation.
+    Returns:
+        list[:class:`limap.base.LineTrack`]: list of output 3D line tracks
     '''
     # assertion check
     assert imagecols.IsUndistorted() == True
@@ -209,3 +233,4 @@ def line_fitting_with_3Dpoints(cfg, imagecols, p3d_readers, inloc_read_transform
             track = _base.LineTrack(l3d, [img_id], [line_id], [l2d])
             linetracks.append(track)
     return linetracks
+

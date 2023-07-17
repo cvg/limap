@@ -32,10 +32,3 @@ limap.runners.line\_triangulation module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
-
-.. automodule:: limap.runners
-   :members:
-   :undoc-members:
-   :show-inheritance:
