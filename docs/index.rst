@@ -41,5 +41,5 @@ In this project, we provide interfaces for various geometric operations on 2D/3D
    :maxdepth: 1
    :caption: Community: 
 
-   contributors
+   developers
 

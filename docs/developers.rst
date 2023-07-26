@@ -1,4 +1,4 @@
-Contributors
+Main developers
 ==================
 
 * Shaohui Liu (`B1ueber2y <https://github.com/B1ueber2y>`_)
