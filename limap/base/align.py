@@ -120,6 +120,9 @@ def align_imagecols_colmap(imagecols_src, imagecols_dst, max_error = 0.01, tmp_f
     t = transform[:3, 3]
     transform = _base.SimilarityTransform3(R, t, scale)
     imagecols_aligned = imagecols_src.apply_similarity_transform(transform)
+
+    # delete tmp folder
+    limapio.delete_folder(tmp_folder)
     return transform, imagecols_aligned
 
 def align_imagecols(imagecols_src, imagecols_dst, max_error = 0.01):
