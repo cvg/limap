@@ -13,7 +13,7 @@ Specifically, to run the line mapping on a set of images, first pose the images 
 
     python runners/colmap_triangulation.py -c ${CONFIG_FILE} -a ${COLMAP_FOLDER} --output_path ${OUTPUT_PATH}
 
-And the line maps will be stored in the specified output folder. To use point SfM to improve robustness, add additional option ``--triangulation.usepointsfm.enable --triangulation.use_pointsfm.colmap_folder ${COLMAP_FOLDER}`` in the end of the command.
+And the line maps will be stored in the specified output folder. To use point SfM to improve robustness, add additional option ``--triangulation.use_pointsfm.enable --triangulation.use_pointsfm.colmap_folder ${COLMAP_FOLDER}`` in the end of the command.
 
 The interface for Bundler, VisualSfM and other datasets are all stored in the ``runners`` folder, building on top of the main interface :py:meth:`limap.runners.line_triangulation` API.
 
