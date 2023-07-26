@@ -1161,6 +1161,8 @@ void bind_camera(py::module& m) {
             Returns:
                 bool: True if all camera models are undistorted.
         )");
+
+        m.def("pose_similarity_transform", &pose_similarity_transform);
 }
 
 void bind_pointtrack(py::module& m) {
