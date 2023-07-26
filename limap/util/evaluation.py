@@ -19,11 +19,11 @@ def compute_pose_err(pose, pose_gt):
     rot_err = compute_rot_err(pose.R(), pose_gt.R())
     return trans_err, rot_err
 
-def eval_imagecols(imagecols, imagecols_gt, enable_logging=True):
+def eval_imagecols(imagecols, imagecols_gt, max_error = 0.01, enable_logging=True):
     if enable_logging:
         print("[LOG EVAL] imagecols.NumImages() = {0}".format(imagecols.NumImages()))
         print("[LOG EVAL] imagecols_gt.NumImages() = {0}".format(imagecols_gt.NumImages()))
-    _, imagecols_aligned = _base.align_imagecols(imagecols, imagecols_gt.subset_by_image_ids(imagecols.get_img_ids()))
+    _, imagecols_aligned = _base.align_imagecols(imagecols, imagecols_gt.subset_by_image_ids(imagecols.get_img_ids()), max_error = max_error)
     shared_img_ids = list(set(imagecols.get_img_ids()) & set(imagecols_gt.get_img_ids()))
     assert len(shared_img_ids) == imagecols.NumImages();
     imagecols_gt = imagecols_gt.subset_by_image_ids(shared_img_ids)
