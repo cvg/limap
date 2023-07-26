@@ -4,12 +4,12 @@ Localization with points & lines
 Currently, runner scripts are provided to run visual localization integrating line along with point features on the following Datasets: 
 
 * `7Scenes Dataset <https://www.microsoft.com/en-us/research/project/rgb-d-dataset-7-scenes/>`_
-* `Cambridge Landmarks Dataset <https://www.repository.cam.ac.uk/handle/1810/251342>`_
+* `Cambridge Landmarks Dataset <https://arxiv.org/abs/1505.07427>`_
 * `InLoc Dataset <http://www.ok.sc.e.titech.ac.jp/INLOC/>`_
 
 Please follow hloc's guide for downloading and preparing Cambridge and 7Scenes dataset:
 
-* `7Scenes <https://arxiv.org/abs/1505.07427>`_
+* `7Scenes <https://github.com/cvg/Hierarchical-Localization/tree/master/hloc/pipelines/7Scenes>`_
 * `Cambridge <https://github.com/cvg/Hierarchical-Localization/tree/master/hloc/pipelines/Cambridge>`_
 
 Use ``runners/<dataset>/localization.py`` to run localization experiments on these supported datasets, use ``--help`` option and take a look at ``cfgs/localization`` folder for all the possible options and configurations.
