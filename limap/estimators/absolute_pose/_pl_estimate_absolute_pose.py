@@ -4,28 +4,8 @@ import limap.estimators as _estimators
 import limap.base as _base
 import numpy as np
 
-def pl_estimate_absolute_pose(cfg, l3ds, l3d_ids, l2ds, p3ds, p2ds, camera, campose=None, 
-                     inliers_line=None, inliers_point=None, jointloc_cfg=None, silent=True, logger=None):
-    """
-    Estimate absolute camera pose of a image from matched 2D-3D line and point correspondences.
-
-    :param cfg:             dict, fields refer to "localization" section in `cfgs/localization/default.yaml`
-    :param l3ds:            iterable of limap.base.Line3d
-    :param l3d_ids:         iterable of int, indices into l3ds for match of each Line2d in `l2ds`, same length of `l2ds`
-    :param l2ds:            iterable of limap.base.Line2d, matched 2d lines, same length of `l3d_ids`
-    :param p3ds:            iterable of np.array, matched 3D points, same length of `p2ds`
-    :param p2ds:            iterable of np.array, matched 2D points, same length of `p3ds`
-    :param camera:          limap.base.Camera, camera of the query image
-    :param campose:         limap.base.CameraPose (optional), initial camera pose, only useful for pose refinement 
-                            (when cfg["ransac"]["method"] is None)
-    :param inliers_line:    iterable of int (optional), indices of line inliers, only useful for pose refinement
-    :param inliers_point:   iterable of int (optional), indices of point inliers, only useful for pose refinement
-    :param jointloc_cfg:    dict (optional), fields corresponding to limap.optimize.LineLocConfig, pass None for default (or set in 'optimize' fields in cfg)
-    :param silent:          boolean (optional), turn off to print logs during Ceres optimization
-    :param logger:          logging.Logger (optional), print logs for information
-
-    :return: tuple<limap.base.CameraPose, limap.estimators.RansacStatistics>, estimated pose and ransac statistics.
-    """ 
+def _pl_estimate_absolute_pose(cfg, l3ds, l3d_ids, l2ds, p3ds, p2ds, camera, campose=None,
+                               inliers_line=None, inliers_point=None, jointloc_cfg=None, silent=True, logger=None):
     if jointloc_cfg is None:
         jointloc_cfg = {}
         if cfg.get('optimize'):

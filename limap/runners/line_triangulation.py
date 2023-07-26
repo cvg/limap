@@ -14,8 +14,15 @@ import limap.visualize as limapvis
 
 def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     '''
+    Main interface of line triangulation over multi-view images.
+
     Args:
-    - imagecols: limap.base.ImageCollection
+        cfg (dict): Configuration. Fields refer to :file:`cfgs/triangulation/default.yaml` as an example
+        imagecols (:class:`limap.base.ImageCollection`): The image collection corresponding to all the images of interest
+        neighbors (dict[int -> list[int]], optional): visual neighbors for each image. By default we compute neighbor information from the covisibility of COLMAP triangulation.
+        ranges (pair of :class:`np.array` each of shape (3,), optional): robust 3D ranges for the scene. By default we compute range information from the COLMAP triangulation.
+    Returns:
+        list[:class:`limap.base.LineTrack`]: list of output 3D line tracks
     '''
     print("[LOG] Number of images: {0}".format(imagecols.NumImages()))
     cfg = _runners.setup(cfg)
@@ -24,7 +31,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
         cfg["triangulation"]["var2d"] = cfg["var2d"][detector_name]
     # undistort images
     if not imagecols.IsUndistorted():
-        imagecols = _runners.undistort_images(imagecols, os.path.join(cfg["dir_save"], cfg["undistortion_output_dir"]), load_undistort=cfg["load_undistort"] or cfg["skip_exists"], n_jobs=cfg["n_jobs"])
+        imagecols = _runners.undistort_images(imagecols, os.path.join(cfg["dir_save"], cfg["undistortion_output_dir"]), skip_exists=cfg["load_undistort"] or cfg["skip_exists"], n_jobs=cfg["n_jobs"])
     # resize cameras
     assert imagecols.IsUndistorted() == True
     if cfg["max_image_dim"] != -1 and cfg["max_image_dim"] is not None:

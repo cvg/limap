@@ -4,6 +4,17 @@ import numpy as np
 import copy
 
 def UndistortImageCamera(camera, imname_in, imname_out):
+    """
+    Run COLMAP undistortion on one single image with an input camera. The undistortion is only applied if the camera model is neither "SIMPLE_PINHOLE" nor "PINHOLE".
+
+    Args:
+        camera (:class:`limap.base.Camera`): The camera (type + parameters) for the image.
+        imname_in (str): filename for the input image
+        imname_out (str): filename for the output undistorted image
+
+    Returns:
+        :class:`limap.base.Camera`: The undistorted camera
+    """
     if camera.IsUndistorted(): # no distortion
         img = cv2.imread(imname_in)
         cv2.imwrite(imname_out, img)
@@ -22,5 +33,16 @@ def UndistortImageCamera(camera, imname_in, imname_out):
     return camera_undistorted
 
 def UndistortPoints(points, distorted_camera, undistorted_camera):
+    """
+    Run COLMAP undistortion on the keypoints.
+
+    Args:
+        points (list[:class:`np.array`]): List of 2D keypoints on the distorted image
+        distorted_camera (:class:`limap.base.Camera`): The camera before undistortion
+        undistorted_camera (:class:`limap.base.Camera`): The camera after undistortion
+
+    Returns:
+        list[:class:`np.array`]: List of the corresponding 2D keypoints on the undistorted image
+    """
     return _undistortion._UndistortPoints(points, distorted_camera, undistorted_camera)
 

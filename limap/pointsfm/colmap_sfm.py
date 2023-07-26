@@ -71,14 +71,9 @@ def run_hloc_matches(cfg, image_path, db_path, keypoints=None, neighbors=None, i
     feature_conf = extract_features.confs[cfg["descriptor"]]
     matcher_conf = match_features.confs[cfg["matcher"]]
 
-    if keypoints is not None and keypoints != []:
-        if cfg["descriptor"][:10] != "superpoint":
-            raise ValueError("Error! Non-superpoint feature extraction is unfortunately not supported in the current implementation.")
-        # run superpoint
-        from limap.point2d import run_superpoint
-        feature_path = run_superpoint(feature_conf, image_path, outputs, keypoints=keypoints)
-    else:
-        feature_path = extract_features.main(feature_conf, image_path, outputs)
+    # run superpoint
+    from limap.point2d import run_superpoint
+    feature_path = run_superpoint(feature_conf, image_path, outputs, keypoints=keypoints)
     if neighbors is None or imagecols is None:
         # run exhaustive matches
         sfm_pairs = outputs / "pairs-exhaustive.txt"
@@ -92,8 +87,7 @@ def run_hloc_matches(cfg, image_path, db_path, keypoints=None, neighbors=None, i
     sfm_dir.mkdir(parents=True, exist_ok=True)
     reconstruction.create_empty_db(db_path)
     if imagecols is None:
-        import pycolmap
-        reconstruction.import_images(image_dir=image_path, database_path=db_path, camera_mode=pycolmap.CameraMode.AUTO)
+        reconstruction.import_images(image_dir=image_path, database_path=db_path)
     else:
         # use the id mapping from imagecols
         import_images_with_known_cameras(image_path, db_path, imagecols) # use cameras and id mapping
@@ -206,5 +200,5 @@ def run_colmap_sfm_with_known_poses(cfg, imagecols, output_path='tmp/tmp_colmap'
         for img_id in imagecols.get_img_ids():
             colmap_images[img_id] = colmap_images[img_id]._replace(name = imagecols.image_name(img_id))
         colmap_utils.write_images_binary(colmap_images, fname_images_bin)
-    return Path(point_triangulation_path)
 
+    return Path(point_triangulation_path)

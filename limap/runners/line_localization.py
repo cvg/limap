@@ -68,29 +68,27 @@ def get_hloc_keypoints_from_log(logs, query_img_name, ref_sfm=None, resize_scale
 
     return p2ds, p3ds, inliers
 
-def line_localization(cfg, imagecols_db, imagecols_query, point_corresp, linemap_db, retrieval, results_path,
-                      img_name_dict=None, logger=None):
+def line_localization(cfg, imagecols_db, imagecols_query, point_corresp, linemap_db, retrieval, results_path, img_name_dict=None, logger=None):
     """
     Run visual localization on query images with `imagecols`, it takes 2D-3D point correspondences from HLoc;
     runs line matching using 2D line matcher ("epipolar" for Gao et al. "Pose Refinement with Joint Optimization of Visual Points and Lines");
-    calls limap.estimators.pl_estimate_absolute_pose to estimate the absolute camera pose for all query images,
+    calls :func:`~limap.estimators.absolute_pose.pl_estimate_absolute_pose` to estimate the absolute camera pose for all query images,
     and writes results in results file in `results_path`.
 
-    :param cfg:             dict, configurations which fields refer to `cfgs/localization/default.yaml`
-    :param imagecols_db:    limap.base.ImageCollection of database images, with triangulated camera poses
-    :param imagecols_query: limap.base.ImageCollection of query images, camera poses only used for epipolar matcher/filter as coarse poses,
-                            can be left uninitialized otherwise
-    :param point_corresp:   dict, map query image IDs to extracted point correspondences for the query image,
-                            point correspondences for each image ID stored as a dict with keys 'p2ds', 'p3ds', and optionally 'inliers'
-    :param linemap_db:      iterable of limap.base.LineTrack, LIMAP triangulated/fitted database line tracks
-    :param retrieval:       dict, map query image file path to list of neighbor image file paths,
-                            e.g. returned from hloc.utils.parsers.parse_retrieval
-    :param results_path:    str or Path, file path to write the localization results
-    :param img_name_dict:   dict (optional), map query image IDs to the image file path, by default the image names from `imagecols`
-    :param logger:          logging.Logger (optional), print logs for more information
+    Args:
+        cfg (dict): Configuration, fields refer to :file:`cfgs/localization/default.yaml`
+        imagecols_db (:class:`limap.base.ImageCollection`): Image collection of database images, with triangulated camera poses
+        imagecols_query (:class:`limap.base.ImageCollection`): Image collection of query images, camera poses only used for epipolar matcher/filter as coarse poses, can be left uninitialized otherwise
+        linemap_db (list[:class:`limap.base.LineTrack`]): LIMAP triangulated/fitted line tracks
+        retrieval (dict): Mapping of query image file path to list of neighbor image file paths, e.g. returned from :func:`hloc.utils.parsers.parse_retrieval`
+        results_path (str | Path): File path to write the localization results
+        img_name_dict(dict, optional): Mapping of query image IDs to the image file path, by default the image names from `imagecols`
+        logger (:class:`logging.Logger`, optional): Logger to print logs for information
 
-    :return: Dict<int: limap.base.CameraPose>, mapping of query image IDs to the localized camera poses for all query images.
-    """
+    Returns:
+        Dict[int -> :class:`limap.base.CameraPose`]: Mapping of query image IDs to the localized camera poses for all query images.
+    """ 
+
     if cfg['localization']['2d_matcher'] not in ['epipolar', 'sold2', 'superglue_endpoints', 'gluestick', 'linetr', 'lbd', 'l2d2']:
         raise ValueError("Unknown 2d line matcher: {}".format(cfg['localization']['2d_matcher']))
 

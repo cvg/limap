@@ -19,7 +19,7 @@ namespace limap {
 void bind_pose(py::module& m);
 void bind_ransaclib(py::module& m) {
     using ExtendedHybridLORansacOptions = estimators::ExtendedHybridLORansacOptions;
-    py::class_<ransac_lib::RansacStatistics>(m, "RansacStats")
+    py::class_<ransac_lib::RansacStatistics>(m, "RansacStatistics")
         .def(py::init<>())
         .def_readwrite("num_iterations", &ransac_lib::RansacStatistics::num_iterations)
         .def_readwrite("best_num_inliers", &ransac_lib::RansacStatistics::best_num_inliers)
@@ -36,7 +36,7 @@ void bind_ransaclib(py::module& m) {
         .def_readwrite("squared_inlier_threshold_", &ransac_lib::RansacOptions::squared_inlier_threshold_)
         .def_readwrite("random_seed_", &ransac_lib::RansacOptions::random_seed_);
 
-    py::class_<ransac_lib::LORansacOptions>(m, "LORansacOptions")
+    py::class_<ransac_lib::LORansacOptions>(m, "LORansacOptions", "Inherits :class:`~limap.estimators.RansacOptions`")
         .def(py::init<>())
         .def_readwrite("min_num_iterations_", &ransac_lib::LORansacOptions::min_num_iterations_)
         .def_readwrite("max_num_iterations_", &ransac_lib::LORansacOptions::max_num_iterations_)
@@ -52,7 +52,7 @@ void bind_ransaclib(py::module& m) {
         .def_readwrite("final_least_squares_", &ransac_lib::LORansacOptions::final_least_squares_);
     
     // hybrid ransac
-    py::class_<ransac_lib::HybridRansacStatistics>(m, "HybridRansacStatistics")
+    py::class_<ransac_lib::HybridRansacStatistics>(m, "HybridRansacStatistics", "Inherits :class:`~limap.estimators.RansacStatistics`")
         .def(py::init<>())
         .def_readwrite("num_iterations_total", &ransac_lib::HybridRansacStatistics::num_iterations_total)
         .def_readwrite("num_iterations_per_solver", &ransac_lib::HybridRansacStatistics::num_iterations_per_solver)
@@ -62,24 +62,8 @@ void bind_ransaclib(py::module& m) {
         .def_readwrite("inlier_ratios", &ransac_lib::HybridRansacStatistics::inlier_ratios)
         .def_readwrite("inlier_indices", &ransac_lib::HybridRansacStatistics::inlier_indices)
         .def_readwrite("number_lo_iterations", &ransac_lib::HybridRansacStatistics::number_lo_iterations);
-
-    py::class_<ransac_lib::HybridLORansacOptions>(m, "HybridLORansacOptions")
-        .def(py::init<>())
-        .def_readwrite("min_num_iterations_", &ransac_lib::HybridLORansacOptions::min_num_iterations_)
-        .def_readwrite("max_num_iterations_", &ransac_lib::HybridLORansacOptions::max_num_iterations_)
-        .def_readwrite("max_num_iterations_per_solver_", &ransac_lib::HybridLORansacOptions::max_num_iterations_per_solver_)
-        .def_readwrite("success_probability_", &ransac_lib::HybridLORansacOptions::success_probability_)
-        .def_readwrite("squared_inlier_thresholds_", &ransac_lib::HybridLORansacOptions::squared_inlier_thresholds_)
-        .def_readwrite("data_type_weights_", &ransac_lib::HybridLORansacOptions::data_type_weights_)
-        .def_readwrite("random_seed_", &ransac_lib::HybridLORansacOptions::random_seed_)
-        .def_readwrite("num_lo_steps_", &ransac_lib::HybridLORansacOptions::num_lo_steps_)
-        .def_readwrite("threshold_multiplier_", &ransac_lib::HybridLORansacOptions::threshold_multiplier_)
-        .def_readwrite("num_lsq_iterations_", &ransac_lib::HybridLORansacOptions::num_lsq_iterations_)
-        .def_readwrite("min_sample_multiplicator_", &ransac_lib::HybridLORansacOptions::min_sample_multiplicator_)
-        .def_readwrite("lo_starting_iterations_", &ransac_lib::HybridLORansacOptions::lo_starting_iterations_)
-        .def_readwrite("final_least_squares_", &ransac_lib::HybridLORansacOptions::final_least_squares_);
     
-    py::class_<ExtendedHybridLORansacOptions>(m, "ExtendedHybridLORansacOptions")
+    py::class_<ExtendedHybridLORansacOptions>(m, "HybridLORansacOptions", "Inherits :class:`~limap.estimators.LORansacOptions`")
         .def(py::init<>())
         .def_readwrite("min_num_iterations_", &ExtendedHybridLORansacOptions::min_num_iterations_)
         .def_readwrite("max_num_iterations_", &ExtendedHybridLORansacOptions::max_num_iterations_)

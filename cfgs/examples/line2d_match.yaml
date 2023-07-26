@@ -1,0 +1,22 @@
+# global config
+dir_save: "tmp" 
+
+# loading config 
+load_match: False
+dir_load: null
+skip_exists: False
+
+# line matching config
+line2d:
+    detector: 
+        method: "deeplsd" # ["lsd", "sold2", "hawpv3", "tp_lsd", "deeplsd"]
+    extractor: 
+        method: "wireframe" # ["sold2", "lbd", "l2d2", "linetr", "superpoint_endpoints", "wireframe"]
+    matcher:
+        method: "gluestick" # ["sold2", "lbd", "l2d2", "linetr", "nn_endpoints", "superglue_endpoints", "gluestick"]
+        n_jobs: 1
+        topk: 10
+        skip_exists: False
+        superglue:
+            weights: "outdoor" # ["indoor", "outdoor"] for selecting superglue models
+

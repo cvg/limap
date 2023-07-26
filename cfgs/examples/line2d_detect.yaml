@@ -1,0 +1,22 @@
+# global config
+dir_save: "tmp" 
+
+# loading config 
+load_det: False
+dir_load: null
+skip_exists: False
+
+# line detection and description config
+line2d:
+    max_num_2d_segs: 3000
+    do_merge_lines: False 
+    visualize: False
+    save_l3dpp: False
+    compute_descinfo: False
+    detector: 
+        method: "deeplsd" # ["lsd", "sold2", "hawpv3", "tp_lsd", "deeplsd"]
+        skip_exists: False
+    extractor: 
+        method: "wireframe" # ["sold2", "lbd", "l2d2", "linetr", "superpoint_endpoints", "wireframe"]
+        skip_exists: False
+
