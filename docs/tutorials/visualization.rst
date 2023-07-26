@@ -1,7 +1,7 @@
 Visualization
 =================================
 
-We provide the visualization interface at `here <https://github.com/cvg/limap/blob/main/visualize_3d_lines.py>`_ to visualize the reconstructed line maps. Optionally, the camera frustums can also be visualized with an additional :class:`limap.base.ImageCollection` instance as the input. An example visualization command could be:
+We provide the visualization interface `here <https://github.com/cvg/limap/blob/main/visualize_3d_lines.py>`_ to visualize the reconstructed line maps. Optionally, the camera frustums can also be visualized with an additional :class:`limap.base.ImageCollection` instance as the input. An example visualization command could be:
 
 .. code-block:: bash
 
