@@ -1,4 +1,4 @@
-RANSAC Options and Statistics
+RANSAC options and statistics
 ==============================
 
 .. autoclass:: limap.estimators.RansacStatistics

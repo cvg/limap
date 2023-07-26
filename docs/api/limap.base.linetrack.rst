@@ -1,4 +1,4 @@
-Line Track
+Line track
 ================
 
 .. autoclass:: limap.base.LineTrack

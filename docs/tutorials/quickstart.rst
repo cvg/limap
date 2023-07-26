@@ -13,17 +13,24 @@ For this example we are using the first scene ``ai_001_001`` from `Hypersim <htt
 
     bash scripts/quickstart.sh
 
-To run line mapping using **Line Triangulation** on Hypersim:
+To run line mapping using **Line Mapping** (RGB-only) on Hypersim:
 
 .. code-block:: bash
 
     python runners/hypersim/triangulation.py --output_dir outputs/quickstart_triangulation
 
-To run line mapping using **Fit&Merge** on Hypersim:
+To run line mapping using **Fitnmerge** (line mapping with available depth maps) on Hypersim:
 
 .. code-block:: bash
 
     python runners/hypersim/fitnmerge.py --output_dir outputs/quickstart_fitnmerge
+
+To run **Visualization** of the 3D line maps after the reconstruction:
+
+.. code-block:: bash
+
+    python visualize_3d_lines.py --input_dir outputs/quickstart_triangulation/finaltracks \
+                                 # add the camera frustums with "--imagecols outputs/quickstart_triangulation/imagecols.npy"
 
 [**Tips**] Options are stored in the config folder: ``cfgs``. You can easily change the options with the Python argument parser. Here's an example:
 

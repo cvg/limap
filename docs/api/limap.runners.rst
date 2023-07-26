@@ -1,34 +1,12 @@
 limap.runners package
 =====================
 
-limap.runners.functions module
-------------------------------
+.. toctree::
+   :maxdepth: 3
+   :caption: Module Contents: 
 
-.. automodule:: limap.runners.functions
-   :members:
-   :show-inheritance:
-
-limap.runners.line\_fitnmerge module
-------------------------------------
-
-.. automodule:: limap.runners.line_fitnmerge
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-limap.runners.line\_localization module
----------------------------------------
-
-.. automodule:: limap.runners.line_localization
-   :members:
-   :show-inheritance:
-
-
-limap.runners.line\_triangulation module
-----------------------------------------
-
-.. automodule:: limap.runners.line_triangulation
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   limap.runners.line_triangulation
+   limap.runners.line_fitnmerge
+   limap.runners.line_localization
+   limap.runners.functions
 

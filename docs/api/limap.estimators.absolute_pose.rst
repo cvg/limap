@@ -1,4 +1,4 @@
-limap.estimators.absolute\_pose package
+Estimate absolute pose
 =======================================
 
 .. automodule:: limap.estimators.absolute_pose

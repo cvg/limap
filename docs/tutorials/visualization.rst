@@ -1,2 +1,2 @@
-Line triangulation
+Visualization
 =================================

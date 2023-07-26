@@ -1,10 +1,9 @@
 limap.undistortion package
 ==========================
 
-limap.undistortion.undistort module
------------------------------------
+.. toctree::
+   :maxdepth: 3
+   :caption: Module Contents: 
 
-.. automodule:: limap.undistortion.undistort
-   :members:
-   :show-inheritance:
+   limap.undistortion.undistortion
 

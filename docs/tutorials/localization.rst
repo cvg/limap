@@ -1,4 +1,4 @@
-Localization with Points & Lines
+Localization with points & lines
 =================================
 
 Currently, runner scripts are provided to run visual localization integrating line along with point features on the following Datasets: 

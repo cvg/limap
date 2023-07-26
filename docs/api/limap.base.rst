@@ -5,10 +5,10 @@ limap.base package
    :maxdepth: 3
    :caption: Module Contents: 
 
+   limap.base.camera
    limap.base.lines
    limap.base.line_dists
    limap.base.linetrack
-   limap.base.camera
    limap.base.reader
 
 .. toctree::

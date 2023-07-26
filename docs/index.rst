@@ -16,8 +16,10 @@ LIMAP is a toolbox for mapping and localization with line features.
 
    tutorials/installation
    tutorials/quickstart
+   tutorials/line2d
    tutorials/triangulation
    tutorials/localization
+   tutorials/visualization
 
 .. toctree::
    :maxdepth: 2

@@ -1,13 +1,10 @@
 limap.triangulation package
 ===========================
 
-Submodules
-----------
+.. toctree::
+   :maxdepth: 3
+   :caption: Module Contents: 
 
-limap.triangulation.triangulation module
-----------------------------------------
+   limap.triangulation.triangulation
 
-.. automodule:: limap.triangulation.triangulation
-   :members:
-   :show-inheritance:
 

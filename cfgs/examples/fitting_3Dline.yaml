@@ -1,0 +1,8 @@
+
+# fitting config
+fitting:
+    var2d: 4.0 # This is for DeepLSD. This hyperparameter should depend on the detector
+    ransac_th: 0.75
+    min_percentage_inliers: 0.9
+    n_jobs: 4
+

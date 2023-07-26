@@ -1,13 +1,10 @@
 limap.visualize package
 =======================
 
-limap.visualize.vis\_lines module
------------------------------------
-
 .. toctree::
    :maxdepth: 4
+   :caption: Module Contents: 
 
-.. automodule:: limap.visualize.vis_lines
-   :members:
-   :show-inheritance:
+   limap.visualize.vis_lines
+
 

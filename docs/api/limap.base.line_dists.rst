@@ -1,4 +1,4 @@
-Line Distance
+Line distance
 ================
 
 .. autoclass:: limap.base.LineDistType
