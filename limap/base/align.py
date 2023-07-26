@@ -49,8 +49,7 @@ def umeyama_alignment(x, y, with_scale=True):
     t = mean_y - np.multiply(c, r.dot(mean_x))
     return r, t, c
 
-def align_imagecols(imagecols_src, imagecols_dst):
-    # TODO: robust alignment
+def align_imagecols_umeyama(imagecols_src, imagecols_dst):
     # assertion check
     assert imagecols_src.NumImages() == imagecols_dst.NumImages()
     assert np.all(imagecols_src.get_img_ids() == imagecols_dst.get_img_ids()) == True
@@ -62,4 +61,70 @@ def align_imagecols(imagecols_src, imagecols_dst):
     transform = _base.SimilarityTransform3(r, t, c)
     imagecols_aligned = imagecols_src.apply_similarity_transform(transform)
     return transform, imagecols_aligned
+
+def align_imagecols_colmap(imagecols_src, imagecols_dst, max_error = 0.01, tmp_folder = "tmp/model_convertion"):
+    import os, shutil
+    import numpy as np
+    from limap.pointsfm import convert_imagecols_to_colmap
+    import limap.util.io as limapio
+    import subprocess
+
+    # assertion check
+    assert imagecols_src.NumImages() == imagecols_dst.NumImages()
+    assert np.all(imagecols_src.get_img_ids() == imagecols_dst.get_img_ids()) == True
+
+    limapio.check_makedirs(tmp_folder)
+    src_folder = os.path.join(tmp_folder, "source")
+    tgt_folder = os.path.join(tmp_folder, "target")
+    limapio.check_makedirs(src_folder)
+    limapio.check_makedirs(tgt_folder)
+
+    # write source imagecols into COLMAP format
+    convert_imagecols_to_colmap(imagecols_src, src_folder)
+
+    # write the positions of target imagecols
+    fname_positions = os.path.join(tmp_folder, "geo_positions.txt")
+    with open(fname_positions, "w") as f:
+        for img_id in imagecols_src.get_img_ids():
+            imname = imagecols_src.image_name(img_id)
+            pos = imagecols_dst.camview(img_id).pose.center()
+            f.write('{0} {1} {2} {3}\n'.format(imname, pos[0], pos[1], pos[2]))
+
+    # call comlap model aligner
+    transform_path = os.path.join(tmp_folder, "transform.txt")
+    cmd = ['colmap', 'model_aligner',
+           '--input_path', src_folder,
+           '--output_path', tgt_folder,
+           '--ref_images_path', fname_positions,
+           '--robust_alignment', str(1),
+           '--robust_alignment_max_error', str(max_error),
+           '--transform_path', transform_path,
+           '--ref_is_gps', "false"]
+    subprocess.run(cmd, check=True)
+
+    # read in transformation
+    def read_trans(fname):
+        with open(fname, 'r') as f:
+            lines = f.readlines()
+        mat = []
+        for idx in range(4):
+            l = lines[idx].strip('\n').split()
+            mat.append([float(k) for k in l])
+        mat = np.array(mat)
+        assert np.all(mat[3, :] == np.array([0, 0, 0, 1]))
+        return mat[:3, :]
+    transform = read_trans(transform_path)
+
+    scale = np.linalg.norm(transform[:, 0])
+    R = transform[:3, :3] / scale
+    t = transform[:3, 3]
+    transform = _base.SimilarityTransform3(R, t, scale)
+    imagecols_aligned = imagecols_src.apply_similarity_transform(transform)
+
+    # delete tmp folder
+    limapio.delete_folder(tmp_folder)
+    return transform, imagecols_aligned
+
+def align_imagecols(imagecols_src, imagecols_dst, max_error = 0.01):
+    return align_imagecols_colmap(imagecols_src, imagecols_dst, max_error = max_error)
 
