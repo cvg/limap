@@ -1,11 +1,10 @@
 # LIMAP 
+
+**The documentation is available [here](http://b1ueber2y.me/projects/LIMAP/docs/)**.
+
 <p align="center">
 <img src="./misc/media/supp_qualitative_5x3.png">
 </p>
-
-----------------------------------------------------------------
-**Note**: More README and docs will be available soon.
-----------------------------------------------------------------
 
 LIMAP is a toolbox for mapping and localization with line features. The system was initially described in the highlight paper [3D Line Mapping Revisited](https://arxiv.org/abs/2303.17504) at CVPR 2023 in Vancouver, Canada. Contributors to this project are from the [Computer Vision and Geometry Group](https://cvg.ethz.ch/) at [ETH Zurich](https://ethz.ch/en.html).
 
