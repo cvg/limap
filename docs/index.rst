@@ -43,9 +43,3 @@ In this project, we provide interfaces for various geometric operations on 2D/3D
 
    contributors
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
