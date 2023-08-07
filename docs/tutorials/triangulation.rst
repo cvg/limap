@@ -1,9 +1,13 @@
 Line mapping 
 =================================
 
+-----------------------------------------
+Line mapping on a set of posed images
+-----------------------------------------
+
 As one of the main features, LIMAP supports line reconstruction on a set of posed images, optionally with assistance of the point-based SfM model or the depth map. We currently support to use the poses from `COLMAP <https://colmap.github.io/>`_, `Bundler <https://www.cs.cornell.edu/~snavely/bundler/>`_ and `VisualSfM <http://ccwu.me/vsfm/index.html>`_. One can also use customized poses and intrinsics with the main interface :py:meth:`limap.runners.line_triangulation` API by constructing a :class:`limap.base.ImageCollection` instance as the input.
 
-As an example, one can refer to the :class:`limap.base.ImageCollection` instance construction for `Hypersim <https://github.com/cvg/limap/blob/main/runners/hypersim/loader.py#L34-L41>`_ and `COLMAP <https://github.com/cvg/limap/blob/main/limap/pointsfm/colmap_reader.py#L31-L47>`_.
+To give some references, one can construct the :class:`limap.base.ImageCollection` instance as in `Hypersim <https://github.com/cvg/limap/blob/main/runners/hypersim/loader.py#L34-L41>`_ or in `COLMAP <https://github.com/cvg/limap/blob/main/limap/pointsfm/colmap_reader.py#L31-L47>`_.
 
 Here shows a minimal example on running line mapping on the constructed input:
 
@@ -23,11 +27,11 @@ Here shows a minimal example on running line mapping on the constructed input:
 
 All the output and intermediate data will be stored at the specified output directory. 
 
------------------------------------------
-Line mapping on a set of images
------------------------------------------
+---------------------------------------------------------------------
+Line mapping on a set of unposed images by running COLMAP first
+---------------------------------------------------------------------
 
-Specifically, to run the line mapping on a set of images, first pose the images with `COLMAP <https://colmap.github.io>`_ following the guide `here <https://colmap.github.io/cli.html>`_. Then, use the `COLMAP interface <https://github.com/cvg/limap/blob/main/runners/colmap_triangulation.py>`_ in LIMAP to build 3D line maps by:
+To run the line mapping on a set of unposed images, we now suggest to run COLMAP first to get the poses. Specifically, first pose the images with `COLMAP <https://colmap.github.io>`_ following the guide `here <https://colmap.github.io/cli.html>`_. Then, use the `COLMAP interface <https://github.com/cvg/limap/blob/main/runners/colmap_triangulation.py>`_ in LIMAP to build 3D line maps by:
 
 .. code-block:: bash
 
