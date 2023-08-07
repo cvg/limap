@@ -3,6 +3,26 @@ Line mapping
 
 As one of the main features, LIMAP supports line reconstruction on a set of posed images, optionally with assistance of the point-based SfM model or the depth map. We currently support to use the poses from `COLMAP <https://colmap.github.io/>`_, `Bundler <https://www.cs.cornell.edu/~snavely/bundler/>`_ and `VisualSfM <http://ccwu.me/vsfm/index.html>`_. One can also use customized poses and intrinsics with the main interface :py:meth:`limap.runners.line_triangulation` API by constructing a :class:`limap.base.ImageCollection` instance as the input.
 
+As an example, one can refer to the :class:`limap.base.ImageCollection` instance construction for `Hypersim <https://github.com/cvg/limap/blob/main/runners/hypersim/loader.py#L34-L41>`_ and `COLMAP <https://github.com/cvg/limap/blob/main/limap/pointsfm/colmap_reader.py#L31-L47>`_.
+
+Here shows a minimal example on running line mapping on the constructed input:
+
+.. code-block:: python
+
+    global imagecols
+    import limap.util.config
+    import limap.runners
+    import limap.visualize
+    cfg = limap.util.config.load_config("cfgs/triangulation/default.yaml") # load the example config
+    cfg["output_dir"] = "outputs/TBA" # specify an output directory
+    linetracks = limap.runners.line_triangulation.line_triangulation(cfg, imagecols, neighbors=None, ranges=None) # run mapping, you can also specify visual neighboring information if applicable (for example, in a video stream you can use the sequential timestamps to construct visual neighbors)
+    # visualize
+    visualizer = limap.visualize.Open3DTrackVisualizer(linetracks)
+    visualizer.report()
+    visualizer.vis_reconstruction(imagecols, n_visibile_views=4)
+
+All the output and intermediate data will be stored at the specified output directory. 
+
 -----------------------------------------
 Line mapping on a set of images
 -----------------------------------------
