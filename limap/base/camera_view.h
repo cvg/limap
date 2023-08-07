@@ -45,6 +45,7 @@ private:
 class CameraView: public CameraImage {
 public:
     CameraView() {}
+    CameraView(const std::string& image_name): CameraImage(Camera(), image_name), cam(Camera()) {} // empty view
     CameraView(const Camera& input_cam, const std::string& image_name = "none"): CameraImage(input_cam, image_name), cam(input_cam) {} // empty view 
     CameraView(const Camera& input_cam, const CameraPose& input_pose, const std::string& image_name = "none"): CameraImage(input_cam, input_pose, image_name), cam(input_cam) {}
     CameraView(py::dict dict);
