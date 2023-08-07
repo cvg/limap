@@ -826,6 +826,7 @@ void bind_camera(py::module& m) {
 
     py::class_<CameraView>(m, "CameraView", "Inherits :class:`~limap.base.CameraImage`, incorporating the :class:`~limap.base.Camera` model and its parameters for projection/unprojection between 2D and 3D.")
         .def(py::init<>())
+        .def(py::init<const std::string&>()) // empty view
         .def(py::init<const Camera&, const std::string&>(), py::arg("camera"), py::arg("image_name") = "none") // empty view
         .def(py::init<const Camera&, const CameraPose&, const std::string&>(), py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
         .def(py::init<py::dict>(), py::arg("dict"))

@@ -34,7 +34,7 @@ namespace limap {
 
 class Camera: public colmap::Camera {
 public:
-    Camera() {}
+    Camera() { SetCameraId(-1); SetModelId(0); SetHeight(-1); SetWidth(-1); } // default
     Camera(const colmap::Camera& cam);
     Camera(int model_id, const std::vector<double>& params, int cam_id=-1, std::pair<int, int> hw=std::make_pair<int, int>(-1, -1));
     Camera(const std::string& model_name, const std::vector<double>& params, int cam_id=-1, std::pair<int, int> hw=std::make_pair<int, int>(-1, -1));
@@ -44,8 +44,8 @@ public:
     Camera(const std::string& model_name, M3D K, int cam_id=-1, std::pair<int, int> hw=std::make_pair<int, int>(-1, -1));
     Camera(py::dict dict);
     Camera(const Camera& cam);
-    Camera(int model_id, int cam_id, std::pair<int, int> hw=std::make_pair<int, int>(-1, -1)); // empty camera
-    Camera(const std::string& model_name, int cam_id, std::pair<int, int> hw=std::make_pair<int, int>(-1, -1)); // empty camera
+    Camera(int model_id, int cam_id=-1, std::pair<int, int> hw=std::make_pair<int, int>(-1, -1)); // empty camera
+    Camera(const std::string& model_name, int cam_id=-1, std::pair<int, int> hw=std::make_pair<int, int>(-1, -1)); // empty camera
     bool operator ==(const Camera&);
 
     py::dict as_dict() const;

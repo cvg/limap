@@ -50,7 +50,8 @@ py::dict CameraView::as_dict() const {
 py::array_t<uint8_t> CameraView::read_image(const bool set_gray) const {
     py::object cv2 = py::module_::import("cv2");
     py::array_t<uint8_t> img = cv2.attr("imread")(image_name());
-    img = cv2.attr("resize")(img, std::make_pair(w(), h()));
+    if (w() > 0 && h() > 0)
+        img = cv2.attr("resize")(img, std::make_pair(w(), h()));
     if (set_gray) {
         img = cv2.attr("cvtColor")(img, cv2.attr("COLOR_BGR2GRAY"));
     }
@@ -92,7 +93,9 @@ std::pair<double, bool> CameraView::get_initial_focal_length() const {
     colmap::Bitmap bitmap;
     double max_dim = std::max(w(), h());
     bitmap.Read(image_name());
-    double ratio = max_dim / std::max(bitmap.Width(), bitmap.Height());
+    double ratio = 1.0;
+    if (w() > 0 && h() > 0)
+        ratio = max_dim / std::max(bitmap.Width(), bitmap.Height());
     double focal_length = 0.0;
     if (bitmap.ExifFocalLength(&focal_length)) {
         return std::make_pair(ratio * focal_length, true);
