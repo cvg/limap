@@ -39,7 +39,7 @@ sfm:
 line2d:
     max_num_2d_segs: 3000
     do_merge_lines: False 
-    visualize: False
+    visualize: True
     save_l3dpp: False
     compute_descinfo: False
     detector: 
