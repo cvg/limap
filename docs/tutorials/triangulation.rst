@@ -7,13 +7,13 @@ Line mapping on a set of posed images
 
 As one of the main features, LIMAP supports line reconstruction on a set of posed images, optionally with assistance of the point-based SfM model or the depth map. We currently support to use the poses from `COLMAP <https://colmap.github.io/>`_, `Bundler <https://www.cs.cornell.edu/~snavely/bundler/>`_ and `VisualSfM <http://ccwu.me/vsfm/index.html>`_. One can also use customized poses and intrinsics with the main interface :py:meth:`limap.runners.line_triangulation` API by constructing a :class:`limap.base.ImageCollection` instance as the input.
 
-To give some references, one can construct the :class:`limap.base.ImageCollection` instance as in `Hypersim <https://github.com/cvg/limap/blob/main/runners/hypersim/loader.py#L34-L41>`_ or in `COLMAP <https://github.com/cvg/limap/blob/main/limap/pointsfm/colmap_reader.py#L31-L47>`_.
+To give some references, one can construct the :class:`limap.base.ImageCollection` instance as in `Example for Hypersim <https://github.com/cvg/limap/blob/main/runners/hypersim/loader.py#L34-L41>`_ or in `Example for COLMAP <https://github.com/cvg/limap/blob/main/limap/pointsfm/colmap_reader.py#L31-L47>`_.
 
 Here shows a minimal example on running line mapping on the constructed input:
 
 .. code-block:: python
 
-    global imagecols
+    global imagecols # construct your own imagecols by setting up the intrinsics and extrinsics
     import limap.util.config
     import limap.runners
     import limap.visualize
