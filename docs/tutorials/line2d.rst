@@ -1,7 +1,7 @@
 Line detection, description and matching 
 ============================================
 
-We provide interfaces for running line detection, description and matching with supported modules in LIMAP. 
+We support modular interfaces for running line detection, description and matching in LIMAP. In addition, we also provide minimal examples here and a mimimal test scripts at ``runners/tests/line2d.py``.
 
 -----------------------------------------------------
 Minimal example on line detection and description
@@ -47,7 +47,7 @@ Here shows an example on visualizing the detections:
     import cv2
     import limap.visualize
     img = view.read_image(set_gray = False)
-    img = limap.visualize.draw_segments(img, segs1, (0, 255, 0))
+    img = limap.visualize.draw_segments(img, segs, (0, 255, 0))
     cv2.imshow("detetions", img)
     cv2.waitKey(0)
 
