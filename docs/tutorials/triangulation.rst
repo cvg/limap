@@ -5,7 +5,7 @@ Line mapping
 Line mapping on a set of posed images
 -----------------------------------------
 
-As one of the main features, LIMAP supports line reconstruction on a set of posed images, optionally with assistance of the point-based SfM model or the depth map. We currently support to use the poses from `COLMAP <https://colmap.github.io/>`_, `Bundler <https://www.cs.cornell.edu/~snavely/bundler/>`_ and `VisualSfM <http://ccwu.me/vsfm/index.html>`_. One can also use customized poses and intrinsics with the main interface :py:meth:`limap.runners.line_triangulation` API by constructing a :class:`limap.base.ImageCollection` instance as the input.
+As one of the main features, LIMAP supports line reconstruction on a set of posed images, optionally with assistance of the point-based SfM model or the depth map. We support to use the poses directly from `COLMAP <https://colmap.github.io/>`_, `Bundler <https://www.cs.cornell.edu/~snavely/bundler/>`_ or `VisualSfM <http://ccwu.me/vsfm/index.html>`_. One can also use customized poses and intrinsics with the main interface :py:meth:`limap.runners.line_triangulation` API by constructing a :class:`limap.base.ImageCollection` instance as the input.
 
 To give some references, one can construct the :class:`limap.base.ImageCollection` instance as in `Example for Hypersim <https://github.com/cvg/limap/blob/main/runners/hypersim/loader.py#L34-L41>`_ or in `Example for COLMAP <https://github.com/cvg/limap/blob/main/limap/pointsfm/colmap_reader.py#L31-L47>`_.
 
@@ -19,7 +19,7 @@ Here shows a minimal example on running line mapping on the constructed input:
     import limap.visualize
     cfg = limap.util.config.load_config("cfgs/triangulation/default.yaml") # load the example config
     cfg["output_dir"] = "outputs/TBA" # specify an output directory
-    linetracks = limap.runners.line_triangulation.line_triangulation(cfg, imagecols, neighbors=None, ranges=None) # run mapping, you can also specify visual neighboring information if applicable (for example, in a video stream you can use the sequential timestamps to construct visual neighbors)
+    linetracks = limap.runners.line_triangulation(cfg, imagecols, neighbors=None, ranges=None) # run mapping, you can also specify visual neighboring information if applicable (for example, in a video stream you can use the sequential timestamps to construct visual neighbors)
     # visualize
     visualizer = limap.visualize.Open3DTrackVisualizer(linetracks)
     visualizer.report()

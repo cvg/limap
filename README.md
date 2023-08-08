@@ -77,7 +77,7 @@ In particular, ``--skip_exists`` is a very useful option to avoid running point-
 Also, the combination  ``LSD detector + Endpoints NN matcher`` can be enabled with ``--default_config_file cfgs/triangulation/default_fast.yaml`` for high efficiency (while with non-negligible performance degradation).
 
 ### Example of Hybrid Point-Line Localization
-We provide two query examples for localization from the *Stairs* scene in the [7Scenes](https://www.microsoft.com/en-us/research/project/rgb-d-dataset-7-scenes/) Dataset, where traditional point-based methods normally struggle due to the repeated steps and lack of texture. The examples are provided in `.npy` files: `runners/tests/localization/localization_test_data_stairs_[1|2].npy`, which contains the necessary 2D-3D point and line correspondences along with the necessary configurations.
+We provide two query examples for localization from the *Stairs* scene in the [7Scenes](https://www.microsoft.com/en-us/research/project/rgb-d-dataset-7-scenes/) Dataset, where traditional point-based methods normally struggle due to the repeated steps and lack of texture. The examples are provided in `.npy` files: `runners/tests/data/localization/localization_test_data_stairs_[1|2].npy`, which contains the necessary 2D-3D point and line correspondences along with the necessary configurations.
 
 To run the examples, for instance the first one:
 ```bash
