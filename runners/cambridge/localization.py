@@ -96,7 +96,7 @@ def main():
     ##########################################################
     # [A] hloc point-based localization
     ##########################################################
-    ref_sfm_path, poses, hloc_log_file = run_hloc_cambridge(
+    ref_sfm, poses, hloc_log_file = run_hloc_cambridge(
         cfg, image_dir, imagecols, neighbors, train_ids, query_ids, id_to_origin_name,
         results_point, args.num_loc, logger
     )
@@ -127,8 +127,6 @@ def main():
         qid = img_name_to_id[name]
         retrieval[id_to_origin_name[qid]] = [id_to_origin_name[img_name_to_id[n]] for n in _retrieval[name]]
     hloc_name_dict = {id: "image{0:08d}.png".format(id) for id in (train_ids + query_ids)}
-
-    ref_sfm = pycolmap.Reconstruction(ref_sfm_path)
 
      # Update coarse poses for epipolar methods
     if cfg['localization']['2d_matcher'] == 'epipolar' or cfg['localization']['epipolar_filter']:
