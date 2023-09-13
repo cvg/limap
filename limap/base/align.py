@@ -100,7 +100,9 @@ def align_imagecols_colmap(imagecols_src, imagecols_dst, max_error = 0.01, tmp_f
            '--robust_alignment_max_error', str(max_error),
            '--transform_path', transform_path,
            '--ref_is_gps', "false"]
-    subprocess.run(cmd, check=True)
+    subprocess.run(cmd)
+    if not os.path.exists(transform_path):
+        return None, None
 
     # read in transformation
     def read_trans(fname):

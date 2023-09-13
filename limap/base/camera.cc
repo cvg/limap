@@ -258,7 +258,7 @@ py::dict Camera::as_dict() const {
     py::dict output;
     output["model_id"] = ModelId();
     output["params"] = params();
-    output["cam_id"] = CameraId();
+    output["cam_id"] = int(CameraId());
     output["height"] = h();
     output["width"] = w();
     output["initialized"] = initialized;
