@@ -81,8 +81,18 @@ def convert_imagecols_to_colmap(imagecols, colmap_output_path):
             model_name = "SIMPLE_PINHOLE"
         elif model_id == 1:
             model_name = "PINHOLE"
+        elif model_id == 2:
+            model_name = "SIMPLE_RADIAL"
+        elif model_id == 3:
+            model_name = "RADIAL"
+        elif model_id == 4:
+            model_name = "OPENCV"
+        elif model_id == 5:
+            model_name = "OPENCV_FISHEYE"
+        elif model_id == 6:
+            model_name = "FULL_OPENCV"
         else:
-            raise ValueError("The provided camera model should be without distortion.")
+            raise ValueError("Camera model not supported.")
         colmap_cameras[cam_id] = colmap_utils.Camera(id=cam_id, model=model_name, width=cam.w(), height=cam.h(), params=cam.params())
     fname = os.path.join(colmap_output_path, 'cameras.txt')
     colmap_utils.write_cameras_text(colmap_cameras, fname)

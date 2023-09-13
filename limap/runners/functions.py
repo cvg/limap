@@ -103,7 +103,7 @@ def undistort_images(imagecols, output_dir, fname="image_collection_undistorted.
 
     # save info
     limapio.save_txt_imname_dict(os.path.join(output_dir, 'original_image_list.txt'), imagecols.get_image_name_dict())
-    limapio.save_npy(os.path.join(output_dir, fname), imagecols_undistorted.as_dict())
+    limapio.save_npy(os.path.join(output_dir, fname), imagecols_undistorted)
     return imagecols_undistorted
 
 def compute_sfminfos(cfg, imagecols, fname="metainfos.txt"):
