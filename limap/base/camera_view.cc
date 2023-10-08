@@ -5,7 +5,7 @@ namespace limap {
 
 CameraImage::CameraImage(py::dict dict) {
     ASSIGN_PYDICT_ITEM(dict, cam_id, int)
-    pose = CameraPose(dict);
+    pose = CameraPose(dict["pose"]);
 
     // load image name
     std::string image_name;
@@ -16,16 +16,14 @@ CameraImage::CameraImage(py::dict dict) {
 py::dict CameraImage::as_dict() const {
     py::dict output;
     output["cam_id"] = cam_id;
-    output["qvec"] = pose.qvec;
-    output["tvec"] = pose.tvec;
-    output["initialized"] = pose.initialized;
+    output["pose"] = pose.as_dict();
     output["image_name"] = image_name_;
     return output;
 }
 
 CameraView::CameraView(py::dict dict) {
-    cam = Camera(dict);
-    pose = CameraPose(dict);
+    cam = Camera(dict["camera"]);
+    pose = CameraPose(dict["pose"]);
 
     // load image name
     std::string image_name;
@@ -35,14 +33,8 @@ CameraView::CameraView(py::dict dict) {
 
 py::dict CameraView::as_dict() const {
     py::dict output;
-    output["model_id"] = cam.ModelId();
-    output["params"] = cam.params();
-    output["cam_id"] = cam.CameraId();
-    output["height"] = cam.h();
-    output["width"] = cam.w();
-    output["qvec"] = pose.qvec;
-    output["tvec"] = pose.tvec;
-    output["initialized"] = pose.initialized;
+    output["camera"] = cam.as_dict();
+    output["pose"] = pose.as_dict();
     output["image_name"] = image_name();
     return output;
 }
