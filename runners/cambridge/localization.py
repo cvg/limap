@@ -36,8 +36,6 @@ def parse_config():
     arg_parser.add_argument('-a', '--vsfm_path', type=str, required=True, help='visualsfm path')
     arg_parser.add_argument('--nvm_file', type=str, default='reconstruction.nvm', help='nvm filename')
     arg_parser.add_argument('--info_path', type=str, default=None, help='load precomputed info')
-    arg_parser.add_argument('--outputs', type=Path, default='outputs/localization/cambridge',
-                        help='Path to the output directory, default: %(default)s')
     
     arg_parser.add_argument('--query_images', default=None, type=Path, help='Path to the file listing query images')
     arg_parser.add_argument('--eval', default=None, type=Path, help='Path to the result file')
@@ -68,10 +66,13 @@ def main():
     # Output path for LIMAP results (tmp)
     if cfg['output_dir'] is None:
         cfg['output_dir'] = 'tmp/cambridge/{}'.format(scene_id)
+    # Output folder for LIMAP linetracks (in tmp)
+    if cfg['output_folder'] is None:
+        cfg['output_folder'] = 'finaltracks'
     cfg = _runners.setup(cfg)
 
     # outputs is for localization-related results
-    outputs = args.outputs / f'{scene_id}'
+    outputs = Path(cfg['output_dir']) / 'localization'
     outputs.mkdir(exist_ok=True, parents=True)
 
     logger.info(f'Working on scene "{scene_id}".')

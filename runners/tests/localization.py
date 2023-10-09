@@ -29,7 +29,7 @@ def parse_args():
     arg_parser = argparse.ArgumentParser(description='minimal test for visual localization with points and lines')
     arg_parser.add_argument('--data', type=Path, default='runners/tests/data/localization/localization_test_data_stairs_1.npy',
                             help='Path to test data file, default: %(default)s')
-    arg_parser.add_argument('--outputs', type=Path, default='outputs/test/localization',
+    arg_parser.add_argument('--outputs', type=Path, default='test_outputs/localization',
                             help='Path to the output directory, default: %(default)s')
     arg_parser.add_argument('--ransac_method', choices=['ransac', 'solver', 'hybrid'], default='hybrid',
                             help='RANSAC method')

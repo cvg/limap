@@ -37,8 +37,6 @@ def parse_config():
     arg_parser.add_argument('--dataset', type=Path, required=True, help='7scenes root path')
     arg_parser.add_argument('-s', '--scene', type=str, required=True, help='scene name(s)')
     arg_parser.add_argument('--info_path', type=str, default=None, help='load precomputed info')
-    arg_parser.add_argument('--outputs', type=Path, default='outputs/localization/7scenes',
-                        help='Path to the output directory, default: %(default)s')
 
     arg_parser.add_argument('--query_images', default=None, type=Path, help='Path to the file listing query images')
     arg_parser.add_argument('--eval', default=None, type=Path, help='Path to the result file')
@@ -76,7 +74,7 @@ def main():
     cfg = _runners.setup(cfg)
 
     # outputs is for localization-related results
-    outputs = args.outputs / f'{args.scene}'
+    outputs = Path(cfg['output_dir']) / 'localization'
     outputs.mkdir(exist_ok=True, parents=True)
 
     logger.info(f'Working on scene "{args.scene}".')
