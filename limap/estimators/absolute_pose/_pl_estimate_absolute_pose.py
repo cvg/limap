@@ -10,7 +10,12 @@ def _pl_estimate_absolute_pose(cfg, l3ds, l3d_ids, l2ds, p3ds, p2ds, camera, cam
         jointloc_cfg = {}
         if cfg.get('optimize'):
             jointloc_cfg = cfg.get('optimize').copy()
-            jointloc_cfg['loss_function'] = getattr(_ceresbase, jointloc_cfg['loss_func'])(*jointloc_cfg['loss_func_args'])
+            loss_func_args = jointloc_cfg.get('loss_func_args')
+            if jointloc_cfg.get('loss_func') == 'TrivialLoss':
+                loss_func_args = []
+            elif jointloc_cfg.get('loss_func') == 'HuberLoss':
+                assert len(loss_func_args) == 1, 'HuberLoss requires one argument'
+            jointloc_cfg['loss_function'] = getattr(_ceresbase, jointloc_cfg['loss_func'])(*loss_func_args)
             del jointloc_cfg['loss_func'], jointloc_cfg['loss_func_args']
         else:
             jointloc_cfg['loss_function'] = _ceresbase.TrivialLoss()
