@@ -129,12 +129,12 @@ std::map<int, VPLine_Bipartite2d> GetAllBipartites_VPLine2d(const std::map<int, 
 
         // init vps
         const auto& vpres = vpresults.at(img_id);
-        for (size_t i = 0; i < vpres.count_vps(); ++i) {
-            int vp3d_id = m_2d_to_3d.at(img_id)[i];
+        for (int vp2d_id = 0; vp2d_id < vpres.count_vps(); ++vp2d_id) {
+            int vp3d_id = m_2d_to_3d.at(img_id)[vp2d_id];
             if (vp3d_id < 0)
                 continue;
-            vplib::VP2d vp2d = vplib::VP2d(vpres.vps[i], vp3d_id);
-            bpt.add_point(vp2d, vp3d_id);
+            vplib::VP2d vp2d = vplib::VP2d(vpres.vps[vp2d_id], vp3d_id);
+            bpt.add_point(vp2d, vp2d_id);
         }
 
         // add edges
@@ -145,7 +145,7 @@ std::map<int, VPLine_Bipartite2d> GetAllBipartites_VPLine2d(const std::map<int, 
             int vp3d_id = m_2d_to_3d.at(img_id)[vp2d_id];
             if (vp3d_id < 0)
                 continue;
-            bpt.add_edge(vp3d_id, line_id);
+            bpt.add_edge(vp2d_id, line_id);
         }
         all_bipartites.insert(std::make_pair(img_id, bpt));
     }
