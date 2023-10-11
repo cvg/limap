@@ -35,7 +35,7 @@ To run the line mapping on a set of unposed images, we now suggest to run COLMAP
 
 .. code-block:: bash
 
-    python runners/colmap_triangulation.py -c ${CONFIG_FILE} -a ${COLMAP_FOLDER} --output_path ${OUTPUT_PATH}
+    python runners/colmap_triangulation.py -c ${CONFIG_FILE} -a ${COLMAP_FOLDER} --output_dir ${OUTPUT_DIR}
 
 And the line maps will be stored in the specified output folder. To use point SfM to improve robustness, add additional option ``--triangulation.use_pointsfm.enable --triangulation.use_pointsfm.colmap_folder ${COLMAP_FOLDER}`` in the end of the command.
 

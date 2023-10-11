@@ -64,6 +64,9 @@ void BaseLineTriangulator::TriangulateImage(const int img_id,
             // good match exists
             int line_id = match_info(k, 0);
             int ng_line_id = match_info(k, 1);
+            if (line_id >= edges_[img_id].size()) {
+                throw std::runtime_error("IndexError! Out-of-index matches exist between image (img_id = " + std::to_string(img_id) + ") and neighbor image (img_id = " + std::to_string(ng_img_id) + "). Please make sure you are reusing the correct descriptors and matches when using the --skip_exists option.");
+            }
             edges_[img_id][line_id].push_back(std::make_pair(ng_img_id, ng_line_id));
         }
         for (size_t line_id = 0; line_id < CountLines(img_id); ++line_id) {

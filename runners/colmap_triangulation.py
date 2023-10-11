@@ -40,7 +40,7 @@ def parse_config():
     arg_parser = argparse.ArgumentParser(description='triangulate 3d lines from COLMAP')
     arg_parser.add_argument('-c', '--config_file', type=str, default='cfgs/triangulation/default.yaml', help='config file')
     arg_parser.add_argument('--default_config_file', type=str, default='cfgs/triangulation/default.yaml', help='default config file')
-    arg_parser.add_argument('-a', '--colmap_path', type=str, required=True, help='colmap path')
+    arg_parser.add_argument('-a', '--colmap_path', type=str, default=None, help='colmap path')
     arg_parser.add_argument('-m', '--model_path', type=str, default='sparse', help='model path')
     arg_parser.add_argument('-i', '--image_path', type=str, default='images', help='image path')
     arg_parser.add_argument('--npyfolder', type=str, default="tmp", help='folder to load precomputed results')
@@ -58,6 +58,8 @@ def parse_config():
     cfg["model_path"] = args.model_path
     cfg["folder_to_load"] = args.npyfolder
     cfg["info_path"] = args.info_path
+    if cfg["colmap_path"] is None and cfg["info_path"] is None:
+        raise ValueError("Error! colmap_path unspecified.")
     if ("max_image_dim" not in cfg.keys()) or args.max_image_dim is not None:
         cfg["max_image_dim"] = args.max_image_dim
     return cfg
