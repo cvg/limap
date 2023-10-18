@@ -98,14 +98,8 @@ void JointLocEngine::AddResiduals() {
     // ceres::LossFunction* loss_function = new ceres::CauchyLoss(0.1);
     ceres::LossFunction* loss_function = this->config_.loss_function.get();
 
-    int num_lines = this->l3ds.size();
-    int num_points = this->p3ds.size();
-    double weight_lines = double(num_points) / (num_lines + num_points);
-    double weight_points = 1 - weight_lines;
-    if (!this->config_.normalize_weight)
-        weight_lines = weight_points = 1.0;
-    weight_lines *= this->config_.weight_line;
-    weight_points *= this->config_.weight_point;
+    double weight_lines = this->config_.weight_line;
+    double weight_points = this->config_.weight_point;
     
     // add to problem for each pair of lines
     for (int i = 0; i < this->l3ds.size(); i++) {

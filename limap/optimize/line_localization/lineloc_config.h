@@ -59,14 +59,12 @@ public:
         ASSIGN_PYDICT_ITEM(dict, weight_line, double);
         ASSIGN_PYDICT_ITEM(dict, weight_point, double);
         ASSIGN_PYDICT_ITEM(dict, print_summary, bool);
-        ASSIGN_PYDICT_ITEM(dict, normalize_weight, bool);
         ASSIGN_PYDICT_ITEM(dict, loss_function, std::shared_ptr<ceres::LossFunction>);
         if (dict.contains("solver_options"))
             AssignSolverOptionsFromDict(solver_options, dict["solver_options"]);
     }
     double weight_line = 1.0;
     double weight_point = 1.0;
-    bool normalize_weight = true;
     bool points_3d_dist = false;
     
     ceres::Solver::Options solver_options;

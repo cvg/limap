@@ -72,7 +72,6 @@ void bind_line_localization(py::module &m) {
         .def(py::init<py::dict>())
         .def_readwrite("solver_options", &LineLocConfig::solver_options)
         .def_readwrite("print_summary", &LineLocConfig::print_summary)
-        .def_readwrite("normalize_weight", &LineLocConfig::normalize_weight)
         .def_readwrite("weight_point", &LineLocConfig::weight_point)
         .def_readwrite("weight_line", &LineLocConfig::weight_line)
         .def_readwrite("cost_function", &LineLocConfig::cost_function)
