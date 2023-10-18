@@ -40,7 +40,6 @@ localization:
         min_num_iterations: 100
         solver_flags: [True, True, True, True]
     optimize:
-        normalize_weight: False
         loss_func: "TrivialLoss"
         loss_func_args: []
     line_cost_func: "PerpendicularDist"

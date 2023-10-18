@@ -14,7 +14,6 @@ def _pl_estimate_absolute_pose(cfg, l3ds, l3d_ids, l2ds, p3ds, p2ds, camera, cam
             del jointloc_cfg['loss_func'], jointloc_cfg['loss_func_args']
         else:
             jointloc_cfg['loss_function'] = _ceresbase.TrivialLoss()
-            jointloc_cfg['normalize_weight'] = False
 
     # Optimization weight, not for RANSAC scoring
     if 'line_weight' in cfg:
