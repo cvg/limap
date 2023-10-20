@@ -247,7 +247,8 @@ def run_hloc_7scenes(cfg, dataset, scene, results_file, test_list, num_covis=30,
         'preprocessing': {'globs': ['*.color.png'], 'grayscale': True, 'resize_max': 1024}
     }
     if cfg['localization']['2d_matcher'] == 'gluestick':
-        matcher_conf = match_features.confs['gluestick']
+        raise ValueError("GlueStick not yet supported in HLoc.")
+        # matcher_conf = match_features.confs['gluestick']
     else:
         matcher_conf = match_features.confs['superglue']
         matcher_conf['model']['sinkhorn_iterations'] = 5
