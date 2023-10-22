@@ -93,6 +93,7 @@ filtering2d:
 refinement:
     disable: True 
     constant_intrinsics: True
+    constant_principal_point: True
     constant_pose: True
     constant_line: False
     min_num_images: 4

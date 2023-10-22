@@ -7,6 +7,7 @@
 #include <colmap/util/threading.h>
 #include <colmap/util/misc.h>
 #include <colmap/optim/bundle_adjustment.h>
+#include <colmap/base/cost_functions.h>
 
 namespace limap {
 
@@ -58,10 +59,17 @@ void HybridBAEngine::ParameterizeCameras() {
         double* qvec_data = imagecols_.qvec_data(img_id);
         double* tvec_data = imagecols_.tvec_data(img_id);
 
-        if (config_.constant_intrinsics) {
-            if (!problem_->HasParameterBlock(params_data))
+        if (!problem_->HasParameterBlock(params_data))
                 continue;
+        if (config_.constant_intrinsics) {
             problem_->SetParameterBlockConstant(params_data);
+        }
+        else if (config_.constant_principal_point) {
+            int cam_id = imagecols_.camimage(img_id).cam_id;
+            std::vector<int> const_idxs;
+            const std::vector<size_t>& principal_point_idxs = imagecols_.cam(cam_id).PrincipalPointIdxs();
+            const_idxs.insert(const_idxs.end(), principal_point_idxs.begin(), principal_point_idxs.end());
+            colmap::SetSubsetManifold(imagecols_.cam(cam_id).params().size(), const_idxs, problem_.get(), params_data); // TODO: change this to customized function
         }
 
         if (config_.constant_pose) {
