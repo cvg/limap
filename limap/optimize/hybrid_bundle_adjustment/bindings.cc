@@ -29,6 +29,7 @@ void bind_hybrid_bundle_adjustment(py::module &m) {
         .def_readwrite("lw_point", &HybridBAConfig::lw_point)
         .def_readwrite("print_summary", &HybridBAConfig::print_summary)
         .def_readwrite("constant_intrinsics", &HybridBAConfig::constant_intrinsics)
+        .def_readwrite("constant_principal_point", &HybridBAConfig::constant_principal_point)
         .def_readwrite("constant_pose", &HybridBAConfig::constant_pose)
         .def_readwrite("constant_point", &HybridBAConfig::constant_point)
         .def_readwrite("constant_line", &HybridBAConfig::constant_line);

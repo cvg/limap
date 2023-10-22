@@ -23,12 +23,14 @@ public:
     HybridBAConfig(py::dict dict): line_refinement::RefinementConfig(dict) {
         InitConfig();
         ASSIGN_PYDICT_ITEM(dict, constant_intrinsics, bool);
+        ASSIGN_PYDICT_ITEM(dict, constant_principal_point, bool);
         ASSIGN_PYDICT_ITEM(dict, constant_pose, bool);
         ASSIGN_PYDICT_ITEM(dict, constant_point, bool);
         ASSIGN_PYDICT_ITEM(dict, constant_line, bool);
         ASSIGN_PYDICT_ITEM(dict, lw_point, double);
     }
     bool constant_intrinsics = false;
+    bool constant_principal_point = true;
     bool constant_pose = false;
     bool constant_point = false;
     bool constant_line = false;
