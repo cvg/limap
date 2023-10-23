@@ -83,15 +83,7 @@ void HybridBAEngine::ParameterizeCameras() {
         else {
             if (!problem_->HasParameterBlock(qvec_data))
                 continue;
-#ifdef CERES_PARAMETERIZATION_ENABLED
-            ceres::LocalParameterization* quaternion_parameterization = 
-                new ceres::QuaternionParameterization;
-            problem_->SetParameterization(qvec_data, quaternion_parameterization);
-#else
-            ceres::Manifold* quaternion_manifold = 
-                new ceres::QuaternionManifold;
-            problem_->SetManifold(qvec_data, quaternion_manifold);
-#endif
+            SetQuaternionManifold(problem_, qvec_data);
         }
     }
 }
@@ -119,21 +111,8 @@ void HybridBAEngine::ParameterizeLines() {
             problem_->SetParameterBlockConstant(wvec_data);
         }
         else {
-#ifdef CERES_PARAMETERIZATION_ENABLED
-            ceres::LocalParameterization* quaternion_parameterization = 
-                new ceres::QuaternionParameterization;
-            problem_->SetParameterization(uvec_data, quaternion_parameterization);
-            ceres::LocalParameterization* homo2d_parameterization = 
-                new ceres::HomogeneousVectorParameterization(2);
-            problem_->SetParameterization(wvec_data, homo2d_parameterization);
-#else
-            ceres::Manifold* quaternion_manifold = 
-                new ceres::QuaternionManifold;
-            problem_->SetManifold(uvec_data, quaternion_manifold);
-            ceres::Manifold* homo2d_manifold = 
-                new ceres::SphereManifold<2>;
-            problem_->SetManifold(wvec_data, homo2d_manifold);
-#endif
+            SetQuaternionManifold(problem_, uvec_data);
+            SetSphereManifold<2>(problem_, wvec_data);
         }
     }
 }

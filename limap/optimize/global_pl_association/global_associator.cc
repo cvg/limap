@@ -3,6 +3,7 @@
 
 #include "base/line_linker.h"
 #include "base/linetrack.h"
+#include "ceresbase/parameterization.h"
 #include "optimize/line_refinement/cost_functions.h"
 
 #include <cmath>
@@ -271,20 +272,10 @@ void GlobalAssociator::ParameterizeVPs() {
         double* vp_data = it->second.data();
         if (!problem_->HasParameterBlock(vp_data))
             continue;
-        if (config_.constant_vp) {
+        if (config_.constant_vp)
             problem_->SetParameterBlockConstant(vp_data);
-        }
-        else {
-#ifdef CERES_PARAMETERIZATION_ENABLED
-            ceres::LocalParameterization* homo3d_parameterization = 
-                new ceres::HomogeneousVectorParameterization(3);
-            problem_->SetParameterization(vp_data, homo3d_parameterization);
-#else
-            ceres::Manifold* homo3d_manifold = 
-                new ceres::SphereManifold<3>;
-            problem_->SetManifold(vp_data, homo3d_manifold);
-#endif
-        }
+        else
+            SetSphereManifold<3>(problem_, vp_data);
     }
 }
 

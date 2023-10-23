@@ -19,14 +19,7 @@ void LineLocEngine::ParameterizeCamera() {
 
     // We do not optimize for intrinsics
     problem_->SetParameterBlockConstant(kvec_data);
-
-#ifdef CERES_PARAMETERIZATION_ENABLED
-    ceres::LocalParameterization* quaternion_parameterization = new ceres::QuaternionParameterization;
-    problem_->SetParameterization(qvec_data, quaternion_parameterization);
-#else
-    ceres::Manifold* quaternion_manifold = new ceres::QuaternionManifold;
-    problem_->SetManifold(qvec_data, quaternion_manifold);
-#endif
+    SetQuaternionManifold(problem_, qvec_data);
 }
 
 void LineLocEngine::AddResiduals() {
