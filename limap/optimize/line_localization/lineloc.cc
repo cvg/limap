@@ -1,5 +1,6 @@
 #include "optimize/line_localization/lineloc.h"
 #include "optimize/line_localization/cost_functions.h"
+#include "ceresbase/parameterization.h"
 
 #include <colmap/util/logging.h>
 #include <colmap/util/threading.h>
@@ -19,7 +20,7 @@ void LineLocEngine::ParameterizeCamera() {
 
     // We do not optimize for intrinsics
     problem_->SetParameterBlockConstant(kvec_data);
-    SetQuaternionManifold(problem_, qvec_data);
+    SetQuaternionManifold(problem_.get(), qvec_data);
 }
 
 void LineLocEngine::AddResiduals() {

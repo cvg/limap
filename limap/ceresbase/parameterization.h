@@ -37,9 +37,6 @@ inline void SetSphereManifold(ceres::Problem* problem, double* params) {
 #endif
 }
 
-#endif
-
-
 } // namespace limap
 
 #endif

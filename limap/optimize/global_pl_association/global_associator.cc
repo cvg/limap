@@ -275,7 +275,7 @@ void GlobalAssociator::ParameterizeVPs() {
         if (config_.constant_vp)
             problem_->SetParameterBlockConstant(vp_data);
         else
-            SetSphereManifold<3>(problem_, vp_data);
+            SetSphereManifold<3>(problem_.get(), vp_data);
     }
 }
 

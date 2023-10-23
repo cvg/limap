@@ -37,8 +37,8 @@ template <typename DTYPE, int CHANNELS>
 void RefinementEngine<DTYPE, CHANNELS>::ParameterizeMinimalLine() {
     double* uvec_data = inf_line_.uvec.data();
     double* wvec_data = inf_line_.wvec.data();
-    SetQuaternionManifold(problem_, uvec_data);
-    SetSphereManifold<2>(problem_, wvec_data);
+    SetQuaternionManifold(problem_.get(), uvec_data);
+    SetSphereManifold<2>(problem_.get(), wvec_data);
 }
 
 template <typename DTYPE, int CHANNELS>
