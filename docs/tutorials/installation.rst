@@ -6,9 +6,9 @@ Dependencies
 ------------------
 
 * CMake >= 3.17
-* COLMAP 
+* COLMAP 3.8
   
-  Follow `official document <https://colmap.github.io/install.html>`_ to install COLMAP.
+  Follow `official document <https://colmap.github.io/install.html>`_ to install COLMAP. Make sure to use the tag 3.8. (COLMAP has been under active development since summer 2023, so we currently only support COLMAP 3.8 or before)
 
 * PoseLib
   

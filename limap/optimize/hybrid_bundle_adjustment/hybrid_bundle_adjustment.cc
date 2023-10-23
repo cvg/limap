@@ -2,6 +2,7 @@
 #include "optimize/line_refinement/cost_functions.h"
 #include "optimize/hybrid_bundle_adjustment/cost_functions.h"
 #include "base/camera_models.h"
+#include "ceresbase/parameterization.h"
 
 #include <colmap/util/logging.h>
 #include <colmap/util/threading.h>
@@ -69,7 +70,7 @@ void HybridBAEngine::ParameterizeCameras() {
             std::vector<int> const_idxs;
             const std::vector<size_t>& principal_point_idxs = imagecols_.cam(cam_id).PrincipalPointIdxs();
             const_idxs.insert(const_idxs.end(), principal_point_idxs.begin(), principal_point_idxs.end());
-            colmap::SetSubsetManifold(imagecols_.cam(cam_id).params().size(), const_idxs, problem_.get(), params_data); // TODO: change this to customized function
+            SetSubsetManifold(imagecols_.cam(cam_id).params().size(), const_idxs, problem_.get(), params_data); 
         }
 
         if (config_.constant_pose) {
@@ -83,15 +84,7 @@ void HybridBAEngine::ParameterizeCameras() {
         else {
             if (!problem_->HasParameterBlock(qvec_data))
                 continue;
-#ifdef CERES_PARAMETERIZATION_ENABLED
-            ceres::LocalParameterization* quaternion_parameterization = 
-                new ceres::QuaternionParameterization;
-            problem_->SetParameterization(qvec_data, quaternion_parameterization);
-#else
-            ceres::Manifold* quaternion_manifold = 
-                new ceres::QuaternionManifold;
-            problem_->SetManifold(qvec_data, quaternion_manifold);
-#endif
+            SetQuaternionManifold(problem_.get(), qvec_data);
         }
     }
 }
@@ -119,21 +112,8 @@ void HybridBAEngine::ParameterizeLines() {
             problem_->SetParameterBlockConstant(wvec_data);
         }
         else {
-#ifdef CERES_PARAMETERIZATION_ENABLED
-            ceres::LocalParameterization* quaternion_parameterization = 
-                new ceres::QuaternionParameterization;
-            problem_->SetParameterization(uvec_data, quaternion_parameterization);
-            ceres::LocalParameterization* homo2d_parameterization = 
-                new ceres::HomogeneousVectorParameterization(2);
-            problem_->SetParameterization(wvec_data, homo2d_parameterization);
-#else
-            ceres::Manifold* quaternion_manifold = 
-                new ceres::QuaternionManifold;
-            problem_->SetManifold(uvec_data, quaternion_manifold);
-            ceres::Manifold* homo2d_manifold = 
-                new ceres::SphereManifold<2>;
-            problem_->SetManifold(wvec_data, homo2d_manifold);
-#endif
+            SetQuaternionManifold(problem_.get(), uvec_data);
+            SetSphereManifold<2>(problem_.get(), wvec_data);
         }
     }
 }
