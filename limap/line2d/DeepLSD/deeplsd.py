@@ -33,7 +33,7 @@ class DeepLSDDetector(BaseDetector):
         import subprocess
         if not os.path.exists(os.path.dirname(path)):
             os.makedirs(os.path.dirname(path))
-        link = "https://www.polybox.ethz.ch/index.php/s/XVb30sUyuJttFys/download"
+        link = "https://cvg-data.inf.ethz.ch/DeepLSD/deeplsd_md.tar"
         cmd = ["wget", link, "-O", path]
         print("Downloading DeepLSD model...")
         subprocess.run(cmd, check=True)

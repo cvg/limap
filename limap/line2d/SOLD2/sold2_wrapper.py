@@ -30,7 +30,7 @@ class SOLD2LineDetector():
         if not os.path.isfile(self.ckpt_path):
             if not os.path.exists(os.path.dirname(self.ckpt_path)):
                 os.makedirs(os.path.dirname(self.ckpt_path))
-            link = "https://www.polybox.ethz.ch/index.php/s/blOrW89gqSLoHOk/download"
+            link = "https://cvg-data.inf.ethz.ch/SOLD2/sold2_wireframe.tar"
             cmd = ['wget', link, '-O', self.ckpt_path]
             print("Downloading SOLD2 model...")
             subprocess.run(cmd, check=True)
