@@ -1,0 +1,18 @@
+---
+###############################
+# fast config
+base_config_file: "cfgs/triangulation/default.yaml"
+sfm:
+    hloc:
+        descriptor: "sift"
+        matcher: "NN-ratio"
+line2d:
+    detector:
+        method: "lsd"
+    extractor:
+        method: "lbd"
+    matcher:
+        method: "lbd"
+        topk: 0
+        n_jobs: 16
+

@@ -1,0 +1,12 @@
+---
+###############################
+# fast config
+base_config_file: "cfgs/fitnmerge/default.yaml"
+sfm:
+    hloc:
+        descriptor: "sift"
+        matcher: "NN-ratio"
+line2d:
+    detector:
+        method: "lsd"
+

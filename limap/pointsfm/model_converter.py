@@ -96,6 +96,7 @@ def convert_imagecols_to_colmap(imagecols, colmap_output_path):
         colmap_cameras[cam_id] = colmap_utils.Camera(id=cam_id, model=model_name, width=cam.w(), height=cam.h(), params=cam.params())
     fname = os.path.join(colmap_output_path, 'cameras.txt')
     colmap_utils.write_cameras_text(colmap_cameras, fname)
+    colmap_utils.write_cameras_binary(colmap_cameras, fname[:-4] + ".bin")
 
     ### write images.txt
     colmap_images = {}
@@ -110,8 +111,10 @@ def convert_imagecols_to_colmap(imagecols, colmap_output_path):
                                                    xys=[], point3D_ids=[])
     fname = os.path.join(colmap_output_path, 'images.txt')
     colmap_utils.write_images_text(colmap_images, fname)
+    colmap_utils.write_images_binary(colmap_images, fname[:-4] + ".bin")
 
     ### write empty points3D.txt
     fname = os.path.join(colmap_output_path, 'points3D.txt')
     colmap_utils.write_points3D_text({}, fname)
+    colmap_utils.write_points3D_binary({}, fname[:-4] + ".bin")
 
