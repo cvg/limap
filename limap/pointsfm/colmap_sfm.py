@@ -69,11 +69,24 @@ def run_hloc_matches(cfg, image_path, db_path, keypoints=None, neighbors=None, i
     outputs = Path(os.path.join(os.path.dirname(db_path), 'hloc_outputs'))
     sfm_dir = Path(os.path.join(outputs, "sfm"))
     feature_conf = extract_features.confs[cfg["descriptor"]]
+    if cfg["descriptor"] == "sift":
+        # make sift consistent with colmap
+        feature_conf["model"]["options"] = dict()
+        feature_conf["model"]["options"]["first_octave"] = -1
+        feature_conf["model"]["options"]["peak_threshold"] = 0.02 / 3
     matcher_conf = match_features.confs[cfg["matcher"]]
 
-    # run superpoint
-    from limap.point2d import run_superpoint
-    feature_path = run_superpoint(feature_conf, image_path, outputs, keypoints=keypoints)
+    # feature extraction
+    if keypoints is not None and keypoints != []:
+        if cfg["descriptor"][:10] != "superpoint":
+            raise ValueError("Error! Non-superpoint feature extraction is unfortunately not supported in the current implementation.")
+        # run superpoint
+        from limap.point2d import run_superpoint
+        feature_path = run_superpoint(feature_conf, image_path, outputs, keypoints=keypoints)
+    else:
+        feature_path = extract_features.main(feature_conf, image_path, outputs)
+
+    # feature matching
     if neighbors is None or imagecols is None:
         # run exhaustive matches
         sfm_pairs = outputs / "pairs-exhaustive.txt"
