@@ -18,7 +18,7 @@ In this project, we provide interfaces for various geometric operations on 2D/3D
 
 ## Installation
 
-**Note**: COLMAP has been under active development since summer 2023, so we currently only support COLMAP 3.8 or before.
+**Note**: COLMAP has been under active development since summer 2023, so we currently only support COLMAP 3.8.
 
 **Install the dependencies as follows:**
 * CMake >= 3.17
