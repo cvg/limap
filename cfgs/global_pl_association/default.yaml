@@ -2,6 +2,7 @@ global_pl_association:
     use_vp: True
     print_summary: True 
     constant_intrinsics: True 
+    constant_principal_point: True
     constant_pose: True 
     constant_point: False 
     constant_line: False

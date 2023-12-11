@@ -128,6 +128,7 @@ var2d: # in pixels
     lsd: 2.0
     hawpv3: 5.0
     tp_lsd: 5.0
+    deeplsd: 4.0
 
 ##############################
 # triangulation config
@@ -198,6 +199,7 @@ triangulation:
 refinement:
     disable: False
     constant_intrinsics: True
+    constant_principal_point: True
     constant_pose: True
     constant_line: False
     min_num_images: 4

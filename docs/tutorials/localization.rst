@@ -60,7 +60,6 @@ Now, to run the localization pipeline with points and lines. As shown above, the
 
     python runners/7scenes/localization.py --dataset $dataset -s stairs --skip_exists \
                                            --localization.optimize.loss_func TrivialLoss \
-                                           --localization.optimize.normalize_weight
 
 It is also possible to use the rendered depth with the ``--use_dense_depth`` flag, in which case the 3D line map will be built using LIMAP's Fit&Merge (enable merging by adding ``--merging.do_merging``) utilities instead of triangulation.
 
@@ -69,6 +68,5 @@ It is also possible to use the rendered depth with the ``--use_dense_depth`` fla
     python runners/7scenes/localization.py --dataset $dataset -s stairs --skip_exists \
                                            --use_dense_depth \
                                            --localization.optimize.loss_func TrivialLoss \
-                                           --localization.optimize.normalize_weight
 
 The runner scripts will also run `hloc <https://github.com/cvg/Hierarchical-Localization/tree/master/hloc/pipelines/7Scenes>`_ for extracting and matching the feature points and for comparing the results. The evaluation result will be printed in terminal after localization is finished. You could also evaluate different result ``.txt`` files using the ``--eval`` flag.
