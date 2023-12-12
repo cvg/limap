@@ -30,8 +30,6 @@ def parse_config():
     arg_parser.add_argument('--default_config_file', type=str, default='cfgs/localization/default.yaml', help='default config file')
     arg_parser.add_argument('--dataset', type=Path, required=True, help='inloc dataset path')
     arg_parser.add_argument('--info_path', type=str, default=None, help='load precomputed info')
-    arg_parser.add_argument('--outputs', type=Path, default='outputs/localization/inloc',
-                        help='Path to the output directory, default: %(default)s')
 
     arg_parser.add_argument('--num_loc', type=int, default=40,
                         help='Number of image pairs for loc, default: %(default)s')
@@ -51,19 +49,23 @@ def parse_config():
         cfg["refinement"]["disable"] = True
     cfg['info_path'] = args.info_path
     cfg['n_neighbors_loc'] = args.num_loc
+
+    # Output path for LIMAP results (tmp)
+    if cfg['output_dir'] is None:
+        cfg['output_dir'] = 'tmp/inloc'
+    # Output folder for LIMAP linetracks (in tmp)
+    if cfg['output_folder'] is None:
+        cfg['output_folder'] = 'finaltracks'
+    cfg['inloc_dataset'] = args.dataset # For reading camera poses for estimating 3D lines fron depth
     return cfg, args
 
 def main():
     cfg, args = parse_config()
-    cfg['inloc_dataset'] = args.dataset # For reading camera poses for estimating 3D lines fron depth 
-    
-    # Output path for LIMAP results (tmp)
-    if cfg['output_dir'] is None:
-        cfg['output_dir'] = 'tmp/inloc'
     cfg = _runners.setup(cfg)
 
-    # args.outputs is for localization-related results
-    args.outputs.mkdir(exist_ok=True, parents=True)
+    # outputs is for localization-related results
+    outputs = Path(cfg['output_dir']) / 'localization'
+    outputs.mkdir(exist_ok=True, parents=True)
 
     logger.info(f'Working on InLoc.')
     pairs = Path('third-party/Hierarchical-Localization/pairs/inloc/')
@@ -74,7 +76,7 @@ def main():
         imagecols.set_max_image_dim(cfg["max_image_dim"])
 
     results_point, results_joint = get_result_filenames(cfg['localization'], args.use_temporal)
-    results_point, results_joint = args.outputs / results_point, args.outputs / results_joint
+    results_point, results_joint = outputs / results_point, outputs / results_joint
 
     ##########################################################
     # [A] hloc point-based localization

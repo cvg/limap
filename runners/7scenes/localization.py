@@ -37,8 +37,6 @@ def parse_config():
     arg_parser.add_argument('--dataset', type=Path, required=True, help='7scenes root path')
     arg_parser.add_argument('-s', '--scene', type=str, required=True, help='scene name(s)')
     arg_parser.add_argument('--info_path', type=str, default=None, help='load precomputed info')
-    arg_parser.add_argument('--outputs', type=Path, default='outputs/localization/7scenes',
-                        help='Path to the output directory, default: %(default)s')
 
     arg_parser.add_argument('--query_images', default=None, type=Path, help='Path to the file listing query images')
     arg_parser.add_argument('--eval', default=None, type=Path, help='Path to the result file')
@@ -61,10 +59,6 @@ def parse_config():
     if cfg['merging']['do_merging'] and '--refinement.disable' not in unknown:
         # disable refinement for fitnmerge
         cfg['refinement']['disable'] = True
-    return cfg, args
-
-def main():
-    cfg, args = parse_config()
 
     # Output path for LIMAP results (tmp)
     if cfg['output_dir'] is None:
@@ -73,10 +67,14 @@ def main():
     if cfg['output_folder'] is None:
         cfg['output_folder'] = 'finaltracks'
     cfg['output_folder'] += '_{}'.format('dense' if args.use_dense_depth else 'sparse')
+    return cfg, args
+
+def main():
+    cfg, args = parse_config()
     cfg = _runners.setup(cfg)
 
     # outputs is for localization-related results
-    outputs = args.outputs / f'{args.scene}'
+    outputs = Path(cfg['output_dir']) / 'localization'
     outputs.mkdir(exist_ok=True, parents=True)
 
     logger.info(f'Working on scene "{args.scene}".')
@@ -93,7 +91,7 @@ def main():
     if args.use_dense_depth and cfg['merging']['do_merging']:
         results_joint = results_joint.replace('dense', 'dense_fnm')
     results_point, results_joint = outputs / results_point, outputs / results_joint
-    
+
     ##########################################################
     # [A] hloc point-based localization
     ##########################################################
@@ -101,7 +99,7 @@ def main():
         cfg, args.dataset, args.scene, results_point, test_list, args.num_covis, args.use_dense_depth, logger
     )
     train_ids, query_ids = ids['train'], ids['query']
-    
+
     # Some paths useful for LIMAP localization too
     ref_sfm_path = outputs / ('sfm_superpoint+superglue' + ('+depth' if args.use_dense_depth else ''))
     depth_dir = args.dataset / f'depth/7scenes_{args.scene}/train/depth'

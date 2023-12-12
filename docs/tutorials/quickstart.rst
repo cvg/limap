@@ -54,7 +54,7 @@ To run the examples, for instance the first one:
 
 .. code-block:: bash
 
-    python runners/tests/localization.py --data runners/tests/localization_test_data_stairs_1.npy
+    python runners/tests/localization.py --data runners/tests/data/localization/localization_test_data_stairs_1.npy
 
 The script will print the pose error estimated using point-only (hloc), and the pose error estimated by our hybrid point-line localization framework. In addition, two images will be created in the output folder (default to ``outputs/test/localization``) showing the inliers point and line correspondences in hybrid localization projected using the two estimated camera pose (by point-only and point+line) onto the query image with 2D point and line detections marked. 
 
