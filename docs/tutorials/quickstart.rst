@@ -48,7 +48,7 @@ Also, the combination  ``LSD detector + Endpoints NN matcher`` can be enabled wi
 Hybrid Localization with Points and Lines
 -------------------------------------------------
 
-We provide two query examples for localization from the Stairs scene in the `7Scenes <https://www.microsoft.com/en-us/research/project/rgb-d-dataset-7-scenes/>`_ Dataset, where traditional point-based methods normally struggle due to the repeated steps and lack of texture. The examples are provided in ``.npy`` files: ``runners/tests/localization/localization_test_data_stairs_[1|2].npy``, which contains the necessary 2D-3D point and line correspondences along with the necessary configurations.
+We provide two query examples for localization from the Stairs scene in the `7Scenes <https://www.microsoft.com/en-us/research/project/rgb-d-dataset-7-scenes/>`_ Dataset, where traditional point-based methods normally struggle due to the repeated steps and lack of texture. The examples are provided in ``.npy`` files: ``runners/tests/localization/data/localization/localization_test_data_stairs_[1|2].npy``, which contains the necessary 2D-3D point and line correspondences along with the necessary configurations.
 
 To run the examples, for instance the first one:
 
