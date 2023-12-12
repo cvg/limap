@@ -49,18 +49,18 @@ def parse_config():
         cfg["refinement"]["disable"] = True
     cfg['info_path'] = args.info_path
     cfg['n_neighbors_loc'] = args.num_loc
-    return cfg, args
 
-def main():
-    cfg, args = parse_config()
-    cfg['inloc_dataset'] = args.dataset # For reading camera poses for estimating 3D lines fron depth 
-    
     # Output path for LIMAP results (tmp)
     if cfg['output_dir'] is None:
         cfg['output_dir'] = 'tmp/inloc'
     # Output folder for LIMAP linetracks (in tmp)
     if cfg['output_folder'] is None:
         cfg['output_folder'] = 'finaltracks'
+    cfg['inloc_dataset'] = args.dataset # For reading camera poses for estimating 3D lines fron depth
+    return cfg, args
+
+def main():
+    cfg, args = parse_config()
     cfg = _runners.setup(cfg)
 
     # outputs is for localization-related results
