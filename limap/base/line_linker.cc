@@ -10,7 +10,7 @@ double expscore(const double& val, const double& sigma) {
 
 double get_multiplier(const double& score_th) {
     // exp(- (val / sigma)^2 / 2.0) >= 0.5 <--> val <= 1.1774100 sigma
-    return sqrt(-log(score_th) * 2.0);
+    return 1.0 / sqrt(-log(score_th) * 2.0);
 }
 
 double LineLinker2d::compute_score_angle(const Line2d& l1, const Line2d& l2) const {
