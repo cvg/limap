@@ -4,7 +4,7 @@
 
 # Check version
 version_string=$(black --version | sed -E 's/^.*(\d+\.\d+-.*).*$/\1/')
-expected_version_string='24.4.2'
+expected_version_string='21.12'
 if [[ "$version_string" =~ "$expected_version_string" ]]; then
     echo "black version '$version_string' matches '$expected_version_string'"
 else
