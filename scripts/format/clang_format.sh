@@ -5,7 +5,7 @@
 # Find clang-format
 tools='
   clang-format-8
-  clang-format-14
+  clang-format
 '
 
 clang_format=''
@@ -24,7 +24,7 @@ echo "Found clang-format: $(which  ${clang_format})"
 
 # Check version
 version_string=$($clang_format --version | sed -E 's/^.*(\d+\.\d+\.\d+-.*).*$/\1/')
-expected_version_string='14.0.6'
+expected_version_string='14.0.0'
 if [[ "$version_string" =~ "$expected_version_string" ]]; then
     echo "clang-format version '$version_string' matches '$expected_version_string'"
 else
@@ -36,7 +36,7 @@ fi
 root_folder=$(git rev-parse --show-toplevel)
 all_files=$( \
     git ls-tree --full-tree -r --name-only HEAD . \
-    | grep "limap.*\(\.cc\|\.h\|\.hpp\|\.cpp\|\.cu\)$" \
+    | grep "^limap.*\(\.cc\|\.h\|\.hpp\|\.cpp\|\.cu\)$" \
     | sed "s~^~$root_folder/~")
 num_files=$(echo $all_files | wc -w)
 echo "Formatting ${num_files} files"

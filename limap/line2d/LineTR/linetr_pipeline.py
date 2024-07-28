@@ -90,7 +90,6 @@ class LineTrPipeline(BaseModel):
         return torch.stack(lines).to(x)
 
     def _forward(self, data):
-
         def process_siamese(data, i):
             data_i = {k[:-1]: v for k, v in data.items() if k[-1] == i}
             if self.conf.extractor.name:
@@ -181,30 +180,34 @@ class LineTrPipeline(BaseModel):
                 ):
                     # Several points are sampled per line, and we supervise them independently
                     b_size = len(pred["lines0"])
-                    samples_assignment, samples_m0, samples_m1 = (
-                        gt_matches_from_homography(
-                            pred["lines0"].reshape(b_size, -1, 2),
-                            pred["lines1"].reshape(b_size, -1, 2),
-                            **data,
-                            pos_th=self.conf.ground_truth.th_positive
-                        )
+                    (
+                        samples_assignment,
+                        samples_m0,
+                        samples_m1,
+                    ) = gt_matches_from_homography(
+                        pred["lines0"].reshape(b_size, -1, 2),
+                        pred["lines1"].reshape(b_size, -1, 2),
+                        **data,
+                        pos_th=self.conf.ground_truth.th_positive
                     )
                     pred["samples_gt_assignment"] = samples_assignment
                     pred["samples_gt_matches0"] = samples_m0
                     pred["samples_gt_matches1"] = samples_m1
 
                 # Compute the GT line association
-                line_assignment, line_m0, line_m1 = (
-                    gt_line_matches_from_homography(
-                        pred["lines0"],
-                        pred["lines1"],
-                        pred["valid_lines0"],
-                        pred["valid_lines1"],
-                        data,
-                        self.conf.ground_truth.n_line_sampled_pts,
-                        self.conf.ground_truth.line_perp_dist_th,
-                        self.conf.ground_truth.overlap_th,
-                    )
+                (
+                    line_assignment,
+                    line_m0,
+                    line_m1,
+                ) = gt_line_matches_from_homography(
+                    pred["lines0"],
+                    pred["lines1"],
+                    pred["valid_lines0"],
+                    pred["valid_lines1"],
+                    data,
+                    self.conf.ground_truth.n_line_sampled_pts,
+                    self.conf.ground_truth.line_perp_dist_th,
+                    self.conf.ground_truth.overlap_th,
                 )
                 pred["line_gt_matches0"] = line_m0
                 pred["line_gt_matches1"] = line_m1
@@ -232,31 +235,37 @@ class LineTrPipeline(BaseModel):
                 ):
                     # Several points are sampled per line, and we supervise them independently
                     b_size = len(pred["lines0"])
-                    samples_assignment, samples_m0, samples_m1 = (
-                        gt_matches_from_pose_depth(
-                            pred["lines0"].reshape(b_size, -1, 2),
-                            pred["lines1"].reshape(b_size, -1, 2),
-                            **data,
-                            pos_th=self.conf.ground_truth.th_positive,
-                            neg_th=self.conf.ground_truth.th_negative
-                        )[:3]
-                    )
+                    (
+                        samples_assignment,
+                        samples_m0,
+                        samples_m1,
+                    ) = gt_matches_from_pose_depth(
+                        pred["lines0"].reshape(b_size, -1, 2),
+                        pred["lines1"].reshape(b_size, -1, 2),
+                        **data,
+                        pos_th=self.conf.ground_truth.th_positive,
+                        neg_th=self.conf.ground_truth.th_negative
+                    )[
+                        :3
+                    ]
                     pred["samples_gt_assignment"] = samples_assignment
                     pred["samples_gt_matches0"] = samples_m0
                     pred["samples_gt_matches1"] = samples_m1
 
                 # Compute the GT line association
-                line_assignment, line_m0, line_m1 = (
-                    gt_line_matches_from_pose_depth(
-                        pred["lines0"],
-                        pred["lines1"],
-                        pred["valid_lines0"],
-                        pred["valid_lines1"],
-                        data,
-                        self.conf.ground_truth.n_line_sampled_pts,
-                        self.conf.ground_truth.line_perp_dist_th,
-                        self.conf.ground_truth.overlap_th,
-                    )
+                (
+                    line_assignment,
+                    line_m0,
+                    line_m1,
+                ) = gt_line_matches_from_pose_depth(
+                    pred["lines0"],
+                    pred["lines1"],
+                    pred["valid_lines0"],
+                    pred["valid_lines1"],
+                    data,
+                    self.conf.ground_truth.n_line_sampled_pts,
+                    self.conf.ground_truth.line_perp_dist_th,
+                    self.conf.ground_truth.overlap_th,
                 )
                 pred["line_gt_matches0"] = line_m0
                 pred["line_gt_matches1"] = line_m1
@@ -299,21 +308,21 @@ class LineTrPipeline(BaseModel):
         assert match_mat.shape[0] == 1
         bool_match_mat = match_mat[0] > 0
         pred["line_matches0"] = np.argmax(bool_match_mat, axis=1)
-        pred["line_matches0"][~np.any(bool_match_mat, axis=1)] = (
-            UNMATCHED_FEATURE
-        )
+        pred["line_matches0"][
+            ~np.any(bool_match_mat, axis=1)
+        ] = UNMATCHED_FEATURE
         pred["line_matches1"] = np.argmax(bool_match_mat, axis=0)
-        pred["line_matches1"][~np.any(bool_match_mat, axis=0)] = (
-            UNMATCHED_FEATURE
-        )
+        pred["line_matches1"][
+            ~np.any(bool_match_mat, axis=0)
+        ] = UNMATCHED_FEATURE
         pred["line_matches0"] = torch.from_numpy(pred["line_matches0"])[None]
         pred["line_matches1"] = torch.from_numpy(pred["line_matches1"])[None]
         lmatch_scores = torch.from_numpy(
             distance_matrix[(0,) + np.where(match_mat[0] > 0)]
         )
-        pred["line_match_scores0"] = pred["line_match_scores1"] = (
-            -lmatch_scores[None]
-        )
+        pred["line_match_scores0"] = pred[
+            "line_match_scores1"
+        ] = -lmatch_scores[None]
         return pred
 
     def loss(self, pred, data):

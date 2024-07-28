@@ -1,0 +1,44 @@
+name: Check code formatting (Ubuntu)
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [ assigned, opened, synchronize, reopened ]
+  release:
+    types: [ published, edited ]
+
+jobs:
+  build:
+    name: ${{ matrix.config.os }} formatting 
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      matrix:
+        config: [
+          {
+            os: ubuntu-22.04,
+            checkCodeFormat: true,
+          },
+        ]
+
+    env:
+      COMPILER_CACHE_VERSION: 1
+      COMPILER_CACHE_DIR: ${{ github.workspace }}/compiler-cache
+      CCACHE_DIR: ${{ github.workspace }}/compiler-cache/ccache
+      CCACHE_BASEDIR: ${{ github.workspace }}
+      CTCACHE_DIR: ${{ github.workspace }}/compiler-cache/ctcache
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check code format
+        run: |
+          if [ "${{ matrix.config.checkCodeFormat }}" != "true" ]; then
+            exit 0
+          fi
+          set +x -euo pipefail
+          sudo apt-get update && sudo apt-get install -y clang-format-14 black
+          ./scripts/format/clang_format.sh
+          ./scripts/format/black.sh
+          git diff --name-only
+          git diff --exit-code || (echo "Code formatting failed" && exit 1)

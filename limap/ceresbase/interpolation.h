@@ -87,9 +87,9 @@ template <typename dtype> struct InterpolationQuery {
                      const Eigen::Vector2d &scale_,
                      const std::array<int, 3> &shape_, const dtype *data_ptr_)
       : scale(scale_), shape(shape_), corner(corner_), data_ptr(data_ptr_) {}
-  Eigen::Vector2d scale; // Could be a const-reference? --> With little change
-                         // to pybind this can be done
-  Eigen::Vector2i corner;   // Could be a const-reference?
+  Eigen::Vector2d scale;  // Could be a const-reference? --> With little change
+                          // to pybind this can be done
+  Eigen::Vector2i corner; // Could be a const-reference?
   std::array<int, 3> shape; // Could be a const-reference?
   const dtype *data_ptr;
 
