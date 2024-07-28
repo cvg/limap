@@ -8,7 +8,7 @@
 
 namespace limap {
 
-inline void SetQuaternionManifold(ceres::Problem* problem, double* qvec) {
+inline void SetQuaternionManifold(ceres::Problem *problem, double *qvec) {
 #ifdef CERES_PARAMETERIZATION_ENABLED
   problem->SetParameterization(qvec, new ceres::QuaternionParameterization);
 #else
@@ -16,8 +16,8 @@ inline void SetQuaternionManifold(ceres::Problem* problem, double* qvec) {
 #endif
 }
 
-inline void SetSubsetManifold(int size, const std::vector<int>& constant_params,
-                              ceres::Problem* problem, double* params) {
+inline void SetSubsetManifold(int size, const std::vector<int> &constant_params,
+                              ceres::Problem *problem, double *params) {
 #ifdef CERES_PARAMETERIZATION_ENABLED
   problem->SetParameterization(
       params, new ceres::SubsetParameterization(size, constant_params));
@@ -28,7 +28,7 @@ inline void SetSubsetManifold(int size, const std::vector<int>& constant_params,
 }
 
 template <int size>
-inline void SetSphereManifold(ceres::Problem* problem, double* params) {
+inline void SetSphereManifold(ceres::Problem *problem, double *params) {
 #ifdef CERES_PARAMETERIZATION_ENABLED
   problem->SetParameterization(
       params, new ceres::HomogeneousVectorParameterization(size));
@@ -40,4 +40,3 @@ inline void SetSphereManifold(ceres::Problem* problem, double* params) {
 } // namespace limap
 
 #endif
-

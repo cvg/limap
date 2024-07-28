@@ -2,29 +2,29 @@
 #define LIMAP_EVALUATION_MESH_EVALUATOR_H_
 
 #include "base/linebase.h"
-#include "util/types.h"
 #include "evaluation/base_evaluator.h"
+#include "util/types.h"
 
-#include <tuple>
-#include <string>
 #include <igl/AABB.h>
+#include <string>
+#include <tuple>
 
 namespace limap {
 
 namespace evaluation {
 
-class MeshEvaluator: public BaseEvaluator {
+class MeshEvaluator : public BaseEvaluator {
 public:
-    MeshEvaluator(): BaseEvaluator() {}
-    MeshEvaluator(const std::string& filename, const double& mpau);
+  MeshEvaluator() : BaseEvaluator() {}
+  MeshEvaluator(const std::string &filename, const double &mpau);
 
-    // compute dist point
-    double ComputeDistPoint(const V3D& point) override;
+  // compute dist point
+  double ComputeDistPoint(const V3D &point) override;
 
 private:
-    Eigen::MatrixXd V_;
-    Eigen::MatrixXi F_;
-    igl::AABB<Eigen::MatrixXd, 3> tree_;
+  Eigen::MatrixXd V_;
+  Eigen::MatrixXi F_;
+  igl::AABB<Eigen::MatrixXd, 3> tree_;
 };
 
 } // namespace evaluation
@@ -32,4 +32,3 @@ private:
 } // namespace limap
 
 #endif
-

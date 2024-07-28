@@ -50,22 +50,23 @@ namespace absolute_pose {
 using namespace ransac_lib;
 
 // Our customized RANSAC based on HybridLocallyOptimizedMSAC from RansacLib
-// [LINK] https://github.com/tsattler/RansacLib/blob/master/RansacLib/hybrid_ransac.h
+// [LINK]
+// https://github.com/tsattler/RansacLib/blob/master/RansacLib/hybrid_ransac.h
 template <class Model, class ModelVector, class HybridSolver,
-          class Sampler = HybridUniformSampling<HybridSolver> >
+          class Sampler = HybridUniformSampling<HybridSolver>>
 class PointLineAbsolutePoseHybridRansac : public HybridRansacBase {
- public:
+public:
   // Estimates a model using a given solver. Notice that the solver contains
   // all data and is responsible to implement a non-minimal solver and
   // least-squares refinement. The latter two are optional, i.e., a dummy
   // implementation returning false is sufficient.
   // Returns the number of inliers.
-  int EstimateModel(const ExtendedHybridLORansacOptions& options,
-                    const HybridSolver& solver, Model* best_model,
-                    HybridRansacStatistics* statistics) const {
+  int EstimateModel(const ExtendedHybridLORansacOptions &options,
+                    const HybridSolver &solver, Model *best_model,
+                    HybridRansacStatistics *statistics) const {
     // Initializes all relevant variables.
     ResetStatistics(statistics);
-    HybridRansacStatistics& stats = *statistics;
+    HybridRansacStatistics &stats = *statistics;
 
     const int kNumSolvers = solver.num_minimal_solvers();
     stats.num_iterations_per_solver.resize(kNumSolvers, 0);
@@ -97,7 +98,7 @@ class PointLineAbsolutePoseHybridRansac : public HybridRansacBase {
         kNumSolvers, std::max(options.max_num_iterations_per_solver_,
                               options.min_num_iterations_));
 
-    const std::vector<double>& kSqrInlierThresh =
+    const std::vector<double> &kSqrInlierThresh =
         options.squared_inlier_thresholds_;
 
     Model best_minimal_model;
@@ -174,7 +175,8 @@ class PointLineAbsolutePoseHybridRansac : public HybridRansacBase {
           const bool kRunLO =
               (stats.num_iterations_total >= options.lo_starting_iterations_ &&
                best_min_model_score < std::numeric_limits<double>::max());
-          if ((!kBestMinModel) && (!kRunLO)) continue;
+          if ((!kBestMinModel) && (!kRunLO))
+            continue;
 
           // Performs local optimization. By construction, the local
           // optimization method returns the best model between all models found
@@ -247,13 +249,13 @@ class PointLineAbsolutePoseHybridRansac : public HybridRansacBase {
     return stats.best_num_inliers;
   }
 
- protected:
+protected:
   // Randomly selects a minimal solver. See Eq. 1 in Camposeco et al.
-  int SelectMinimalSolver(const HybridSolver& solver,
+  int SelectMinimalSolver(const HybridSolver &solver,
                           const std::vector<double> prior_probabilities,
-                          const HybridRansacStatistics& stats,
+                          const HybridRansacStatistics &stats,
                           const uint32_t min_num_iterations,
-                          std::mt19937* rng) const {
+                          std::mt19937 *rng) const {
     double sum_probabilities = 0.0;
     const int kNumSolvers = static_cast<int>(prior_probabilities.size());
     std::vector<std::vector<int>> min_sample_sizes;
@@ -303,20 +305,22 @@ class PointLineAbsolutePoseHybridRansac : public HybridRansacBase {
     const double kProb = dist(*rng);
     double current_prob = 0.0;
     for (int i = 0; i < kNumSolvers; ++i) {
-      if (prior_probabilities[i] == 0.0) continue;
+      if (prior_probabilities[i] == 0.0)
+        continue;
 
       current_prob += probabilities[i];
-      if (kProb <= current_prob) return i;
+      if (kProb <= current_prob)
+        return i;
     }
     return -1;
   }
 
   void GetBestEstimatedModelId(
-      const ExtendedHybridLORansacOptions& options, const HybridSolver& solver,
-      const ModelVector& models, const int num_models,
-      const std::vector<double>& squared_inlier_thresholds,
+      const ExtendedHybridLORansacOptions &options, const HybridSolver &solver,
+      const ModelVector &models, const int num_models,
+      const std::vector<double> &squared_inlier_thresholds,
       const int num_data_types, const std::vector<int> num_data,
-      double* best_score, int* best_model_id) const {
+      double *best_score, int *best_model_id) const {
     *best_score = std::numeric_limits<double>::max();
     *best_model_id = 0;
 
@@ -332,11 +336,11 @@ class PointLineAbsolutePoseHybridRansac : public HybridRansacBase {
     }
   }
 
-  void ScoreModel(const ExtendedHybridLORansacOptions& options,
-                  const HybridSolver& solver, const Model& model,
-                  const std::vector<double>& squared_inlier_thresholds,
+  void ScoreModel(const ExtendedHybridLORansacOptions &options,
+                  const HybridSolver &solver, const Model &model,
+                  const std::vector<double> &squared_inlier_thresholds,
                   const int num_data_types, const std::vector<int> num_data,
-                  double* score) const {
+                  double *score) const {
     *score = 0.0;
 
     for (int t = 0; t < num_data_types; ++t) {
@@ -354,9 +358,9 @@ class PointLineAbsolutePoseHybridRansac : public HybridRansacBase {
     return std::min(squared_error, squared_error_threshold);
   }
 
-  int GetInliers(const HybridSolver& solver, const Model& model,
-                 const std::vector<double>& squared_inlier_thresholds,
-                 std::vector<std::vector<int>>* inliers) const {
+  int GetInliers(const HybridSolver &solver, const Model &model,
+                 const std::vector<double> &squared_inlier_thresholds,
+                 std::vector<std::vector<int>> *inliers) const {
     const int kNumDataTypes = solver.num_data_types();
     std::vector<int> num_data;
     solver.num_data(&num_data);
@@ -390,9 +394,9 @@ class PointLineAbsolutePoseHybridRansac : public HybridRansacBase {
   }
 
   void UpdateRANSACTerminationCriteria(
-      const ExtendedHybridLORansacOptions& options, const HybridSolver& solver,
-      const Model& model, HybridRansacStatistics* statistics,
-      std::vector<uint32_t>* max_iterations) const {
+      const ExtendedHybridLORansacOptions &options, const HybridSolver &solver,
+      const Model &model, HybridRansacStatistics *statistics,
+      std::vector<uint32_t> *max_iterations) const {
     statistics->best_num_inliers =
         GetInliers(solver, model, options.squared_inlier_thresholds_,
                    &(statistics->inlier_indices));
@@ -425,11 +429,11 @@ class PointLineAbsolutePoseHybridRansac : public HybridRansacBase {
   // See algorithms 2 and 3 in Lebeda et al.
   // The input model is overwritten with the refined model if the latter is
   // better, i.e., has a lower score.
-  void LocalOptimization(const ExtendedHybridLORansacOptions& options,
-                         const HybridSolver& solver, const int solver_type,
-                         std::mt19937* rng, Model* best_minimal_model,
-                         double* score_best_minimal_model,
-                         int* best_solver_type) const {
+  void LocalOptimization(const ExtendedHybridLORansacOptions &options,
+                         const HybridSolver &solver, const int solver_type,
+                         std::mt19937 *rng, Model *best_minimal_model,
+                         double *score_best_minimal_model,
+                         int *best_solver_type) const {
     std::vector<int> num_data;
     solver.num_data(&num_data);
     const int kNumDataTypes = static_cast<int>(num_data.size());
@@ -468,24 +472,26 @@ class PointLineAbsolutePoseHybridRansac : public HybridRansacBase {
     std::vector<int> inliers_base_all_type = inliers_base[0];
     int num_data_previous_types = 0;
     for (int i = 1; i < inliers_base.size(); i++) {
-      num_data_previous_types += num_data[i-1];
+      num_data_previous_types += num_data[i - 1];
       for (auto &idx : inliers_base[i])
         inliers_base_all_type.push_back(idx + num_data_previous_types);
     }
 
     // Determines the size of the non-miminal samples drawn in each LO step.
     // std::vector<int> kNonMinSampleSizes(kNumDataTypes);
-    const int kMinNonMinSampleSize = solver.non_minimal_sample_size(); // / kNumDataTypes + 1;
+    const int kMinNonMinSampleSize =
+        solver.non_minimal_sample_size(); // / kNumDataTypes + 1;
     int kMinSampleSize = solver.min_sample_size();
-    int kNonMinSampleSize = 
+    int kNonMinSampleSize =
         std::max(kMinNonMinSampleSize,
-              std::min(kMinSampleSize * options.non_min_sample_multiplier_,
+                 std::min(kMinSampleSize * options.non_min_sample_multiplier_,
                           static_cast<int>(inliers_base_all_type.size()) / 2));
-   
+
     // for (int i = 0; i < kNumDataTypes; ++i) {
-    //     kNonMinSampleSizes[i] = 
+    //     kNonMinSampleSizes[i] =
     //         std::max(kMinNonMinSampleSize,
-    //              std::min(kMinSampleSize * options.non_min_sample_multiplier_,
+    //              std::min(kMinSampleSize *
+    //              options.non_min_sample_multiplier_,
     //                       static_cast<int>(inliers_base[i].size()) / 2));
     // }
 
@@ -504,15 +510,16 @@ class PointLineAbsolutePoseHybridRansac : public HybridRansacBase {
       // }
 
       Model m_non_min;
-      if (!solver.NonMinimalSolver(sample, &m_non_min)) continue;
+      if (!solver.NonMinimalSolver(sample, &m_non_min))
+        continue;
 
-      ScoreModel(options, solver, m_non_min,
-                 options.squared_inlier_thresholds_, kNumDataTypes, num_data, &score);
+      ScoreModel(options, solver, m_non_min, options.squared_inlier_thresholds_,
+                 kNumDataTypes, num_data, &score);
       UpdateBestModel(score, m_non_min, solver_type, score_best_minimal_model,
-                        best_minimal_model, best_solver_type);
+                      best_minimal_model, best_solver_type);
 
-      // Uncomment this line to fall back to original hybrid ransac in ransac lib
-      // m_non_min = m_init;
+      // Uncomment this line to fall back to original hybrid ransac in ransac
+      // lib m_non_min = m_init;
 
       // Iterative least squares refinement. Note that a random subset of all
       // inliers is used.
@@ -520,10 +527,11 @@ class PointLineAbsolutePoseHybridRansac : public HybridRansacBase {
                       solver, rng, &m_non_min);
 
       // The current threshold multiplier and its update.
-      std::vector<double> cur_squared_inlier_thresholds = squared_inlier_thresholds;
+      std::vector<double> cur_squared_inlier_thresholds =
+          squared_inlier_thresholds;
       for (int i = 0; i < options.num_lsq_iterations_; ++i) {
-        LeastSquaresFit(options, cur_squared_inlier_thresholds, solver_type, solver,
-                        rng, &m_non_min);
+        LeastSquaresFit(options, cur_squared_inlier_thresholds, solver_type,
+                        solver, rng, &m_non_min);
 
         ScoreModel(options, solver, m_non_min,
                    options.squared_inlier_thresholds_, kNumDataTypes, num_data,
@@ -537,10 +545,10 @@ class PointLineAbsolutePoseHybridRansac : public HybridRansacBase {
     }
   }
 
-  void LeastSquaresFit(const ExtendedHybridLORansacOptions& options,
-                       const std::vector<double>& thresholds,
-                       const int solver_type, const HybridSolver& solver,
-                       std::mt19937* rng, Model* model) const {
+  void LeastSquaresFit(const ExtendedHybridLORansacOptions &options,
+                       const std::vector<double> &thresholds,
+                       const int solver_type, const HybridSolver &solver,
+                       std::mt19937 *rng, Model *model) const {
     std::vector<std::vector<int>> sample_sizes;
     solver.min_sample_sizes(&sample_sizes);
 
@@ -565,9 +573,9 @@ class PointLineAbsolutePoseHybridRansac : public HybridRansacBase {
     solver.LeastSquares(inliers, model);
   }
 
-  inline void UpdateBestModel(const double score_curr, const Model& m_curr,
-                              const int solver_type, double* score_best,
-                              Model* m_best, int* best_solver_type) const {
+  inline void UpdateBestModel(const double score_curr, const Model &m_curr,
+                              const int solver_type, double *score_best,
+                              Model *m_best, int *best_solver_type) const {
     if (score_curr < *score_best) {
       *score_best = score_curr;
       *m_best = m_curr;
@@ -578,10 +586,10 @@ class PointLineAbsolutePoseHybridRansac : public HybridRansacBase {
   // Determines whether enough data is available to run any of the minimal
   // solvers. Returns false otherwise. For those solvers that are not feasible
   // because not all data is available, the prior probability is set to 0.
-  bool VerifyData(const std::vector<std::vector<int>>& min_sample_sizes,
-                  const std::vector<int>& num_data, const int num_solvers,
+  bool VerifyData(const std::vector<std::vector<int>> &min_sample_sizes,
+                  const std::vector<int> &num_data, const int num_solvers,
                   const int num_data_types,
-                  std::vector<double>* prior_probabilities) const {
+                  std::vector<double> *prior_probabilities) const {
     for (int i = 0; i < num_solvers; ++i) {
       for (int j = 0; j < num_data_types; ++j) {
         if (min_sample_sizes[i][j] > num_data[j] ||
@@ -609,11 +617,10 @@ class PointLineAbsolutePoseHybridRansac : public HybridRansacBase {
   }
 };
 
-} // namespace pose
+} // namespace absolute_pose
 
 } // namespace estimators
 
 } // namespace limap
 
 #endif
-

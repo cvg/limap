@@ -50,41 +50,49 @@ namespace absolute_pose {
 
 using namespace ransac_lib;
 
-enum MinimalSolverType {
-  P3P, P2P1LL, P1P2LL, P3LL
-};
+enum MinimalSolverType { P3P, P2P1LL, P1P2LL, P3LL };
 
-template <class Solver>
-class PointLineSolverFirstSampler {
- public:
-  PointLineSolverFirstSampler(const unsigned int random_seed, const Solver& solver)
-      : num_data_points(solver.num_data_points()), 
+template <class Solver> class PointLineSolverFirstSampler {
+public:
+  PointLineSolverFirstSampler(const unsigned int random_seed,
+                              const Solver &solver)
+      : num_data_points(solver.num_data_points()),
         num_data_lines(solver.num_data_lines()),
         sample_size_(solver.min_sample_size()) {
     rng_.seed(random_seed);
-    uniform_dstr_solver.param(
-        std::uniform_int_distribution<int>::param_type(0, 4 - 1)); // Number of solver: 4
+    uniform_dstr_solver.param(std::uniform_int_distribution<int>::param_type(
+        0, 4 - 1)); // Number of solver: 4
     uniform_dstr_point.param(
         std::uniform_int_distribution<int>::param_type(0, num_data_points - 1));
-    uniform_dstr_line.param(
-        std::uniform_int_distribution<int>::param_type(num_data_points, num_data_lines + num_data_points - 1));
+    uniform_dstr_line.param(std::uniform_int_distribution<int>::param_type(
+        num_data_points, num_data_lines + num_data_points - 1));
   }
 
   // Draws minimal sample.
-  void Sample(std::vector<int>* random_sample) {
+  void Sample(std::vector<int> *random_sample) {
     // Draw a solver first
-    MinimalSolverType minimal_solver = static_cast<MinimalSolverType>(uniform_dstr_solver(rng_));
-    
+    MinimalSolverType minimal_solver =
+        static_cast<MinimalSolverType>(uniform_dstr_solver(rng_));
+
     switch (minimal_solver) {
-    case P3P: DrawSample(random_sample, 3, 0); break;
-    case P2P1LL: DrawSample(random_sample, 2, 1); break;
-    case P1P2LL: DrawSample(random_sample, 1, 2); break;
-    case P3LL: DrawSample(random_sample, 0, 3); break;
+    case P3P:
+      DrawSample(random_sample, 3, 0);
+      break;
+    case P2P1LL:
+      DrawSample(random_sample, 2, 1);
+      break;
+    case P1P2LL:
+      DrawSample(random_sample, 1, 2);
+      break;
+    case P3LL:
+      DrawSample(random_sample, 0, 3);
+      break;
     }
   }
 
-  void DrawSample(std::vector<int>* random_sample, int point_num, int line_num) {
-    std::vector<int>& sample = *random_sample;
+  void DrawSample(std::vector<int> *random_sample, int point_num,
+                  int line_num) {
+    std::vector<int> &sample = *random_sample;
     sample.resize(sample_size_);
 
     for (int i = 0; i < point_num; ++i) {
@@ -92,7 +100,7 @@ class PointLineSolverFirstSampler {
       while (found) {
         found = false;
         sample[i] = uniform_dstr_point(rng_);
-        for (int j = 0; j < i; ++j) 
+        for (int j = 0; j < i; ++j)
           if (sample[j] == sample[i]) {
             found = true;
             break;
@@ -105,7 +113,7 @@ class PointLineSolverFirstSampler {
       while (found) {
         found = false;
         sample[i] = uniform_dstr_line(rng_);
-        for (int j = point_num; j < i; ++j) 
+        for (int j = point_num; j < i; ++j)
           if (sample[j] == sample[i]) {
             found = true;
             break;
@@ -114,7 +122,7 @@ class PointLineSolverFirstSampler {
     }
   }
 
- protected:
+protected:
   // The random number generator used by RANSAC.
   std::mt19937 rng_;
   std::uniform_int_distribution<int> uniform_dstr_solver;
@@ -125,20 +133,21 @@ class PointLineSolverFirstSampler {
 };
 
 // Our customized RANSAC based on LocallyOptimizedMSAC from RansacLib
-// [LINK] https://github.com/tsattler/RansacLib/blob/master/RansacLib/ransac.h#L121
+// [LINK]
+// https://github.com/tsattler/RansacLib/blob/master/RansacLib/ransac.h#L121
 template <class Model, class ModelVector, class Solver,
-          class Sampler = PointLineSolverFirstSampler<Solver> >
-class PointLineAbsolutePoseRansac: public RansacBase {
- public:
+          class Sampler = PointLineSolverFirstSampler<Solver>>
+class PointLineAbsolutePoseRansac : public RansacBase {
+public:
   // Estimates a model using a given solver. Notice that the solver contains
   // all data and is responsible to implement a non-minimal solver and
   // least-squares refinement. The latter two are optional, i.e., a dummy
   // implementation returning false is sufficient.
   // Returns the number of inliers.
-  int EstimateModel(const LORansacOptions& options, const Solver& solver,
-                    Model* best_model, RansacStatistics* statistics) const {
+  int EstimateModel(const LORansacOptions &options, const Solver &solver,
+                    Model *best_model, RansacStatistics *statistics) const {
     ResetStatistics(statistics);
-    RansacStatistics& stats = *statistics;
+    RansacStatistics &stats = *statistics;
 
     // Sanity check: No need to run RANSAC if there are not enough data
     // points.
@@ -192,7 +201,8 @@ class PointLineAbsolutePoseRansac: public RansacBase {
       // MinimalSolver returns the number of estimated models.
       const int kNumEstimatedModels =
           solver.MinimalSolver(minimal_sample, &estimated_models);
-      if (kNumEstimatedModels <= 0) continue;
+      if (kNumEstimatedModels <= 0)
+        continue;
 
       // Finds the best model among all estimated models.
       double best_local_score = std::numeric_limits<double>::max();
@@ -221,7 +231,8 @@ class PointLineAbsolutePoseRansac: public RansacBase {
             (stats.num_iterations >= options.lo_starting_iterations_ &&
              best_min_model_score < std::numeric_limits<double>::max());
 
-        if ((!kBestMinModel) && (!kRunLO)) continue;
+        if ((!kBestMinModel) && (!kRunLO))
+          continue;
 
         // Performs local optimization. By construction, the local optimization
         // method returns the best model between all models found by local
@@ -284,11 +295,11 @@ class PointLineAbsolutePoseRansac: public RansacBase {
     return stats.best_num_inliers;
   }
 
- protected:
-  void GetBestEstimatedModelId(const Solver& solver, const ModelVector& models,
+protected:
+  void GetBestEstimatedModelId(const Solver &solver, const ModelVector &models,
                                const int num_models,
                                const double squared_inlier_threshold,
-                               double* best_score, int* best_model_id) const {
+                               double *best_score, int *best_model_id) const {
     *best_score = std::numeric_limits<double>::max();
     *best_model_id = 0;
     for (int m = 0; m < num_models; ++m) {
@@ -302,14 +313,14 @@ class PointLineAbsolutePoseRansac: public RansacBase {
     }
   }
 
-  void ScoreModel(const Solver& solver, const Model& model,
-                  const double squared_inlier_threshold, double* score) const {
-      const int kNumData = solver.num_data();
-      *score = 0.0;
-      for (int i = 0; i < kNumData; ++i) {
-        double squared_error = solver.EvaluateModelOnPoint(model, i);
-        *score += ComputeScore(squared_error, squared_inlier_threshold);
-      }
+  void ScoreModel(const Solver &solver, const Model &model,
+                  const double squared_inlier_threshold, double *score) const {
+    const int kNumData = solver.num_data();
+    *score = 0.0;
+    for (int i = 0; i < kNumData; ++i) {
+      double squared_error = solver.EvaluateModelOnPoint(model, i);
+      *score += ComputeScore(squared_error, squared_inlier_threshold);
+    }
   }
 
   // MSAC (top-hat) scoring function.
@@ -318,9 +329,9 @@ class PointLineAbsolutePoseRansac: public RansacBase {
     return std::min(squared_error, squared_error_threshold);
   }
 
-  int GetInliers(const Solver& solver, const Model& model,
+  int GetInliers(const Solver &solver, const Model &model,
                  const double squared_inlier_threshold,
-                 std::vector<int>* inliers) const {
+                 std::vector<int> *inliers) const {
     const int kNumData = solver.num_data();
     if (inliers == nullptr) {
       int num_inliers = 0;
@@ -348,16 +359,17 @@ class PointLineAbsolutePoseRansac: public RansacBase {
   // See algorithms 2 and 3 in Lebeda et al.
   // The input model is overwritten with the refined model if the latter is
   // better, i.e., has a lower score.
-  void LocalOptimization(const LORansacOptions& options, const Solver& solver,
-                         std::mt19937* rng, Model* best_minimal_model,
-                         double* score_best_minimal_model) const {
+  void LocalOptimization(const LORansacOptions &options, const Solver &solver,
+                         std::mt19937 *rng, Model *best_minimal_model,
+                         double *score_best_minimal_model) const {
     const int kNumData = solver.num_data();
     // kMinNonMinSampleSize stores how many data points are required for a
     // non-minimal sample. For example, consider the case of pose estimation
     // for a calibrated camera. A minimal sample has size 3, while the
     // smallest non-minimal sample has size 4.
     const int kMinNonMinSampleSize = solver.non_minimal_sample_size();
-    if (kMinNonMinSampleSize > kNumData) return;
+    if (kMinNonMinSampleSize > kNumData)
+      return;
 
     const int kMinSampleSize = solver.min_sample_size();
 
@@ -391,7 +403,8 @@ class PointLineAbsolutePoseRansac: public RansacBase {
       utils::RandomShuffleAndResize(kNonMinSampleSize, rng, &sample);
 
       Model m_non_min;
-      if (!solver.NonMinimalSolver(sample, &m_non_min)) continue;
+      if (!solver.NonMinimalSolver(sample, &m_non_min))
+        continue;
 
       ScoreModel(solver, m_non_min, kSqInThresh, &score);
       UpdateBestModel(score, m_non_min, score_best_minimal_model,
@@ -416,21 +429,22 @@ class PointLineAbsolutePoseRansac: public RansacBase {
     }
   }
 
-  void LeastSquaresFit(const LORansacOptions& options, const double thresh,
-                       const Solver& solver, std::mt19937* rng,
-                       Model* model) const {
+  void LeastSquaresFit(const LORansacOptions &options, const double thresh,
+                       const Solver &solver, std::mt19937 *rng,
+                       Model *model) const {
     const int kLSqSampleSize =
         options.min_sample_multiplicator_ * solver.min_sample_size();
     std::vector<int> inliers;
     int num_inliers = GetInliers(solver, *model, thresh, &inliers);
-    if (num_inliers < solver.min_sample_size()) return;
+    if (num_inliers < solver.min_sample_size())
+      return;
     int lsq_data_size = std::min(kLSqSampleSize, num_inliers);
     utils::RandomShuffleAndResize(lsq_data_size, rng, &inliers);
     solver.LeastSquares(inliers, model);
   }
 
-  inline void UpdateBestModel(const double score_curr, const Model& m_curr,
-                              double* score_best, Model* m_best) const {
+  inline void UpdateBestModel(const double score_curr, const Model &m_curr,
+                              double *score_best, Model *m_best) const {
     if (score_curr < *score_best) {
       *score_best = score_curr;
       *m_best = m_curr;
@@ -438,11 +452,10 @@ class PointLineAbsolutePoseRansac: public RansacBase {
   }
 };
 
-} // namespace pose
+} // namespace absolute_pose
 
 } // namespace estimators
 
 } // namespace limap
 
 #endif
-
