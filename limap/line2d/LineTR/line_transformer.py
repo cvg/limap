@@ -186,7 +186,7 @@ class KeylineEncoder(nn.Module):
 def attention(query, key, value):
     dim = query.shape[1]
     scores = (
-        torch.einsum("bdhn,bdhm->bhnm", query, key) / dim**0.5
+        torch.einsum("bdhn,bdhm->bhnm", query, key) / dim ** 0.5
     )  # [3, 64, 4, 512] -> [3, 4, 512, 512]
     prob = torch.nn.functional.softmax(scores, dim=-1)
     return torch.einsum("bhnm,bdhm->bdhn", prob, value), prob

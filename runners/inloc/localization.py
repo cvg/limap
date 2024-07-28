@@ -98,7 +98,9 @@ def parse_config():
     # Output folder for LIMAP linetracks (in tmp)
     if cfg["output_folder"] is None:
         cfg["output_folder"] = "finaltracks"
-    cfg["inloc_dataset"] = (
+    cfg[
+        "inloc_dataset"
+    ] = (
         args.dataset
     )  # For reading camera poses for estimating 3D lines fron depth
     return cfg, args

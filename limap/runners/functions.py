@@ -233,10 +233,11 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
             == cfg["line2d"]["extractor"]["method"]
             and (not cfg["line2d"]["do_merge_lines"])
         ):
-            all_2d_segs, descinfo_folder = (
-                detector.detect_and_extract_all_images(
-                    folder_save, imagecols, skip_exists=(se_det and se_ext)
-                )
+            (
+                all_2d_segs,
+                descinfo_folder,
+            ) = detector.detect_and_extract_all_images(
+                folder_save, imagecols, skip_exists=(se_det and se_ext)
             )
         else:
             all_2d_segs = detector.detect_all_images(

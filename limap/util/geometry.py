@@ -48,13 +48,13 @@ def rotation_from_quaternion(quad):
     quad = quad / norm
     qr, qi, qj, qk = quad[0], quad[1], quad[2], quad[3]
     rot_mat = np.zeros((3, 3))
-    rot_mat[0, 0] = 1 - 2 * (qj**2 + qk**2)
+    rot_mat[0, 0] = 1 - 2 * (qj ** 2 + qk ** 2)
     rot_mat[0, 1] = 2 * (qi * qj - qk * qr)
     rot_mat[0, 2] = 2 * (qi * qk + qj * qr)
     rot_mat[1, 0] = 2 * (qi * qj + qk * qr)
-    rot_mat[1, 1] = 1 - 2 * (qi**2 + qk**2)
+    rot_mat[1, 1] = 1 - 2 * (qi ** 2 + qk ** 2)
     rot_mat[1, 2] = 2 * (qj * qk - qi * qr)
     rot_mat[2, 0] = 2 * (qi * qk - qj * qr)
     rot_mat[2, 1] = 2 * (qj * qk + qi * qr)
-    rot_mat[2, 2] = 1 - 2 * (qi**2 + qj**2)
+    rot_mat[2, 2] = 1 - 2 * (qi ** 2 + qj ** 2)
     return rot_mat

@@ -66,7 +66,7 @@ def print_gpu_memory():
     a = torch.cuda.memory_allocated(0)
     f = r - a  # free inside reserved
 
-    print(np.array([t, r, a, f]) / 2**30)
+    print(np.array([t, r, a, f]) / 2 ** 30)
 
 
 class AdapLayers(nn.Module):
@@ -130,7 +130,7 @@ class S2DNet(BaseModel):
             if isinstance(layer, torch.nn.MaxPool2d):
                 current_scale += 1
             if i in self.hypercolumn_indices:
-                self.scales.append(2**current_scale)
+                self.scales.append(2 ** current_scale)
 
         self.adaptation_layers = AdapLayers(
             conf.hypercolumn_layers, conf.output_dim

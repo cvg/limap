@@ -51,9 +51,12 @@ def pointline_association(cfg, input_folder, output_folder, colmap_folder):
     """
     optimization to associate points and lines
     """
-    linetracks, cfg_info, imagecols, all_2d_segs = (
-        limapio.read_folder_linetracks_with_info(input_folder)
-    )
+    (
+        linetracks,
+        cfg_info,
+        imagecols,
+        all_2d_segs,
+    ) = limapio.read_folder_linetracks_with_info(input_folder)
     all_2d_lines = _base.get_all_lines_2d(all_2d_segs)
 
     ############################################################

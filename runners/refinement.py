@@ -15,9 +15,12 @@ def one_by_one_refinement(cfg):
     """
     One by one refinement
     """
-    linetracks, cfg_info, imagecols, all_2d_segs = (
-        limapio.read_folder_linetracks_with_info(cfg["input_folder"])
-    )
+    (
+        linetracks,
+        cfg_info,
+        imagecols,
+        all_2d_segs,
+    ) = limapio.read_folder_linetracks_with_info(cfg["input_folder"])
     all_2d_lines = _base.get_all_lines_2d(all_2d_segs)
 
     # vp
@@ -68,9 +71,12 @@ def joint_refinement(cfg):
     """
     refine all the lines together
     """
-    linetracks, cfg_info, imagecols, all_2d_segs = (
-        limapio.read_folder_linetracks_with_info(cfg["input_folder"])
-    )
+    (
+        linetracks,
+        cfg_info,
+        imagecols,
+        all_2d_segs,
+    ) = limapio.read_folder_linetracks_with_info(cfg["input_folder"])
 
     # all refinements in a single problem
     cfg_ba = _optim.HybridBAConfig(cfg["refinement"])
