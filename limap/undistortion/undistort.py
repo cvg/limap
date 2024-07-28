@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import copy
 
+
 def UndistortImageCamera(camera, imname_in, imname_out):
     """
     Run COLMAP undistortion on one single image with an input camera. The undistortion is only applied if the camera model is neither "SIMPLE_PINHOLE" nor "PINHOLE".
@@ -15,22 +16,35 @@ def UndistortImageCamera(camera, imname_in, imname_out):
     Returns:
         :class:`limap.base.Camera`: The undistorted camera
     """
-    if camera.IsUndistorted(): # no distortion
+    if camera.IsUndistorted():  # no distortion
         img = cv2.imread(imname_in)
         cv2.imwrite(imname_out, img)
         if camera.model_id() == 0 or camera.model_id() == 1:
             return camera
         # if "SIMPLE_RADIAL", update to "SIMPLE_PINHOLE"
         if camera.model_id() == 2:
-            new_camera = _base.Camera("SIMPLE_PINHOLE", camera.K(), cam_id = camera.cam_id(), hw=[camera.h(), camera.w()])
+            new_camera = _base.Camera(
+                "SIMPLE_PINHOLE",
+                camera.K(),
+                cam_id=camera.cam_id(),
+                hw=[camera.h(), camera.w()],
+            )
         else:
             # else change to pinhole
-            new_camera = _base.Camera("PINHOLE", camera.K(), cam_id = camera.cam_id(), hw=[camera.h(), camera.w()])
+            new_camera = _base.Camera(
+                "PINHOLE",
+                camera.K(),
+                cam_id=camera.cam_id(),
+                hw=[camera.h(), camera.w()],
+            )
         return new_camera
 
     # undistort
-    camera_undistorted = _undistortion._UndistortCamera(imname_in, camera, imname_out)
+    camera_undistorted = _undistortion._UndistortCamera(
+        imname_in, camera, imname_out
+    )
     return camera_undistorted
+
 
 def UndistortPoints(points, distorted_camera, undistorted_camera):
     """
@@ -44,5 +58,6 @@ def UndistortPoints(points, distorted_camera, undistorted_camera):
     Returns:
         list[:class:`np.array`]: List of the corresponding 2D keypoints on the undistorted image
     """
-    return _undistortion._UndistortPoints(points, distorted_camera, undistorted_camera)
-
+    return _undistortion._UndistortPoints(
+        points, distorted_camera, undistorted_camera
+    )

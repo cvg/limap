@@ -8,21 +8,28 @@ import limap.base as _base
 import limap.features as _features
 import limap.util.io as limapio
 
+
 def extract_feature_s2dnet(feature_extractor, camview):
     import torch
+
     img = camview.read_image(set_gray=False)
-    input_image = torch.tensor(img, dtype=torch.float).permute(2, 0, 1)[None,...]
-    input_image = input_image.to('cuda')
+    input_image = torch.tensor(img, dtype=torch.float).permute(2, 0, 1)[
+        None, ...
+    ]
+    input_image = input_image.to("cuda")
     featuremap = feature_extractor.extract_featuremaps(input_image)
     feature = featuremap[0][0].detach().cpu().numpy().astype(np.float16)
-    feature  = feature.transpose(1,2,0)
+    feature = feature.transpose(1, 2, 0)
     return feature
 
-def extract_track_patches_s2dnet(cfg, tracks, imagecols, output_dir, skip_exists=False):
-    '''
+
+def extract_track_patches_s2dnet(
+    cfg, tracks, imagecols, output_dir, skip_exists=False
+):
+    """
     Extract line patches (S2DNet) for each track
-    '''
-    feature_extractor = _features.S2DNetExtractor('cuda')
+    """
+    feature_extractor = _features.S2DNetExtractor("cuda")
     extractor = _features.get_extractor(cfg["patch"], cfg["channels"])
     if not skip_exists:
         limapio.delete_folder(output_dir)
@@ -38,12 +45,16 @@ def extract_track_patches_s2dnet(cfg, tracks, imagecols, output_dir, skip_exists
             camview = imagecols.camview(img_id)
             line2d_range = extractor.GetLine2DRange(track, img_id, camview)
             line2d_collections[img_id].append([line2d_range, track_id])
-        limapio.check_makedirs(os.path.join(output_dir, "track{0}".format(track_id)))
+        limapio.check_makedirs(
+            os.path.join(output_dir, "track{0}".format(track_id))
+        )
 
     # extract line patches for each image
     for img_id in tqdm(imagecols.get_img_ids()):
         # extract s2dnet line patches
-        feature = extract_feature_s2dnet(feature_extractor, imagecols.camview(img_id))
+        feature = extract_feature_s2dnet(
+            feature_extractor, imagecols.camview(img_id)
+        )
 
         # extract line patches
         line2ds_info = line2d_collections[img_id]
@@ -51,25 +62,49 @@ def extract_track_patches_s2dnet(cfg, tracks, imagecols, output_dir, skip_exists
         track_ids = [k[1] for k in line2ds_info]
         patches = extractor.ExtractLinePatches(line2ds, feature)
         for patch, track_id in zip(patches, track_ids):
-            fname = os.path.join(output_dir, 'track{0}'.format(track_id), "track{0}_img{1}.npy".format(track_id, img_id))
+            fname = os.path.join(
+                output_dir,
+                "track{0}".format(track_id),
+                "track{0}_img{1}.npy".format(track_id, img_id),
+            )
             if skip_exists and os.path.exists(fname):
                 continue
             _features.write_patch(fname, patch, dtype=cfg["dtype"])
             time.sleep(0.001)
 
+
 def parse_config():
     import argparse
-    arg_parser = argparse.ArgumentParser(description='extract sold2 heatmaps')
-    arg_parser.add_argument('-i', '--input_dir', type=str, required=True, help='track folder')
-    arg_parser.add_argument('-o', '--output_dir', type=str, required=True, help='output folder')
-    arg_parser.add_argument('--patch_folder', type=str, default="track_patches", help='patch folder')
-    arg_parser.add_argument("--skip_exists", action="store_true", help="skip exists")
+
+    arg_parser = argparse.ArgumentParser(description="extract sold2 heatmaps")
+    arg_parser.add_argument(
+        "-i", "--input_dir", type=str, required=True, help="track folder"
+    )
+    arg_parser.add_argument(
+        "-o", "--output_dir", type=str, required=True, help="output folder"
+    )
+    arg_parser.add_argument(
+        "--patch_folder", type=str, default="track_patches", help="patch folder"
+    )
+    arg_parser.add_argument(
+        "--skip_exists", action="store_true", help="skip exists"
+    )
     # patch config
-    arg_parser.add_argument("-c", "--channels", type=int, default=128, help="feature channels")
-    arg_parser.add_argument("--k_stretch", type=float, default=1.0, help="k stretch")
-    arg_parser.add_argument("--t_stretch", type=float, default=10, help="t stretch in pixels")
-    arg_parser.add_argument("--range_perp", type=float, default=16, help="range perp in pixels")
-    arg_parser.add_argument("--dtype", type=str, default="float16", help="float16 or float32")
+    arg_parser.add_argument(
+        "-c", "--channels", type=int, default=128, help="feature channels"
+    )
+    arg_parser.add_argument(
+        "--k_stretch", type=float, default=1.0, help="k stretch"
+    )
+    arg_parser.add_argument(
+        "--t_stretch", type=float, default=10, help="t stretch in pixels"
+    )
+    arg_parser.add_argument(
+        "--range_perp", type=float, default=16, help="range perp in pixels"
+    )
+    arg_parser.add_argument(
+        "--dtype", type=str, default="float16", help="float16 or float32"
+    )
     args = arg_parser.parse_args()
     # generate patch config
     cfg = {}
@@ -81,12 +116,17 @@ def parse_config():
     cfg["dtype"] = args.dtype
     return args, cfg
 
+
 def main():
     args, cfg = parse_config()
-    tracks, _, imagecols, _ = limapio.read_folder_linetracks_with_info(args.input_dir)
+    tracks, _, imagecols, _ = limapio.read_folder_linetracks_with_info(
+        args.input_dir
+    )
     patches_dir = os.path.join(args.output_dir, args.patch_folder)
-    extract_track_patches_s2dnet(cfg, tracks, imagecols, patches_dir, skip_exists=args.skip_exists)
+    extract_track_patches_s2dnet(
+        cfg, tracks, imagecols, patches_dir, skip_exists=args.skip_exists
+    )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
-

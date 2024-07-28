@@ -6,7 +6,10 @@ import pytlbd
 import limap.util.io as limapio
 from ..base_detector import BaseDetector, BaseDetectorOptions
 
-def process_pyramid(img, detector, n_levels=5, level_scale=np.sqrt(2), presmooth=True):
+
+def process_pyramid(
+    img, detector, n_levels=5, level_scale=np.sqrt(2), presmooth=True
+):
     octave_img = img.copy()
     pre_sigma2 = 0
     cur_sigma2 = 1.0
@@ -14,7 +17,9 @@ def process_pyramid(img, detector, n_levels=5, level_scale=np.sqrt(2), presmooth
     multiscale_segs = []
     for i in range(n_levels):
         increase_sigma = np.sqrt(cur_sigma2 - pre_sigma2)
-        blurred = cv2.GaussianBlur(octave_img, (5, 5), increase_sigma, borderType=cv2.BORDER_REPLICATE)
+        blurred = cv2.GaussianBlur(
+            octave_img, (5, 5), increase_sigma, borderType=cv2.BORDER_REPLICATE
+        )
         pyramid.append(blurred)
 
         if presmooth:
@@ -24,8 +29,13 @@ def process_pyramid(img, detector, n_levels=5, level_scale=np.sqrt(2), presmooth
 
         # cv2.imshow(f"Mine L{i}", blurred)
         # down sample the current octave image to get the next octave image
-        new_size = (int(octave_img.shape[1] / level_scale), int(octave_img.shape[0] / level_scale))
-        octave_img = cv2.resize(blurred, new_size, 0, 0, interpolation=cv2.INTER_NEAREST)
+        new_size = (
+            int(octave_img.shape[1] / level_scale),
+            int(octave_img.shape[0] / level_scale),
+        )
+        octave_img = cv2.resize(
+            blurred, new_size, 0, 0, interpolation=cv2.INTER_NEAREST
+        )
         pre_sigma2 = cur_sigma2
         cur_sigma2 = cur_sigma2 * 2
 
@@ -36,12 +46,14 @@ def to_multiscale_lines(lines):
     ms_lines = []
     for l in lines.reshape(-1, 4):
         ll = np.append(l, [0, np.linalg.norm(l[:2] - l[2:4])])
-        ms_lines.append([(0, ll)] + [(i, ll / (i * np.sqrt(2))) for i in range(1, 5)])
+        ms_lines.append(
+            [(0, ll)] + [(i, ll / (i * np.sqrt(2))) for i in range(1, 5)]
+        )
     return ms_lines
 
 
 class LBDExtractor(BaseDetector):
-    def __init__(self, options = BaseDetectorOptions()):
+    def __init__(self, options=BaseDetectorOptions()):
         super(LBDExtractor, self).__init__(options)
 
     def get_module_name(self):
@@ -67,12 +79,12 @@ class LBDExtractor(BaseDetector):
         return descinfo
 
     def compute_descinfo(self, img, segs):
-        """ A desc_info is composed of the following tuple / np arrays:
-            - the multiscale lines [N, 5] containing tuples of (scale, scaled_line)
-            - the line descriptors [N, dim]
+        """A desc_info is composed of the following tuple / np arrays:
+        - the multiscale lines [N, 5] containing tuples of (scale, scaled_line)
+        - the line descriptors [N, dim]
         """
         ms_lines = to_multiscale_lines(segs)
         _, pyramid = process_pyramid(img, pytlsd.lsd, presmooth=False)
         descriptors = pytlbd.lbd_multiscale_pyr(pyramid, ms_lines, 9, 7)
 
-        return {'ms_lines': ms_lines, 'line_descriptors': descriptors}
+        return {"ms_lines": ms_lines, "line_descriptors": descriptors}

@@ -1,10 +1,20 @@
 from _limap import _base, _ceresbase, _optimize
 import numpy as np
 
-def solve_line_refinement(cfg, track, p_camviews, p_vpresults=None, p_heatmaps=None, p_patches=None, p_features=None, dtype="float16"):
-    '''
+
+def solve_line_refinement(
+    cfg,
+    track,
+    p_camviews,
+    p_vpresults=None,
+    p_heatmaps=None,
+    p_patches=None,
+    p_features=None,
+    dtype="float16",
+):
+    """
     p_patches: list of PatchInfo_f objects
-    '''
+    """
     rf_config = _optimize.RefinementConfig(cfg)
     rf_config.solver_options.logging_type = _ceresbase.LoggingType.SILENT
 
@@ -38,4 +48,3 @@ def solve_line_refinement(cfg, track, p_camviews, p_vpresults=None, p_heatmaps=N
     rf_engine.SetUp()
     rf_engine.Solve()
     return rf_engine
-

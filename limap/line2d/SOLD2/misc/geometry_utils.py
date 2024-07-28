@@ -4,11 +4,13 @@ import torch
 
 ### Point-related utils
 
+
 # Warp a list of points using a homography
 def warp_points(points, homography):
     # Convert to homogeneous and in xy format
-    new_points = np.concatenate([points[..., [1, 0]],
-                                 np.ones_like(points[..., :1])], axis=-1)
+    new_points = np.concatenate(
+        [points[..., [1, 0]], np.ones_like(points[..., :1])], axis=-1
+    )
     # Warp
     new_points = (homography @ new_points.T).T
     # Convert back to inhomogeneous and hw format
@@ -18,10 +20,12 @@ def warp_points(points, homography):
 
 # Mask out the points that are outside of img_size
 def mask_points(points, img_size):
-    mask = ((points[..., 0] >= 0)
-            & (points[..., 0] < img_size[0])
-            & (points[..., 1] >= 0)
-            & (points[..., 1] < img_size[1]))
+    mask = (
+        (points[..., 0] >= 0)
+        & (points[..., 0] < img_size[0])
+        & (points[..., 1] >= 0)
+        & (points[..., 1] < img_size[1])
+    )
     return mask
 
 
@@ -30,8 +34,12 @@ def mask_points(points, img_size):
 def keypoints_to_grid(keypoints, img_size):
     n_points = keypoints.size()[-2]
     device = keypoints.device
-    grid_points = keypoints.float() * 2. / torch.tensor(
-        img_size, dtype=torch.float, device=device) - 1.
+    grid_points = (
+        keypoints.float()
+        * 2.0
+        / torch.tensor(img_size, dtype=torch.float, device=device)
+        - 1.0
+    )
     grid_points = grid_points[..., [1, 0]].view(-1, n_points, 1, 2)
     return grid_points
 
@@ -44,13 +52,15 @@ def get_dist_mask(kp0, kp1, valid_mask, dist_thresh):
     dist_mask1 = torch.norm(kp1.unsqueeze(2) - kp1.unsqueeze(1), dim=-1)
     dist_mask = torch.min(dist_mask0, dist_mask1)
     dist_mask = dist_mask <= dist_thresh
-    dist_mask = dist_mask.repeat(1, 1, b_size).reshape(b_size * n_points,
-                                                       b_size * n_points)
+    dist_mask = dist_mask.repeat(1, 1, b_size).reshape(
+        b_size * n_points, b_size * n_points
+    )
     dist_mask = dist_mask[valid_mask, :][:, valid_mask]
     return dist_mask
 
 
 ### Line-related utils
+
 
 # Sample n points along lines of shape (num_lines, 2, 2)
 def sample_line_points(lines, n):
@@ -75,7 +85,8 @@ def mask_lines(lines, valid_mask):
 def get_common_line_mask(line_indices, valid_mask):
     b_size, n_points = line_indices.shape
     common_mask = line_indices[:, :, None] == line_indices[:, None, :]
-    common_mask = common_mask.repeat(1, 1, b_size).reshape(b_size * n_points,
-                                                           b_size * n_points)
+    common_mask = common_mask.repeat(1, 1, b_size).reshape(
+        b_size * n_points, b_size * n_points
+    )
     common_mask = common_mask[valid_mask, :][:, valid_mask]
     return common_mask

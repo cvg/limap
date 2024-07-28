@@ -11,8 +11,9 @@ import limap.runners as _runners
 import limap.util.io as limapio
 import limap.visualize as limapvis
 
+
 def fit_3d_segs(all_2d_segs, imagecols, depths, fitting_config):
-    '''
+    """
     Fit 3D line segments over points produced by depth unprojection
 
     Args:
@@ -22,29 +23,48 @@ def fit_3d_segs(all_2d_segs, imagecols, depths, fitting_config):
         fitting_config (dict): Configuration, fields refer to :file:`cfgs/examples/fitting_3Dline.yaml`
     Returns:
         output (dict[int -> list[(:class:`np.array`, :class:`np.array`)]]): for each image, output a list of :class:`np.array` pair, representing two endpoints
-    '''
+    """
     n_images = len(all_2d_segs)
     seg3d_list = []
+
     def process(all_2d_segs, imagecols, depths, fitting_config, img_id):
         segs, camview = all_2d_segs[img_id], imagecols.camview(img_id)
         depth = depths[img_id].read_depth(img_hw=[camview.h(), camview.w()])
         seg3d_list_idx = []
         for seg_id, s in enumerate(segs):
-            seg3d = _fit.estimate_seg3d_from_depth(s, depth, camview, ransac_th=fitting_config["ransac_th"], min_percentage_inliers=fitting_config["min_percentage_inliers"], var2d=fitting_config["var2d"])
+            seg3d = _fit.estimate_seg3d_from_depth(
+                s,
+                depth,
+                camview,
+                ransac_th=fitting_config["ransac_th"],
+                min_percentage_inliers=fitting_config["min_percentage_inliers"],
+                var2d=fitting_config["var2d"],
+            )
             if seg3d is None:
-                seg3d_list_idx.append((np.array([0., 0., 0.]), np.array([0., 0., 0.])))
+                seg3d_list_idx.append(
+                    (np.array([0.0, 0.0, 0.0]), np.array([0.0, 0.0, 0.0]))
+                )
             else:
                 seg3d_list_idx.append(seg3d)
         return seg3d_list_idx
+
     image_ids = imagecols.get_img_ids()
-    seg3d_list = joblib.Parallel(n_jobs=fitting_config["n_jobs"])(joblib.delayed(process)(all_2d_segs, imagecols, depths, fitting_config, img_id) for img_id in tqdm(image_ids))
+    seg3d_list = joblib.Parallel(n_jobs=fitting_config["n_jobs"])(
+        joblib.delayed(process)(
+            all_2d_segs, imagecols, depths, fitting_config, img_id
+        )
+        for img_id in tqdm(image_ids)
+    )
     output = {}
     for idx, seg3d_list_idx in enumerate(seg3d_list):
         output[image_ids[idx]] = seg3d_list_idx
     return output
 
-def fit_3d_segs_with_points3d(all_2d_segs, imagecols, p3d_reader, fitting_config, inloc_dataset=None):
-    '''
+
+def fit_3d_segs_with_points3d(
+    all_2d_segs, imagecols, p3d_reader, fitting_config, inloc_dataset=None
+):
+    """
     Fit 3D line segments over a set of 3D points
 
     Args:
@@ -54,28 +74,47 @@ def fit_3d_segs_with_points3d(all_2d_segs, imagecols, p3d_reader, fitting_config
         fitting_config (dict): Configuration, fields refer to :file:`cfgs/examples/fitting_3Dline.yaml`
     Returns:
         output (dict[int -> list[(:class:`np.array`, :class:`np.array`)]]): for each image, output a list of :class:`np.array` pair, representing two endpoints
-    '''
+    """
     seg3d_list = []
+
     def process(all_2d_segs, imagecols, p3d_reader, fitting_config, img_id):
         segs, camview = all_2d_segs[img_id], imagecols.camview(img_id)
         p3ds = p3d_reader[img_id].read_p3ds()
         seg3d_list_idx = []
         for seg_id, s in enumerate(segs):
-            seg3d = _fit.estimate_seg3d_from_points3d(s, p3ds, camview, imagecols.image_name(img_id), inloc_dataset, ransac_th=fitting_config["ransac_th"], min_percentage_inliers=fitting_config["min_percentage_inliers"], var2d=fitting_config["var2d"])
+            seg3d = _fit.estimate_seg3d_from_points3d(
+                s,
+                p3ds,
+                camview,
+                imagecols.image_name(img_id),
+                inloc_dataset,
+                ransac_th=fitting_config["ransac_th"],
+                min_percentage_inliers=fitting_config["min_percentage_inliers"],
+                var2d=fitting_config["var2d"],
+            )
             if seg3d is None:
-                seg3d_list_idx.append((np.array([0., 0., 0.]), np.array([0., 0., 0.])))
+                seg3d_list_idx.append(
+                    (np.array([0.0, 0.0, 0.0]), np.array([0.0, 0.0, 0.0]))
+                )
             else:
                 seg3d_list_idx.append(seg3d)
         return seg3d_list_idx
+
     image_ids = imagecols.get_img_ids()
-    seg3d_list = joblib.Parallel(n_jobs=fitting_config["n_jobs"])(joblib.delayed(process)(all_2d_segs, imagecols, p3d_reader, fitting_config, img_id) for img_id in tqdm(image_ids))
+    seg3d_list = joblib.Parallel(n_jobs=fitting_config["n_jobs"])(
+        joblib.delayed(process)(
+            all_2d_segs, imagecols, p3d_reader, fitting_config, img_id
+        )
+        for img_id in tqdm(image_ids)
+    )
     output = {}
     for idx, seg3d_list_idx in enumerate(seg3d_list):
         output[image_ids[idx]] = seg3d_list_idx
     return output
 
+
 def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
-    '''
+    """
     Line reconstruction over multi-view RGB images given depths
 
     Args:
@@ -86,7 +125,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
         ranges (pair of :class:`np.array` each of shape (3,), optional): robust 3D ranges for the scene. By default we compute range information from the COLMAP triangulation.
     Returns:
         list[:class:`limap.base.LineTrack`]: list of output 3D line tracks
-    '''
+    """
     # assertion check
     assert imagecols.IsUndistorted() == True
     print("[LOG] Number of images: {0}".format(imagecols.NumImages()))
@@ -96,8 +135,13 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
         cfg["fitting"]["var2d"] = cfg["var2d"][detector_name]
     if cfg["merging"]["var2d"] == -1:
         cfg["merging"]["var2d"] = cfg["var2d"][detector_name]
-    limapio.save_txt_imname_dict(os.path.join(cfg["dir_save"], 'image_list.txt'), imagecols.get_image_name_dict())
-    limapio.save_npy(os.path.join(cfg["dir_save"], 'imagecols.npy'), imagecols.as_dict())
+    limapio.save_txt_imname_dict(
+        os.path.join(cfg["dir_save"], "image_list.txt"),
+        imagecols.get_image_name_dict(),
+    )
+    limapio.save_npy(
+        os.path.join(cfg["dir_save"], "imagecols.npy"), imagecols.as_dict()
+    )
 
     ##########################################################
     # [A] sfm metainfos (neighbors, ranges)
@@ -107,22 +151,35 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     else:
         neighbors = imagecols.update_neighbors(neighbors)
         for img_id, neighbor in neighbors.items():
-            neighbors[img_id] = neighbors[img_id][:cfg["n_neighbors"]]
+            neighbors[img_id] = neighbors[img_id][: cfg["n_neighbors"]]
 
     ##########################################################
     # [B] get 2D line segments for each image
     ##########################################################
-    all_2d_segs, _ = _runners.compute_2d_segs(cfg, imagecols, compute_descinfo=cfg["line2d"]["compute_descinfo"])
+    all_2d_segs, _ = _runners.compute_2d_segs(
+        cfg, imagecols, compute_descinfo=cfg["line2d"]["compute_descinfo"]
+    )
 
     ##########################################################
     # [C] fit 3d segments
     ##########################################################
-    fname_fit_segs = '{0}_fit_segs.npy'.format(cfg["line2d"]["detector"]["method"])
-    if (not cfg["load_fit"]) and (not (cfg["skip_exists"] and os.path.exists(os.path.join(cfg["dir_load"], fname_fit_segs)))):
+    fname_fit_segs = "{0}_fit_segs.npy".format(
+        cfg["line2d"]["detector"]["method"]
+    )
+    if (not cfg["load_fit"]) and (
+        not (
+            cfg["skip_exists"]
+            and os.path.exists(os.path.join(cfg["dir_load"], fname_fit_segs))
+        )
+    ):
         seg3d_list = fit_3d_segs(all_2d_segs, imagecols, depths, cfg["fitting"])
-        limapio.save_npy(os.path.join(cfg["dir_save"], fname_fit_segs), seg3d_list)
+        limapio.save_npy(
+            os.path.join(cfg["dir_save"], fname_fit_segs), seg3d_list
+        )
     else:
-        seg3d_list = limapio.read_npy(os.path.join(cfg["dir_load"], fname_fit_segs)).item()
+        seg3d_list = limapio.read_npy(
+            os.path.join(cfg["dir_load"], fname_fit_segs)
+        ).item()
 
     if "do_merging" in cfg["merging"] and not cfg["merging"]["do_merging"]:
         linetracks = []
@@ -140,13 +197,34 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     ##########################################################
     # [D] merge 3d segments
     ##########################################################
-    linker = _base.LineLinker(cfg["merging"]["linker2d"], cfg["merging"]["linker3d"])
-    graph, linetracks = _mrg.merging(linker, all_2d_segs, imagecols, seg3d_list, neighbors, var2d=cfg["merging"]["var2d"])
-    linetracks = _mrg.filtertracksbyreprojection(linetracks, imagecols, cfg["filtering2d"]["th_angular_2d"], cfg["filtering2d"]["th_perp_2d"], num_outliers=0)
+    linker = _base.LineLinker(
+        cfg["merging"]["linker2d"], cfg["merging"]["linker3d"]
+    )
+    graph, linetracks = _mrg.merging(
+        linker,
+        all_2d_segs,
+        imagecols,
+        seg3d_list,
+        neighbors,
+        var2d=cfg["merging"]["var2d"],
+    )
+    linetracks = _mrg.filtertracksbyreprojection(
+        linetracks,
+        imagecols,
+        cfg["filtering2d"]["th_angular_2d"],
+        cfg["filtering2d"]["th_perp_2d"],
+        num_outliers=0,
+    )
     if not cfg["remerging"]["disable"]:
         linker3d_remerge = _base.LineLinker3d(cfg["remerging"]["linker3d"])
         linetracks = _mrg.remerge(linker3d_remerge, linetracks, num_outliers=0)
-        linetracks = _mrg.filtertracksbyreprojection(linetracks, imagecols, cfg["filtering2d"]["th_angular_2d"], cfg["filtering2d"]["th_perp_2d"], num_outliers=0)
+        linetracks = _mrg.filtertracksbyreprojection(
+            linetracks,
+            imagecols,
+            cfg["filtering2d"]["th_angular_2d"],
+            cfg["filtering2d"]["th_perp_2d"],
+            num_outliers=0,
+        )
 
     ##########################################################
     # [E] geometric refinement
@@ -154,8 +232,12 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     if not cfg["refinement"]["disable"]:
         cfg_ba = _optim.HybridBAConfig(cfg["refinement"])
         cfg_ba.set_constant_camera()
-        ba_engine = _optim.solve_line_bundle_adjustment(cfg["refinement"], imagecols, linetracks, max_num_iterations=200)
-        linetracks_map = ba_engine.GetOutputLineTracks(num_outliers=cfg["refinement"]["num_outliers_aggregator"])
+        ba_engine = _optim.solve_line_bundle_adjustment(
+            cfg["refinement"], imagecols, linetracks, max_num_iterations=200
+        )
+        linetracks_map = ba_engine.GetOutputLineTracks(
+            num_outliers=cfg["refinement"]["num_outliers_aggregator"]
+        )
         linetracks = [track for (track_id, track) in linetracks_map.items()]
 
     ### Filter out 0-length 3D lines
@@ -167,21 +249,43 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     # save tracks
     if "output_folder" not in cfg or cfg["output_folder"] is None:
         cfg["output_folder"] = "fitnmerge_finaltracks"
-    limapio.save_folder_linetracks_with_info(os.path.join(cfg["dir_save"], cfg["output_folder"]), linetracks, config=cfg, imagecols=imagecols, all_2d_segs=all_2d_segs)
-    limapio.save_txt_linetracks(os.path.join(cfg["dir_save"], "fitnmerge_alltracks.txt"), linetracks, n_visible_views=4)
+    limapio.save_folder_linetracks_with_info(
+        os.path.join(cfg["dir_save"], cfg["output_folder"]),
+        linetracks,
+        config=cfg,
+        imagecols=imagecols,
+        all_2d_segs=all_2d_segs,
+    )
+    limapio.save_txt_linetracks(
+        os.path.join(cfg["dir_save"], "fitnmerge_alltracks.txt"),
+        linetracks,
+        n_visible_views=4,
+    )
     VisTrack = limapvis.Open3DTrackVisualizer(linetracks)
     VisTrack.report()
-    limapio.save_obj(os.path.join(cfg["dir_save"], 'fitnmerge_lines_nv{0}.obj'.format(cfg["n_visible_views"])), VisTrack.get_lines_np(n_visible_views=cfg["n_visible_views"]))
+    limapio.save_obj(
+        os.path.join(
+            cfg["dir_save"],
+            "fitnmerge_lines_nv{0}.obj".format(cfg["n_visible_views"]),
+        ),
+        VisTrack.get_lines_np(n_visible_views=cfg["n_visible_views"]),
+    )
 
     if cfg["visualize"]:
         import pdb
+
         pdb.set_trace()
-        VisTrack.vis_reconstruction(imagecols, n_visible_views=cfg["n_visible_views"], width=2)
+        VisTrack.vis_reconstruction(
+            imagecols, n_visible_views=cfg["n_visible_views"], width=2
+        )
         pdb.set_trace()
     return linetracks
 
-def line_fitting_with_3Dpoints(cfg, imagecols, p3d_readers, inloc_read_transformations=False):
-    '''
+
+def line_fitting_with_3Dpoints(
+    cfg, imagecols, p3d_readers, inloc_read_transformations=False
+):
+    """
     Line reconstruction over multi-view images with its point cloud
 
     Args:
@@ -192,7 +296,7 @@ def line_fitting_with_3Dpoints(cfg, imagecols, p3d_readers, inloc_read_transform
         ranges (pair of :class:`np.array` each of shape (3,), optional): robust 3D ranges for the scene. By default we compute range information from the COLMAP triangulation.
     Returns:
         list[:class:`limap.base.LineTrack`]: list of output 3D line tracks
-    '''
+    """
     # assertion check
     assert imagecols.IsUndistorted() == True
     print("[LOG] Number of images: {0}".format(imagecols.NumImages()))
@@ -202,25 +306,47 @@ def line_fitting_with_3Dpoints(cfg, imagecols, p3d_readers, inloc_read_transform
         cfg["fitting"]["var2d"] = cfg["var2d"][detector_name]
     if cfg["merging"]["var2d"] == -1:
         cfg["merging"]["var2d"] = cfg["var2d"][detector_name]
-    limapio.save_txt_imname_dict(os.path.join(cfg["dir_save"], 'image_list.txt'), imagecols.get_image_name_dict())
-    limapio.save_npy(os.path.join(cfg["dir_save"], 'imagecols.npy'), imagecols.as_dict())
+    limapio.save_txt_imname_dict(
+        os.path.join(cfg["dir_save"], "image_list.txt"),
+        imagecols.get_image_name_dict(),
+    )
+    limapio.save_npy(
+        os.path.join(cfg["dir_save"], "imagecols.npy"), imagecols.as_dict()
+    )
 
     ##########################################################
     # [A] get 2D line segments for each image
     ##########################################################
-    all_2d_segs, _ = _runners.compute_2d_segs(cfg, imagecols, compute_descinfo=cfg["line2d"]["compute_descinfo"])
+    all_2d_segs, _ = _runners.compute_2d_segs(
+        cfg, imagecols, compute_descinfo=cfg["line2d"]["compute_descinfo"]
+    )
 
     ##########################################################
     # [B] fit 3d segments
     ##########################################################
-    fname_fit_segs = '{0}_fit_segs.npy'.format(cfg["line2d"]["detector"]["method"])
-    if (not cfg["load_fit"]) and (not (cfg["skip_exists"] and os.path.exists(os.path.join(cfg["dir_load"], fname_fit_segs)))):
-        if inloc_read_transformations: inloc_dataset = cfg['inloc_dataset']
-        else: inloc_dataset = None
-        seg3d_list = fit_3d_segs_with_points3d(all_2d_segs, imagecols, p3d_readers, cfg["fitting"], inloc_dataset)
-        limapio.save_npy(os.path.join(cfg["dir_save"], fname_fit_segs), seg3d_list)
+    fname_fit_segs = "{0}_fit_segs.npy".format(
+        cfg["line2d"]["detector"]["method"]
+    )
+    if (not cfg["load_fit"]) and (
+        not (
+            cfg["skip_exists"]
+            and os.path.exists(os.path.join(cfg["dir_load"], fname_fit_segs))
+        )
+    ):
+        if inloc_read_transformations:
+            inloc_dataset = cfg["inloc_dataset"]
+        else:
+            inloc_dataset = None
+        seg3d_list = fit_3d_segs_with_points3d(
+            all_2d_segs, imagecols, p3d_readers, cfg["fitting"], inloc_dataset
+        )
+        limapio.save_npy(
+            os.path.join(cfg["dir_save"], fname_fit_segs), seg3d_list
+        )
     else:
-        seg3d_list = limapio.read_npy(os.path.join(cfg["dir_load"], fname_fit_segs)).item()
+        seg3d_list = limapio.read_npy(
+            os.path.join(cfg["dir_load"], fname_fit_segs)
+        ).item()
 
     linetracks = []
     for img_id in all_2d_segs:
@@ -233,4 +359,3 @@ def line_fitting_with_3Dpoints(cfg, imagecols, p3d_readers, inloc_read_transform
             track = _base.LineTrack(l3d, [img_id], [line_id], [l2d])
             linetracks.append(track)
     return linetracks
-

@@ -29,7 +29,9 @@ class CMakeExtension(Extension):
 
 class CMakeBuild(build_ext):
     def build_extension(self, ext):
-        extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
+        extdir = os.path.abspath(
+            os.path.dirname(self.get_ext_fullpath(ext.name))
+        )
 
         # required for auto-detection of auxiliary "native" libs
         if not extdir.endswith(os.path.sep):
@@ -48,7 +50,9 @@ class CMakeBuild(build_ext):
             "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}".format(extdir),
             "-DPYTHON_EXECUTABLE={}".format(sys.executable),
             "-DEXAMPLE_VERSION_INFO={}".format(self.distribution.get_version()),
-            "-DCMAKE_BUILD_TYPE={}".format(cfg),  # not used on MSVC, but no harm
+            "-DCMAKE_BUILD_TYPE={}".format(
+                cfg
+            ),  # not used on MSVC, but no harm
         ]
         build_args = []
 
@@ -59,7 +63,9 @@ class CMakeBuild(build_ext):
             ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp
         )
         subprocess.check_call(
-            ["cmake", "--build", ".", "--parallel {0}".format(N_CORES)] + build_args, cwd=self.build_temp
+            ["cmake", "--build", ".", "--parallel {0}".format(N_CORES)]
+            + build_args,
+            cwd=self.build_temp,
         )
 
 
@@ -76,4 +82,3 @@ setup(
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
 )
-

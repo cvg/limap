@@ -2,8 +2,9 @@ from ..base_vp_detector import BaseVPDetector, BaseVPDetectorOptions
 
 from _limap import _vplib
 
+
 class JLinkage(BaseVPDetector):
-    def __init__(self, cfg_jlinkage, options = BaseVPDetectorOptions()):
+    def __init__(self, cfg_jlinkage, options=BaseVPDetectorOptions()):
         super(JLinkage, self).__init__(options)
         self.detector = _vplib.JLinkage(cfg_jlinkage)
 
@@ -18,4 +19,3 @@ class JLinkage(BaseVPDetector):
     # # parallelization directly in cpp is faster at initializing threads
     # def detect_vp_all_images(self, all_lines, camviews=None):
     #     return self.detector.AssociateVPsParallel(all_lines)
-

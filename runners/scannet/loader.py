@@ -2,8 +2,11 @@ import os, sys
 import numpy as np
 import cv2
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.append(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 import limap.base as _base
+
 
 class ScanNetDepthReader(_base.BaseDepthReader):
     def __init__(self, filename):
@@ -13,6 +16,7 @@ class ScanNetDepthReader(_base.BaseDepthReader):
         ref_depth = cv2.imread(filename, cv2.IMREAD_UNCHANGED)
         ref_depth = ref_depth.astype(np.float32) / 1000.0
         return ref_depth
+
 
 def read_scene_scannet(cfg, dataset, scene_id, load_depth=False):
     # set scene id
@@ -29,7 +33,12 @@ def read_scene_scannet(cfg, dataset, scene_id, load_depth=False):
     img_hw = dataset.get_img_hw()
     Ts, Rs = dataset.load_cameras()
     cameras = [_base.Camera("PINHOLE", K, cam_id=0, hw=img_hw)]
-    camimages = [_base.CameraImage(0, _base.CameraPose(Rs[idx], Ts[idx]), image_name=imname_list[idx]) for idx in range(len(imname_list))]
+    camimages = [
+        _base.CameraImage(
+            0, _base.CameraPose(Rs[idx], Ts[idx]), image_name=imname_list[idx]
+        )
+        for idx in range(len(imname_list))
+    ]
     imagecols = _base.ImageCollection(cameras, camimages)
 
     # TODO: advanced implementation with the original ids
@@ -39,7 +48,7 @@ def read_scene_scannet(cfg, dataset, scene_id, load_depth=False):
     for idx, image_id in enumerate(index_list):
         val = np.abs(np.array(index_list) - image_id)
         val[idx] = val.max() + 1
-        neighbor = np.array(index_list)[np.argsort(val)[:cfg["n_neighbors"]]]
+        neighbor = np.array(index_list)[np.argsort(val)[: cfg["n_neighbors"]]]
         neighbors[image_id] = neighbor.tolist()
 
     # get depth
@@ -52,5 +61,3 @@ def read_scene_scannet(cfg, dataset, scene_id, load_depth=False):
         return imagecols, neighbors, depths
     else:
         return imagecols, neighbors
-
-

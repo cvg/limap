@@ -1,6 +1,4 @@
-
-
-class BaseP3DReader():
+class BaseP3DReader:
     def __init__(self, filename):
         self.filename = filename
 
@@ -24,4 +22,3 @@ class BaseP3DReader():
         """
         p3ds = self.read(self.filename)
         return p3ds
-

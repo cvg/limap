@@ -1,9 +1,11 @@
 import cv2
 
-class BaseDepthReader():
+
+class BaseDepthReader:
     """
     Base class for the depth reader storing the filename and potentially other information
     """
+
     def __init__(self, filename):
         self.filename = filename
 
@@ -28,7 +30,8 @@ class BaseDepthReader():
             depth (:class:`np.array` of shape (H, W)): The array for the depth map
         """
         depth = self.read(self.filename)
-        if img_hw is not None and (depth.shape[0] != img_hw[0] or depth.shape[1] != img_hw[1]):
+        if img_hw is not None and (
+            depth.shape[0] != img_hw[0] or depth.shape[1] != img_hw[1]
+        ):
             depth = cv2.resize(depth, (img_hw[1], img_hw[0]))
         return depth
-

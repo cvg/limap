@@ -2,8 +2,9 @@ import os
 import numpy as np
 from ..base_matcher import BaseMatcher, BaseMatcherOptions
 
+
 class L2D2Matcher(BaseMatcher):
-    def __init__(self, extractor, options = BaseMatcherOptions()):
+    def __init__(self, extractor, options=BaseMatcherOptions()):
         super(L2D2Matcher, self).__init__(extractor, options)
 
     def get_module_name(self):
@@ -16,11 +17,13 @@ class L2D2Matcher(BaseMatcher):
         if self.topk == 0:
             return self.match_segs_with_descinfo(descinfo1, descinfo2)
         else:
-            return self.match_segs_with_descinfo_topk(descinfo1, descinfo2, topk=self.topk)
+            return self.match_segs_with_descinfo_topk(
+                descinfo1, descinfo2, topk=self.topk
+            )
 
     def match_segs_with_descinfo(self, descinfo1, descinfo2):
-        desc1 = descinfo1['line_descriptors']
-        desc2 = descinfo2['line_descriptors']
+        desc1 = descinfo1["line_descriptors"]
+        desc2 = descinfo2["line_descriptors"]
 
         # Default case when an image has no lines
         if len(desc1) == 0 or len(desc2) == 0:
@@ -40,8 +43,8 @@ class L2D2Matcher(BaseMatcher):
         return matches_t
 
     def match_segs_with_descinfo_topk(self, descinfo1, descinfo2, topk=10):
-        desc1 = descinfo1['line_descriptors']
-        desc2 = descinfo2['line_descriptors']
+        desc1 = descinfo1["line_descriptors"]
+        desc2 = descinfo2["line_descriptors"]
 
         # Default case when an image has no lines
         if len(desc1) == 0 or len(desc2) == 0:
@@ -54,6 +57,7 @@ class L2D2Matcher(BaseMatcher):
 
         # Transform matches to [n_matches, 2]
         n_lines = len(matches)
-        matches_t = np.stack([np.arange(n_lines).repeat(topk),
-                              matches.flatten()], axis=1)
+        matches_t = np.stack(
+            [np.arange(n_lines).repeat(topk), matches.flatten()], axis=1
+        )
         return matches_t

@@ -5,8 +5,9 @@ from .sold2_wrapper import SOLD2LineDetector
 from ..base_detector import BaseDetector, BaseDetectorOptions
 from ..base_matcher import BaseMatcher, BaseMatcherOptions
 
+
 class SOLD2Detector(BaseDetector):
-    def __init__(self, options = BaseDetectorOptions()):
+    def __init__(self, options=BaseDetectorOptions()):
         super(SOLD2Detector, self).__init__(options)
         self.detector = SOLD2LineDetector(weight_path=self.weight_path)
 
@@ -22,7 +23,7 @@ class SOLD2Detector(BaseDetector):
         fname = self.get_descinfo_fname(descinfo_folder, img_id)
         # special handling of None and same dimension
         if len(descinfo) == 2:
-            descinfo[1] = descinfo[1][None,:]
+            descinfo[1] = descinfo[1][None, :]
         limapio.save_npy(fname, descinfo)
 
     def read_descinfo(self, descinfo_folder, img_id):
@@ -51,7 +52,9 @@ class SOLD2Detector(BaseDetector):
 
     def sample_descinfo_by_indexes(self, descinfo, indexes):
         descinfo = copy.deepcopy(descinfo)
-        descinfo[0] = descinfo[0].reshape(128, -1, 5)[:, indexes, :].reshape(128, -1)
+        descinfo[0] = (
+            descinfo[0].reshape(128, -1, 5)[:, indexes, :].reshape(128, -1)
+        )
         descinfo[1] = descinfo[1][indexes, :]
         return descinfo
 
@@ -65,12 +68,19 @@ class SOLD2Detector(BaseDetector):
 
     def extract_heatmaps_all_images(self, folder, imagecols, skip_exists=False):
         from tqdm import tqdm
+
         heatmap_folder = os.path.join(folder, "sold2_heatmaps")
         if not skip_exists:
             limapio.delete_folder(heatmap_folder)
         limapio.check_makedirs(heatmap_folder)
-        if not (skip_exists and os.path.exists(os.path.join(heatmap_folder, "imagecols.npy"))):
-            limapio.save_npy(os.path.join(heatmap_folder, "imagecols.npy"), imagecols.as_dict())
+        if not (
+            skip_exists
+            and os.path.exists(os.path.join(heatmap_folder, "imagecols.npy"))
+        ):
+            limapio.save_npy(
+                os.path.join(heatmap_folder, "imagecols.npy"),
+                imagecols.as_dict(),
+            )
         for img_id in tqdm(imagecols.get_img_ids()):
             heatmap_fname = self.get_heatmap_fname(heatmap_folder, img_id)
             if skip_exists and os.path.exists(heatmap_fname):
@@ -79,8 +89,9 @@ class SOLD2Detector(BaseDetector):
             limapio.save_npy(heatmap_fname, heatmap)
         return heatmap_folder
 
+
 class SOLD2Matcher(BaseMatcher):
-    def __init__(self, extractor, options = BaseMatcherOptions()):
+    def __init__(self, extractor, options=BaseMatcherOptions()):
         super(SOLD2Matcher, self).__init__(extractor, options)
         assert self.extractor.get_module_name() == "sold2"
         self.detector = SOLD2LineDetector(weight_path=self.weight_path)
@@ -92,6 +103,6 @@ class SOLD2Matcher(BaseMatcher):
         if self.topk == 0:
             return self.detector.match_segs_with_descinfo(descinfo1, descinfo2)
         else:
-            return self.detector.match_segs_with_descinfo_topk(descinfo1, descinfo2, topk=self.topk)
-
-
+            return self.detector.match_segs_with_descinfo_topk(
+                descinfo1, descinfo2, topk=self.topk
+            )

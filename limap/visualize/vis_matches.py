@@ -5,6 +5,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+
 def plot_matches(kpts0, kpts1, color=None, lw=1.5, ps=4, indices=(0, 1)):
     """Plot matches for a pair of existing images.
     Args:
@@ -30,10 +31,17 @@ def plot_matches(kpts0, kpts1, color=None, lw=1.5, ps=4, indices=(0, 1)):
     transFigure = fig.transFigure.inverted()
     fkpts0 = transFigure.transform(ax0.transData.transform(kpts0))
     fkpts1 = transFigure.transform(ax1.transData.transform(kpts1))
-    fig.lines += [matplotlib.lines.Line2D(
-        (fkpts0[i, 0], fkpts1[i, 0]), (fkpts0[i, 1], fkpts1[i, 1]), zorder=1,
-        transform=fig.transFigure, c=color[i], linewidth=lw)
-        for i in range(len(kpts0))]
+    fig.lines += [
+        matplotlib.lines.Line2D(
+            (fkpts0[i, 0], fkpts1[i, 0]),
+            (fkpts0[i, 1], fkpts1[i, 1]),
+            zorder=1,
+            transform=fig.transFigure,
+            c=color[i],
+            linewidth=lw,
+        )
+        for i in range(len(kpts0))
+    ]
 
     # freeze the axes to prevent the transform to change
     ax0.autoscale(enable=False)
@@ -44,9 +52,16 @@ def plot_matches(kpts0, kpts1, color=None, lw=1.5, ps=4, indices=(0, 1)):
         ax1.scatter(kpts1[:, 0], kpts1[:, 1], c=color, s=ps)
 
 
-def plot_lines(lines, line_colors='orange', point_color='cyan',
-               ps=4, lw=2, indices=(0, 1), alpha=1):
-    """ Plot lines and endpoints for existing images.
+def plot_lines(
+    lines,
+    line_colors="orange",
+    point_color="cyan",
+    ps=4,
+    lw=2,
+    indices=(0, 1),
+    alpha=1,
+):
+    """Plot lines and endpoints for existing images.
     Args:
         lines: list of ndarrays of size (N, 2, 2).
         line_colors: string, or list of list of tuples (one for per line).
@@ -59,8 +74,9 @@ def plot_lines(lines, line_colors='orange', point_color='cyan',
     if not isinstance(line_colors, list):
         line_colors = [[line_colors] * len(l) for l in lines]
     for i in range(len(lines)):
-        if ((not isinstance(line_colors[i], list))
-            and (not isinstance(line_colors[i], np.ndarray))):
+        if (not isinstance(line_colors[i], list)) and (
+            not isinstance(line_colors[i], np.ndarray)
+        ):
             line_colors[i] = [line_colors[i]] * len(lines[i])
 
     fig = plt.gcf()
@@ -73,16 +89,27 @@ def plot_lines(lines, line_colors='orange', point_color='cyan',
     for a, l, lc in zip(axes, lines, line_colors):
         for i in range(len(l)):
             line = matplotlib.lines.Line2D(
-                (l[i, 0, 0], l[i, 1, 0]), (l[i, 0, 1], l[i, 1, 1]),
-                zorder=1, c=lc[i], linewidth=lw, alpha=alpha)
+                (l[i, 0, 0], l[i, 1, 0]),
+                (l[i, 0, 1], l[i, 1, 1]),
+                zorder=1,
+                c=lc[i],
+                linewidth=lw,
+                alpha=alpha,
+            )
             a.add_line(line)
         pts = l.reshape(-1, 2)
-        a.scatter(pts[:, 0], pts[:, 1], c=point_color, s=ps,
-                  linewidths=0, zorder=2, alpha=alpha)
+        a.scatter(
+            pts[:, 0],
+            pts[:, 1],
+            c=point_color,
+            s=ps,
+            linewidths=0,
+            zorder=2,
+            alpha=alpha,
+        )
 
 
-def plot_color_line_matches(lines, correct_matches=None,
-                            lw=2, indices=(0, 1)):
+def plot_color_line_matches(lines, correct_matches=None, lw=2, indices=(0, 1)):
     """Plot line matches for existing images with multiple colors.
     Args:
         lines: list of ndarrays of size (N, 2, 2).
@@ -91,7 +118,7 @@ def plot_color_line_matches(lines, correct_matches=None,
         indices: indices of the images to draw the matches on.
     """
     n_lines = len(lines[0])
-    colors = sns.color_palette('husl', n_colors=n_lines)
+    colors = sns.color_palette("husl", n_colors=n_lines)
     np.random.shuffle(colors)
     alphas = np.ones(n_lines)
     # If correct_matches is not None, display wrong matches with a low alpha
@@ -110,15 +137,23 @@ def plot_color_line_matches(lines, correct_matches=None,
         transFigure = fig.transFigure.inverted()
         endpoint0 = transFigure.transform(a.transData.transform(l[:, 0]))
         endpoint1 = transFigure.transform(a.transData.transform(l[:, 1]))
-        fig.lines += [matplotlib.lines.Line2D(
-            (endpoint0[i, 0], endpoint1[i, 0]),
-            (endpoint0[i, 1], endpoint1[i, 1]),
-            zorder=1, transform=fig.transFigure, c=colors[i],
-            alpha=alphas[i], linewidth=lw) for i in range(n_lines)]
+        fig.lines += [
+            matplotlib.lines.Line2D(
+                (endpoint0[i, 0], endpoint1[i, 0]),
+                (endpoint0[i, 1], endpoint1[i, 1]),
+                zorder=1,
+                transform=fig.transFigure,
+                c=colors[i],
+                alpha=alphas[i],
+                linewidth=lw,
+            )
+            for i in range(n_lines)
+        ]
 
 
-def plot_color_lines(lines, correct_matches, wrong_matches,
-                     lw=2, indices=(0, 1)):
+def plot_color_lines(
+    lines, correct_matches, wrong_matches, lw=2, indices=(0, 1)
+):
     """Plot line matches for existing images with multiple colors:
     green for correct matches, red for wrong ones, and blue for the rest.
     Args:
@@ -150,15 +185,19 @@ def plot_color_lines(lines, correct_matches, wrong_matches,
         transFigure = fig.transFigure.inverted()
         endpoint0 = transFigure.transform(a.transData.transform(l[:, 0]))
         endpoint1 = transFigure.transform(a.transData.transform(l[:, 1]))
-        fig.lines += [matplotlib.lines.Line2D(
-            (endpoint0[i, 0], endpoint1[i, 0]),
-            (endpoint0[i, 1], endpoint1[i, 1]),
-            zorder=1, transform=fig.transFigure, c=c[i],
-            linewidth=lw) for i in range(len(l))]
+        fig.lines += [
+            matplotlib.lines.Line2D(
+                (endpoint0[i, 0], endpoint1[i, 0]),
+                (endpoint0[i, 1], endpoint1[i, 1]),
+                zorder=1,
+                transform=fig.transFigure,
+                c=c[i],
+                linewidth=lw,
+            )
+            for i in range(len(l))
+        ]
 
 
 def save_plot(path, **kw):
     """Save the current figure without any white margin."""
-    plt.savefig(path, bbox_inches='tight', pad_inches=0)
-
-
+    plt.savefig(path, bbox_inches="tight", pad_inches=0)

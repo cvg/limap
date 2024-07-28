@@ -1,2 +1,1 @@
 from .lsd import LSDDetector
-

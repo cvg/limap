@@ -4,4 +4,3 @@ from .register_matcher import get_matcher
 
 # line utilization functions
 from .line_utils import *
-

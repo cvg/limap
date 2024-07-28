@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import copy
 
+
 class ScanNet:
     # constants
     max_image_dim = -1
@@ -38,45 +39,45 @@ class ScanNet:
         # load all infos here
         self.loadinfos()
 
-    def read_intrinsics(self, fname, mode='color'):
-        with open(fname, 'r') as f:
+    def read_intrinsics(self, fname, mode="color"):
+        with open(fname, "r") as f:
             lines = f.readlines()
         img_hw = [-1, -1]
         K = np.zeros((3, 3))
         K[2, 2] = 1.0
         for line in lines:
-            if line[:11] == mode + 'Height':
-                img_hw[0] = float(line.strip('\n').split('=')[1])
+            if line[:11] == mode + "Height":
+                img_hw[0] = float(line.strip("\n").split("=")[1])
                 continue
-            if line[:10] == mode + 'Width':
-                img_hw[1] = float(line.strip('\n').split('=')[1])
+            if line[:10] == mode + "Width":
+                img_hw[1] = float(line.strip("\n").split("=")[1])
                 continue
-            if line[:8] == 'fx_' + mode:
-                K[0, 0] = float(line.strip('\n').split('=')[1])
+            if line[:8] == "fx_" + mode:
+                K[0, 0] = float(line.strip("\n").split("=")[1])
                 continue
-            if line[:8] == 'fy_' + mode:
-                K[1, 1] = float(line.strip('\n').split('=')[1])
+            if line[:8] == "fy_" + mode:
+                K[1, 1] = float(line.strip("\n").split("=")[1])
                 continue
-            if line[:8] == 'mx_' + mode:
-                K[0, 2] = float(line.strip('\n').split('=')[1])
+            if line[:8] == "mx_" + mode:
+                K[0, 2] = float(line.strip("\n").split("=")[1])
                 continue
-            if line[:8] == 'my_' + mode:
-                K[1, 2] = float(line.strip('\n').split('=')[1])
+            if line[:8] == "my_" + mode:
+                K[1, 2] = float(line.strip("\n").split("=")[1])
                 continue
         return K, img_hw
 
     def read_pose(self, pose_txt):
-        with open(pose_txt, 'r') as f:
+        with open(pose_txt, "r") as f:
             lines = f.readlines()
         mat = []
         for line in lines:
-            dd = line.strip('\n').split()
+            dd = line.strip("\n").split()
             dd = [float(k) for k in dd]
             mat.append(dd)
         mat = np.array(mat)
         R_cam2world, t_cam2world = mat[:3, :3], mat[:3, 3]
         R = R_cam2world.T
-        t = - R @ t_cam2world
+        t = -R @ t_cam2world
         return R, t
 
     def loadinfos(self):
@@ -87,7 +88,9 @@ class ScanNet:
         index_list = np.arange(0, n_images, self.stride).tolist()
 
         # load intrinsic
-        fname_meta = os.path.join(self.scene_dir, "{0}.txt".format(self.scene_id))
+        fname_meta = os.path.join(
+            self.scene_dir, "{0}.txt".format(self.scene_id)
+        )
         K_orig, img_hw_orig = self.read_intrinsics(fname_meta)
         h_orig, w_orig = img_hw_orig[0], img_hw_orig[1]
         # reshape w.r.t max_image_dim
@@ -99,23 +102,27 @@ class ScanNet:
             if ratio < 1.0:
                 h_new = int(round(h_orig * ratio))
                 w_new = int(round(w_orig * ratio))
-                K[0,:] = K[0,:] * w_new / w_orig
-                K[1,:] = K[1,:] * h_new / h_orig
+                K[0, :] = K[0, :] * w_new / w_orig
+                K[1, :] = K[1, :] * h_new / h_orig
                 img_hw = (h_new, w_new)
-        if (self.img_hw_resized is not None):
+        if self.img_hw_resized is not None:
             h_new, w_new = self.img_hw_resized[0], self.img_hw_resized[1]
-            K[0,:] = K[0,:] * w_new / w_orig
-            K[1,:] = K[1,:] * h_new / h_orig
+            K[0, :] = K[0, :] * w_new / w_orig
+            K[1, :] = K[1, :] * h_new / h_orig
             img_hw = (h_new, w_new)
         self.K, self.img_hw = K, img_hw
 
         # get imname_list and cameras
         self.imname_list, self.Rs, self.Ts = [], [], []
         for index in index_list:
-            imname = os.path.join(self.scene_dir, 'color', '{0}.jpg'.format(index))
+            imname = os.path.join(
+                self.scene_dir, "color", "{0}.jpg".format(index)
+            )
             self.imname_list.append(imname)
 
-            pose_txt = os.path.join(self.scene_dir, 'pose', '{0}.txt'.format(index))
+            pose_txt = os.path.join(
+                self.scene_dir, "pose", "{0}.txt".format(index)
+            )
             R, T = self.read_pose(pose_txt)
             self.Rs.append(R)
             self.Ts.append(T)
@@ -123,7 +130,7 @@ class ScanNet:
     def get_depth_fname(self, imname):
         depth_folder = os.path.join(self.scene_dir, "depth")
         img_id = int(os.path.basename(imname)[:-4])
-        depth_fname = os.path.join(depth_folder, '{0}.png'.format(img_id))
+        depth_fname = os.path.join(depth_folder, "{0}.png".format(img_id))
         return depth_fname
 
     def get_depth(self, imname):
@@ -151,4 +158,3 @@ class ScanNet:
         if len(self.Rs) == 0:
             self.loadinfos()
         return self.Ts, self.Rs
-

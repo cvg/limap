@@ -5,25 +5,55 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 
-from .vis_utils import draw_segments, draw_points, test_point_inside_ranges, test_line_inside_ranges
-from .vis_lines import open3d_add_points, open3d_add_line_set, open3d_add_cameras
+from .vis_utils import (
+    draw_segments,
+    draw_points,
+    test_point_inside_ranges,
+    test_line_inside_ranges,
+)
+from .vis_lines import (
+    open3d_add_points,
+    open3d_add_line_set,
+    open3d_add_cameras,
+)
 
 import _limap._base as _base
+
 
 def draw_bipartite2d(image, bpt2d):
     image = copy.deepcopy(image)
     lines = bpt2d.get_all_lines()
-    image = draw_segments(image, [line.as_array().reshape(-1) for line in lines], (0, 255, 0))
+    image = draw_segments(
+        image, [line.as_array().reshape(-1) for line in lines], (0, 255, 0)
+    )
     junctions = bpt2d.get_all_junctions()
-    image = draw_points(image, [junc.p.p for junc in junctions if junc.degree() == 1], (255, 0, 0), 1)
-    image = draw_points(image, [junc.p.p for junc in junctions if junc.degree() == 2], (0, 0, 255), 1)
-    image = draw_points(image, [junc.p.p for junc in junctions if junc.degree() > 2], (0, 0, 0), 1)
+    image = draw_points(
+        image,
+        [junc.p.p for junc in junctions if junc.degree() == 1],
+        (255, 0, 0),
+        1,
+    )
+    image = draw_points(
+        image,
+        [junc.p.p for junc in junctions if junc.degree() == 2],
+        (0, 0, 255),
+        1,
+    )
+    image = draw_points(
+        image,
+        [junc.p.p for junc in junctions if junc.degree() > 2],
+        (0, 0, 0),
+        1,
+    )
     return image
 
-def open3d_draw_bipartite3d_pointline(bpt3d, ranges=None, draw_edges=True, imagecols=None, draw_planes=False):
-    '''
+
+def open3d_draw_bipartite3d_pointline(
+    bpt3d, ranges=None, draw_edges=True, imagecols=None, draw_planes=False
+):
+    """
     Visualize point-line bipartite on 3D with Open3D
-    '''
+    """
     points, degrees = [], []
     for idx, ptrack in bpt3d.get_dict_points().items():
         p = ptrack.p
@@ -61,7 +91,7 @@ def open3d_draw_bipartite3d_pointline(bpt3d, ranges=None, draw_edges=True, image
     planes = None
     if draw_planes:
         planes = []
-        scale = 0.2 # TODO: port properties
+        scale = 0.2  # TODO: port properties
         for point_id in bpt3d.get_point_ids():
             # TODO: now we only consider degree-2 points
             if bpt3d.pdegree(point_id) != 2:
@@ -88,16 +118,31 @@ def open3d_draw_bipartite3d_pointline(bpt3d, ranges=None, draw_edges=True, image
             planes.append([vert1, vert2, vert3, vert4])
 
     import open3d as o3d
+
     app = o3d.visualization.gui.Application.instance
     app.initialize()
     w = o3d.visualization.O3DVisualizer(height=1080, width=1920)
     w.show_skybox(False)
-    w = open3d_add_points(w, points_deg1, color=(0.0, 0.0, 1.0), psize=1, name="pcd_deg1")
-    w = open3d_add_points(w, points_deg2, color=(1.0, 0.0, 0.0), psize=3, name="pcd_deg2")
-    w = open3d_add_points(w, points_deg3p, color=(1.0, 0.0, 0.0), psize=5, name="pcd_deg3p")
-    w = open3d_add_line_set(w, lines, color=(0.0, 1.0, 0.0), width=-1, name="line_set")
+    w = open3d_add_points(
+        w, points_deg1, color=(0.0, 0.0, 1.0), psize=1, name="pcd_deg1"
+    )
+    w = open3d_add_points(
+        w, points_deg2, color=(1.0, 0.0, 0.0), psize=3, name="pcd_deg2"
+    )
+    w = open3d_add_points(
+        w, points_deg3p, color=(1.0, 0.0, 0.0), psize=5, name="pcd_deg3p"
+    )
+    w = open3d_add_line_set(
+        w, lines, color=(0.0, 1.0, 0.0), width=-1, name="line_set"
+    )
     if edges is not None:
-        w = open3d_add_line_set(w, edges, color=(0.0, 0.0, 0.0), width=-1, name="line_set_constraints")
+        w = open3d_add_line_set(
+            w,
+            edges,
+            color=(0.0, 0.0, 0.0),
+            width=-1,
+            name="line_set_constraints",
+        )
 
     if planes is not None:
         for plane_id, plane in enumerate(planes):
@@ -118,17 +163,19 @@ def open3d_draw_bipartite3d_pointline(bpt3d, ranges=None, draw_edges=True, image
     app.add_window(w)
     app.run()
 
+
 def open3d_draw_bipartite3d_vpline(bpt3d, ranges=None):
-    '''
+    """
     Visualize point-line bipartite on 3D with Open3D
-    '''
+    """
     import seaborn as sns
+
     n_vps = bpt3d.count_points()
     colors = sns.color_palette("husl", n_colors=n_vps)
 
     vp_ids = bpt3d.get_point_ids()
-    vp_id_to_color = { vp_id: colors[idx] for idx, vp_id in enumerate(vp_ids) }
-    vp_line_sets = { vp_id: [] for vp_id in vp_ids }
+    vp_id_to_color = {vp_id: colors[idx] for idx, vp_id in enumerate(vp_ids)}
+    vp_line_sets = {vp_id: [] for vp_id in vp_ids}
     nonvp_line_set = []
     for line_id, ltrack in bpt3d.get_dict_lines().items():
         if ranges is not None:
@@ -144,6 +191,7 @@ def open3d_draw_bipartite3d_vpline(bpt3d, ranges=None):
 
     # open3d
     import open3d as o3d
+
     app = o3d.visualization.gui.Application.instance
     app.initialize()
     w = o3d.visualization.O3DVisualizer(height=1080, width=1920)
@@ -151,12 +199,16 @@ def open3d_draw_bipartite3d_vpline(bpt3d, ranges=None):
     for vp_id in vp_ids:
         if len(vp_line_sets[vp_id]) == 0:
             continue
-        w = open3d_add_line_set(w, vp_line_sets[vp_id], color=vp_id_to_color[vp_id], width=2, name="lineset_vp_{0}".format(vp_id))
+        w = open3d_add_line_set(
+            w,
+            vp_line_sets[vp_id],
+            color=vp_id_to_color[vp_id],
+            width=2,
+            name="lineset_vp_{0}".format(vp_id),
+        )
     # w = open3d_add_line_set(w, nonvp_line_set, color=(0.0, 0.0, 0.0), width=2, name="lineset_nonvp")
     w.reset_camera_to_default()
     w.scene_shader = w.UNLIT
     w.enable_raw_mode(True)
     app.add_window(w)
     app.run()
-
-

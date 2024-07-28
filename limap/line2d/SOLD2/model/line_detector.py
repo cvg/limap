@@ -1,6 +1,7 @@
 """
 Line segment detection from raw images.
 """
+
 import time
 import numpy as np
 import torch
@@ -13,7 +14,7 @@ from ..train import convert_junc_predictions
 
 
 def line_map_to_segments(junctions, line_map):
-    """ Convert a line map to a Nx2x2 list of segments. """
+    """Convert a line map to a Nx2x2 list of segments."""
     line_map_tmp = line_map.copy()
 
     output_segments = np.zeros([0, 2, 2])
@@ -26,10 +27,12 @@ def line_map_to_segments(junctions, line_map):
             for idx2 in np.where(line_map_tmp[idx, :] == 1)[0]:
                 p1 = junctions[idx, :]  # HW format
                 p2 = junctions[idx2, :]
-                single_seg = np.concatenate([p1[None, ...], p2[None, ...]],
-                                            axis=0)
+                single_seg = np.concatenate(
+                    [p1[None, ...], p2[None, ...]], axis=0
+                )
                 output_segments = np.concatenate(
-                    (output_segments, single_seg[None, ...]), axis=0)
+                    (output_segments, single_seg[None, ...]), axis=0
+                )
 
                 # Update line_map
                 line_map_tmp[idx, idx2] = 0
@@ -39,9 +42,15 @@ def line_map_to_segments(junctions, line_map):
 
 
 class LineDetector(object):
-    def __init__(self, model_cfg, ckpt_path, device, line_detector_cfg,
-                 junc_detect_thresh=None):
-        """ SOLD² line detector taking raw images as input.
+    def __init__(
+        self,
+        model_cfg,
+        ckpt_path,
+        device,
+        line_detector_cfg,
+        junc_detect_thresh=None,
+    ):
+        """SOLD² line detector taking raw images as input.
         Parameters:
             model_cfg: config for CNN model
             ckpt_path: path to the weights
@@ -63,20 +72,23 @@ class LineDetector(object):
         if junc_detect_thresh is not None:
             self.junc_detect_thresh = junc_detect_thresh
         else:
-            self.junc_detect_thresh = model_cfg.get("detection_thresh", 1/65)
+            self.junc_detect_thresh = model_cfg.get("detection_thresh", 1 / 65)
         self.max_num_junctions = model_cfg.get("max_num_junctions", 300)
 
         # Initialize the line detector
         self.line_detector_cfg = line_detector_cfg
         self.line_detector = LineSegmentDetectionModule(**line_detector_cfg)
 
-    def __call__(self, input_image, valid_mask=None,
-                 return_heatmap=False, profile=False):
+    def __call__(
+        self, input_image, valid_mask=None, return_heatmap=False, profile=False
+    ):
         # Now we restrict input_image to 4D torch tensor
-        if ((not len(input_image.shape) == 4)
-            or (not isinstance(input_image, torch.Tensor))):
+        if (not len(input_image.shape) == 4) or (
+            not isinstance(input_image, torch.Tensor)
+        ):
             raise ValueError(
-        "[Error] the input image should be a 4D torch tensor.")
+                "[Error] the input image should be a 4D torch tensor."
+            )
 
         # Move the input to corresponding device
         input_image = input_image.to(self.device)
@@ -87,15 +99,20 @@ class LineDetector(object):
             net_outputs = self.model(input_image)
 
         junc_np = convert_junc_predictions(
-            net_outputs["junctions"], self.grid_size,
-            self.junc_detect_thresh, self.max_num_junctions)
+            net_outputs["junctions"],
+            self.grid_size,
+            self.junc_detect_thresh,
+            self.max_num_junctions,
+        )
         if valid_mask is None:
             junctions = np.where(junc_np["junc_pred_nms"].squeeze())
         else:
-            junctions = np.where(junc_np["junc_pred_nms"].squeeze()
-                                 * valid_mask)
+            junctions = np.where(
+                junc_np["junc_pred_nms"].squeeze() * valid_mask
+            )
         junctions = np.concatenate(
-            [junctions[0][..., None], junctions[1][..., None]], axis=-1)
+            [junctions[0][..., None], junctions[1][..., None]], axis=-1
+        )
 
         if net_outputs["heatmap"].shape[1] == 2:
             # Convert to single channel directly from here
@@ -106,7 +123,8 @@ class LineDetector(object):
 
         # Run the line detector.
         line_map, junctions, heatmap = self.line_detector.detect(
-            junctions, heatmap, device=self.device)
+            junctions, heatmap, device=self.device
+        )
         heatmap = heatmap.cpu().numpy()
         if isinstance(line_map, torch.Tensor):
             line_map = line_map.cpu().numpy()

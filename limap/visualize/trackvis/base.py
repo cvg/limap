@@ -1,5 +1,6 @@
 from ..vis_utils import *
 
+
 class BaseTrackVisualizer(object):
     def __init__(self, tracks):
         self.tracks = tracks
@@ -20,22 +21,36 @@ class BaseTrackVisualizer(object):
 
     def report_stats(self):
         counts = np.array(self.counts)
-        print('[Track Report] (N2, N4, N6, N8, N10, N20, N50) = ({0}, {1}, {2}, {3}, {4}, {5}, {6})'
-            .format(counts[counts >= 2].shape[0],
-                    counts[counts >= 4].shape[0],
-                    counts[counts >= 6].shape[0],
-                    counts[counts >= 8].shape[0],
-                    counts[counts >= 10].shape[0],
-                    counts[counts >= 20].shape[0],
-                    counts[counts >= 50].shape[0]))
+        print(
+            "[Track Report] (N2, N4, N6, N8, N10, N20, N50) = ({0}, {1}, {2}, {3}, {4}, {5}, {6})".format(
+                counts[counts >= 2].shape[0],
+                counts[counts >= 4].shape[0],
+                counts[counts >= 6].shape[0],
+                counts[counts >= 8].shape[0],
+                counts[counts >= 10].shape[0],
+                counts[counts >= 20].shape[0],
+                counts[counts >= 50].shape[0],
+            )
+        )
 
     def report_avg_supports(self, n_visible_views=4):
         counts = np.array(self.counts)
         counts_lines = np.array(self.counts_lines)
         arr = counts[counts >= n_visible_views]
         arr_lines = counts_lines[counts >= n_visible_views]
-        print("average supporting images (>= {0}): {1} / {2} = {3:.2f}".format(n_visible_views, arr.sum(), arr.shape[0], arr.mean()))
-        print("average supporting lines (>= {0}): {1} / {2} = {3:.2f}".format(n_visible_views, arr_lines.sum(), arr_lines.shape[0], arr_lines.mean()))
+        print(
+            "average supporting images (>= {0}): {1} / {2} = {3:.2f}".format(
+                n_visible_views, arr.sum(), arr.shape[0], arr.mean()
+            )
+        )
+        print(
+            "average supporting lines (>= {0}): {1} / {2} = {3:.2f}".format(
+                n_visible_views,
+                arr_lines.sum(),
+                arr_lines.shape[0],
+                arr_lines.mean(),
+            )
+        )
 
     def get_counts_np(self):
         return np.array(self.counts)
@@ -81,4 +96,3 @@ class BaseTrackVisualizer(object):
                 continue
             lines.append(track.line)
         return lines
-

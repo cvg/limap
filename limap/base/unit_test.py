@@ -1,6 +1,7 @@
 import _limap._base as _base
 import numpy as np
 
+
 def unit_test_add_noise(imagecols):
     dict_imagecols = imagecols.as_dict()
     # # perturb cameras
@@ -15,11 +16,14 @@ def unit_test_add_noise(imagecols):
         m_images[img_id]["tvec"] += np.random.normal(0, 0.01, 3)
     return _base.ImageCollection(dict_imagecols)
 
+
 def report_error(imagecols_pred, imagecols):
     # cameras
     camera_errors = []
     for cam_id in imagecols.get_cam_ids():
-        error = np.array(imagecols_pred.cam(cam_id).params()) - np.array(imagecols.cam(cam_id).params())
+        error = np.array(imagecols_pred.cam(cam_id).params()) - np.array(
+            imagecols.cam(cam_id).params()
+        )
         error = np.abs(error)
         camera_errors.append(error)
     print("camera_errors", np.array(camera_errors).mean(0))
@@ -27,10 +31,13 @@ def report_error(imagecols_pred, imagecols):
     # images
     pose_errors = []
     for img_id in imagecols.get_img_ids():
-        R_error = imagecols_pred.camimage(img_id).R() - imagecols.camimage(img_id).R()
-        R_error = np.sqrt(np.sum(R_error ** 2))
-        T_error = imagecols_pred.camimage(img_id).T() - imagecols.camimage(img_id).T()
-        T_error = np.sqrt(np.sum(T_error ** 2))
+        R_error = (
+            imagecols_pred.camimage(img_id).R() - imagecols.camimage(img_id).R()
+        )
+        R_error = np.sqrt(np.sum(R_error**2))
+        T_error = (
+            imagecols_pred.camimage(img_id).T() - imagecols.camimage(img_id).T()
+        )
+        T_error = np.sqrt(np.sum(T_error**2))
         pose_errors.append(np.array([R_error, T_error]))
     print("pose_error: (R, T)", np.array(pose_errors).mean(0))
-

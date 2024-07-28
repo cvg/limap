@@ -2,8 +2,10 @@ from _limap import _triangulation as _tri
 from _limap import _base
 import numpy as np
 
+
 def get_normal_direction(l, view):
     return _tri.get_normal_direction(l, view)
+
 
 def get_direction_from_VP(vp, view):
     """
@@ -17,6 +19,7 @@ def get_direction_from_VP(vp, view):
     """
     return _tri.get_direction_from_VP(vp, view)
 
+
 def compute_essential_matrix(view1, view2):
     """
     Get the essential matrix between two views
@@ -29,6 +32,7 @@ def compute_essential_matrix(view1, view2):
     """
     return _tri.compute_essential_matrix(view1, view2)
 
+
 def compute_fundamental_matrix(view1, view2):
     """
     Get the essential matrix between two views
@@ -40,6 +44,7 @@ def compute_fundamental_matrix(view1, view2):
         fundamental_matrix (:class:`np.array` of shape (3, 3))
     """
     return _tri.compute_fundamental_matrix(view1, view2)
+
 
 def compute_epipolar_IoU(l1, view1, l2, view2):
     """
@@ -55,6 +60,7 @@ def compute_epipolar_IoU(l1, view1, l2, view2):
     """
     return _tri.compute_epipolar_IoU(l1, view1, l2, view2)
 
+
 def point_triangulation(p1, view1, p2, view2):
     """
     Two-view point triangulation (mid-point)
@@ -68,6 +74,7 @@ def point_triangulation(p1, view1, p2, view2):
         point3d (:class:`np.array` of shape (3,))
     """
     return _tri.point_triangulation(p1, view1, p2, view2)
+
 
 def triangulate_endpoints(l1, view1, l2, view2):
     """
@@ -83,6 +90,7 @@ def triangulate_endpoints(l1, view1, l2, view2):
     """
     return _tri.triangulate_endpoints(l1, view1, l2, view2)
 
+
 def triangulate(l1, view1, l2, view2):
     """
     Two-view triangulation of lines by ray-plane intersection
@@ -96,6 +104,7 @@ def triangulate(l1, view1, l2, view2):
         line3d (:class:`limap.base.Line3d`)
     """
     return _tri.triangulate(l1, view1, l2, view2)
+
 
 def triangulate_with_one_point(l1, view1, l2, view2, p):
     """
@@ -112,6 +121,7 @@ def triangulate_with_one_point(l1, view1, l2, view2, p):
     """
     return _tri.triangulate_with_one_point(l1, view1, l2, view2, p)
 
+
 def triangulate_with_direction(l1, view1, l2, view2, direc):
     """
     Two-view triangulation of lines with known 3D line direction
@@ -126,4 +136,3 @@ def triangulate_with_direction(l1, view1, l2, view2, direc):
         line3d (:class:`limap.base.Line3d`)
     """
     return _tri.triangulate_with_direction(l1, view1, l2, view2, direc)
-

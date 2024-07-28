@@ -1,5 +1,6 @@
 import _limap._base as _base
 
+
 def get_all_lines_2d(all_2d_segs):
     """
     Convert :class:`np.array` representations of 2D line segments to dict of :class:`~limap.base.Line2d`.
@@ -12,15 +13,18 @@ def get_all_lines_2d(all_2d_segs):
     """
     all_lines_2d = {}
     for img_id in all_2d_segs:
-        all_lines_2d[img_id] = _base._GetLine2dVectorFromArray(all_2d_segs[img_id])
+        all_lines_2d[img_id] = _base._GetLine2dVectorFromArray(
+            all_2d_segs[img_id]
+        )
     return all_lines_2d
+
 
 def get_all_lines_3d(all_3d_segs):
     """
     Convert :class:`np.array` representations of 3D line segments to dict of :class:`~limap.base.Line3d`.
 
     Args:
-        all_3d_segs (dict[int -> :class:`np.array`]): Map image IDs to :class:`np.array` of shape (N, 2, 3), each 2*3 matrix is stacked from the two endpoints of a 3D line segment. 
+        all_3d_segs (dict[int -> :class:`np.array`]): Map image IDs to :class:`np.array` of shape (N, 2, 3), each 2*3 matrix is stacked from the two endpoints of a 3D line segment.
 
     Returns:
         dict[int -> list[:class:`~limap.base.Line3d`]]: Map image IDs to list of :class:`~limap.base.Line3d`.
@@ -29,6 +33,7 @@ def get_all_lines_3d(all_3d_segs):
     for img_id, segs3d in all_3d_segs.items():
         all_lines_3d[img_id] = _base._GetLine3dVectorFromArray(segs3d)
     return all_lines_3d
+
 
 def get_invert_idmap_from_linetracks(all_lines_2d, linetracks):
     """
@@ -49,4 +54,3 @@ def get_invert_idmap_from_linetracks(all_lines_2d, linetracks):
         for img_id, line_id in zip(track.image_id_list, track.line_id_list):
             map[img_id][line_id] = track_id
     return map
-

@@ -1,6 +1,7 @@
 """
 Hourglass network, taken from https://github.com/zhou13/lcnn
 """
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -39,8 +40,9 @@ class Bottleneck2D(nn.Module):
         self.bn1 = nn.BatchNorm2d(inplanes)
         self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=1)
         self.bn2 = nn.BatchNorm2d(planes)
-        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3,
-                               stride=stride, padding=1)
+        self.conv2 = nn.Conv2d(
+            planes, planes, kernel_size=3, stride=stride, padding=1
+        )
         self.bn3 = nn.BatchNorm2d(planes)
         self.conv3 = nn.Conv2d(planes, planes * 2, kernel_size=1)
         self.relu = nn.ReLU(inplace=True)
@@ -116,15 +118,24 @@ class Hourglass(nn.Module):
 class HourglassNet(nn.Module):
     """Hourglass model from Newell et al ECCV 2016"""
 
-    def __init__(self, block, head, depth, num_stacks, num_blocks,
-                 num_classes, input_channels):
+    def __init__(
+        self,
+        block,
+        head,
+        depth,
+        num_stacks,
+        num_blocks,
+        num_classes,
+        input_channels,
+    ):
         super(HourglassNet, self).__init__()
 
         self.inplanes = 64
         self.num_feats = 128
         self.num_stacks = num_stacks
-        self.conv1 = nn.Conv2d(input_channels, self.inplanes, kernel_size=7,
-                               stride=2, padding=3)
+        self.conv1 = nn.Conv2d(
+            input_channels, self.inplanes, kernel_size=7, stride=2, padding=3
+        )
         self.bn1 = nn.BatchNorm2d(self.inplanes)
         self.relu = nn.ReLU(inplace=True)
         self.layer1 = self._make_residual(block, self.inplanes, 1)
@@ -215,12 +226,11 @@ class HourglassNet(nn.Module):
 def hg(**kwargs):
     model = HourglassNet(
         Bottleneck2D,
-        head=kwargs.get("head",
-                        lambda c_in, c_out: nn.Conv2D(c_in, c_out, 1)),
+        head=kwargs.get("head", lambda c_in, c_out: nn.Conv2D(c_in, c_out, 1)),
         depth=kwargs["depth"],
         num_stacks=kwargs["num_stacks"],
         num_blocks=kwargs["num_blocks"],
         num_classes=kwargs["num_classes"],
-        input_channels=kwargs["input_channels"]
+        input_channels=kwargs["input_channels"],
     )
     return model

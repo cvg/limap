@@ -12,17 +12,24 @@ from torchvision import transforms
 import time
 
 from _limap import _features
+
 RGB_mean = [0.485, 0.456, 0.406]
-RGB_std  = [0.229, 0.224, 0.225]
+RGB_std = [0.229, 0.224, 0.225]
 
-norm_RGB = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=RGB_mean, std=RGB_std)])
+norm_RGB = transforms.Compose(
+    [transforms.ToTensor(), transforms.Normalize(mean=RGB_mean, std=RGB_std)]
+)
 
-to_grayscale  = transforms.Compose([transforms.Grayscale(num_output_channels=1),
-                                    transforms.ToTensor(),
-                                    # transforms.Normalize((0.5,), (0.5,))
-                                    ])
+to_grayscale = transforms.Compose(
+    [
+        transforms.Grayscale(num_output_channels=1),
+        transforms.ToTensor(),
+        # transforms.Normalize((0.5,), (0.5,))
+    ]
+)
 
-#Interface
+
+# Interface
 class Extractor(torch.nn.Module):
     """Dense feature extractor.
 
@@ -35,8 +42,9 @@ class Extractor(torch.nn.Module):
         channels (List[int]): output channels for each level of featuremaps.
 
     """
-    def __init__(self,device: str):
-        super(Extractor,self).__init__()
+
+    def __init__(self, device: str):
+        super(Extractor, self).__init__()
         self.device = device
         self.num_levels = 0
         self.model = None
@@ -71,12 +79,13 @@ class Extractor(torch.nn.Module):
         """
         raise NotImplementedError()
 
+
 class S2DNetExtractor(Extractor):
     def __init__(self, device: str, *args, **kwargs):
         super().__init__(device)
         self.model = S2DNet().to(device)
         self.num_levels = 1
-        self.channels = [128]#,128] #[128,128]
+        self.channels = [128]  # ,128] #[128,128]
         self.l2_normalize = True
         if "output_channels" in kwargs.keys():
             self.channels = [min(kwargs["output_channels"], self.channels[0])]
@@ -86,12 +95,13 @@ class S2DNetExtractor(Extractor):
 
         for i, channels in enumerate(self.channels):
             if channels != 128:
-                maps[i] = maps[i][:,:channels]
+                maps[i] = maps[i][:, :channels]
         early = maps[0]
-        return [early]#,middle]
+        return [early]  # ,middle]
 
     def adapt_image(self, pil_img: PIL.Image) -> torch.Tensor:
         return tvf.to_tensor(pil_img).unsqueeze(0)
+
 
 class DSIFTExtractor(Extractor):
     def __init__(self, device: str, *args, **kwargs):
@@ -99,19 +109,27 @@ class DSIFTExtractor(Extractor):
         self.model = None
         self.num_levels = 1
         self.channels = [128]
-        self.l2_normalize = True #already normalized
+        self.l2_normalize = True  # already normalized
         self.step = 1
         self.bin_size = 4
         sys.path.append("lib/sift-flow-gpu")
         from sift_flow_torch import SiftFlowTorch
+
         self.model = SiftFlowTorch()
 
         self.pad = torch.nn.ZeroPad2d(int(round(1.5 * self.bin_size)))
 
     def extract_featuremaps(self, image_batch: torch.Tensor) -> list:
         cpu_image = image_batch.squeeze().cpu().numpy()
-        numpy_fmap = _features.extract_dsift(cpu_image, self.step, self.bin_size)
-        res = self.pad(torch.Tensor(numpy_fmap).to(self.device).permute(2,0,1).unsqueeze(0))
+        numpy_fmap = _features.extract_dsift(
+            cpu_image, self.step, self.bin_size
+        )
+        res = self.pad(
+            torch.Tensor(numpy_fmap)
+            .to(self.device)
+            .permute(2, 0, 1)
+            .unsqueeze(0)
+        )
         print(res.shape, image_batch.shape)
         return [res]
 
@@ -122,12 +140,13 @@ class DSIFTExtractor(Extractor):
         print(time.time() - t)
         return res
 
+
 class VGGNetExtractor(Extractor):
     def __init__(self, device: str, *args, **kwargs):
         super().__init__(device)
         self.model = VGGNet().to(device)
-        self.num_levels = 1 #2
-        self.channels = [64] #[128,128]
+        self.num_levels = 1  # 2
+        self.channels = [64]  # [128,128]
         self.l2_normalize = True
         if "output_channels" in kwargs.keys():
             self.channels = [min(kwargs["output_channels"], self.channels[0])]
@@ -137,17 +156,18 @@ class VGGNetExtractor(Extractor):
 
         for i, channels in enumerate(self.channels):
             if channels != 64:
-                maps[i] = maps[i][:,:channels]
+                maps[i] = maps[i][:, :channels]
         early = maps[0]
         middle = maps[1]
-        #combined = early + nn.Upsample(size = early.shape[2:], mode="bilinear", align_corners=True)(middle)
+        # combined = early + nn.Upsample(size = early.shape[2:], mode="bilinear", align_corners=True)(middle)
         return [early, middle]
 
     def adapt_image(self, pil_img: PIL.Image) -> torch.Tensor:
         return tvf.to_tensor(pil_img).unsqueeze(0)
 
+
 class ImageExtractor(Extractor):
-    def __init__(self, device: str, * args, **kwargs):
+    def __init__(self, device: str, *args, **kwargs):
         super().__init__(device)
         self.model = None
         self.num_levels = 1
@@ -155,12 +175,14 @@ class ImageExtractor(Extractor):
 
     def extract_featuremaps(self, image_batch: torch.Tensor) -> list:
         return [image_batch]
+
     def adapt_image(self, pil_img: PIL.Image) -> torch.Tensor:
         return tvf.to_tensor(pil_img).unsqueeze(0)
-        #return torch.from_numpy(np.asarray(pil_img) / 255.0).permute(2,0,1).unsqueeze(0)
+        # return torch.from_numpy(np.asarray(pil_img) / 255.0).permute(2,0,1).unsqueeze(0)
+
 
 class GrayscaleExtractor(Extractor):
-    def __init__(self, device: str, * args, **kwargs):
+    def __init__(self, device: str, *args, **kwargs):
         super().__init__(device)
         self.model = None
         self.num_levels = 1
@@ -172,7 +194,10 @@ class GrayscaleExtractor(Extractor):
     def adapt_image(self, pil_img: PIL.Image) -> torch.Tensor:
         return to_grayscale(pil_img).unsqueeze(0)
 
-def load_extractor(extractor_name: str, device: str, *args, **kwargs)-> Extractor:
+
+def load_extractor(
+    extractor_name: str, device: str, *args, **kwargs
+) -> Extractor:
     """
     Load extractor by name onto device.
 
@@ -197,4 +222,3 @@ def load_extractor(extractor_name: str, device: str, *args, **kwargs)-> Extracto
     if extractor_name == "dsift":
         return DSIFTExtractor(device, *args, **kwargs)
     raise NotImplementedError(extractor_name)
-

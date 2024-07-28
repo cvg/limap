@@ -1,7 +1,21 @@
 from ._pl_estimate_absolute_pose import _pl_estimate_absolute_pose
 
-def pl_estimate_absolute_pose(cfg, l3ds, l3d_ids, l2ds, p3ds, p2ds, camera, campose=None,
-                     inliers_line=None, inliers_point=None, jointloc_cfg=None, silent=True, logger=None):
+
+def pl_estimate_absolute_pose(
+    cfg,
+    l3ds,
+    l3d_ids,
+    l2ds,
+    p3ds,
+    p2ds,
+    camera,
+    campose=None,
+    inliers_line=None,
+    inliers_point=None,
+    jointloc_cfg=None,
+    silent=True,
+    logger=None,
+):
     """
     Estimate absolute camera pose of a image from matched 2D-3D line and point correspondences.
 
@@ -23,6 +37,18 @@ def pl_estimate_absolute_pose(cfg, l3ds, l3d_ids, l2ds, p3ds, p2ds, camera, camp
     Returns:
         tuple[:class:`limap.base.CameraPose`, :class:`limap.estimators.RansacStatistics`]: Estimated pose and ransac statistics.
     """
-    return _pl_estimate_absolute_pose(cfg, l3ds, l3d_ids, l2ds, p3ds, p2ds, camera, campose=campose,
-                                      inliers_line=inliers_line, inliers_point=inliers_point, jointloc_cfg=jointloc_cfg, silent=silent, logger=logger)
-
+    return _pl_estimate_absolute_pose(
+        cfg,
+        l3ds,
+        l3d_ids,
+        l2ds,
+        p3ds,
+        p2ds,
+        camera,
+        campose=campose,
+        inliers_line=inliers_line,
+        inliers_point=inliers_point,
+        jointloc_cfg=jointloc_cfg,
+        silent=silent,
+        logger=logger,
+    )

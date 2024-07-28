@@ -8,15 +8,21 @@ from tp_lsd.utils.reconstruct import TPS_line
 from tp_lsd.utils.utils import load_model
 from tp_lsd.modeling.TP_Net import Res320
 
+
 class TPLSDDetector(BaseDetector):
-    def __init__(self, options = BaseDetectorOptions()):
+    def __init__(self, options=BaseDetectorOptions()):
         super(TPLSDDetector, self).__init__(options)
         # Load the TP-LSD model
-        head = {'center': 1, 'dis': 4, 'line': 1}
+        head = {"center": 1, "dis": 4, "line": 1}
         if self.weight_path is None:
-            ckpt = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'pretraineds/Res512.pth')
+            ckpt = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                "pretraineds/Res512.pth",
+            )
         else:
-            ckpt = os.path.join(self.weight_path, "line2d", "TP_LSD", "pretrained/Res512.pth")
+            ckpt = os.path.join(
+                self.weight_path, "line2d", "TP_LSD", "pretrained/Res512.pth"
+            )
         if not os.path.isfile(ckpt):
             self.download_model(ckpt)
         self.net = load_model(Res320(head), ckpt)
@@ -24,6 +30,7 @@ class TPLSDDetector(BaseDetector):
 
     def download_model(self, path):
         import subprocess
+
         if not os.path.exists(os.path.dirname(path)):
             os.makedirs(os.path.dirname(path))
         link = "https://github.com/Siyuada7/TP-LSD/blob/master/pretraineds/Res512.pth?raw=true"
@@ -43,7 +50,13 @@ class TPLSDDetector(BaseDetector):
         H, W = img.shape[:2]
         hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
         imgv0 = hsv[..., 2]
-        imgv = cv2.resize(imgv0, (0, 0), fx=1. / 4, fy=1. / 4, interpolation=cv2.INTER_LINEAR)
+        imgv = cv2.resize(
+            imgv0,
+            (0, 0),
+            fx=1.0 / 4,
+            fy=1.0 / 4,
+            interpolation=cv2.INTER_LINEAR,
+        )
         imgv = cv2.GaussianBlur(imgv, (5, 5), 3)
         imgv = cv2.resize(imgv, (W, H), interpolation=cv2.INTER_LINEAR)
         imgv = cv2.GaussianBlur(imgv, (5, 5), 3)
@@ -53,16 +66,21 @@ class TPLSDDetector(BaseDetector):
         hsv[..., 2] = imgv1
         inp = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
 
-        inp = (inp.astype(np.float32) / 255.)
+        inp = inp.astype(np.float32) / 255.0
         inp = torch.from_numpy(inp.transpose(2, 0, 1)).unsqueeze(0).cuda()
         with torch.no_grad():
             outputs = net(inp)
         lines = TPS_line(outputs[-1], 0.25, 0.5, H, W)[0].reshape(-1, 2, 2)
 
         # Use the line length as score
-        lines = np.concatenate([
-            lines.reshape(-1, 4),
-            np.linalg.norm(lines[:, 0] - lines[:, 1], axis=1, keepdims=True)],
-                               axis=1)
+        lines = np.concatenate(
+            [
+                lines.reshape(-1, 4),
+                np.linalg.norm(
+                    lines[:, 0] - lines[:, 1], axis=1, keepdims=True
+                ),
+            ],
+            axis=1,
+        )
 
         return lines

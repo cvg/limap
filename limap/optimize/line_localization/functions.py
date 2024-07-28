@@ -2,7 +2,10 @@ import numpy as np
 
 import limap.base as _base
 
-def match_line_2to2_epipolarIoU(ref_lines, tgt_lines, ref_cam, ref_pose, tgt_cam, tgt_pose, IoU_threshold):
+
+def match_line_2to2_epipolarIoU(
+    ref_lines, tgt_lines, ref_cam, ref_pose, tgt_cam, tgt_pose, IoU_threshold
+):
     from limap.triangulation.triangulation import compute_epipolar_IoU
 
     pairs = []
@@ -19,7 +22,17 @@ def match_line_2to2_epipolarIoU(ref_lines, tgt_lines, ref_cam, ref_pose, tgt_cam
                 pairs.append((ref_line_id, tgt_line_id))
     return pairs
 
-def filter_line_2to2_epipolarIoU(pairs, ref_lines, tgt_lines, ref_cam, ref_pose, tgt_cam, tgt_pose, IoU_threshold):
+
+def filter_line_2to2_epipolarIoU(
+    pairs,
+    ref_lines,
+    tgt_lines,
+    ref_cam,
+    ref_pose,
+    tgt_cam,
+    tgt_pose,
+    IoU_threshold,
+):
     from limap.triangulation.triangulation import compute_epipolar_IoU
 
     if not isinstance(ref_pose, _base.CameraPose):
@@ -30,10 +43,13 @@ def filter_line_2to2_epipolarIoU(pairs, ref_lines, tgt_lines, ref_cam, ref_pose,
     tgt_view = _base.CameraView(tgt_cam, tgt_pose)
     filtered = []
     for ref_line_id, tgt_line_id in pairs:
-        res = compute_epipolar_IoU(ref_lines[ref_line_id], ref_view, tgt_lines[tgt_line_id], tgt_view)
+        res = compute_epipolar_IoU(
+            ref_lines[ref_line_id], ref_view, tgt_lines[tgt_line_id], tgt_view
+        )
         if res > IoU_threshold:
             filtered.append((ref_line_id, tgt_line_id))
     return filtered
+
 
 def match_line_2to3(pairs_2to2, line2track, tgt_img_id):
     track_ids = line2track[tgt_img_id]
@@ -46,8 +62,10 @@ def match_line_2to3(pairs_2to2, line2track, tgt_img_id):
             pairs_2to3.append((ref_line_id, track_ids[tgt_line_id]))
     return pairs_2to3
 
+
 def midpoint_dist(ref_line, tgt_line):
     return np.linalg.norm(ref_line.midpoint() - tgt_line.midpoint())
+
 
 def midpoint_perpendicular_dist(ref_line, tgt_line):
     m = ref_line.midpoint()
@@ -56,6 +74,7 @@ def midpoint_perpendicular_dist(ref_line, tgt_line):
     dist = np.abs(np.cross(dir, t - m)) / ref_line.length()
     return dist
 
+
 def perpendicular_dist(ref_line, tgt_line):
     s, e = ref_line.start, ref_line.end
     t, dir = tgt_line.start, tgt_line.direction()
@@ -63,16 +82,27 @@ def perpendicular_dist(ref_line, tgt_line):
     dist = 0.5 * (np.abs(np.cross(dir, t - s)) + np.abs(np.cross(dir, t - e)))
     return dist
 
+
 def get_reprojection_dist_func(func_name):
-    if func_name == 'Perpendicular':
+    if func_name == "Perpendicular":
         return perpendicular_dist
-    if func_name == 'Midpoint':
+    if func_name == "Midpoint":
         return midpoint_dist
-    if func_name == 'Midpoint_Perpendicular':
+    if func_name == "Midpoint_Perpendicular":
         return midpoint_perpendicular_dist
     raise ValueError(f"[Error] Unknown dist function: {func_name}")
 
-def reprojection_filter_matches_2to3(ref_lines, ref_camview, all_pairs_2to3, linetracks, dist_thres=10, sine_thres=0.4, angle_scale=1.0, dist_func=midpoint_dist):
+
+def reprojection_filter_matches_2to3(
+    ref_lines,
+    ref_camview,
+    all_pairs_2to3,
+    linetracks,
+    dist_thres=10,
+    sine_thres=0.4,
+    angle_scale=1.0,
+    dist_func=midpoint_dist,
+):
     matches = []
     for ref_line_id in all_pairs_2to3:
         ref_line = ref_lines[ref_line_id]
@@ -83,7 +113,9 @@ def reprojection_filter_matches_2to3(ref_lines, ref_camview, all_pairs_2to3, lin
         best_id = None
         for id in track_ids:
             l3d = linetracks[id].line
-            l2d_start, l2d_end = ref_camview.projection(l3d.start), ref_camview.projection(l3d.end)
+            l2d_start, l2d_end = ref_camview.projection(
+                l3d.start
+            ), ref_camview.projection(l3d.end)
             l2d = _base.Line2d(l2d_start, l2d_end)
 
             dist = dist_func(ref_line, l2d)
