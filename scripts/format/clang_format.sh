@@ -42,4 +42,4 @@ num_files=$(echo $all_files | wc -w)
 echo "Formatting ${num_files} files"
 
 # Run clang-format
-${clang_format} -i $all_files
+${clang_format} -I $all_files
