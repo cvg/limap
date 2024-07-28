@@ -5,7 +5,7 @@
 # Find clang-format
 tools='
   clang-format-8
-  clang
+  clang-format
 '
 
 clang_format=''
