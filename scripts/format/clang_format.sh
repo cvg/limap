@@ -36,10 +36,10 @@ fi
 root_folder=$(git rev-parse --show-toplevel)
 all_files=$( \
     git ls-tree --full-tree -r --name-only HEAD . \
-    | grep "limap.*\(\.cc\|\.h\|\.hpp\|\.cpp\|\.cu\)$" \
+    | grep "^limap.*\(\.cc\|\.h\|\.hpp\|\.cpp\|\.cu\)$" \
     | sed "s~^~$root_folder/~")
 num_files=$(echo $all_files | wc -w)
 echo "Formatting ${num_files} files"
 
 # Run clang-format
-${clang_format} -I $all_files
+${clang_format} -i $all_files
