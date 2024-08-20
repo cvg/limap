@@ -2,6 +2,7 @@
 #define LIMAP_CERESBASE_LINE_DISTS_H
 
 #include <ceres/ceres.h>
+#include <ceres/rotation.h>
 
 namespace limap {
 
