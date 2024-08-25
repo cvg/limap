@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "undistortion/undistort.h"
-#include <colmap/util/bitmap.h>
+#include <colmap/sensor/bitmap.h>
 
 namespace py = pybind11;
 

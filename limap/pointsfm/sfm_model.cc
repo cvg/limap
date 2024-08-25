@@ -1,8 +1,8 @@
 #include "pointsfm/sfm_model.h"
-#include "util/log_exceptions.h"
 
-#include <colmap/base/reconstruction.h>
-#include <colmap/util/math.h>
+#include <colmap/math/math.h>
+#include <colmap/scene/reconstruction.h>
+#include <colmap/util/logging.h>
 #include <colmap/util/misc.h>
 
 namespace limap {

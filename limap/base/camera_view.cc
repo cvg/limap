@@ -1,5 +1,5 @@
 #include "base/camera_view.h"
-#include <colmap/util/bitmap.h>
+#include <colmap/sensor/bitmap.h>
 
 namespace limap {
 

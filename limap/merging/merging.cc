@@ -7,6 +7,7 @@
 #include "util/types.h"
 
 #include <algorithm>
+#include <colmap/util/logging.h>
 #include <set>
 #include <third-party/progressbar.hpp>
 

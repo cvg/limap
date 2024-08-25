@@ -97,7 +97,7 @@ def undistort_images(
         cam_undistorted = _undist.UndistortImageCamera(
             cam, imname_in, imname_out
         )
-        cam_undistorted.set_cam_id(cam_id)
+        cam_undistorted.camera_id = cam_id
         return cam_undistorted
 
     outputs = joblib.Parallel(n_jobs=n_jobs)(
@@ -111,7 +111,7 @@ def undistort_images(
     for idx, img_id in enumerate(unload_ids):
         imname_out = os.path.join(output_dir, "image{0:08d}.png".format(img_id))
         cam_undistorted = outputs[idx]
-        cam_id = cam_undistorted.cam_id()
+        cam_id = cam_undistorted.camera_id
         if cam_id not in cam_dict:
             cam_dict[cam_id] = cam_undistorted
             imagecols_undistorted.change_camera(cam_id, cam_undistorted)

@@ -686,6 +686,13 @@ void bind_line_linker(py::module &m) {
 }
 
 void bind_camera(py::module &m) {
+  // TODO: use pycolmap
+  py::enum_<colmap::CameraModelId> PyCameraModelId(m, "CameraModelId");
+  PyCameraModelId.value("INVALID", colmap::CameraModelId::kInvalid);
+  PyCameraModelId.value("SIMPLE_PINHOLE",
+                        colmap::CameraModelId::kSimplePinhole);
+  PyCameraModelId.value("PINHOLE", colmap::CameraModelId::kPinhole);
+
   py::class_<Camera>(m, "Camera", R"(
             | Camera model, inherits `COLMAP's camera model <https://colmap.github.io/cameras.html>`_.
             | COLMAP camera models:
@@ -734,6 +741,11 @@ void bind_camera(py::module &m) {
           [](const py::dict &dict) { // load
             return Camera(dict);
           }))
+      .def_readwrite("camera_id", &Camera::camera_id,
+                     "Unique identifier of the camera.")
+      .def_readwrite("model", &Camera::model_id, "Camera model.")
+      .def_readwrite("width", &Camera::width, "Width of camera sensor.")
+      .def_readwrite("height", &Camera::height, "Height of camera sensor.")
       .def("as_dict", &Camera::as_dict, R"(
             Returns:
                 dict: Python dict representation of this :class:`~limap.base.Camera`
@@ -754,22 +766,6 @@ void bind_camera(py::module &m) {
             Returns:
                 :class:`np.array` of shape (3, 3): Inverse of the intrinsic matrix
         )")
-      .def("cam_id", &Camera::CameraId, R"(
-            Returns:
-                int: Camera ID
-        )")
-      .def("model_id", &Camera::ModelId, R"(
-            Returns:
-                int: COLMAP camera model ID
-        )")
-      .def("params", &Camera::params, R"(
-            Returns:
-                list (float): Minimal representation of intrinsic paramters, length varies according to camera model
-        )")
-      .def("num_params", &Camera::NumParams, R"(
-            Returns:
-                int: Number of the paramters for minimal representation of intrinsic 
-        )")
       .def("resize", &Camera::resize, R"(
             Resize camera's width and height.
 
@@ -785,10 +781,6 @@ void bind_camera(py::module &m) {
                 val (int)
         )",
            py::arg("val"))
-      .def("set_cam_id", &Camera::SetCameraId, R"(
-            Set the camera ID.
-        )",
-           py::arg("camera_id"))
       .def("InitializeParams", &Camera::InitializeParams, R"(
             Initialize the intrinsics using focal length, width, and height
 
@@ -798,8 +790,8 @@ void bind_camera(py::module &m) {
                 height (int)
         )",
            py::arg("focal_length"), py::arg("width"), py::arg("height"))
-      .def("ImageToWorld", &Camera::ImageToWorld)
-      .def("WorldToImage", &Camera::WorldToImage)
+      .def("CamFromImg", &Camera::CamFromImg)
+      .def("ImgFromCam", &Camera::ImgFromCam)
       .def("IsInitialized", &Camera::IsInitialized, R"(
             Returns:
                 bool: True if the camera parameters are initialized

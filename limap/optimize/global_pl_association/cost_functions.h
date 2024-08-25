@@ -39,7 +39,7 @@ public:
                                      const double *tvec = NULL) {
     if (!params && !qvec && !tvec)
       return new ceres::AutoDiffCostFunction<PointGeometricRefinementFunctor, 2,
-                                             3, CameraModel::kNumParams, 4, 3>(
+                                             3, CameraModel::num_params, 4, 3>(
           new PointGeometricRefinementFunctor(p2d, NULL, NULL, NULL));
     else
       return new ceres::AutoDiffCostFunction<PointGeometricRefinementFunctor, 2,
@@ -53,7 +53,7 @@ public:
     CHECK_NOTNULL(qvec_);
     CHECK_NOTNULL(tvec_);
 
-    const int num_params = CameraModel::kNumParams;
+    const int num_params = CameraModel::num_params;
     T params[num_params];
     for (size_t i = 0; i < num_params; ++i) {
       params[i] = T(params_[i]);

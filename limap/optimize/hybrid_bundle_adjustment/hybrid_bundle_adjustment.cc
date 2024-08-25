@@ -72,11 +72,10 @@ void HybridBAEngine::ParameterizeCameras() {
     } else if (config_.constant_principal_point) {
       int cam_id = imagecols_.camimage(img_id).cam_id;
       std::vector<int> const_idxs;
-      const std::vector<size_t> &principal_point_idxs =
-          imagecols_.cam(cam_id).PrincipalPointIdxs();
+      auto principal_point_idxs = imagecols_.cam(cam_id).PrincipalPointIdxs();
       const_idxs.insert(const_idxs.end(), principal_point_idxs.begin(),
                         principal_point_idxs.end());
-      SetSubsetManifold(imagecols_.cam(cam_id).params().size(), const_idxs,
+      SetSubsetManifold(imagecols_.cam(cam_id).params.size(), const_idxs,
                         problem_.get(), params_data);
     }
 
@@ -132,13 +131,13 @@ void HybridBAEngine::AddPointGeometricResiduals(const int track_id) {
       config_.point_geometric_loss_function.get();
   for (size_t i = 0; i < track.count_images(); ++i) {
     int img_id = track.image_id_list[i];
-    int model_id = imagecols_.camview(img_id).cam.ModelId();
+    auto model_id = imagecols_.camview(img_id).cam.model_id;
     V2D p2d = track.p2d_list[i];
 
     ceres::CostFunction *cost_function = nullptr;
     switch (model_id) {
 #define CAMERA_MODEL_CASE(CameraModel)                                         \
-  case CameraModel::kModelId:                                                  \
+  case CameraModel::model_id:                                                  \
     cost_function = PointGeometricRefinementFunctor<CameraModel>::Create(      \
         p2d, NULL, NULL, NULL);                                                \
     break;
@@ -170,7 +169,7 @@ void HybridBAEngine::AddLineGeometricResiduals(const int track_id) {
   std::vector<int> image_ids = track.GetSortedImageIds();
   for (auto it1 = image_ids.begin(); it1 != image_ids.end(); ++it1) {
     int img_id = *it1;
-    int model_id = imagecols_.camview(img_id).cam.ModelId();
+    auto model_id = imagecols_.camview(img_id).cam.model_id;
     const auto &ids = idmap.at(img_id);
     for (auto it2 = ids.begin(); it2 != ids.end(); ++it2) {
       const Line2d &line = track.line2d_list[*it2];
@@ -179,7 +178,7 @@ void HybridBAEngine::AddLineGeometricResiduals(const int track_id) {
 
       switch (model_id) {
 #define CAMERA_MODEL_CASE(CameraModel)                                         \
-  case CameraModel::kModelId:                                                  \
+  case CameraModel::model_id:                                                  \
     cost_function =                                                            \
         line_refinement::GeometricRefinementFunctor<CameraModel>::Create(      \
             line, NULL, NULL, NULL, config_.geometric_alpha);                  \
