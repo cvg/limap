@@ -15,21 +15,21 @@ namespace limap {
 // @param rot_mat        3x3 rotation matrix.
 //
 // @return               Unit Quaternion rotation coefficients (w, x, y, z).
-Eigen::Vector4d RotationMatrixToQuaternion(const Eigen::Matrix3d& rot_mat);
+Eigen::Vector4d RotationMatrixToQuaternion(const Eigen::Matrix3d &rot_mat);
 
 // Convert Quaternion representation to 3D rotation matrix.
 //
 // @param qvec           Unit Quaternion rotation coefficients (w, x, y, z).
 //
 // @return               3x3 rotation matrix.
-Eigen::Matrix3d QuaternionToRotationMatrix(const Eigen::Vector4d& qvec);
+Eigen::Matrix3d QuaternionToRotationMatrix(const Eigen::Vector4d &qvec);
 
 // Normalize Quaternion vector.
 //
 // @param qvec          Quaternion rotation coefficients (w, x, y, z).
 //
 // @return              Unit Quaternion rotation coefficients (w, x, y, z).
-Eigen::Vector4d NormalizeQuaternion(const Eigen::Vector4d& qvec);
+Eigen::Vector4d NormalizeQuaternion(const Eigen::Vector4d &qvec);
 
 } // namespace limap
 
