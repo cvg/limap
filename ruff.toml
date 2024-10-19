@@ -18,4 +18,4 @@ select = [
 ignore = ["SIM117"]
 
 [lint.per-file-ignores]
-"scripts/*.py" = ["E", "SIM", "UP", "B"]
+"scripts/*.py" = ["E"]
