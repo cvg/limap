@@ -1,7 +1,9 @@
 import os
-from .base import BaseDenseMatcher
+
 import romatch
 from PIL import Image
+
+from .base import BaseDenseMatcher
 
 
 class RoMa(BaseDenseMatcher):

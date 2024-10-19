@@ -1,8 +1,9 @@
 import os
+
 import torch
 
 
-class BaseDenseMatcher(object):
+class BaseDenseMatcher:
     def __init__(self):
         pass
 

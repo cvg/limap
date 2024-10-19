@@ -1,7 +1,8 @@
-import limap.util.config
+import cv2
+
 import limap.base
 import limap.line2d
-import cv2
+import limap.util.config
 
 detector = limap.line2d.get_detector(
     {"method": "lsd", "skip_exists": False}
@@ -29,8 +30,9 @@ matches = matcher.match_pair(desc1, desc2)  # matching
 
 
 def vis_detections(img, segs):
-    from limap.visualize.vis_utils import draw_segments
     import copy
+
+    from limap.visualize.vis_utils import draw_segments
 
     img_draw = copy.deepcopy(img)
     img_draw = draw_segments(img_draw, segs, color=[0, 255, 0])
@@ -38,10 +40,11 @@ def vis_detections(img, segs):
 
 
 def vis_matches(img1, img2, segs1, segs2, matches):
+    import copy
+
     import cv2
     import numpy as np
     import seaborn as sns
-    import copy
 
     matched_seg1 = segs1[matches[:, 0]]
     matched_seg2 = segs2[matches[:, 1]]

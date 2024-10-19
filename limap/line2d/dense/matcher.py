@@ -1,10 +1,12 @@
 import os
+from typing import NamedTuple
+
 import numpy as np
 import torch
 import torch.nn.functional as F
-from typing import NamedTuple
 
 import limap.util.io as limapio
+
 from ..base_matcher import BaseMatcher, BaseMatcherOptions
 
 
@@ -23,7 +25,7 @@ class BaseDenseLineMatcher(BaseMatcher):
         dense_options=BaseDenseLineMatcherOptions(),
         options=BaseMatcherOptions(),
     ):
-        super(BaseDenseLineMatcher, self).__init__(extractor, options)
+        super().__init__(extractor, options)
         assert self.extractor.get_module_name() == "dense_naive"
         self.dense_matcher = dense_matcher
         self.dense_options = dense_options
@@ -135,11 +137,11 @@ class BaseDenseLineMatcher(BaseMatcher):
         sample_weight[sample_weight_sum > 0] /= sample_weight_sum[
             sample_weight_sum > 0
         ][:, None].repeat(1, sample_weight.shape[2])
-        is_active = (
-            sample_weight_sum
-            > self.dense_options.segment_percentage_th
-            * self.dense_options.n_samples
-        )
+        # is_active = (
+        #     sample_weight_sum
+        #     > self.dense_options.segment_percentage_th
+        #     * self.dense_options.n_samples
+        # )
 
         # get weighted dists
         weighted_dists = (dists * sample_weight).sum(2)
@@ -163,7 +165,7 @@ class BaseDenseLineMatcher(BaseMatcher):
         dists_2to1, overlap_2to1 = self.compute_distance_one_direction(
             descinfo2, descinfo1, warp_2to1, cert_2to1
         )
-        overlap = torch.maximum(overlap_1to2, overlap_2to1.T)
+        # overlap = torch.maximum(overlap_1to2, overlap_2to1.T)
         dists = torch.where(
             overlap_1to2 > overlap_2to1.T, dists_1to2, dists_2to1.T
         )
@@ -196,7 +198,7 @@ class RoMaLineMatcher(BaseDenseLineMatcher):
         from .dense_matcher import RoMa
 
         roma_matcher = RoMa(mode=mode, device=dense_options.device)
-        super(RoMaLineMatcher, self).__init__(
+        super().__init__(
             extractor,
             roma_matcher,
             dense_options=dense_options,

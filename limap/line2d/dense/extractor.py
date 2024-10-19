@@ -1,18 +1,21 @@
 import os
+
 import numpy as np
+
 import limap.util.io as limapio
+
 from ..base_detector import BaseDetector, BaseDetectorOptions
 
 
 class DenseNaiveExtractor(BaseDetector):
     def __init__(self, options=BaseDetectorOptions(), device=None):
-        super(DenseNaiveExtractor, self).__init__(options)
+        super().__init__(options)
 
     def get_module_name(self):
         return "dense_naive"
 
     def get_descinfo_fname(self, descinfo_folder, img_id):
-        fname = os.path.join(descinfo_folder, "descinfo_{0}.npz".format(img_id))
+        fname = os.path.join(descinfo_folder, f"descinfo_{img_id}.npz")
         return fname
 
     def save_descinfo(self, descinfo_folder, img_id, descinfo):
