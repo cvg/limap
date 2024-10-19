@@ -60,9 +60,7 @@ def process(image_list, cameras):
             assert camera_undistorted.K[0, 0] == camera_undistorted.K[1, 1]
             fx = camera_undistorted.K[0, 0]
             cx, cy = camera_undistorted.K[0, 2], camera_undistorted.K[1, 2]
-            f.write(
-                f"{imname_undist} SIMPLE_PINHOLE {w} {h} {fx} {cx} {cy}\n"
-            )
+            f.write(f"{imname_undist} SIMPLE_PINHOLE {w} {h} {fx} {cx} {cy}\n")
 
 
 if __name__ == "__main__":
