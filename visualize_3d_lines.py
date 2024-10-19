@@ -1,5 +1,4 @@
-import os, sys
-import numpy as np
+import os
 
 import limap.base as _base
 import limap.util.io as limapio
@@ -113,7 +112,7 @@ def main(args):
             not args.imagecols.endswith(".npy")
         ):
             raise ValueError(
-                "Error! Input file {0} is not valid".format(args.imagecols)
+                f"Error! Input file {args.imagecols} is not valid"
             )
         imagecols = _base.ImageCollection(
             limapio.read_npy(args.imagecols).item()
