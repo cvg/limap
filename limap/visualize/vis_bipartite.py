@@ -64,7 +64,9 @@ def open3d_draw_bipartite3d_pointline(
     points_deg3p = [p for p, deg in zip(points, degrees) if deg >= 3]
     lines = bpt3d.get_line_cloud()
     if ranges is not None:
-        lines = [l for l in lines if test_line_inside_ranges(l, ranges)]
+        lines = [
+            line for line in lines if test_line_inside_ranges(line, ranges)
+        ]
 
     # optionally draw edges
     edges = None

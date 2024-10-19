@@ -47,8 +47,8 @@ def process_pyramid(
 
 def to_multiscale_lines(lines):
     ms_lines = []
-    for l in lines.reshape(-1, 4):
-        ll = np.append(l, [0, np.linalg.norm(l[:2] - l[2:4])])
+    for line in lines.reshape(-1, 4):
+        ll = np.append(line, [0, np.linalg.norm(line[:2] - line[2:4])])
         ms_lines.append(
             [(0, ll)] + [(i, ll / (i * np.sqrt(2))) for i in range(1, 5)]
         )

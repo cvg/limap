@@ -123,8 +123,8 @@ class L2D2Extractor(BaseDetector):
             return {"line_descriptors": np.empty((0, 128))}
 
         patches, line_desc = [], []
-        for i, l in enumerate(lines):
-            patches.append(self.get_patch(img, l))
+        for i, line in enumerate(lines):
+            patches.append(self.get_patch(img, line))
 
             if (i + 1) % self.mini_batch == 0 or i == len(lines) - 1:
                 # Extract the descriptors

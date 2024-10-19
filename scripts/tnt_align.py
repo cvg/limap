@@ -29,8 +29,8 @@ def read_positions(log_file):
         counter += 1
         mat = []
         for _ in range(4):
-            l = lines[counter].strip("\n").split(" ")
-            mat.append([float(k) for k in l])
+            line = lines[counter].strip("\n").split(" ")
+            mat.append([float(k) for k in line])
             counter += 1
         mat = np.array(mat)
         pos = mat[:3, 3]
@@ -43,8 +43,8 @@ def read_trans(fname):
         lines = f.readlines()
     mat = []
     for idx in range(4):
-        l = lines[idx].strip("\n").split(" ")
-        mat.append([float(k) for k in l])
+        line = lines[idx].strip("\n").split(" ")
+        mat.append([float(k) for k in line])
     mat = np.array(mat)
     assert np.all(mat[3, :] == np.array([0, 0, 0, 1]))
     return mat[:3, :]

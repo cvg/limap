@@ -112,8 +112,8 @@ class MultiHeadedAttention(nn.Module):
     ) -> torch.Tensor:
         batch_dim = query.size(0)
         query, key, value = (
-            l(x).view(batch_dim, self.dim, self.num_heads, -1)
-            for l, x in zip(self.proj, (query, key, value))
+            layer(x).view(batch_dim, self.dim, self.num_heads, -1)
+            for layer, x in zip(self.proj, (query, key, value))
         )
         x, _ = attention(query, key, value)
         return self.merge(
