@@ -1,11 +1,5 @@
-import os
-
-import cv2
 import numpy as np
-from tqdm import tqdm
-
 import limap.base as _base
-import limap.visualize as limapvis
 
 
 def unit_test_add_noise_to_track(track):
