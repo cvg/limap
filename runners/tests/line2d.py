@@ -1,3 +1,5 @@
+import cv2
+
 import limap.base
 import limap.line2d
 import limap.util.config
@@ -23,8 +25,6 @@ segs2 = detector.detect(view2)  # detection
 desc2 = extractor.extract(view2, segs2)  # description
 
 # visualize
-import cv2
-
 img1 = view1.read_image(set_gray=False)
 img1 = limap.visualize.draw_segments(img1, segs1, (0, 255, 0))
 cv2.imshow("detections", img1)
