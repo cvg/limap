@@ -68,8 +68,7 @@ def weights_init(m):
         nn.init.orthogonal_(m.weight.data, gain=0.6)
         try:
             nn.init.constant_(m.bias.data, 0.01)
-
-        except:
+        except AttributeError:
             pass
     return
 
