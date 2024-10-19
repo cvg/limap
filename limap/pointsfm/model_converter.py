@@ -21,10 +21,9 @@ def convert_colmap_to_visualsfm(colmap_model_path, output_nvm_file):
         # write images
         f.write(f"{len(colmap_images)}\n")
         map_image_id = dict()
-        counter = 0
-        for img_id, colmap_image in colmap_images.items():
-            map_image_id[img_id] = counter
-            counter += 1
+        for cnt, item in enumerate(colmap_images.items()):
+            img_id, colmap_image = item
+            map_image_id[img_id] = cnt
             img_name = colmap_image.name
             cam_id = colmap_image.camera_id
             cam = colmap_cameras[cam_id]
