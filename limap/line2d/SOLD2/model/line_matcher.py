@@ -3,22 +3,23 @@ Implements the full pipeline from raw images to line matches.
 """
 
 import time
+
 import cv2
 import numpy as np
 import torch
 import torch.nn.functional as F
 from torch.nn.functional import softmax
 
-from .model_util import get_model
+from ..train import convert_junc_predictions
+from .line_detection import LineSegmentDetectionModule
+from .line_detector import line_map_to_segments
+from .line_matching import WunschLineMatcher
 from .loss import get_loss_and_weights
 from .metrics import super_nms
-from .line_detection import LineSegmentDetectionModule
-from .line_matching import WunschLineMatcher
-from ..train import convert_junc_predictions
-from .line_detector import line_map_to_segments
+from .model_util import get_model
 
 
-class LineMatcher(object):
+class LineMatcher:
     """Full line matcher including line detection and matching
     with the Needleman-Wunsch algorithm."""
 

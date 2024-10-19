@@ -1,9 +1,11 @@
-import os
 import copy
+import os
+
 import limap.util.io as limapio
-from .sold2_wrapper import SOLD2LineDetector
+
 from ..base_detector import BaseDetector, BaseDetectorOptions
 from ..base_matcher import BaseMatcher, BaseMatcherOptions
+from .sold2_wrapper import SOLD2LineDetector
 
 
 class SOLD2Detector(BaseDetector):
@@ -15,7 +17,7 @@ class SOLD2Detector(BaseDetector):
         return "sold2"
 
     def get_descinfo_fname(self, descinfo_folder, img_id):
-        fname = os.path.join(descinfo_folder, "descinfo_{0}.npy".format(img_id))
+        fname = os.path.join(descinfo_folder, f"descinfo_{img_id}.npy")
         return fname
 
     def save_descinfo(self, descinfo_folder, img_id, descinfo):
@@ -59,7 +61,7 @@ class SOLD2Detector(BaseDetector):
         return descinfo
 
     def get_heatmap_fname(self, folder, img_id):
-        return os.path.join(folder, "heatmap_{0}.npy".format(img_id))
+        return os.path.join(folder, f"heatmap_{img_id}.npy")
 
     def extract_heatmap(self, camview):
         img = camview.read_image(set_gray=self.set_gray)

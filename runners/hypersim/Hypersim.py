@@ -1,6 +1,7 @@
-import os, sys
-import h5py
+import os
+
 import cv2
+import h5py
 import numpy as np
 import pyvista as pv
 
@@ -58,7 +59,7 @@ def raydepth2depth(raydepth, K, img_hw):
     K_inv = np.linalg.inv(K)
     h, w = raydepth.shape[0], raydepth.shape[1]
     grids = np.meshgrid(np.arange(w), np.arange(h))
-    coords_homo = [grids[0].reshape(-1), grids[1].reshape(-1), np.ones((h * w))]
+    coords_homo = [grids[0].reshape(-1), grids[1].reshape(-1), np.ones(h * w)]
     coords_homo = np.stack(coords_homo)
     coeffs = np.linalg.norm(K_inv @ coords_homo, axis=0)
     coeffs = coeffs.reshape(h, w)
@@ -95,8 +96,9 @@ class Hypersim:
 
     @classmethod
     def set_resize_ratio(cls, ratio):
-        cls.h, cls.w = int(round(cls.default_h * ratio)), int(
-            round(cls.default_w * ratio)
+        cls.h, cls.w = (
+            int(round(cls.default_h * ratio)),
+            int(round(cls.default_w * ratio)),
         )
         cls.K[0, :] = cls.default_K[0, :] * cls.w / cls.default_w
         cls.K[1, :] = cls.default_K[1, :] * cls.h / cls.default_h
@@ -108,7 +110,7 @@ class Hypersim:
         import csv
 
         param_dict = {}
-        with open(fname_metascene, "r") as f:
+        with open(fname_metascene) as f:
             reader = csv.DictReader(f)
             for row in reader:
                 param_dict[row["parameter_name"]] = row["parameter_value"]
@@ -117,7 +119,7 @@ class Hypersim:
             return float(param_dict[key])
         else:
             raise ValueError(
-                "Key {0} not exists in {1}".format(key, fname_metascene)
+                f"Key {key} not exists in {fname_metascene}"
             )
 
     def set_scene_id(self, scene_id):
@@ -130,8 +132,8 @@ class Hypersim:
             image_fname = os.path.join(
                 self.scene_dir,
                 "images",
-                "scene_cam_{0:02d}_final_preview".format(cam_id),
-                "frame.{0:04d}.color.jpg".format(image_id),
+                f"scene_cam_{cam_id:02d}_final_preview",
+                f"frame.{image_id:04d}.color.jpg",
             )
             if os.path.exists(image_fname):
                 new_index_list.append(image_id)
@@ -148,7 +150,7 @@ class Hypersim:
         positions_fname = os.path.join(
             scene_dir,
             "_detail",
-            "cam_{0:02d}".format(cam_id),
+            f"cam_{cam_id:02d}",
             "camera_keyframe_positions.hdf5",
         )
         with h5py.File(positions_fname, "r") as f:
@@ -157,7 +159,7 @@ class Hypersim:
         orientations_fname = os.path.join(
             scene_dir,
             "_detail",
-            "cam_{0:02d}".format(cam_id),
+            f"cam_{cam_id:02d}",
             "camera_keyframe_orientations.hdf5",
         )
         with h5py.File(orientations_fname, "r") as f:
@@ -179,8 +181,8 @@ class Hypersim:
         image_fname = os.path.join(
             scene_dir,
             "images",
-            "scene_cam_{0:02d}_final_preview".format(cam_id),
-            "frame.{0:04d}.color.jpg".format(image_id),
+            f"scene_cam_{cam_id:02d}_final_preview",
+            f"frame.{image_id:04d}.color.jpg",
         )
         return image_fname
 
@@ -200,8 +202,8 @@ class Hypersim:
         raydepth_fname = os.path.join(
             scene_dir,
             "images",
-            "scene_cam_{0:02d}_geometry_hdf5".format(cam_id),
-            "frame.{0:04d}.depth_meters.hdf5".format(image_id),
+            f"scene_cam_{cam_id:02d}_geometry_hdf5",
+            f"frame.{image_id:04d}.depth_meters.hdf5",
         )
         return raydepth_fname
 

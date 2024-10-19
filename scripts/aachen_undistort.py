@@ -1,13 +1,14 @@
-import os, sys
+import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import numpy as np
+
 import cv2
+import numpy as np
 from tqdm import tqdm
 
 import limap.base as _base
 import limap.undistortion as _undist
-import pdb
 
 data_dir = os.path.expanduser("~/data/Localization/Aachen-1.1")
 img_orig_dir = os.path.join(data_dir, "images_upright")

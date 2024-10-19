@@ -1,12 +1,12 @@
 import os
-from ..base_detector import BaseDetector, BaseDetectorOptions
 
 import cv2
 import numpy as np
 import torch
-
 from hawp.fsl.config import cfg as model_config
 from hawp.ssl.models import MODELS
+
+from ..base_detector import BaseDetector, BaseDetectorOptions
 
 
 class HAWPv3Detector(BaseDetector):

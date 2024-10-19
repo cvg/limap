@@ -1,7 +1,9 @@
 import os
-import numpy as np
 import shutil
+
+import numpy as np
 from tqdm import tqdm
+
 import limap.base as _base
 
 
@@ -12,9 +14,7 @@ def check_directory(fname):
         not os.path.exists(os.path.dirname(fname))
     ):
         raise ValueError(
-            "Error! Base directory {0} does not exist!".format(
-                os.path.dirname(fname)
-            )
+            f"Error! Base directory {os.path.dirname(fname)} does not exist!"
         )
 
 
@@ -22,7 +22,7 @@ def check_path(fname):
     if fname is None:
         raise ValueError("Error! Input filepath is None!")
     if not os.path.exists(fname):
-        raise ValueError("Error! File {0} does not exist!".format(fname))
+        raise ValueError(f"Error! File {fname} does not exist!")
 
 
 def delete_folder(folder):
@@ -72,14 +72,14 @@ def save_ply(fname, points):
 
 
 def read_ply(fname):
-    from plyfile import PlyData, PlyElement
+    from plyfile import PlyData
 
     plydata = PlyData.read(fname)
     x = np.asarray(plydata.elements[0].data["x"])
     y = np.asarray(plydata.elements[0].data["y"])
     z = np.asarray(plydata.elements[0].data["z"])
     points = np.stack([x, y, z], axis=1)
-    print("number of points: {0}".format(points.shape[0]))
+    print(f"number of points: {points.shape[0]}")
     return points
 
 
@@ -89,14 +89,14 @@ def save_txt_metainfos(fname, neighbors, ranges):
     """
     check_directory(fname)
     with open(fname, "w") as f:
-        f.write("number of images, {0}\n".format(len(neighbors)))
-        f.write("x-range, {0}, {1}\n".format(ranges[0][0], ranges[1][0]))
-        f.write("y-range, {0}, {1}\n".format(ranges[0][1], ranges[1][1]))
-        f.write("z-range, {0}, {1}\n".format(ranges[0][2], ranges[1][2]))
+        f.write(f"number of images, {len(neighbors)}\n")
+        f.write(f"x-range, {ranges[0][0]}, {ranges[1][0]}\n")
+        f.write(f"y-range, {ranges[0][1]}, {ranges[1][1]}\n")
+        f.write(f"z-range, {ranges[0][2]}, {ranges[1][2]}\n")
         for img_id, neighbor in neighbors.items():
-            str_ = "image {0}".format(img_id)
+            str_ = f"image {img_id}"
             for ng_idx in neighbor:
-                str_ += ", {0}".format(ng_idx)
+                str_ += f", {ng_idx}"
             f.write(str_ + "\n")
 
 
@@ -105,7 +105,7 @@ def read_txt_metainfos(fname):
     Read in .txt for neighbors and ranges
     """
     check_path(fname)
-    with open(fname, "r") as f:
+    with open(fname) as f:
         txt_lines = f.readlines()
     counter = 0
     n_images = int(txt_lines[counter].strip().split(",")[1])
@@ -133,14 +133,14 @@ def read_txt_metainfos(fname):
 def save_txt_imname_list(fname, imname_list):
     check_directory(fname)
     with open(fname, "w") as f:
-        f.write("number of images, {0}\n".format(len(imname_list)))
+        f.write(f"number of images, {len(imname_list)}\n")
         for imname in imname_list:
             f.write(imname + "\n")
 
 
 def read_txt_imname_list(fname):
     check_path(fname)
-    with open(fname, "r") as f:
+    with open(fname) as f:
         txt_lines = f.readlines()
     counter = 0
     n_images = int(txt_lines[counter].strip().split(",")[1])
@@ -156,14 +156,14 @@ def read_txt_imname_list(fname):
 def save_txt_imname_dict(fname, imname_dict):
     check_directory(fname)
     with open(fname, "w") as f:
-        f.write("number of images, {0}\n".format(len(imname_dict)))
+        f.write(f"number of images, {len(imname_dict)}\n")
         for img_id, imname in imname_dict.items():
-            f.write("{0}, {1}\n".format(img_id, imname))
+            f.write(f"{img_id}, {imname}\n")
 
 
 def read_txt_imname_dict(fname):
     check_path(fname)
-    with open(fname, "r") as f:
+    with open(fname) as f:
         txt_lines = f.readlines()
     counter = 0
     n_images = int(txt_lines[counter].strip().split(",")[1])
@@ -193,13 +193,13 @@ def save_obj(fname, lines):
     n_lines = int(len(vertices) / 2)
     with open(fname, "w") as f:
         for v in vertices:
-            f.write("v {0} {1} {2}\n".format(v[0], v[1], v[2]))
+            f.write(f"v {v[0]} {v[1]} {v[2]}\n")
         for idx in range(n_lines):
-            f.write("l {0} {1}\n".format(2 * idx + 1, 2 * idx + 2))
+            f.write(f"l {2 * idx + 1} {2 * idx + 2}\n")
 
 
 def load_obj(fname):
-    with open(fname, "r") as f:
+    with open(fname) as f:
         flines = f.readlines()
     counter = 0
     vertices = []
@@ -243,22 +243,18 @@ def save_l3dpp(folder, imagecols, all_2d_segs):
             image_id = index_list.index(idx)
         else:
             raise NotImplementedError
-        fname = "segments_L3D++_{0}_{1}x{2}_3000.txt".format(
-            image_id, width, height
-        )
+        fname = f"segments_L3D++_{image_id}_{width}x{height}_3000.txt"
         fname = os.path.join(folder, fname)
         segs = all_2d_segs[idx]
         n_segments = segs.shape[0]
         with open(fname, "w") as f:
-            f.write("{0}\n".format(n_segments))
+            f.write(f"{n_segments}\n")
             for line_id in range(n_segments):
                 line = segs[line_id]
                 f.write(
-                    "{0} {1} {2} {3}\n".format(
-                        line[0], line[1], line[2], line[3]
-                    )
+                    f"{line[0]} {line[1]} {line[2]} {line[3]}\n"
                 )
-        print("Writing for L3DPP: {0}".format(fname))
+        print(f"Writing for L3DPP: {fname}")
 
 
 def save_txt_linetracks(fname, linetracks, n_visible_views=4):
@@ -273,31 +269,23 @@ def save_txt_linetracks(fname, linetracks, n_visible_views=4):
     print("Writing all linetracks to a single file...")
     n_tracks = len(linetracks)
     with open(fname, "w") as f:
-        f.write("{0}\n".format(n_tracks))
+        f.write(f"{n_tracks}\n")
         for track_id in tqdm(range(n_tracks)):
             track = linetracks[track_id]
             f.write(
-                "{0} {1} {2}\n".format(
-                    track_id, track.count_lines(), track.count_images()
-                )
+                f"{track_id} {track.count_lines()} {track.count_images()}\n"
             )
             f.write(
-                "{0:.10f} {1:.10f} {2:.10f}\n".format(
-                    track.line.start[0],
-                    track.line.start[1],
-                    track.line.start[2],
-                )
+                f"{track.line.start[0]:.10f} {track.line.start[1]:.10f} {track.line.start[2]:.10f}\n"
             )
             f.write(
-                "{0:.10f} {1:.10f} {2:.10f}\n".format(
-                    track.line.end[0], track.line.end[1], track.line.end[2]
-                )
+                f"{track.line.end[0]:.10f} {track.line.end[1]:.10f} {track.line.end[2]:.10f}\n"
             )
             for idx in range(track.count_lines()):
-                f.write("{0} ".format(track.image_id_list[idx]))
+                f.write(f"{track.image_id_list[idx]} ")
             f.write("\n")
             for idx in range(track.count_lines()):
-                f.write("{0} ".format(track.line_id_list[idx]))
+                f.write(f"{track.line_id_list[idx]} ")
             f.write("\n")
 
 
@@ -305,10 +293,10 @@ def save_folder_linetracks(folder, linetracks):
     if os.path.exists(folder):
         shutil.rmtree(folder)
     os.makedirs(folder)
-    print("Writing linetracks to {0}...".format(folder))
+    print(f"Writing linetracks to {folder}...")
     n_tracks = len(linetracks)
     for track_id in tqdm(range(n_tracks)):
-        fname = os.path.join(folder, "track_{0}.txt".format(track_id))
+        fname = os.path.join(folder, f"track_{track_id}.txt")
         linetracks[track_id].Write(fname)
 
 
@@ -319,10 +307,10 @@ def read_folder_linetracks(folder):
     for fname in flist:
         if fname[-4:] == ".txt" and fname[:5] == "track":
             n_tracks += 1
-    print("Read linetracks from {0}...".format(folder))
+    print(f"Read linetracks from {folder}...")
     linetracks = []
     for track_id in range(n_tracks):
-        fname = os.path.join(folder, "track_{0}.txt".format(track_id))
+        fname = os.path.join(folder, f"track_{track_id}.txt")
         track = _base.LineTrack()
         track.Read(fname)
         linetracks.append(track)
@@ -357,7 +345,7 @@ def read_folder_linetracks_with_info(folder):
 
 def read_txt_Line3Dpp(fname):
     linetracks = []
-    with open(fname, "r") as f:
+    with open(fname) as f:
         txt_lines = f.readlines()
     line_counts = []
     line_track_id_list = []
@@ -410,7 +398,7 @@ def read_lines_from_input(input_file):
     """
     if not os.path.exists(input_file):
         raise ValueError(
-            "Error! Input file/directory {0} not found.".format(input_file)
+            f"Error! Input file/directory {input_file} not found."
         )
 
     # linetracks folder
@@ -439,33 +427,31 @@ def read_lines_from_input(input_file):
 
     # exception
     raise ValueError(
-        "Error! File {0} not supported. should be txt, obj, or folder to the linetracks.".format(
-            input_dir
-        )
+        f"Error! File {input_dir} not supported. should be txt, obj, or folder to the linetracks."
     )
 
 
 def exists_txt_segments(folder, img_id):
-    fname = os.path.join(folder, "segments_{0}.txt".format(img_id))
+    fname = os.path.join(folder, f"segments_{img_id}.txt")
     return os.path.exists(fname)
 
 
 def save_txt_segments(folder, img_id, segs):
-    fname = os.path.join(folder, "segments_{0}.txt".format(img_id))
+    fname = os.path.join(folder, f"segments_{img_id}.txt")
     n_segments = segs.shape[0]
     with open(fname, "w") as f:
-        f.write("{0}\n".format(n_segments))
+        f.write(f"{n_segments}\n")
         for line_id in range(n_segments):
             line = segs[line_id]
             f.write(
-                "{0} {1} {2} {3}\n".format(line[0], line[1], line[2], line[3])
+                f"{line[0]} {line[1]} {line[2]} {line[3]}\n"
             )
 
 
 def read_txt_segments(folder, img_id):
     check_path(folder)
-    fname = os.path.join(folder, "segments_{0}.txt".format(img_id))
-    with open(fname, "r") as f:
+    fname = os.path.join(folder, f"segments_{img_id}.txt")
+    with open(fname) as f:
         txt_lines = f.readlines()
     n_segments = int(txt_lines[0].strip())
     assert n_segments + 1 == len(txt_lines)

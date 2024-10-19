@@ -1,6 +1,5 @@
-from _limap import _base, _estimators, _fitting
-import os
 import numpy as np
+from _limap import _estimators, _fitting
 from bresenham import bresenham
 from hloc.localize_inloc import interpolate_scan
 

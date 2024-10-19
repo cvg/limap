@@ -1,6 +1,8 @@
 import os
+
 import numpy as np
 from tqdm import tqdm
+
 import limap.visualize as limapvis
 
 
@@ -12,8 +14,8 @@ def visualize_heatmap_intersections(
     ht_intersections,
     max_image_dim=None,
 ):
-    import matplotlib.colors as colors
     import matplotlib.cm as cmx
+    import matplotlib.colors as colors
 
     cNorm = colors.Normalize(vmin=0, vmax=1)
     scalarMap = cmx.ScalarMappable(norm=cNorm, cmap="viridis")
@@ -31,7 +33,7 @@ def visualize_heatmap_intersections(
             imname, max_image_dim=max_image_dim, set_gray=False
         )
         img = limapvis.draw_points(img, intersections, (255, 0, 0), 2)
-        fname_out = prefix + "_img{0}.png".format(img_id)
+        fname_out = prefix + f"_img{img_id}.png"
         cv2.imwrite(fname_out, img)
 
         # visualize heatmap
@@ -41,7 +43,7 @@ def visualize_heatmap_intersections(
         heatmap_img = limapvis.draw_points(
             heatmap_img, intersections, (255, 0, 0), 2
         )
-        fname_out_heatmap = prefix + "_heatmap{0}.png".format(img_id)
+        fname_out_heatmap = prefix + f"_heatmap{img_id}.png"
         cv2.imwrite(fname_out_heatmap, heatmap_img)
 
 
@@ -69,7 +71,7 @@ def visualize_fconsis_intersections(
             img = limapvis.crop_to_patch(img, point, patch_size=100)
             imgs.append(img)
         bigimg = limapvis.make_bigimage(imgs, pad=20)
-        fname_out = prefix + "_sample{0}.png".format(sample_id)
+        fname_out = prefix + f"_sample{sample_id}.png"
         cv2.imwrite(fname_out, bigimg)
 
 

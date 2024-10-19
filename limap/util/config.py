@@ -1,6 +1,6 @@
-import yaml
-import numpy as np
 import copy
+
+import yaml
 
 
 def update_recursive(dict1, dictinfo):
@@ -20,7 +20,7 @@ def update_recursive_deepcopy(dict1, dictinfo):
 
 
 def load_config(config_file, default_path=None):
-    with open(config_file, "r") as f:
+    with open(config_file) as f:
         cfg_loaded = yaml.load(f, Loader=yaml.Loader)
 
     base_config_file = cfg_loaded.get("base_config_file")
@@ -56,9 +56,7 @@ def update_config(cfg, unknown, shortcuts):
         argtype = type(val)
         if argtype == bool:
             # test if it is a store action
-            if idx == len(unknown) - 1:
-                v = True
-            elif unknown[idx + 1].startswith("--"):
+            if idx == len(unknown) - 1 or unknown[idx + 1].startswith("--"):
                 v = True
             else:
                 v = unknown[idx + 1].lower() == "true"

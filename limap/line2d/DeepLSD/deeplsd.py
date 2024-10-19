@@ -1,7 +1,9 @@
 import os
+
 import numpy as np
 import torch
 from deeplsd.models.deeplsd_inference import DeepLSD
+
 from ..base_detector import BaseDetector, BaseDetectorOptions
 
 

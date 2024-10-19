@@ -1,6 +1,5 @@
-import os
 import pytlsd
-import numpy as np
+
 from ..base_detector import BaseDetector, BaseDetectorOptions
 
 

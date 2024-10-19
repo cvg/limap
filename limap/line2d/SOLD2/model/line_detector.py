@@ -3,14 +3,15 @@ Line segment detection from raw images.
 """
 
 import time
+
 import numpy as np
 import torch
 from torch.nn.functional import softmax
 
-from .model_util import get_model
-from .loss import get_loss_and_weights
-from .line_detection import LineSegmentDetectionModule
 from ..train import convert_junc_predictions
+from .line_detection import LineSegmentDetectionModule
+from .loss import get_loss_and_weights
+from .model_util import get_model
 
 
 def line_map_to_segments(junctions, line_map):
@@ -41,7 +42,7 @@ def line_map_to_segments(junctions, line_map):
     return output_segments
 
 
-class LineDetector(object):
+class LineDetector:
     def __init__(
         self,
         model_cfg,

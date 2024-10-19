@@ -1,12 +1,13 @@
 import os
+
 import numpy as np
-from sklearn.cluster import DBSCAN
 import torch
-from omegaconf import OmegaConf
 from gluestick.models.wireframe import lines_to_wireframe
+from omegaconf import OmegaConf
 
 import limap.util.io as limapio
 from limap.point2d.superpoint.superpoint import SuperPoint, sample_descriptors
+
 from ..base_detector import BaseDetector, BaseDetectorOptions
 
 
@@ -28,7 +29,7 @@ class WireframeExtractor(BaseDetector):
         return "wireframe"
 
     def get_descinfo_fname(self, descinfo_folder, img_id):
-        fname = os.path.join(descinfo_folder, "descinfo_{0}.npz".format(img_id))
+        fname = os.path.join(descinfo_folder, f"descinfo_{img_id}.npz")
         return fname
 
     def save_descinfo(self, descinfo_folder, img_id, descinfo):

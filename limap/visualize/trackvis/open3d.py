@@ -1,7 +1,8 @@
 import open3d as o3d
-from .base import BaseTrackVisualizer
+
+from ..vis_lines import open3d_get_cameras, open3d_get_line_set
 from ..vis_utils import compute_robust_range_lines
-from ..vis_lines import open3d_get_line_set, open3d_get_cameras
+from .base import BaseTrackVisualizer
 
 
 class Open3DTrackVisualizer(BaseTrackVisualizer):

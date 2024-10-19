@@ -1,24 +1,26 @@
-import os, sys
+import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
-import limap.util.io as limapio
-import limap.util.config as cfgutils
-import limap.runners as _runners
 import argparse
 import logging
 import pickle
-from tqdm import tqdm
 from pathlib import Path
+
 from utils import (
     InLocP3DReader,
-    read_dataset_inloc,
     get_result_filenames,
-    run_hloc_inloc,
     parse_retrieval,
+    read_dataset_inloc,
+    run_hloc_inloc,
 )
+
+import limap.runners as _runners
+import limap.util.config as cfgutils
+import limap.util.io as limapio
 
 formatter = logging.Formatter(
     fmt="[%(asctime)s %(name)s %(levelname)s] %(message)s",
@@ -98,9 +100,7 @@ def parse_config():
     # Output folder for LIMAP linetracks (in tmp)
     if cfg["output_folder"] is None:
         cfg["output_folder"] = "finaltracks"
-    cfg[
-        "inloc_dataset"
-    ] = (
+    cfg["inloc_dataset"] = (
         args.dataset
     )  # For reading camera poses for estimating 3D lines fron depth
     return cfg, args
@@ -114,7 +114,7 @@ def main():
     outputs = Path(cfg["output_dir"]) / "localization"
     outputs.mkdir(exist_ok=True, parents=True)
 
-    logger.info(f"Working on InLoc.")
+    logger.info("Working on InLoc.")
     pairs = Path("third-party/Hierarchical-Localization/pairs/inloc/")
     loc_pairs = pairs / "pairs-query-netvlad{}{}.txt".format(
         args.num_loc, "-temporal" if args.use_temporal else ""

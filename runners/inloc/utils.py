@@ -1,15 +1,15 @@
-import os, sys
-import numpy as np
+import os
+from pathlib import Path
 
 import imagesize
-from tqdm import tqdm
-from pathlib import Path
+import numpy as np
+from hloc import extract_features, localize_inloc, match_features
+from hloc.utils.parsers import parse_retrieval
 from scipy.io import loadmat
+from tqdm import tqdm
+
 import limap.base as _base
 import limap.util.io as limapio
-
-from hloc import extract_features, match_features, localize_inloc
-from hloc.utils.parsers import parse_retrieval
 
 
 class InLocP3DReader(_base.BaseP3DReader):
@@ -191,11 +191,11 @@ def run_hloc_inloc(
         if logger:
             logger.info(f"Coarse pose saved at {results_file}")
     else:
-        logger.info(f"Point-only localization skipped.")
+        logger.info("Point-only localization skipped.")
 
     # Read coarse poses and inliers
     poses = {}
-    with open(results_file, "r") as f:
+    with open(results_file) as f:
         lines = []
         for data in f.read().rstrip().split("\n"):
             data = data.split()

@@ -1,9 +1,12 @@
 import os
-import numpy as np
+
 import cv2
-import pytlsd
+import numpy as np
 import pytlbd
+import pytlsd
+
 import limap.util.io as limapio
+
 from ..base_detector import BaseDetector, BaseDetectorOptions
 
 
@@ -60,7 +63,7 @@ class LBDExtractor(BaseDetector):
         return "lbd"
 
     def get_descinfo_fname(self, descinfo_folder, img_id):
-        fname = os.path.join(descinfo_folder, "descinfo_{0}.npz".format(img_id))
+        fname = os.path.join(descinfo_folder, f"descinfo_{img_id}.npz")
         return fname
 
     def save_descinfo(self, descinfo_folder, img_id, descinfo):

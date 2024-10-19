@@ -1,6 +1,4 @@
 from _limap import _triangulation as _tri
-from _limap import _base
-import numpy as np
 
 
 def get_normal_direction(l, view):

@@ -6,10 +6,11 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
 from ..misc.geometry_utils import (
-    keypoints_to_grid,
-    get_dist_mask,
     get_common_line_mask,
+    get_dist_mask,
+    keypoints_to_grid,
 )
 
 
@@ -17,7 +18,7 @@ def get_loss_and_weights(model_cfg, device=torch.device("cuda")):
     """Get loss functions and either static or dynamic weighting."""
     # Get the global weighting policy
     w_policy = model_cfg.get("weighting_policy", "static")
-    if not w_policy in ["static", "dynamic"]:
+    if w_policy not in ["static", "dynamic"]:
         raise ValueError("[Error] Not supported weighting policy.")
 
     loss_func = {}
@@ -154,7 +155,7 @@ def space_to_depth(input_tensor, grid_size):
     # (N, bs, bs, C, H//bs, W//bs)
     x = x.permute(0, 3, 5, 1, 2, 4).contiguous()
     # (N, C*bs^2, H//bs, W//bs)
-    x = x.view(N, C * (grid_size ** 2), H // grid_size, W // grid_size)
+    x = x.view(N, C * (grid_size**2), H // grid_size, W // grid_size)
     return x
 
 

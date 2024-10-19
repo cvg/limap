@@ -1,5 +1,6 @@
 import numpy as np
-from .vis_utils import test_point_inside_ranges, test_line_inside_ranges
+
+from .vis_utils import test_line_inside_ranges, test_point_inside_ranges
 
 
 def pyvista_vis_3d_lines(
@@ -116,8 +117,9 @@ def open3d_get_cameras(
     scale_cam_geometry=1.0,
     scale=1.0,
 ):
-    import open3d as o3d
     import copy
+
+    import open3d as o3d
 
     cameras = o3d.geometry.LineSet()
 
@@ -154,8 +156,9 @@ def open3d_add_cameras(
     scale_cam_geometry=1.0,
     scale=1.0,
 ):
-    import open3d as o3d
     import copy
+
+    import open3d as o3d
 
     camera_lines = {}
     for cam_id in imagecols.get_cam_ids():

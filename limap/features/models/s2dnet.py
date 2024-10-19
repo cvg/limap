@@ -1,22 +1,14 @@
+import logging
+import os
+from pathlib import Path
 from typing import List
-import numpy
+
+import numpy as np
 import torch
 import torch.nn as nn
 from torchvision import models
-from pathlib import Path
-import logging
 
-from PIL import Image
 from .base_model import BaseModel
-import os, sys
-from torchvision import transforms
-import numpy as np
-import torch.nn.functional as F
-
-import argparse
-import h5py
-
-from time import time
 
 type_dict = {
     "uint8_t": torch.cuda.ByteTensor,
@@ -66,7 +58,7 @@ def print_gpu_memory():
     a = torch.cuda.memory_allocated(0)
     f = r - a  # free inside reserved
 
-    print(np.array([t, r, a, f]) / 2 ** 30)
+    print(np.array([t, r, a, f]) / 2**30)
 
 
 class AdapLayers(nn.Module):
@@ -90,12 +82,12 @@ class AdapLayers(nn.Module):
                 nn.BatchNorm2d(output_dim),
             )
             self.layers.append(layer)
-            self.add_module("adap_layer_{}".format(i), layer)
+            self.add_module(f"adap_layer_{i}", layer)
 
     def forward(self, features: List[torch.tensor]):
         """Apply adaptation layers."""
         for i, _ in enumerate(features):
-            features[i] = getattr(self, "adap_layer_{}".format(i))(features[i])
+            features[i] = getattr(self, f"adap_layer_{i}")(features[i])
         return features
 
 
@@ -130,7 +122,7 @@ class S2DNet(BaseModel):
             if isinstance(layer, torch.nn.MaxPool2d):
                 current_scale += 1
             if i in self.hypercolumn_indices:
-                self.scales.append(2 ** current_scale)
+                self.scales.append(2**current_scale)
 
         self.adaptation_layers = AdapLayers(
             conf.hypercolumn_layers, conf.output_dim

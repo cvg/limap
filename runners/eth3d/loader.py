@@ -1,6 +1,8 @@
-import os, sys
-import numpy as np
+import os
+import sys
+
 import cv2
+import numpy as np
 
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

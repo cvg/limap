@@ -1,10 +1,12 @@
 from copy import deepcopy
 from pathlib import Path
+
 import torch
+from einops import repeat
 from torch import nn
-from .line_attention import MultiHeadAttention, FeedForward
+
+from .line_attention import FeedForward, MultiHeadAttention
 from .line_process import *
-from einops import rearrange, repeat
 
 
 def MLP(channels: list, do_bn=True):  # channels [3, 32, 64, 128, 256, 256]
@@ -186,7 +188,7 @@ class KeylineEncoder(nn.Module):
 def attention(query, key, value):
     dim = query.shape[1]
     scores = (
-        torch.einsum("bdhn,bdhm->bhnm", query, key) / dim ** 0.5
+        torch.einsum("bdhn,bdhm->bhnm", query, key) / dim**0.5
     )  # [3, 64, 4, 512] -> [3, 4, 512, 512]
     prob = torch.nn.functional.softmax(scores, dim=-1)
     return torch.einsum("bhnm,bdhm->bdhn", prob, value), prob
@@ -207,12 +209,12 @@ class MultiHeadedAttention(nn.Module):
 
     def forward(self, query, key, value):
         batch_dim = query.size(0)
-        query, key, value = [
+        query, key, value = (
             l(x).view(
                 batch_dim, self.dim, self.num_heads, -1
             )  # [3, 64, 4, 512]
             for l, x in zip(self.proj, (query, key, value))
-        ]
+        )
         x, prob = attention(query, key, value)
         return (
             self.merge(

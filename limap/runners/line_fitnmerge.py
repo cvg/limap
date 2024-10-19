@@ -1,7 +1,8 @@
 import os
+
+import joblib
 import numpy as np
 from tqdm import tqdm
-import joblib
 
 import limap.base as _base
 import limap.fitting as _fit
@@ -128,7 +129,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     """
     # assertion check
     assert imagecols.IsUndistorted() == True
-    print("[LOG] Number of images: {0}".format(imagecols.NumImages()))
+    print(f"[LOG] Number of images: {imagecols.NumImages()}")
     cfg = _runners.setup(cfg)
     detector_name = cfg["line2d"]["detector"]["method"]
     if cfg["fitting"]["var2d"] == -1:
@@ -299,7 +300,7 @@ def line_fitting_with_3Dpoints(
     """
     # assertion check
     assert imagecols.IsUndistorted() == True
-    print("[LOG] Number of images: {0}".format(imagecols.NumImages()))
+    print(f"[LOG] Number of images: {imagecols.NumImages()}")
     cfg = _runners.setup(cfg)
     detector_name = cfg["line2d"]["detector"]["method"]
     if cfg["fitting"]["var2d"] == -1:

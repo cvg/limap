@@ -1,6 +1,6 @@
-import limap.util.config
 import limap.base
 import limap.line2d
+import limap.util.config
 import limap.visualize
 
 # detect and describe lines

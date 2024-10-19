@@ -1,30 +1,28 @@
-import os, sys
-import numpy as np
+import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
-import limap.base as _base
-import limap.pointsfm as _psfm
-import limap.util.io as limapio
-import limap.util.config as cfgutils
-import limap.runners as _runners
 import argparse
 import logging
-import pycolmap
 import pickle
 from pathlib import Path
 
 from hloc.utils.parsers import parse_retrieval
 from utils import (
-    read_scene_visualsfm,
-    get_scene_info,
-    get_result_filenames,
     eval,
-    undistort_and_resize,
+    get_result_filenames,
+    get_scene_info,
+    read_scene_visualsfm,
     run_hloc_cambridge,
+    undistort_and_resize,
 )
+
+import limap.runners as _runners
+import limap.util.config as cfgutils
+import limap.util.io as limapio
 
 formatter = logging.Formatter(
     fmt="[%(asctime)s %(name)s %(levelname)s] %(message)s",
@@ -109,7 +107,7 @@ def parse_config():
     cfg["n_neighbors_loc"] = args.num_loc
     # Output path for LIMAP results (tmp)
     if cfg["output_dir"] is None:
-        cfg["output_dir"] = "tmp/cambridge/{}".format(scene_id)
+        cfg["output_dir"] = f"tmp/cambridge/{scene_id}"
     # Output folder for LIMAP linetracks (in tmp)
     if cfg["output_folder"] is None:
         cfg["output_folder"] = "finaltracks"
@@ -158,7 +156,7 @@ def main():
     )
 
     img_name_to_id = {
-        "image{0:08d}.png".format(id): id for id in (train_ids + query_ids)
+        f"image{id:08d}.png": id for id in (train_ids + query_ids)
     }
 
     ##########################################################
@@ -207,7 +205,7 @@ def main():
             id_to_origin_name[img_name_to_id[n]] for n in _retrieval[name]
         ]
     hloc_name_dict = {
-        id: "image{0:08d}.png".format(id) for id in (train_ids + query_ids)
+        id: f"image{id:08d}.png" for id in (train_ids + query_ids)
     }
 
     # Update coarse poses for epipolar methods

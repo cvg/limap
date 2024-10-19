@@ -1,4 +1,5 @@
-import os, sys
+import os
+
 import numpy as np
 
 
@@ -7,18 +8,18 @@ class Rome16K:
         self.image_list = self.load_image_list(list_file)
         self.components = {}
         self.component_names = []
-        self.component_ids = (np.ones((len(self.image_list))) * -1).tolist()
+        self.component_ids = (np.ones(len(self.image_list)) * -1).tolist()
         self.load_components(component_folder)
 
     def load_image_list(self, list_file):
-        print("Loading bundler list file {0}...".format(list_file))
-        with open(list_file, "r") as f:
+        print(f"Loading bundler list file {list_file}...")
+        with open(list_file) as f:
             lines = f.readlines()
         image_names = [line.strip("\n").split(" ")[0] for line in lines]
         return image_names
 
     def load_component_file(self, component_file):
-        with open(component_file, "r") as f:
+        with open(component_file) as f:
             lines = f.readlines()
         imname_list = []
         for line in lines:

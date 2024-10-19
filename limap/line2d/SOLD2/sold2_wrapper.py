@@ -1,10 +1,10 @@
-import os, sys
-import numpy as np
-from torch.nn.functional import softmax
+import os
+import subprocess
+
 import cv2
+import numpy as np
 import torch
 from skimage.draw import line
-import subprocess
 
 from .experiment import load_config
 from .model.line_matcher import LineMatcher

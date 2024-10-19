@@ -1,5 +1,4 @@
-from _limap import _base, _ceresbase, _optimize
-import numpy as np
+from _limap import _ceresbase, _optimize
 
 
 def _init_bundle_adjustment_engine(cfg, imagecols, max_num_iterations=100):

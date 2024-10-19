@@ -1,6 +1,6 @@
-import os, sys
+import os
+
 import numpy as np
-import pdb
 
 MAX_ERROR = 0.01
 colmap_output_path = os.path.expanduser("~/data/TanksTemples/colmap/training")

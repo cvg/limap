@@ -1,8 +1,11 @@
 import os
-import numpy as np
+
 import cv2
+import numpy as np
 import torch
+
 import limap.util.io as limapio
+
 from ..base_detector import BaseDetector, BaseDetectorOptions
 
 
@@ -44,7 +47,7 @@ class L2D2Extractor(BaseDetector):
         return "l2d2"
 
     def get_descinfo_fname(self, descinfo_folder, img_id):
-        fname = os.path.join(descinfo_folder, "descinfo_{0}.npz".format(img_id))
+        fname = os.path.join(descinfo_folder, f"descinfo_{img_id}.npz")
         return fname
 
     def save_descinfo(self, descinfo_folder, img_id, descinfo):

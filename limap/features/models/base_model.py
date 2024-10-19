@@ -4,9 +4,10 @@ See mnist_net.py for an example of model.
 """
 
 from abc import ABCMeta, abstractmethod
+from copy import copy
+
 from omegaconf import OmegaConf
 from torch import nn
-from copy import copy
 
 
 class BaseModel(nn.Module, metaclass=ABCMeta):
@@ -77,7 +78,7 @@ class BaseModel(nn.Module, metaclass=ABCMeta):
     def forward(self, data):
         """Check the data and call the _forward method of the child model."""
         for key in self.required_data_keys:
-            assert key in data, "Missing key {} in data".format(key)
+            assert key in data, f"Missing key {key} in data"
         return self._forward(data)
 
     @abstractmethod

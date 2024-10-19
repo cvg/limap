@@ -1,9 +1,7 @@
-import numpy as np
+from typing import NamedTuple
+
 import joblib
 from tqdm import tqdm
-
-import collections
-from typing import NamedTuple
 
 
 class BaseVPDetectorOptions(NamedTuple):
@@ -75,6 +73,7 @@ class BaseVPDetector:
         self, fname, img, lines, vpresult, show_original=False, endpoints=False
     ):
         import cv2
+
         import limap.visualize as limapvis
 
         img = limapvis.vis_vpresult(

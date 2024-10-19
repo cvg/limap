@@ -1,10 +1,8 @@
-import os
 import numpy as np
-import torch
 
 from ..base_matcher import BaseMatcher, BaseMatcherOptions
-from .line_transformer import LineTransformer
 from .line_process import get_dist_matrix
+from .line_transformer import LineTransformer
 from .nn_matcher import nn_matcher_distmat
 
 

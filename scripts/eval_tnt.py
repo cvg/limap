@@ -1,6 +1,8 @@
-import os, sys
+import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 
@@ -9,9 +11,6 @@ import limap.evaluation as _eval
 import limap.util.config as cfgutils
 import limap.util.io as limapio
 import limap.visualize as limapvis
-
-import matplotlib as mpl
-import matplotlib.pyplot as plt
 
 
 def plot_curve(fname, thresholds, data):
@@ -63,7 +62,7 @@ def report_pc_recall_for_GT(evaluator, lines):
 
 
 def read_ply(fname):
-    from plyfile import PlyData, PlyElement
+    from plyfile import PlyData
 
     plydata = PlyData.read(fname)
     x = np.asarray(plydata.elements[0].data["x"])

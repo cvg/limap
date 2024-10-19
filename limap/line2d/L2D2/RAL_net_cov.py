@@ -1,7 +1,6 @@
-from __future__ import division, print_function
 import torch
-import torch.nn.init
 import torch.nn as nn
+import torch.nn.init
 
 
 class L2Norm(nn.Module):

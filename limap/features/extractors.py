@@ -1,17 +1,17 @@
 # [NOTE] modified from the pixel-perfect-sfm project
 
-import os, sys
-import torch
+import sys
+import time
+
 import numpy as np
 import PIL
+import torch
+import torchvision.transforms.functional as tvf
+from _limap import _features
+from torchvision import transforms
 
 from .models.s2dnet import *
 from .models.vggnet import VGGNet
-import torchvision.transforms.functional as tvf
-from torchvision import transforms
-import time
-
-from _limap import _features
 
 RGB_mean = [0.485, 0.456, 0.406]
 RGB_std = [0.229, 0.224, 0.225]

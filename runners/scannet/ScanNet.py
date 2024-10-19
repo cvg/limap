@@ -1,7 +1,8 @@
-import os, sys
+import copy
+import os
+
 import cv2
 import numpy as np
-import copy
 
 
 class ScanNet:
@@ -40,7 +41,7 @@ class ScanNet:
         self.loadinfos()
 
     def read_intrinsics(self, fname, mode="color"):
-        with open(fname, "r") as f:
+        with open(fname) as f:
             lines = f.readlines()
         img_hw = [-1, -1]
         K = np.zeros((3, 3))
@@ -67,7 +68,7 @@ class ScanNet:
         return K, img_hw
 
     def read_pose(self, pose_txt):
-        with open(pose_txt, "r") as f:
+        with open(pose_txt) as f:
             lines = f.readlines()
         mat = []
         for line in lines:
@@ -89,7 +90,7 @@ class ScanNet:
 
         # load intrinsic
         fname_meta = os.path.join(
-            self.scene_dir, "{0}.txt".format(self.scene_id)
+            self.scene_dir, f"{self.scene_id}.txt"
         )
         K_orig, img_hw_orig = self.read_intrinsics(fname_meta)
         h_orig, w_orig = img_hw_orig[0], img_hw_orig[1]
@@ -116,12 +117,12 @@ class ScanNet:
         self.imname_list, self.Rs, self.Ts = [], [], []
         for index in index_list:
             imname = os.path.join(
-                self.scene_dir, "color", "{0}.jpg".format(index)
+                self.scene_dir, "color", f"{index}.jpg"
             )
             self.imname_list.append(imname)
 
             pose_txt = os.path.join(
-                self.scene_dir, "pose", "{0}.txt".format(index)
+                self.scene_dir, "pose", f"{index}.txt"
             )
             R, T = self.read_pose(pose_txt)
             self.Rs.append(R)
@@ -130,7 +131,7 @@ class ScanNet:
     def get_depth_fname(self, imname):
         depth_folder = os.path.join(self.scene_dir, "depth")
         img_id = int(os.path.basename(imname)[:-4])
-        depth_fname = os.path.join(depth_folder, "{0}.png".format(img_id))
+        depth_fname = os.path.join(depth_folder, f"{img_id}.png")
         return depth_fname
 
     def get_depth(self, imname):

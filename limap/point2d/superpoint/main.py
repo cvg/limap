@@ -1,16 +1,18 @@
-import torch
-import numpy as np
-import h5py
-from tqdm import tqdm
-from pathlib import Path
-from typing import Dict, List, Union, Optional
 import pprint
+from pathlib import Path
+from typing import Dict, List, Optional, Union
+
+import h5py
+import numpy as np
+import torch
+from tqdm import tqdm
 
 string_classes = str
 import collections.abc as collections
 
 from hloc import extract_features
 from hloc.utils.io import list_h5_names
+
 from .superpoint import SuperPoint
 
 

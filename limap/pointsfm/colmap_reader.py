@@ -1,4 +1,6 @@
-import os, sys
+import os
+import sys
+
 from _limap import _base
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -37,9 +39,9 @@ def ReadInfos(colmap_path, model_path="sparse", image_path="images"):
         colmap_images = read_images_text(fname_images)
     else:
         raise ValueError(
-            "Error! The model file does not exist at {0}".format(model_path)
+            f"Error! The model file does not exist at {model_path}"
         )
-    print("Reconstruction loaded. (n_images = {0})".format(len(colmap_images)))
+    print(f"Reconstruction loaded. (n_images = {len(colmap_images)})")
 
     # read cameras
     cameras = {}
@@ -89,7 +91,7 @@ def PyReadCOLMAP(colmap_path, model_path=None):
         colmap_points = read_points3D_text(fname_points)
     else:
         raise ValueError(
-            "Error! The model file does not exist at {0}".format(model_path)
+            f"Error! The model file does not exist at {model_path}"
         )
     reconstruction = {}
     reconstruction["cameras"] = colmap_cameras

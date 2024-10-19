@@ -1,4 +1,6 @@
-import os, sys
+import os
+import sys
+
 import numpy as np
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -6,14 +8,15 @@ sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
 
+import argparse
+import logging
+from pathlib import Path
+
 import cv2
-import limap
+from hloc.utils.read_write_model import *
+
 import limap.base as _base
 import limap.estimators as _estimators
-import logging
-import argparse
-from pathlib import Path
-from hloc.utils.read_write_model import *
 
 formatter = logging.Formatter(
     fmt="[%(asctime)s %(name)s %(levelname)s] %(message)s",

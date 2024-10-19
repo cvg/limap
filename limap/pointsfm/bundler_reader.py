@@ -1,8 +1,8 @@
-from _limap import _base, _pointsfm
-
 import os
-import numpy as np
+
 import imagesize
+import numpy as np
+from _limap import _base, _pointsfm
 from tqdm import tqdm
 
 
@@ -11,8 +11,8 @@ def ReadModelBundler(bundler_path, list_path, model_path):
     # read imname_list
     ################################
     list_path = os.path.join(bundler_path, list_path)
-    print("Loading bundler list file {0}...".format(list_path))
-    with open(list_path, "r") as f:
+    print(f"Loading bundler list file {list_path}...")
+    with open(list_path) as f:
         lines = f.readlines()
     image_names = [line.strip("\n").split(" ")[0] for line in lines]
     imname_list = [
@@ -23,8 +23,8 @@ def ReadModelBundler(bundler_path, list_path, model_path):
     # read sfm model
     ################################
     model_path = os.path.join(bundler_path, model_path)
-    print("Loading bundler model file {0}...".format(model_path))
-    with open(model_path, "r") as f:
+    print(f"Loading bundler model file {model_path}...")
+    with open(model_path) as f:
         lines = f.readlines()
     counter = 1  # start from the second line
     line = lines[counter].strip("\n").split(" ")
@@ -42,7 +42,7 @@ def ReadModelBundler(bundler_path, list_path, model_path):
         counter += 1
         imname = imname_list[img_id]
         if not os.path.exists(imname):
-            raise ValueError("Error! Image not found: {0}".format(imname))
+            raise ValueError(f"Error! Image not found: {imname}")
         width, height = imagesize.get(imname)
         img_hw = [height, width]
         K = np.zeros((3, 3))
@@ -64,7 +64,7 @@ def ReadModelBundler(bundler_path, list_path, model_path):
             counter += 1
         R[1, :] = -R[1, :]  # for bundler format
         R[2, :] = -R[2, :]  # for bundler format
-        T = np.zeros((3))
+        T = np.zeros(3)
         line = lines[counter].strip("\n").split(" ")
         T[0], T[1], T[2] = float(line[0]), float(line[1]), float(line[2])
         T[1:] = -T[1:]  # for bundler format

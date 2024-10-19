@@ -1,6 +1,6 @@
-import os
 import numpy as np
 import pytlbd
+
 from ..base_matcher import BaseMatcher, BaseMatcherOptions
 
 

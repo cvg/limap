@@ -1,4 +1,3 @@
-import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -38,7 +37,7 @@ class MultiHeadAttention(nn.Module):
         self.w_vs = nn.Linear(d_feature, n_heads * dim, bias=True)
         self.fc = nn.Linear(n_heads * dim, d_feature, bias=True)
 
-        self.attention = ScaledDotProduct(scale=dim ** 0.5)
+        self.attention = ScaledDotProduct(scale=dim**0.5)
 
         self.dropout = nn.Dropout(dropout)
         self.layer_norm = nn.LayerNorm(d_feature, eps=1e-6)

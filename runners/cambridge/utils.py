@@ -1,25 +1,27 @@
-import os, sys
+import os
+import sys
+
 import numpy as np
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
+from pathlib import Path
+
 import imagesize
 import pycolmap
-from tqdm import tqdm
-from pathlib import Path
-import limap.base as _base
-import limap.pointsfm as _psfm
-import limap.util.io as limapio
-
 from hloc import (
     extract_features,
     localize_sfm,
     match_features,
     pairs_from_retrieval,
 )
-from hloc.utils.parsers import parse_retrieval
+from tqdm import tqdm
+
+import limap.base as _base
+import limap.pointsfm as _psfm
+import limap.util.io as limapio
 
 
 def read_scene_visualsfm(
@@ -82,8 +84,9 @@ def get_scene_info(vsfm_path, imagecols, query_images):
 
 
 def undistort_and_resize(cfg, imagecols, logger=None):
-    import limap.runners as _runners
     import cv2
+
+    import limap.runners as _runners
 
     # undistort images
     logger.info("Performing undistortion...")
@@ -190,7 +193,7 @@ def eval(filename, poses_gt, query_ids, id_to_name, logger):
     errors_t = []
     errors_R = []
     pose_results = {}
-    with open(filename, "r") as f:
+    with open(filename) as f:
         for data in f.read().rstrip().split("\n"):
             data = data.split()
             name = data[0]
@@ -259,10 +262,10 @@ def run_hloc_cambridge(
     query_list = results_dir / "query_list_with_intrinsics.txt"
     loc_pairs = results_dir / f"pairs-query-netvlad{num_loc}.txt"
     image_list = [
-        "image{0:08d}.png".format(img_id) for img_id in (train_ids + query_ids)
+        f"image{img_id:08d}.png" for img_id in (train_ids + query_ids)
     ]
     img_name_to_id = {
-        "image{0:08d}.png".format(id): id for id in (train_ids + query_ids)
+        f"image{id:08d}.png": id for id in (train_ids + query_ids)
     }
 
     imagecols_train = imagecols.subset_by_image_ids(train_ids)
@@ -286,8 +289,8 @@ def run_hloc_cambridge(
         global_descriptors,
         loc_pairs,
         num_loc,
-        db_list=["image{0:08d}.png".format(img_id) for img_id in train_ids],
-        query_list=["image{0:08d}.png".format(img_id) for img_id in query_ids],
+        db_list=[f"image{img_id:08d}.png" for img_id in train_ids],
+        query_list=[f"image{img_id:08d}.png" for img_id in query_ids],
     )
 
     # feature extraction
@@ -336,7 +339,7 @@ def run_hloc_cambridge(
         )
 
         # Read coarse poses
-        with open(results_file, "r") as f:
+        with open(results_file) as f:
             lines = []
             for data in f.read().rstrip().split("\n"):
                 data = data.split()
@@ -361,11 +364,11 @@ def run_hloc_cambridge(
             logger.info(f"Coarse pose saved at {results_file}")
     else:
         if logger:
-            logger.info(f"Point-only localization skipped.")
+            logger.info("Point-only localization skipped.")
 
     # Read coarse poses
     poses = {}
-    with open(results_file, "r") as f:
+    with open(results_file) as f:
         lines = []
         for data in f.read().rstrip().split("\n"):
             data = data.split()

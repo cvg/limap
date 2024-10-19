@@ -1,5 +1,5 @@
-import os
 import numpy as np
+
 from ..base_matcher import BaseMatcher, BaseMatcherOptions
 
 

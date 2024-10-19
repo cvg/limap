@@ -1,18 +1,16 @@
-import os, sys
+import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 
-import limap.base as _base
 import limap.evaluation as _eval
 import limap.util.config as cfgutils
 import limap.util.io as limapio
 import limap.visualize as limapvis
 from runners.hypersim.Hypersim import Hypersim
-
-import matplotlib as mpl
-import matplotlib.pyplot as plt
 
 # hypersim
 MPAU = 0.02539999969303608
@@ -29,7 +27,6 @@ def visualize_error_to_GT(evaluator, lines, threshold):
     outlier_lines = evaluator.ComputeOutlierSegs(lines, threshold)
 
     # visualize
-    import limap.visualize as limapvis
     import open3d as o3d
 
     vis = o3d.visualization.Visualizer()
@@ -73,7 +70,7 @@ def report_error_to_GT(evaluator, lines, vis_err_th=None):
 
 
 def read_ply(fname):
-    from plyfile import PlyData, PlyElement
+    from plyfile import PlyData
 
     plydata = PlyData.read(fname)
     x = np.asarray(plydata.elements[0].data["x"])

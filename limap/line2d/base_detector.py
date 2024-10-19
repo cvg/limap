@@ -1,13 +1,12 @@
 import os
+from typing import NamedTuple
+
+import cv2
 import numpy as np
 from tqdm import tqdm
-import cv2
 
 import limap.util.io as limapio
 import limap.visualize as limapvis
-
-import collections
-from typing import NamedTuple
 
 
 class BaseDetectorOptions(NamedTuple):
@@ -182,7 +181,7 @@ class BaseDetector:
             img = imagecols.read_image(img_id)
             segs = limapio.read_txt_segments(seg_folder, img_id)
             img = limapvis.draw_segments(img, segs, (0, 255, 0))
-            fname = os.path.join(vis_folder, "img_{0}_det.png".format(img_id))
+            fname = os.path.join(vis_folder, f"img_{img_id}_det.png")
             cv2.imwrite(fname, img)
 
     def detect_all_images(self, output_folder, imagecols, skip_exists=False):
@@ -219,7 +218,7 @@ class BaseDetector:
                 img = imagecols.read_image(img_id)
                 img = limapvis.draw_segments(img, segs, (0, 255, 0))
                 fname = os.path.join(
-                    vis_folder, "img_{0}_det.png".format(img_id)
+                    vis_folder, f"img_{img_id}_det.png"
                 )
                 cv2.imwrite(fname, img)
         all_2d_segs = limapio.read_all_segments_from_folder(seg_folder)
@@ -308,7 +307,7 @@ class BaseDetector:
                 img = imagecols.read_image(img_id)
                 img = limapvis.draw_segments(img, segs, (0, 255, 0))
                 fname = os.path.join(
-                    vis_folder, "img_{0}_det.png".format(img_id)
+                    vis_folder, f"img_{img_id}_det.png"
                 )
                 cv2.imwrite(fname, img)
         all_2d_segs = limapio.read_all_segments_from_folder(seg_folder)

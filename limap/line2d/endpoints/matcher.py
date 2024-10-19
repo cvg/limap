@@ -1,9 +1,8 @@
-import os
 import numpy as np
 import torch
 
-import limap.util.io as limapio
 from limap.point2d.superglue.superglue import SuperGlue
+
 from ..base_matcher import BaseMatcher, BaseMatcherOptions
 
 

@@ -1,10 +1,8 @@
 import numpy as np
 import torch
+from dsfm.trainlib.models.superpoint import SuperPoint
 from pytlsd import lsd
 
-from dsfm.trainlib.models.superpoint import SuperPoint
-from .line_transformer import LineTransformer, get_dist_matrix
-from .nn_matcher import nn_matcher, nn_matcher_distmat
 from .. import BaseModel
 from ..utils.gt_line_matches import (
     UNMATCHED_FEATURE,
@@ -15,6 +13,8 @@ from ..utils.gt_matches import (
     gt_matches_from_homography,
     gt_matches_from_pose_depth,
 )
+from .line_transformer import LineTransformer, get_dist_matrix
+from .nn_matcher import nn_matcher, nn_matcher_distmat
 
 
 class LineTrPipeline(BaseModel):
@@ -168,7 +168,7 @@ class LineTrPipeline(BaseModel):
                     pred["keypoints0"],
                     pred["keypoints1"],
                     **data,
-                    pos_th=self.conf.ground_truth.th_positive
+                    pos_th=self.conf.ground_truth.th_positive,
                 )
                 pred["gt_assignment"] = assignment
                 pred["gt_matches0"], pred["gt_matches1"] = m0, m1
@@ -188,7 +188,7 @@ class LineTrPipeline(BaseModel):
                         pred["lines0"].reshape(b_size, -1, 2),
                         pred["lines1"].reshape(b_size, -1, 2),
                         **data,
-                        pos_th=self.conf.ground_truth.th_positive
+                        pos_th=self.conf.ground_truth.th_positive,
                     )
                     pred["samples_gt_assignment"] = samples_assignment
                     pred["samples_gt_matches0"] = samples_m0
@@ -219,7 +219,7 @@ class LineTrPipeline(BaseModel):
                     pred["keypoints1"],
                     **data,
                     pos_th=self.conf.ground_truth.th_positive,
-                    neg_th=self.conf.ground_truth.th_negative
+                    neg_th=self.conf.ground_truth.th_negative,
                 )
                 pred["gt_assignment"] = assignment
                 pred["gt_matches0"], pred["gt_matches1"] = m0, m1
@@ -244,10 +244,8 @@ class LineTrPipeline(BaseModel):
                         pred["lines1"].reshape(b_size, -1, 2),
                         **data,
                         pos_th=self.conf.ground_truth.th_positive,
-                        neg_th=self.conf.ground_truth.th_negative
-                    )[
-                        :3
-                    ]
+                        neg_th=self.conf.ground_truth.th_negative,
+                    )[:3]
                     pred["samples_gt_assignment"] = samples_assignment
                     pred["samples_gt_matches0"] = samples_m0
                     pred["samples_gt_matches1"] = samples_m1
@@ -308,13 +306,13 @@ class LineTrPipeline(BaseModel):
         assert match_mat.shape[0] == 1
         bool_match_mat = match_mat[0] > 0
         pred["line_matches0"] = np.argmax(bool_match_mat, axis=1)
-        pred["line_matches0"][
-            ~np.any(bool_match_mat, axis=1)
-        ] = UNMATCHED_FEATURE
+        pred["line_matches0"][~np.any(bool_match_mat, axis=1)] = (
+            UNMATCHED_FEATURE
+        )
         pred["line_matches1"] = np.argmax(bool_match_mat, axis=0)
-        pred["line_matches1"][
-            ~np.any(bool_match_mat, axis=0)
-        ] = UNMATCHED_FEATURE
+        pred["line_matches1"][~np.any(bool_match_mat, axis=0)] = (
+            UNMATCHED_FEATURE
+        )
         pred["line_matches0"] = torch.from_numpy(pred["line_matches0"])[None]
         pred["line_matches1"] = torch.from_numpy(pred["line_matches1"])[None]
         lmatch_scores = torch.from_numpy(

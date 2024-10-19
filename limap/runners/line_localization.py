@@ -1,16 +1,15 @@
 import os
-import numpy as np
-import pycolmap
-import pickle
-import limap.estimators as _estimators
-import limap.runners as _runners
-import limap.base as _base
-import limap.util.io as limapio
-import limap.line2d
-
-from tqdm import tqdm
 from collections import defaultdict
+
+import numpy as np
 from hloc.utils.io import get_keypoints, get_matches
+from tqdm import tqdm
+
+import limap.base as _base
+import limap.estimators as _estimators
+import limap.line2d
+import limap.runners as _runners
+import limap.util.io as limapio
 from limap.optimize.line_localization.functions import *
 
 
@@ -199,7 +198,7 @@ def line_localization(
         basedir = os.path.join(
             "line_matchings",
             cfg["line2d"]["detector"]["method"],
-            "feats_{0}".format(matcher_name),
+            f"feats_{matcher_name}",
         )
         matcher = limap.line2d.get_matcher(
             ma_cfg,
@@ -230,7 +229,7 @@ def line_localization(
         if cfg["localization"]["skip_exists"]:
             limapio.check_makedirs(str(pose_dir))
             if os.path.exists(os.path.join(pose_dir, f"{qid}.txt")):
-                with open(os.path.join(pose_dir, f"{qid}.txt"), "r") as f:
+                with open(os.path.join(pose_dir, f"{qid}.txt")) as f:
                     data = f.read().rstrip().split("\n")[0].split()
                     q, t = np.split(np.array(data[1:], float), [4])
                     final_poses[qid] = _base.CameraPose(q, t)
@@ -248,7 +247,7 @@ def line_localization(
         if cfg["localization"]["2d_matcher"] != "epipolar":
             # Read from the pre-computed matches
             all_line_pairs_2to2 = limapio.read_npy(
-                os.path.join(se_matches_dir, "matches_{0}.npy".format(qid))
+                os.path.join(se_matches_dir, f"matches_{qid}.npy")
             ).item()
 
         all_line_pairs_2to3 = defaultdict(list)

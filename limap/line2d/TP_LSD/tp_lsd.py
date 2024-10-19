@@ -1,12 +1,13 @@
 import os
-from ..base_detector import BaseDetector, BaseDetectorOptions
 
 import cv2
 import numpy as np
 import torch
+from tp_lsd.modeling.TP_Net import Res320
 from tp_lsd.utils.reconstruct import TPS_line
 from tp_lsd.utils.utils import load_model
-from tp_lsd.modeling.TP_Net import Res320
+
+from ..base_detector import BaseDetector, BaseDetectorOptions
 
 
 class TPLSDDetector(BaseDetector):

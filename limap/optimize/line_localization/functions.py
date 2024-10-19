@@ -113,9 +113,10 @@ def reprojection_filter_matches_2to3(
         best_id = None
         for id in track_ids:
             l3d = linetracks[id].line
-            l2d_start, l2d_end = ref_camview.projection(
-                l3d.start
-            ), ref_camview.projection(l3d.end)
+            l2d_start, l2d_end = (
+                ref_camview.projection(l3d.start),
+                ref_camview.projection(l3d.end),
+            )
             l2d = _base.Line2d(l2d_start, l2d_end)
 
             dist = dist_func(ref_line, l2d)

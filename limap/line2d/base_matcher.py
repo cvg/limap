@@ -1,11 +1,10 @@
 import os
-import numpy as np
-from tqdm import tqdm
-import joblib
-import limap.util.io as limapio
-
-import collections
 from typing import NamedTuple
+
+import joblib
+from tqdm import tqdm
+
+import limap.util.io as limapio
 
 
 class BaseMatcherOptions(NamedTuple):
@@ -60,9 +59,7 @@ class BaseMatcher:
         """
         return os.path.join(
             output_folder,
-            "{0}_n{1}_top{2}".format(
-                self.get_module_name(), self.n_neighbors, self.topk
-            ),
+            f"{self.get_module_name()}_n{self.n_neighbors}_top{self.topk}",
         )
 
     def read_descinfo(self, descinfo_folder, idx):
@@ -76,7 +73,7 @@ class BaseMatcher:
             matches_folder (str): The output matching folder
             idx (int): image id
         """
-        fname = os.path.join(matches_folder, "matches_{0}.npy".format(idx))
+        fname = os.path.join(matches_folder, f"matches_{idx}.npy")
         return fname
 
     def save_match(self, matches_folder, idx, matches):

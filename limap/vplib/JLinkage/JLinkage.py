@@ -1,6 +1,6 @@
-from ..base_vp_detector import BaseVPDetector, BaseVPDetectorOptions
-
 from _limap import _vplib
+
+from ..base_vp_detector import BaseVPDetector, BaseVPDetectorOptions
 
 
 class JLinkage(BaseVPDetector):

@@ -2,27 +2,22 @@
 This file implements the training process and all the summaries
 """
 
-import os
-import numpy as np
 import cv2
+import numpy as np
 import torch
-from torch.nn.functional import pixel_shuffle, softmax
-from torch.utils.data import DataLoader
 import torch.utils.data.dataloader as torch_loader
-
-# from tensorboardX import SummaryWriter
-
-# from dataset.dataset_util import get_dataset
-# from model.model_util import get_model
-# from model.loss import TotalLoss, get_loss_and_weights
-from .model.metrics import AverageMeter, Metrics, super_nms
+from torch.nn.functional import pixel_shuffle, softmax
 
 # from model.lr_scheduler import get_lr_scheduler
 from .misc.train_utils import (
     convert_image,
-    get_latest_checkpoint,
-    remove_old_checkpoints,
 )
+
+# from tensorboardX import SummaryWriter
+# from dataset.dataset_util import get_dataset
+# from model.model_util import get_model
+# from model.loss import TotalLoss, get_loss_and_weights
+from .model.metrics import AverageMeter, super_nms
 
 
 def customized_collate_fn(batch):
@@ -56,7 +51,7 @@ def restore_weights(model, state_dict, strict=True):
         # Load mismatched keys manually
         model_dict = model.state_dict()
         for idx, key in enumerate(missing_keys):
-            dict_keys = [_ for _ in unexpected_keys if not "tracked" in _]
+            dict_keys = [_ for _ in unexpected_keys if "tracked" not in _]
             model_dict[key] = state_dict[dict_keys[idx]]
         model.load_state_dict(model_dict)
 
@@ -373,7 +368,7 @@ def train_single_epoch(
             results = metric_func.metric_results
             average = average_meter.average()
             # Get gpu memory usage in GB
-            gpu_mem_usage = torch.cuda.max_memory_allocated() / (1024 ** 3)
+            gpu_mem_usage = torch.cuda.max_memory_allocated() / (1024**3)
             if compute_descriptors:
                 print(
                     "Epoch [%d / %d] Iter [%d / %d] loss=%.4f (%.4f), junc_loss=%.4f (%.4f), heatmap_loss=%.4f (%.4f), descriptor_loss=%.4f (%.4f), gpu_mem=%.4fGB"
@@ -734,7 +729,7 @@ def record_train_summaries(writer, global_step, scalars, images):
 
     # GPU memory part
     # Get gpu memory usage in GB
-    gpu_mem_usage = torch.cuda.max_memory_allocated() / (1024 ** 3)
+    gpu_mem_usage = torch.cuda.max_memory_allocated() / (1024**3)
     writer.add_scalar("GPU/GPU_memory_usage", gpu_mem_usage, global_step)
 
     # Loss part

@@ -1,4 +1,4 @@
-import os, sys
+import os
 import time
 
 path = "training"

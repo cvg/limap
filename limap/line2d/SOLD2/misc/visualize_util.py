@@ -1,10 +1,11 @@
-""" Organize some frequently used visualization functions. """
+"""Organize some frequently used visualization functions."""
+
+import copy
 
 import cv2
-import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-import copy
+import numpy as np
 import seaborn as sns
 
 

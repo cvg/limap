@@ -1,16 +1,16 @@
 import os
-import numpy as np
+
 from tqdm import tqdm
 
 import limap.base as _base
 import limap.merging as _mrg
-import limap.triangulation as _tri
-import limap.vplib as _vplib
-import limap.pointsfm as _psfm
 import limap.optimize as _optim
+import limap.pointsfm as _psfm
 import limap.runners as _runners
+import limap.triangulation as _tri
 import limap.util.io as limapio
 import limap.visualize as limapvis
+import limap.vplib as _vplib
 
 
 def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
@@ -25,7 +25,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     Returns:
         list[:class:`limap.base.LineTrack`]: list of output 3D line tracks
     """
-    print("[LOG] Number of images: {0}".format(imagecols.NumImages()))
+    print(f"[LOG] Number of images: {imagecols.NumImages()}")
     cfg = _runners.setup(cfg)
     detector_name = cfg["line2d"]["detector"]["method"]
     if cfg["triangulation"]["var2d"] == -1:
@@ -154,7 +154,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
             )
         else:
             matches = limapio.read_npy(
-                os.path.join(matches_dir, "matches_{0}.npy".format(img_id))
+                os.path.join(matches_dir, f"matches_{img_id}.npy")
             ).item()
             Triangulator.TriangulateImage(img_id, matches)
     linetracks = Triangulator.ComputeLineTracks()
@@ -248,7 +248,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
             limapvis.visualize_line_track(
                 imagecols,
                 validtracks[track_id],
-                prefix="track.{0}".format(track_id),
+                prefix=f"track.{track_id}",
             )
 
         import pdb
