@@ -318,9 +318,9 @@ class LineTrPipeline(BaseModel):
         lmatch_scores = torch.from_numpy(
             distance_matrix[(0,) + np.where(match_mat[0] > 0)]
         )
-        pred["line_match_scores0"] = pred[
-            "line_match_scores1"
-        ] = -lmatch_scores[None]
+        pred["line_match_scores0"] = pred["line_match_scores1"] = (
+            -lmatch_scores[None]
+        )
         return pred
 
     def loss(self, pred, data):
