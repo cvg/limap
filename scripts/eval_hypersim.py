@@ -155,8 +155,7 @@ def eval_hypersim(
                 [line.as_array() for line in outlier_lines]
             )
             limap.save_obj(
-                f"tmp/outliers_th_{threshold:.4f}.obj",
-                outlier_lines_np,
+                f"tmp/outliers_th_{threshold:.4f}.obj", outlier_lines_np
             )
 
 

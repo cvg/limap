@@ -136,8 +136,7 @@ def eval_tnt(cfg, lines, ref_lines=None):
                 [line.as_array() for line in outlier_lines]
             )
             limapio.save_obj(
-                f"tmp/outliers_th_{threshold:.4f}.obj",
-                outlier_lines_np,
+                f"tmp/outliers_th_{threshold:.4f}.obj", outlier_lines_np
             )
 
 

@@ -109,7 +109,7 @@ def parse_config():
     cfg["list_path"] = args.list_path
     cfg["model_path"] = args.model_path
     cfg["info_path"] = args.info_path
-    if ("max_image_dim" not in cfg.keys()) or args.max_image_dim is not None:
+    if ("max_image_dim" not in cfg) or args.max_image_dim is not None:
         cfg["max_image_dim"] = args.max_image_dim
     # components
     cfg["component_folder"] = args.component_folder

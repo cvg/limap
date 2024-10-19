@@ -105,7 +105,7 @@ def parse_config():
     cfg["vsfm_path"] = args.vsfm_path
     cfg["nvm_file"] = args.nvm_file
     cfg["info_path"] = args.info_path
-    if ("max_image_dim" not in cfg.keys()) or args.max_image_dim is not None:
+    if ("max_image_dim" not in cfg) or args.max_image_dim is not None:
         cfg["max_image_dim"] = args.max_image_dim
     return cfg
 
