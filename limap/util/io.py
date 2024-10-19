@@ -251,9 +251,7 @@ def save_l3dpp(folder, imagecols, all_2d_segs):
             f.write(f"{n_segments}\n")
             for line_id in range(n_segments):
                 line = segs[line_id]
-                f.write(
-                    f"{line[0]} {line[1]} {line[2]} {line[3]}\n"
-                )
+                f.write(f"{line[0]} {line[1]} {line[2]} {line[3]}\n")
         print(f"Writing for L3DPP: {fname}")
 
 
@@ -397,9 +395,7 @@ def read_lines_from_input(input_file):
     General reader for lines
     """
     if not os.path.exists(input_file):
-        raise ValueError(
-            f"Error! Input file/directory {input_file} not found."
-        )
+        raise ValueError(f"Error! Input file/directory {input_file} not found.")
 
     # linetracks folder
     if not os.path.isfile(input_file):
@@ -443,9 +439,7 @@ def save_txt_segments(folder, img_id, segs):
         f.write(f"{n_segments}\n")
         for line_id in range(n_segments):
             line = segs[line_id]
-            f.write(
-                f"{line[0]} {line[1]} {line[2]} {line[3]}\n"
-            )
+            f.write(f"{line[0]} {line[1]} {line[2]} {line[3]}\n")
 
 
 def read_txt_segments(folder, img_id):

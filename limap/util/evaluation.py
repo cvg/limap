@@ -27,9 +27,7 @@ def eval_imagecols(
     imagecols, imagecols_gt, max_error=0.01, enable_logging=True
 ):
     if enable_logging:
-        print(
-            f"[LOG EVAL] imagecols.NumImages() = {imagecols.NumImages()}"
-        )
+        print(f"[LOG EVAL] imagecols.NumImages() = {imagecols.NumImages()}")
         print(
             f"[LOG EVAL] imagecols_gt.NumImages() = {imagecols_gt.NumImages()}"
         )
@@ -61,9 +59,7 @@ def eval_imagecols_relpose(
     )
     assert len(shared_img_ids) == imagecols.NumImages()
     if enable_logging:
-        print(
-            f"[LOG EVAL] imagecols.NumImages() = {imagecols.NumImages()}"
-        )
+        print(f"[LOG EVAL] imagecols.NumImages() = {imagecols.NumImages()}")
         print(
             f"[LOG EVAL] imagecols_gt.NumImages() = {imagecols_gt.NumImages()}"
         )

@@ -69,9 +69,7 @@ def undistort_images(
     # start undistortion
     if n_jobs == -1:
         n_jobs = os.cpu_count()
-    print(
-        f"[LOG] Start undistorting images (n_images = {len(unload_ids)})..."
-    )
+    print(f"[LOG] Start undistorting images (n_images = {len(unload_ids)})...")
     import cv2
     import imagesize
     import joblib

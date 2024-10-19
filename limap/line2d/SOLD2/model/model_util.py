@@ -180,7 +180,8 @@ class SOLD2Net(nn.Module):
     def get_descriptor_decoder(self):
         """Get the descriptor decoder."""
         if (
-            self.cfg["descriptor_decoder"] not in self.supported_descriptor_decoder
+            self.cfg["descriptor_decoder"]
+            not in self.supported_descriptor_decoder
         ):
             raise ValueError(
                 "[Error] The descriptor decoder selection is not supported."

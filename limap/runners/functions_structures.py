@@ -22,9 +22,7 @@ def compute_2d_feature_points_sp(imagecols, output_path="tmp/featurepoints"):
     ### copy images to tmp folder
     for img_id in imagecols.get_img_ids():
         img = imagecols.read_image(img_id)
-        fname_to_save = os.path.join(
-            image_path, f"image{img_id:08d}.png"
-        )
+        fname_to_save = os.path.join(image_path, f"image{img_id:08d}.png")
         cv2.imwrite(fname_to_save, img)
 
     # run superpoint

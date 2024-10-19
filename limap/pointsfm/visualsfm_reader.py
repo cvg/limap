@@ -11,9 +11,7 @@ from limap.util.geometry import rotation_from_quaternion
 def ReadModelVisualSfM(vsfm_path, nvm_file="reconstruction.nvm"):
     input_file = os.path.join(vsfm_path, nvm_file)
     if not os.path.exists(input_file):
-        raise ValueError(
-            f"Error! Input file {input_file} does not exist."
-        )
+        raise ValueError(f"Error! Input file {input_file} does not exist.")
     with open(input_file) as f:
         txt_lines = f.readlines()
 

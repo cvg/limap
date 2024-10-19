@@ -118,9 +118,7 @@ class Hypersim:
         if key in param_dict:
             return float(param_dict[key])
         else:
-            raise ValueError(
-                f"Key {key} not exists in {fname_metascene}"
-            )
+            raise ValueError(f"Key {key} not exists in {fname_metascene}")
 
     def set_scene_id(self, scene_id):
         self.scene_dir = os.path.join(self.data_dir, scene_id)

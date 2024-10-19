@@ -33,9 +33,7 @@ def report_error_to_GT(evaluator, lines):
         list_precision.append(precision)
     for idx, threshold in enumerate(thresholds):
         print(
-            "R / P at {0}mm: {1:.2f} / {2:.2f}".format(
-                int(threshold * 1000), list_recall[idx], list_precision[idx]
-            )
+            f"R / P at {int(threshold * 1000)}mm: {list_recall[idx]:.2f} / {list_precision[idx]:.2f}"
         )
     return evaluator
 
@@ -54,9 +52,7 @@ def report_pc_recall_for_GT(evaluator, lines):
         num_inliers = (point_dists < threshold).sum()
         point_recall = 100 * num_inliers / n_points
         print(
-            "{0:.0f}mm, inliers = {1}, point recall = {2:.2f}".format(
-                int(threshold * 1000), num_inliers, point_recall
-            )
+            f"{int(threshold * 1000):.0f}mm, inliers = {num_inliers}, point recall = {point_recall:.2f}"
         )
     return evaluator
 
@@ -69,7 +65,7 @@ def read_ply(fname):
     y = np.asarray(plydata.elements[0].data["y"])
     z = np.asarray(plydata.elements[0].data["z"])
     points = np.stack([x, y, z], axis=1)
-    print("number of points: {0}".format(points.shape[0]))
+    print(f"number of points: {points.shape[0]}")
     return points
 
 
@@ -119,7 +115,7 @@ def eval_tnt(cfg, lines, ref_lines=None):
                 for line in lines
                 if limapvis.test_line_inside_ranges(line, ranges)
             ]
-            print("Filtering by range: {0} / {1}".format(len(lines), n_lines))
+            print(f"Filtering by range: {len(lines)} / {n_lines}")
         evaluator = report_error_to_point_cloud(
             points, lines, kdtree_dir=cfg["kdtree_dir"]
         )
@@ -133,14 +129,14 @@ def eval_tnt(cfg, lines, ref_lines=None):
                 [line.as_array() for line in inlier_lines]
             )
             limapio.save_obj(
-                "tmp/inliers_th_{0:.4f}.obj".format(threshold), inlier_lines_np
+                f"tmp/inliers_th_{threshold:.4f}.obj", inlier_lines_np
             )
             outlier_lines = evaluator.ComputeOutlierSegs(lines, threshold)
             outlier_lines_np = np.array(
                 [line.as_array() for line in outlier_lines]
             )
             limapio.save_obj(
-                "tmp/outliers_th_{0:.4f}.obj".format(threshold),
+                f"tmp/outliers_th_{threshold:.4f}.obj",
                 outlier_lines_np,
             )
 
@@ -222,7 +218,7 @@ def parse_config():
 
 
 def transform_lines(fname, lines):
-    with open(fname, "r") as f:
+    with open(fname) as f:
         flines = f.readlines()
     mat = []
     for fline in flines:
@@ -267,7 +263,7 @@ def main():
         return
     ref_lines = None
     if cfg["reference_dir"] is not None:
-        ref_lines = read_lines_from_input(
+        ref_lines = limapio.read_lines_from_input(
             cfg["reference_dir"], n_visible_views=4
         )
     eval_tnt(cfg, lines, ref_lines=ref_lines)
@@ -281,9 +277,7 @@ def main():
             [track.count_lines() for track in linetracks]
         )
         print(
-            "supporting images / lines: ({0:.2f} / {1:.2f})".format(
-                sup_image_counts.mean(), sup_line_counts.mean()
-            )
+            f"supporting images / lines: ({sup_image_counts.mean():.2f} / {sup_line_counts.mean():.2f})"
         )
 
 

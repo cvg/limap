@@ -111,9 +111,7 @@ def main(args):
         if (not os.path.exists(args.imagecols)) or (
             not args.imagecols.endswith(".npy")
         ):
-            raise ValueError(
-                f"Error! Input file {args.imagecols} is not valid"
-            )
+            raise ValueError(f"Error! Input file {args.imagecols} is not valid")
         imagecols = _base.ImageCollection(
             limapio.read_npy(args.imagecols).item()
         )

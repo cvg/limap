@@ -217,9 +217,7 @@ class BaseDetector:
             if self.visualize:
                 img = imagecols.read_image(img_id)
                 img = limapvis.draw_segments(img, segs, (0, 255, 0))
-                fname = os.path.join(
-                    vis_folder, f"img_{img_id}_det.png"
-                )
+                fname = os.path.join(vis_folder, f"img_{img_id}_det.png")
                 cv2.imwrite(fname, img)
         all_2d_segs = limapio.read_all_segments_from_folder(seg_folder)
         all_2d_segs = {id: all_2d_segs[id] for id in imagecols.get_img_ids()}
@@ -306,9 +304,7 @@ class BaseDetector:
             if self.visualize:
                 img = imagecols.read_image(img_id)
                 img = limapvis.draw_segments(img, segs, (0, 255, 0))
-                fname = os.path.join(
-                    vis_folder, f"img_{img_id}_det.png"
-                )
+                fname = os.path.join(vis_folder, f"img_{img_id}_det.png")
                 cv2.imwrite(fname, img)
         all_2d_segs = limapio.read_all_segments_from_folder(seg_folder)
         all_2d_segs = {id: all_2d_segs[id] for id in imagecols.get_img_ids()}

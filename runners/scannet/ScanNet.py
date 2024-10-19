@@ -89,9 +89,7 @@ class ScanNet:
         index_list = np.arange(0, n_images, self.stride).tolist()
 
         # load intrinsic
-        fname_meta = os.path.join(
-            self.scene_dir, f"{self.scene_id}.txt"
-        )
+        fname_meta = os.path.join(self.scene_dir, f"{self.scene_id}.txt")
         K_orig, img_hw_orig = self.read_intrinsics(fname_meta)
         h_orig, w_orig = img_hw_orig[0], img_hw_orig[1]
         # reshape w.r.t max_image_dim
@@ -116,14 +114,10 @@ class ScanNet:
         # get imname_list and cameras
         self.imname_list, self.Rs, self.Ts = [], [], []
         for index in index_list:
-            imname = os.path.join(
-                self.scene_dir, "color", f"{index}.jpg"
-            )
+            imname = os.path.join(self.scene_dir, "color", f"{index}.jpg")
             self.imname_list.append(imname)
 
-            pose_txt = os.path.join(
-                self.scene_dir, "pose", f"{index}.txt"
-            )
+            pose_txt = os.path.join(self.scene_dir, "pose", f"{index}.txt")
             R, T = self.read_pose(pose_txt)
             self.Rs.append(R)
             self.Ts.append(T)

@@ -13,14 +13,14 @@ def get_imname_list(scene_id):
     n_images = len(flist)
     imname_list = []
     for idx in range(n_images):
-        fname = "{0:06d}.jpg".format(idx + 1)
+        fname = f"{idx + 1:06d}.jpg"
         # fname = os.path.join(image_path, fname)
         imname_list.append(fname)
     return imname_list
 
 
 def read_positions(log_file):
-    with open(log_file, "r") as f:
+    with open(log_file) as f:
         lines = f.readlines()
     n_images = int(len(lines) / 5)
     positions = []
@@ -39,7 +39,7 @@ def read_positions(log_file):
 
 
 def read_trans(fname):
-    with open(fname, "r") as f:
+    with open(fname) as f:
         lines = f.readlines()
     mat = []
     for idx in range(4):
@@ -53,7 +53,7 @@ def read_trans(fname):
 def write_geoinfo_txt(fname, imname_list, positions):
     with open(fname, "w") as f:
         for imname, pos in zip(imname_list, positions):
-            f.write("{0} {1} {2} {3}\n".format(imname, pos[0], pos[1], pos[2]))
+            f.write(f"{imname} {pos[0]} {pos[1]} {pos[2]}\n")
 
 
 def main():
@@ -62,11 +62,11 @@ def main():
         # get geo txt
         imname_list = get_imname_list(scene_id)
         log_file = os.path.join(
-            input_meta_path, scene_id, "{0}_COLMAP_SfM.log".format(scene_id)
+            input_meta_path, scene_id, f"{scene_id}_COLMAP_SfM.log"
         )
         positions = read_positions(log_file)
         trans_file = os.path.join(
-            input_meta_path, scene_id, "{0}_trans.txt".format(scene_id)
+            input_meta_path, scene_id, f"{scene_id}_trans.txt"
         )
         trans_mat = read_trans(trans_file)
         new_positions = [

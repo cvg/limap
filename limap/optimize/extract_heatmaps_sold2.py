@@ -1,4 +1,3 @@
-
 import limap.base as _base
 import limap.line2d
 import limap.util.io as limapio

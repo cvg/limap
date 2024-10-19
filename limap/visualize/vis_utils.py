@@ -429,7 +429,11 @@ def vis_vpresult(
         colors = [[255, 0, 0]]
     for line_id, line in enumerate(lines):
         c = [255, 255, 255]  # default color: white
-        if not vpres.HasVP(line_id) or vp_id >= 0 and vpres.labels[line_id] != vp_id:
+        if (
+            not vpres.HasVP(line_id)
+            or vp_id >= 0
+            and vpres.labels[line_id] != vp_id
+        ):
             if not show_original:
                 continue
         else:

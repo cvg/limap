@@ -51,9 +51,7 @@ def convert_colmap_to_visualsfm(colmap_model_path, output_nvm_file):
             qvec, tvec = colmap_image.qvec, colmap_image.tvec
             R = rotation_from_quaternion(qvec)
             center = -R.transpose() @ tvec
-            f.write(
-                f" {qvec[0]} {qvec[1]} {qvec[2]} {qvec[3]}"
-            )
+            f.write(f" {qvec[0]} {qvec[1]} {qvec[2]} {qvec[3]}")
             f.write(f" {center[0]} {center[1]} {center[2]}")
             f.write(f" {k1} 0\n")
         f.write("\n")

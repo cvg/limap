@@ -44,9 +44,7 @@ def extract_track_patches_s2dnet(
             camview = imagecols.camview(img_id)
             line2d_range = extractor.GetLine2DRange(track, img_id, camview)
             line2d_collections[img_id].append([line2d_range, track_id])
-        limapio.check_makedirs(
-            os.path.join(output_dir, f"track{track_id}")
-        )
+        limapio.check_makedirs(os.path.join(output_dir, f"track{track_id}"))
 
     # extract line patches for each image
     for img_id in tqdm(imagecols.get_img_ids()):
