@@ -45,7 +45,7 @@ def ReadModelBundler(bundler_path, list_path, model_path):
             raise ValueError(f"Error! Image not found: {imname}")
         width, height = imagesize.get(imname)
         img_hw = [height, width]
-        K = np.zeros((3, 3))
+        # K = np.zeros((3, 3))
         cx = img_hw[1] / 2.0
         cy = img_hw[0] / 2.0
         params = [f, cx, cy, k1, k2]

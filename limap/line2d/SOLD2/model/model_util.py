@@ -60,7 +60,7 @@ class SOLD2Net(nn.Module):
     """Full network for SOLD²."""
 
     def __init__(self, model_cfg):
-        super(SOLD2Net, self).__init__()
+        super().__init__()
         self.name = model_cfg["model_name"]
         self.cfg = model_cfg
 

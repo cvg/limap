@@ -407,7 +407,7 @@ class TotalLoss(nn.Module):
     def __init__(self, loss_funcs, loss_weights, weighting_policy):
         super().__init__()
         # Whether we need to compute the descriptor loss
-        self.compute_descriptors = "descriptor_loss" in loss_funcs.keys()
+        self.compute_descriptors = "descriptor_loss" in loss_funcs
 
         self.loss_funcs = loss_funcs
         self.loss_weights = loss_weights

@@ -189,7 +189,7 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
         all_2d_segs (dict[int -> :class:`np.array`], each with shape (N, 4) or (N, 5)): all the line detections for each image
         descinfo_folder (str): folder to store the descriptors
     """
-    weight_path = None if "weight_path" not in cfg else cfg["weight_path"]
+    weight_path = cfg.get("weight_path", None)
     if "extractor" in cfg["line2d"]:
         print(
             "[LOG] Start 2D line detection and description (detector = {0}, extractor = {1}, n_images = {2})...".format(
@@ -280,7 +280,7 @@ def compute_matches(cfg, descinfo_folder, image_ids, neighbors):
     Returns:
         matches_folder (str): path to store the computed matches
     """
-    weight_path = None if "weight_path" not in cfg else cfg["weight_path"]
+    weight_path = cfg.get("weight_path", None)
     print(
         "[LOG] Start matching 2D lines... (extractor = {0}, matcher = {1}, n_images = {2}, n_neighbors = {3})".format(
             cfg["line2d"]["extractor"]["method"],

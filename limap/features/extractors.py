@@ -10,7 +10,7 @@ import torchvision.transforms.functional as tvf
 from _limap import _features
 from torchvision import transforms
 
-from .models.s2dnet import *
+from .models.s2dnet import S2DNet
 from .models.vggnet import VGGNet
 
 RGB_mean = [0.485, 0.456, 0.406]
@@ -44,7 +44,7 @@ class Extractor(torch.nn.Module):
     """
 
     def __init__(self, device: str):
-        super(Extractor, self).__init__()
+        super().__init__()
         self.device = device
         self.num_levels = 0
         self.model = None
@@ -87,7 +87,7 @@ class S2DNetExtractor(Extractor):
         self.num_levels = 1
         self.channels = [128]  # ,128] #[128,128]
         self.l2_normalize = True
-        if "output_channels" in kwargs.keys():
+        if "output_channels" in kwargs:
             self.channels = [min(kwargs["output_channels"], self.channels[0])]
 
     def extract_featuremaps(self, image_batch: torch.Tensor) -> list:
@@ -148,7 +148,7 @@ class VGGNetExtractor(Extractor):
         self.num_levels = 1  # 2
         self.channels = [64]  # [128,128]
         self.l2_normalize = True
-        if "output_channels" in kwargs.keys():
+        if "output_channels" in kwargs:
             self.channels = [min(kwargs["output_channels"], self.channels[0])]
 
     def extract_featuremaps(self, image_batch: torch.Tensor) -> list:

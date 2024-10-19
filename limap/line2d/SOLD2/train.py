@@ -741,12 +741,12 @@ def record_train_summaries(writer, global_step, scalars, images):
         "Train_loss/total_loss", scalars["total_loss"], global_step
     )
     # Add regularization loss
-    if "reg_loss" in scalars.keys():
+    if "reg_loss" in scalars:
         writer.add_scalar(
             "Train_loss/reg_loss", scalars["reg_loss"], global_step
         )
     # Add descriptor loss
-    if "descriptor_loss" in scalars.keys():
+    if "descriptor_loss" in scalars:
         key = "descriptor_loss"
         writer.add_scalar("Train_loss/%s" % (key), scalars[key], global_step)
         writer.add_scalar(
@@ -754,7 +754,7 @@ def record_train_summaries(writer, global_step, scalars, images):
         )
 
     # Record weighting
-    for key in scalars.keys():
+    for key in scalars:
         if "w_" in key:
             writer.add_scalar(
                 "Train_weight/%s" % (key), scalars[key], global_step
@@ -771,7 +771,7 @@ def record_train_summaries(writer, global_step, scalars, images):
         "Train_loss_average/total_loss", average["total_loss"], global_step
     )
     # Add smoothed descriptor loss
-    if "descriptor_loss" in average.keys():
+    if "descriptor_loss" in average:
         writer.add_scalar(
             "Train_loss_average/descriptor_loss",
             average["descriptor_loss"],
@@ -802,7 +802,7 @@ def record_train_summaries(writer, global_step, scalars, images):
         "Train_metrics/heatmap_recall", results["heatmap_recall"], global_step
     )
     # Add descriptor metric
-    if "matching_score" in results.keys():
+    if "matching_score" in results:
         writer.add_scalar(
             "Train_metrics/matching_score",
             results["matching_score"],
@@ -839,7 +839,7 @@ def record_train_summaries(writer, global_step, scalars, images):
         global_step,
     )
     # Add smoothed descriptor metric
-    if "matching_score" in average.keys():
+    if "matching_score" in average:
         writer.add_scalar(
             "Train_metrics_average/matching_score",
             average["matching_score"],
@@ -913,7 +913,7 @@ def record_test_summaries(writer, epoch, scalars):
     writer.add_scalar("Val_loss/heatmap_loss", average["heatmap_loss"], epoch)
     writer.add_scalar("Val_loss/total_loss", average["total_loss"], epoch)
     # Add descriptor loss
-    if "descriptor_loss" in average.keys():
+    if "descriptor_loss" in average:
         key = "descriptor_loss"
         writer.add_scalar("Val_loss/%s" % (key), average[key], epoch)
 
@@ -935,7 +935,7 @@ def record_test_summaries(writer, epoch, scalars):
         "Val_metrics/heatmap_recall", average["heatmap_recall"], epoch
     )
     # Add descriptor metric
-    if "matching_score" in average.keys():
+    if "matching_score" in average:
         writer.add_scalar(
             "Val_metrics/matching_score", average["matching_score"], epoch
         )

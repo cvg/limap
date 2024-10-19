@@ -4,7 +4,14 @@ import sys
 from _limap import _base
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from read_write_model import *
+from read_write_model import (
+    read_cameras_binary,
+    read_cameras_text,
+    read_images_binary,
+    read_images_text,
+    read_points3D_binary,
+    read_points3D_text,
+)
 
 
 def check_exists_colmap_model(model_path):
@@ -14,13 +21,11 @@ def check_exists_colmap_model(model_path):
         and os.path.exists(os.path.join(model_path, "points3D.bin"))
     ):
         return True
-    if (
+    return (
         os.path.exists(os.path.join(model_path, "cameras.txt"))
         and os.path.exists(os.path.join(model_path, "images.txt"))
         and os.path.exists(os.path.join(model_path, "points3D.txt"))
-    ):
-        return True
-    return False
+    )
 
 
 def ReadInfos(colmap_path, model_path="sparse", image_path="images"):
@@ -54,7 +59,6 @@ def ReadInfos(colmap_path, model_path="sparse", image_path="images"):
         )
 
     # read images
-    n_images = len(colmap_images)
     camimages = {}
     for img_id, colmap_image in colmap_images.items():
         imname = colmap_image.name

@@ -11,7 +11,7 @@ from ..base_detector import BaseDetector, BaseDetectorOptions
 
 class HAWPv3Detector(BaseDetector):
     def __init__(self, options=BaseDetectorOptions()):
-        super(HAWPv3Detector, self).__init__(options)
+        super().__init__(options)
         # Load the HAWPv3 model
         if self.weight_path is None:
             ckpt = os.path.join(

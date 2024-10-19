@@ -9,7 +9,7 @@ from ..base_detector import BaseDetector, BaseDetectorOptions
 
 class DeepLSDDetector(BaseDetector):
     def __init__(self, options=BaseDetectorOptions()):
-        super(DeepLSDDetector, self).__init__(options)
+        super().__init__(options)
 
         conf = {
             "detect_lines": True,

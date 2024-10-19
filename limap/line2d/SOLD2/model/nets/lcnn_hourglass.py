@@ -11,7 +11,7 @@ __all__ = ["HourglassNet", "hg"]
 
 class MultitaskHead(nn.Module):
     def __init__(self, input_channels, num_class):
-        super(MultitaskHead, self).__init__()
+        super().__init__()
 
         m = int(input_channels / 4)
         head_size = [[2], [1], [2]]
@@ -35,7 +35,7 @@ class Bottleneck2D(nn.Module):
     expansion = 2
 
     def __init__(self, inplanes, planes, stride=1, downsample=None):
-        super(Bottleneck2D, self).__init__()
+        super().__init__()
 
         self.bn1 = nn.BatchNorm2d(inplanes)
         self.conv1 = nn.Conv2d(inplanes, planes, kernel_size=1)
@@ -74,7 +74,7 @@ class Bottleneck2D(nn.Module):
 
 class Hourglass(nn.Module):
     def __init__(self, block, num_blocks, planes, depth):
-        super(Hourglass, self).__init__()
+        super().__init__()
         self.depth = depth
         self.block = block
         self.hg = self._make_hour_glass(block, num_blocks, planes, depth)
@@ -128,7 +128,7 @@ class HourglassNet(nn.Module):
         num_classes,
         input_channels,
     ):
-        super(HourglassNet, self).__init__()
+        super().__init__()
 
         self.inplanes = 64
         self.num_feats = 128

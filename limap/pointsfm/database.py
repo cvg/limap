@@ -147,7 +147,7 @@ class COLMAPDatabase(sqlite3.Connection):
         return sqlite3.connect(database_path, factory=COLMAPDatabase)
 
     def __init__(self, *args, **kwargs):
-        super(COLMAPDatabase, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.create_tables = lambda: self.executescript(CREATE_ALL)
         self.create_cameras_table = lambda: self.executescript(
@@ -398,14 +398,14 @@ def example_usage():
 
     # Read and check matches.
 
-    pair_ids = [
-        image_ids_to_pair_id(*pair)
-        for pair in (
-            (image_id1, image_id2),
-            (image_id2, image_id3),
-            (image_id3, image_id4),
-        )
-    ]
+    # pair_ids = [
+    #     image_ids_to_pair_id(*pair)
+    #     for pair in (
+    #         (image_id1, image_id2),
+    #         (image_id2, image_id3),
+    #         (image_id3, image_id4),
+    #     )
+    # ]
 
     matches = dict(
         (pair_id_to_image_ids(pair_id), blob_to_array(data, np.uint32, (-1, 2)))

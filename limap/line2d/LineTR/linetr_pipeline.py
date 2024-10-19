@@ -133,9 +133,7 @@ class LineTrPipeline(BaseModel):
 
             klines_cv = self.detect_lsd_lines(data["image0"])[0]
 
-            valid_lines0 = (
-                data["valid_lines0"] if "valid_lines0" in data.keys() else None
-            )
+            valid_lines0 = data.get("valid_lines0", None)
             klines0 = self.linetransformer.preprocess(
                 klines_cv, image_shape, pred0, valid_lines0
             )
@@ -153,9 +151,7 @@ class LineTrPipeline(BaseModel):
                 )
 
             klines_cv = self.detect_lsd_lines(data["image1"])[0]
-            valid_lines1 = (
-                data["valid_lines1"] if "valid_lines1" in data.keys() else None
-            )
+            valid_lines1 = data.get("valid_lines1", None)
             klines1 = self.linetransformer.preprocess(
                 klines_cv, image_shape, pred1, valid_lines1
             )

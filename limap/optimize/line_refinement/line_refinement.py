@@ -123,25 +123,6 @@ def line_refinement(
 
     # debug
     if cfg["visualize"]:
-
-        def report_track(track_id):
-            limapvis.visualize_line_track(
-                imname_list,
-                tracks[track_id],
-                max_image_dim=-1,
-                cameras=cameras,
-                prefix=f"track.{track_id}",
-            )
-
-        def report_newtrack(track_id):
-            limapvis.visualize_line_track(
-                imname_list,
-                opttracks[track_id],
-                max_image_dim=-1,
-                cameras=cameras,
-                prefix=f"newtrack.{track_id}",
-            )
-
         import pdb
 
         pdb.set_trace()

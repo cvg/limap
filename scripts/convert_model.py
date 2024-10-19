@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
     if args.type == "imagecols2colmap":
         imagecols = limapio.read_npy(args.input_path).item()
-        if type(imagecols) == dict:
+        if isinstance(imagecols, dict):
             imagecols = _base.ImageCollection(imagecols)
         _psfm.convert_imagecols_to_colmap(imagecols, args.output_path)
     elif args.type == "colmap2vsfm":

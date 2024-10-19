@@ -170,7 +170,7 @@ def line_localization(
 
     # Do matches for query images and retrieved neighbors for superglue endpoints matcher
     if cfg["localization"]["2d_matcher"] != "epipolar":
-        weight_path = None if "weight_path" not in cfg else cfg["weight_path"]
+        weight_path = cfg.get("weight_path", None)
         if cfg["localization"]["2d_matcher"] == "superglue_endpoints":
             extractor_name = "superpoint_endpoints"
             matcher_name = "superglue_endpoints"

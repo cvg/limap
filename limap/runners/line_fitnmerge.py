@@ -25,7 +25,6 @@ def fit_3d_segs(all_2d_segs, imagecols, depths, fitting_config):
     Returns:
         output (dict[int -> list[(:class:`np.array`, :class:`np.array`)]]): for each image, output a list of :class:`np.array` pair, representing two endpoints
     """
-    n_images = len(all_2d_segs)
     seg3d_list = []
 
     def process(all_2d_segs, imagecols, depths, fitting_config, img_id):
@@ -128,7 +127,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
         list[:class:`limap.base.LineTrack`]: list of output 3D line tracks
     """
     # assertion check
-    assert imagecols.IsUndistorted() == True
+    assert imagecols.IsUndistorted()
     print(f"[LOG] Number of images: {imagecols.NumImages()}")
     cfg = _runners.setup(cfg)
     detector_name = cfg["line2d"]["detector"]["method"]
@@ -299,7 +298,7 @@ def line_fitting_with_3Dpoints(
         list[:class:`limap.base.LineTrack`]: list of output 3D line tracks
     """
     # assertion check
-    assert imagecols.IsUndistorted() == True
+    assert imagecols.IsUndistorted()
     print(f"[LOG] Number of images: {imagecols.NumImages()}")
     cfg = _runners.setup(cfg)
     detector_name = cfg["line2d"]["detector"]["method"]

@@ -266,7 +266,7 @@ class BaseDetector:
             all_segs (dict[int -> :class:`np.array`]): The line detection for each image indexed by the image id. Each segment is with shape (N, 5). Each row corresponds to x1, y1, x2, y2 and score.
             descinfo_folder (str): Path to the extracted descriptors.
         """
-        assert self.do_merge_lines == False
+        assert self.do_merge_lines
         seg_folder = self.get_segments_folder(output_folder)
         descinfo_folder = self.get_descinfo_folder(output_folder)
         if not skip_exists:

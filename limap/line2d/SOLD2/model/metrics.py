@@ -74,7 +74,7 @@ class Metrics:
 
         # Initialize the results
         self.metric_results = {}
-        for key in self.metric_table.keys():
+        for key in self.metric_table:
             self.metric_results[key] = 0.0
 
     def evaluate(
@@ -237,13 +237,13 @@ class AverageMeter:
             )
 
         # Update all the losses
-        for loss in loss_dict.keys():
+        for loss in loss_dict:
             self.metric_results[loss] += num_samples * loss_dict[loss]
 
         # Update all pr counts
         for pr_met in self.supported_pr_metrics:
             # Update all tp, tn, fp, fn, precision, and recall.
-            for key in metrics.metric_results[pr_met].keys():
+            for key in metrics.metric_results[pr_met]:
                 # Update each interval
                 for idx in range(len(self.metric_results[pr_met][key])):
                     self.metric_results[pr_met][key][idx] += (
@@ -252,7 +252,7 @@ class AverageMeter:
 
     def average(self):
         results = {}
-        for met in self.metric_results.keys():
+        for met in self.metric_results:
             # Skip pr curve metrics
             if met not in self.supported_pr_metrics:
                 results[met] = self.metric_results[met] / self.count
