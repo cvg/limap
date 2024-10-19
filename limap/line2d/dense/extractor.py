@@ -31,10 +31,10 @@ class DenseNaiveExtractor(BaseDetector):
         scores = segs[:, -1] * np.sqrt(
             np.linalg.norm(segs[:, :2] - segs[:, 2:4], axis=1)
         )
-        descinfo = {"camview": camview,
-                    "image_shape": img.shape,
-                    "lines": lines,
-                    "scores": scores,
-                    }
+        descinfo = {
+            "camview": camview,
+            "image_shape": img.shape,
+            "lines": lines,
+            "scores": scores,
+        }
         return descinfo
-

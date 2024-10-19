@@ -46,9 +46,11 @@ def get_matcher(cfg_matcher, extractor, n_neighbors=20, weight_path=None):
         )
     elif method == "gluestick":
         from .GlueStick import GlueStickMatcher
+
         return GlueStickMatcher(extractor, options)
     elif method == "dense_roma":
         from .dense import RoMaLineMatcher
+
         return RoMaLineMatcher(extractor, options=options)
     else:
         raise NotImplementedError
