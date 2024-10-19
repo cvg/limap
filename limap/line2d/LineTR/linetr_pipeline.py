@@ -308,21 +308,21 @@ class LineTrPipeline(BaseModel):
         assert match_mat.shape[0] == 1
         bool_match_mat = match_mat[0] > 0
         pred["line_matches0"] = np.argmax(bool_match_mat, axis=1)
-        pred["line_matches0"][
-            ~np.any(bool_match_mat, axis=1)
-        ] = UNMATCHED_FEATURE
+        pred["line_matches0"][~np.any(bool_match_mat, axis=1)] = (
+            UNMATCHED_FEATURE
+        )
         pred["line_matches1"] = np.argmax(bool_match_mat, axis=0)
-        pred["line_matches1"][
-            ~np.any(bool_match_mat, axis=0)
-        ] = UNMATCHED_FEATURE
+        pred["line_matches1"][~np.any(bool_match_mat, axis=0)] = (
+            UNMATCHED_FEATURE
+        )
         pred["line_matches0"] = torch.from_numpy(pred["line_matches0"])[None]
         pred["line_matches1"] = torch.from_numpy(pred["line_matches1"])[None]
         lmatch_scores = torch.from_numpy(
             distance_matrix[(0,) + np.where(match_mat[0] > 0)]
         )
-        pred["line_match_scores0"] = pred[
-            "line_match_scores1"
-        ] = -lmatch_scores[None]
+        pred["line_match_scores0"] = pred["line_match_scores1"] = (
+            -lmatch_scores[None]
+        )
         return pred
 
     def loss(self, pred, data):

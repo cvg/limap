@@ -373,7 +373,7 @@ def train_single_epoch(
             results = metric_func.metric_results
             average = average_meter.average()
             # Get gpu memory usage in GB
-            gpu_mem_usage = torch.cuda.max_memory_allocated() / (1024 ** 3)
+            gpu_mem_usage = torch.cuda.max_memory_allocated() / (1024**3)
             if compute_descriptors:
                 print(
                     "Epoch [%d / %d] Iter [%d / %d] loss=%.4f (%.4f), junc_loss=%.4f (%.4f), heatmap_loss=%.4f (%.4f), descriptor_loss=%.4f (%.4f), gpu_mem=%.4fGB"
@@ -734,7 +734,7 @@ def record_train_summaries(writer, global_step, scalars, images):
 
     # GPU memory part
     # Get gpu memory usage in GB
-    gpu_mem_usage = torch.cuda.max_memory_allocated() / (1024 ** 3)
+    gpu_mem_usage = torch.cuda.max_memory_allocated() / (1024**3)
     writer.add_scalar("GPU/GPU_memory_usage", gpu_mem_usage, global_step)
 
     # Loss part

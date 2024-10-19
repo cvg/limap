@@ -178,9 +178,7 @@ class LineSegmentDetectionModule(object):
                     dim=-1,
                 )
             )
-            normalized_seg_length = segments_length / (
-                ((H ** 2) + (W ** 2)) ** 0.5
-            )
+            normalized_seg_length = segments_length / (((H**2) + (W**2)) ** 0.5)
 
             # Perform local max search
             num_cand = cand_h.shape[0]
@@ -552,7 +550,7 @@ class LineSegmentDetectionModule(object):
         """Detection by local maximum search."""
         # Compute the distance threshold
         dist_thresh = (
-            0.5 * (2 ** 0.5) + self.lambda_radius * normalized_seg_length
+            0.5 * (2**0.5) + self.lambda_radius * normalized_seg_length
         )
         # Make it N x 64
         dist_thresh = torch.repeat_interleave(

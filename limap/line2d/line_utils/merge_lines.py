@@ -104,8 +104,8 @@ def merge_line_cluster(lines):
     if b == 0:
         u = np.array([1, 0]) if a >= c else np.array([0, 1])
     else:
-        m = (c - a + np.sqrt((a - c) ** 2 + 4 * b ** 2)) / (2 * b)
-        u = np.array([1, m]) / np.sqrt(1 + m ** 2)
+        m = (c - a + np.sqrt((a - c) ** 2 + 4 * b**2)) / (2 * b)
+        u = np.array([1, m]) / np.sqrt(1 + m**2)
 
     # Get the center of gravity of all endpoints
     cross = np.mean(points, axis=0)

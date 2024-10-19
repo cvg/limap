@@ -154,7 +154,7 @@ def space_to_depth(input_tensor, grid_size):
     # (N, bs, bs, C, H//bs, W//bs)
     x = x.permute(0, 3, 5, 1, 2, 4).contiguous()
     # (N, C*bs^2, H//bs, W//bs)
-    x = x.view(N, C * (grid_size ** 2), H // grid_size, W // grid_size)
+    x = x.view(N, C * (grid_size**2), H // grid_size, W // grid_size)
     return x
 
 

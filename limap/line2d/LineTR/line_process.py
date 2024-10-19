@@ -54,7 +54,7 @@ def point_on_line(line, dist_px):
     vec = ep - sp
     if vec[0] != 0:
         m = vec[1] / vec[0]
-        x = np.sqrt(dist_px ** 2 / (1 + m ** 2))
+        x = np.sqrt(dist_px**2 / (1 + m**2))
         y = m * x
     else:
         x = 0
@@ -275,7 +275,7 @@ def change_cv2_T_np(klines_cv):
             kline_ep = [sp_x, sp_y]
 
         # linelength = math.sqrt((kline_ep[0]-kline_sp[0])**2 +(kline_ep[1]-kline_sp[1])**2)
-        linelength = line.lineLength * (2 ** line.octave)
+        linelength = line.lineLength * (2**line.octave)
 
         klines_sp.append(kline_sp)
         klines_ep.append(kline_ep)
