@@ -207,7 +207,7 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
     import limap.line2d
 
     if not imagecols.IsUndistorted():
-        warnings.warn("The input images are distorted!")
+        warnings.warn("The input images are distorted!", stacklevel=2)
     basedir = os.path.join(
         "line_detections", cfg["line2d"]["detector"]["method"]
     )
