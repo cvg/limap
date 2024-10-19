@@ -1,3 +1,4 @@
+import collections.abc as collections
 import pprint
 from pathlib import Path
 from typing import Dict, List, Optional, Union
@@ -5,15 +6,13 @@ from typing import Dict, List, Optional, Union
 import h5py
 import numpy as np
 import torch
-from tqdm import tqdm
-
-string_classes = str
-import collections.abc as collections
-
 from hloc import extract_features
 from hloc.utils.io import list_h5_names
+from tqdm import tqdm
 
 from .superpoint import SuperPoint
+
+string_classes = str
 
 
 # Copy from legacy hloc code

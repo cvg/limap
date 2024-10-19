@@ -69,7 +69,7 @@ def ReadModelVisualSfM(vsfm_path, nvm_file="reconstruction.nvm"):
     counter += 1
     n_points = int(txt_lines[counter].strip())
     counter += 1
-    for point_id in tqdm(range(n_points)):
+    for _ in tqdm(range(n_points)):
         line = txt_lines[counter].strip().split()
         counter += 1
         point = np.array([float(line[k]) for k in range(3)])
@@ -77,7 +77,7 @@ def ReadModelVisualSfM(vsfm_path, nvm_file="reconstruction.nvm"):
         n_views = int(line[6])
         track = []
         subcounter = 7
-        for view_in in range(n_views):
+        for _ in range(n_views):
             track.append(int(line[subcounter]))
             subcounter += 4
         model.addPoint(point[0], point[1], point[2], track)

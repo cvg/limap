@@ -70,13 +70,13 @@ class AdapLayers(nn.Module):
             hypercolumn_layers: The list of the hypercolumn layer names.
             output_dim: The output channel dimension.
         """
-        super(AdapLayers, self).__init__()
+        super().__init__()
         self.layers = []
         channel_sizes = [vgg16_layers[name] for name in hypercolumn_layers]
         print(channel_sizes)
-        for i, l in enumerate(channel_sizes):
+        for i, ll in enumerate(channel_sizes):
             layer = nn.Sequential(
-                nn.Conv2d(l, 64, kernel_size=1, stride=1, padding=0),
+                nn.Conv2d(ll, 64, kernel_size=1, stride=1, padding=0),
                 nn.ReLU(),
                 nn.Conv2d(64, output_dim, kernel_size=5, stride=1, padding=2),
                 nn.BatchNorm2d(output_dim),
@@ -134,7 +134,6 @@ class S2DNet(BaseModel):
                 self.download_s2dnet_model(path)
             logging.info(f"Loading S2DNet checkpoint at {path}.")
             state_dict = torch.load(path, map_location="cpu")["state_dict"]
-            params = self.state_dict()
             state_dict = {k: v for k, v in state_dict.items()}
             self.load_state_dict(state_dict, strict=False)
 

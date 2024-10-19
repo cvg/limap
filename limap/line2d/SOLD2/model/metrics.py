@@ -577,7 +577,7 @@ def nms_fast(in_corners, H, W, dist_thresh):
         out = np.vstack((rcorners, in_corners[2])).reshape(3, 1)
         return out, np.zeros(1).astype(int)
     # Initialize the grid.
-    for i, rc in enumerate(rcorners.T):
+    for i, _ in enumerate(rcorners.T):
         grid[rcorners[1, i], rcorners[0, i]] = 1
         inds[rcorners[1, i], rcorners[0, i]] = i
     # Pad the border of the grid, so that we can NMS points near the border.
@@ -585,7 +585,7 @@ def nms_fast(in_corners, H, W, dist_thresh):
     grid = np.pad(grid, ((pad, pad), (pad, pad)), mode="constant")
     # Iterate through points, highest to lowest conf, suppress neighborhood.
     count = 0
-    for i, rc in enumerate(rcorners.T):
+    for rc in rcorners.T:
         # Account for top and left padding.
         pt = (rc[0] + pad, rc[1] + pad)
         if grid[pt[1], pt[0]] == 1:  # If not yet suppressed.

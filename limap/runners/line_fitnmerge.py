@@ -31,7 +31,7 @@ def fit_3d_segs(all_2d_segs, imagecols, depths, fitting_config):
         segs, camview = all_2d_segs[img_id], imagecols.camview(img_id)
         depth = depths[img_id].read_depth(img_hw=[camview.h(), camview.w()])
         seg3d_list_idx = []
-        for seg_id, s in enumerate(segs):
+        for s in segs:
             seg3d = _fit.estimate_seg3d_from_depth(
                 s,
                 depth,
@@ -81,7 +81,7 @@ def fit_3d_segs_with_points3d(
         segs, camview = all_2d_segs[img_id], imagecols.camview(img_id)
         p3ds = p3d_reader[img_id].read_p3ds()
         seg3d_list_idx = []
-        for seg_id, s in enumerate(segs):
+        for s in segs:
             seg3d = _fit.estimate_seg3d_from_points3d(
                 s,
                 p3ds,
@@ -150,7 +150,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
         _, neighbors, ranges = _runners.compute_sfminfos(cfg, imagecols)
     else:
         neighbors = imagecols.update_neighbors(neighbors)
-        for img_id, neighbor in neighbors.items():
+        for img_id, _ in neighbors.items():
             neighbors[img_id] = neighbors[img_id][: cfg["n_neighbors"]]
 
     ##########################################################

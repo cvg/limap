@@ -2,7 +2,8 @@ import torch
 import torch.nn as nn
 import torchvision.models as models
 
-from limap.features.models.s2dnet import *
+from .base_model import BaseModel
+from .s2dnet import vgg16_layers
 
 
 class VGGNet(BaseModel):

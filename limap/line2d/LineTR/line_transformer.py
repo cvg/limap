@@ -210,10 +210,10 @@ class MultiHeadedAttention(nn.Module):
     def forward(self, query, key, value):
         batch_dim = query.size(0)
         query, key, value = (
-            l(x).view(
+            layer(x).view(
                 batch_dim, self.dim, self.num_heads, -1
             )  # [3, 64, 4, 512]
-            for l, x in zip(self.proj, (query, key, value))
+            for layer, x in zip(self.proj, (query, key, value))
         )
         x, prob = attention(query, key, value)
         return (
@@ -257,7 +257,8 @@ class SelfAttentionalLayer(nn.Module):
     def forward(self, kline_desc):
         d_desc_kline = kline_desc.size(2)
 
-        for layer, name in zip(self.layers, self.names):
+        for layer in self.layers:
+            # for layer, name in zip(self.layers, self.names):
             delta, _ = layer(kline_desc, kline_desc)
             kline_desc = kline_desc + delta
 
