@@ -63,7 +63,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
             os.path.join(cfg["dir_save"], "metainfos.txt"), neighbors, ranges
         )
         neighbors = imagecols.update_neighbors(neighbors)
-        for img_id, neighbor in neighbors.items():
+        for img_id, _ in neighbors.items():
             neighbors[img_id] = neighbors[img_id][: cfg["n_neighbors"]]
     limapio.save_txt_metainfos(
         os.path.join(cfg["dir_save"], "metainfos.txt"), neighbors, ranges

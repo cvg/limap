@@ -113,7 +113,7 @@ def undistort_images(
             cam_dict[cam_id] = cam_undistorted
             imagecols_undistorted.change_camera(cam_id, cam_undistorted)
         imagecols_undistorted.change_image_name(img_id, imname_out)
-    for idx, img_id in enumerate(loaded_ids):
+    for img_id in loaded_ids:
         imname_out = os.path.join(output_dir, f"image{img_id:08d}.png")
         cam_id = loaded_imagecols.camimage(img_id).cam_id
         cam_undistorted = loaded_imagecols.cam(cam_id)
@@ -172,7 +172,7 @@ def compute_sfminfos(cfg, imagecols, fname="metainfos.txt"):
         limapio.check_path(cfg["dir_load"])
         fname_load = os.path.join(cfg["dir_load"], fname)
         neighbors, ranges = limapio.read_txt_metainfos(fname_load)
-        for img_id, neighbor in neighbors.items():
+        for img_id, _ in neighbors.items():
             neighbors[img_id] = neighbors[img_id][: cfg["n_neighbors"]]
     return colmap_output_path, neighbors, ranges
 

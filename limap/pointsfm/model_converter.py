@@ -57,7 +57,7 @@ def convert_colmap_to_visualsfm(colmap_model_path, output_nvm_file):
 
         # write points
         f.write(f"{len(colmap_points)}\n")
-        for pid, point in colmap_points.items():
+        for _, point in colmap_points.items():
             xyz = point.xyz
             f.write(f"{xyz[0]} {xyz[1]} {xyz[2]}")
             f.write(" 128 128 128")  # dummy color

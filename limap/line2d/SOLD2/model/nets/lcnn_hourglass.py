@@ -81,7 +81,7 @@ class Hourglass(nn.Module):
 
     def _make_residual(self, block, num_blocks, planes):
         layers = []
-        for i in range(0, num_blocks):
+        for _ in range(0, num_blocks):
             layers.append(block(planes * block.expansion, planes))
         return nn.Sequential(*layers)
 
@@ -89,7 +89,7 @@ class Hourglass(nn.Module):
         hg = []
         for i in range(depth):
             res = []
-            for j in range(3):
+            for _ in range(3):
                 res.append(self._make_residual(block, num_blocks, planes))
             if i == 0:
                 res.append(self._make_residual(block, num_blocks, planes))
@@ -183,7 +183,7 @@ class HourglassNet(nn.Module):
         layers = []
         layers.append(block(self.inplanes, planes, stride, downsample))
         self.inplanes = planes * block.expansion
-        for i in range(1, blocks):
+        for _ in range(1, blocks):
             layers.append(block(self.inplanes, planes))
 
         return nn.Sequential(*layers)

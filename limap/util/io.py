@@ -121,7 +121,7 @@ def read_txt_metainfos(fname):
     ranges[0][2], ranges[1][2] = float(k[0]), float(k[1])
     counter += 1
     neighbors = {}
-    for idx in range(n_images):
+    for _ in range(n_images):
         k = txt_lines[counter].strip().split(",")
         img_id = int(k[0][6:])
         neighbor = [int(kk) for kk in k[1:]]
@@ -146,7 +146,7 @@ def read_txt_imname_list(fname):
     n_images = int(txt_lines[counter].strip().split(",")[1])
     counter += 1
     imname_list = []
-    for img_id in range(n_images):
+    for _ in range(n_images):
         imname = txt_lines[counter].strip()
         imname_list.append(imname)
         counter += 1
@@ -355,7 +355,7 @@ def read_txt_Line3Dpp(fname):
         line_counters += n_lines
         # get line 3d
         line3d_list = []
-        for idx in range(n_lines):
+        for _ in range(n_lines):
             infos = [float(k) for k in txt_line[counter : (counter + 6)]]
             line3d = _base.Line3d(infos[:3], infos[3:])
             counter += 6
@@ -365,7 +365,7 @@ def read_txt_Line3Dpp(fname):
         counter += 1
         # collect supports
         img_id_list, line_id_list, line2d_list = [], [], []
-        for supp_id in range(n_supports):
+        for _ in range(n_supports):
             img_id = int(txt_line[counter])
             counter += 1
             line_id = int(txt_line[counter])
@@ -378,7 +378,7 @@ def read_txt_Line3Dpp(fname):
             line2d_list.append(line2d)
         track = _base.LineTrack(line3d, img_id_list, line_id_list, line2d_list)
         linetracks.append(track)
-        for idx in range(n_lines):
+        for _ in range(n_lines):
             line_counts.append(track.count_images())
             line_track_id_list.append(len(linetracks) - 1)
 

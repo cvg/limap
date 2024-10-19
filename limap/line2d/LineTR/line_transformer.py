@@ -257,7 +257,8 @@ class SelfAttentionalLayer(nn.Module):
     def forward(self, kline_desc):
         d_desc_kline = kline_desc.size(2)
 
-        for layer, name in zip(self.layers, self.names):
+        for layer in self.layers:
+            # for layer, name in zip(self.layers, self.names):
             delta, _ = layer(kline_desc, kline_desc)
             kline_desc = kline_desc + delta
 

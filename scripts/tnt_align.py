@@ -25,10 +25,10 @@ def read_positions(log_file):
     n_images = int(len(lines) / 5)
     positions = []
     counter = 0
-    for img_id in range(n_images):
+    for _ in range(n_images):
         counter += 1
         mat = []
-        for idx in range(4):
+        for _ in range(4):
             l = lines[counter].strip("\n").split(" ")
             mat.append([float(k) for k in l])
             counter += 1
