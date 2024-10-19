@@ -35,7 +35,6 @@ def nn_matcher_distmat(dist_mat, nn_thresh, is_mutual_NN=True):
 def nn_matcher(desc0, desc1, nn_thresh=0.8, is_mutual_NN=True):
     """Nearest Neighbor Matching using two descriptors"""
     d, num0 = desc0.shape
-    num1 = desc1.shape[1]
     desc0_, desc1_ = desc0.T, desc1.T
 
     dmat = desc0_ @ desc1_.T

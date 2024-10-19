@@ -1,4 +1,4 @@
-from _limap import _base, _ceresbase, _optimize
+from _limap import _optimize
 
 
 def solve_global_pl_association(cfg, imagecols, bpt3d, all_bpt2ds):

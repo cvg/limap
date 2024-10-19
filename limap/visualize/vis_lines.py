@@ -1,5 +1,6 @@
 import numpy as np
-from .vis_utils import test_point_inside_ranges, test_line_inside_ranges
+
+from .vis_utils import test_line_inside_ranges, test_point_inside_ranges
 
 
 def pyvista_vis_3d_lines(
@@ -16,9 +17,8 @@ def pyvista_vis_3d_lines(
 
     plotter = pv.Plotter(window_size=[img_hw[1], img_hw[0]])
     for line in lines:
-        if ranges is not None:
-            if not test_line_inside_ranges(line, ranges):
-                continue
+        if (ranges is not None) and (not test_line_inside_ranges(line, ranges)):
+            continue
         plotter.add_lines(line.as_array() * scale, "#ff0000", width=width)
     plotter.show()
 
@@ -38,9 +38,10 @@ def open3d_add_points(
 
     o3d_points, o3d_colors = [], []
     for idx in range(np.array(points).shape[0]):
-        if ranges is not None:
-            if not test_point_inside_ranges(points[idx], ranges):
-                continue
+        if (ranges is not None) and (
+            not test_point_inside_ranges(points[idx], ranges)
+        ):
+            continue
         o3d_points.append(points[idx] * scale)
         o3d_colors.append(color)
     pcd = o3d.geometry.PointCloud()
@@ -61,9 +62,8 @@ def open3d_get_line_set(
     o3d_points, o3d_lines, o3d_colors = [], [], []
     counter = 0
     for line in lines:
-        if ranges is not None:
-            if not test_line_inside_ranges(line, ranges):
-                continue
+        if (ranges is not None) and (not test_line_inside_ranges(line, ranges)):
+            continue
         o3d_points.append(line.start * scale)
         o3d_points.append(line.end * scale)
         o3d_lines.append([2 * counter, 2 * counter + 1])
@@ -90,9 +90,8 @@ def open3d_add_line_set(
     o3d_points, o3d_lines, o3d_colors = [], [], []
     counter = 0
     for line in lines:
-        if ranges is not None:
-            if not test_line_inside_ranges(line, ranges):
-                continue
+        if (ranges is not None) and (not test_line_inside_ranges(line, ranges)):
+            continue
         o3d_points.append(line.start * scale)
         o3d_points.append(line.end * scale)
         o3d_lines.append([2 * counter, 2 * counter + 1])
@@ -116,8 +115,9 @@ def open3d_get_cameras(
     scale_cam_geometry=1.0,
     scale=1.0,
 ):
-    import open3d as o3d
     import copy
+
+    import open3d as o3d
 
     cameras = o3d.geometry.LineSet()
 
@@ -133,9 +133,10 @@ def open3d_get_cameras(
         )
     for img_id in imagecols.get_img_ids():
         camimage = imagecols.camimage(img_id)
-        if ranges is not None:
-            if not test_point_inside_ranges(camimage.pose.center(), ranges):
-                continue
+        if (ranges is not None) and (
+            not test_point_inside_ranges(camimage.pose.center(), ranges)
+        ):
+            continue
         T = np.eye(4)
         T[:3, :3] = camimage.R()
         T[:3, 3] = camimage.T() * scale
@@ -154,8 +155,9 @@ def open3d_add_cameras(
     scale_cam_geometry=1.0,
     scale=1.0,
 ):
-    import open3d as o3d
     import copy
+
+    import open3d as o3d
 
     camera_lines = {}
     for cam_id in imagecols.get_cam_ids():
@@ -169,9 +171,10 @@ def open3d_add_cameras(
         )
     for img_id in imagecols.get_img_ids():
         camimage = imagecols.camimage(img_id)
-        if ranges is not None:
-            if not test_point_inside_ranges(camimage.pose.center(), ranges):
-                continue
+        if (ranges is not None) and (
+            not test_point_inside_ranges(camimage.pose.center(), ranges)
+        ):
+            continue
         T = np.eye(4)
         T[:3, :3] = camimage.R()
         T[:3, 3] = camimage.T() * scale

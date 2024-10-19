@@ -1,4 +1,4 @@
-from _limap import _base, _pointsfm
+from _limap import _pointsfm
 
 
 def filter_by_cam_id(cam_id, prev_imagecols, prev_neighbors):
@@ -39,9 +39,7 @@ def ComputeNeighbors(
 
 def compute_metainfos(cfg, model, n_neighbors=20):
     # get neighbors
-    print(
-        "Computing visual neighbors... (n_neighbors = {0})".format(n_neighbors)
-    )
+    print(f"Computing visual neighbors... (n_neighbors = {n_neighbors})")
     neighbors = ComputeNeighbors(
         model,
         n_neighbors,

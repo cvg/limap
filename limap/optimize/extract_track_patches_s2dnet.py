@@ -1,10 +1,9 @@
 import os
-import numpy as np
-from tqdm import tqdm
 import time
 
-import limap.line2d
-import limap.base as _base
+import numpy as np
+from tqdm import tqdm
+
 import limap.features as _features
 import limap.util.io as limapio
 
@@ -45,9 +44,7 @@ def extract_track_patches_s2dnet(
             camview = imagecols.camview(img_id)
             line2d_range = extractor.GetLine2DRange(track, img_id, camview)
             line2d_collections[img_id].append([line2d_range, track_id])
-        limapio.check_makedirs(
-            os.path.join(output_dir, "track{0}".format(track_id))
-        )
+        limapio.check_makedirs(os.path.join(output_dir, f"track{track_id}"))
 
     # extract line patches for each image
     for img_id in tqdm(imagecols.get_img_ids()):
@@ -64,8 +61,8 @@ def extract_track_patches_s2dnet(
         for patch, track_id in zip(patches, track_ids):
             fname = os.path.join(
                 output_dir,
-                "track{0}".format(track_id),
-                "track{0}_img{1}.npy".format(track_id, img_id),
+                f"track{track_id}",
+                f"track{track_id}_img{img_id}.npy",
             )
             if skip_exists and os.path.exists(fname):
                 continue

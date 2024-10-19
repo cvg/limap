@@ -1,4 +1,6 @@
-import os, sys
+import os
+import sys
+
 import numpy as np
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -7,13 +9,7 @@ from Rome16K import Rome16K
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
-import limap.base as _base
-import limap.pointsfm as _psfm
-import limap.util.io as limapio
 import limap.util.config as cfgutils
-import limap.runners
-
-from runners.bundler_triangulation import read_scene_bundler
 
 
 def report_rome16k_statistics(cfg, bundler_path, list_path, model_path):

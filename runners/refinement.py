@@ -1,14 +1,14 @@
-import os, sys
+import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 
-import limap.util.io as limapio
-import limap.util.config as cfgutils
-
 import limap.base as _base
-import limap.vplib as _vplib
 import limap.optimize as _optim
+import limap.util.config as cfgutils
+import limap.util.io as limapio
+import limap.vplib as _vplib
 
 
 def one_by_one_refinement(cfg):

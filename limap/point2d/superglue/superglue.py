@@ -91,7 +91,7 @@ def attention(
     query: torch.Tensor, key: torch.Tensor, value: torch.Tensor
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     dim = query.shape[1]
-    scores = torch.einsum("bdhn,bdhm->bhnm", query, key) / dim ** 0.5
+    scores = torch.einsum("bdhn,bdhm->bhnm", query, key) / dim**0.5
     prob = torch.nn.functional.softmax(scores, dim=-1)
     return torch.einsum("bhnm,bdhm->bdhn", prob, value), prob
 
@@ -111,10 +111,10 @@ class MultiHeadedAttention(nn.Module):
         self, query: torch.Tensor, key: torch.Tensor, value: torch.Tensor
     ) -> torch.Tensor:
         batch_dim = query.size(0)
-        query, key, value = [
+        query, key, value = (
             l(x).view(batch_dim, self.dim, self.num_heads, -1)
             for l, x in zip(self.proj, (query, key, value))
-        ]
+        )
         x, _ = attention(query, key, value)
         return self.merge(
             x.contiguous().view(batch_dim, self.dim * self.num_heads, -1)
@@ -236,10 +236,8 @@ class SuperGlue(nn.Module):
         if not os.path.exists(os.path.dirname(path)):
             os.makedirs(os.path.dirname(path))
         model_name = os.path.basename(path)
-        print("Downloading SuperGlue model {0}...".format(model_name))
-        link = "https://github.com/magicleap/SuperGluePretrainedNetwork/blob/master/models/weights/{0}?raw=true".format(
-            model_name
-        )
+        print(f"Downloading SuperGlue model {model_name}...")
+        link = f"https://github.com/magicleap/SuperGluePretrainedNetwork/blob/master/models/weights/{model_name}?raw=true"
         cmd = ["wget", link, "-O", path]
         subprocess.run(cmd, check=True)
 
@@ -336,9 +334,10 @@ class SuperGlue(nn.Module):
         return Z
 
     def _get_matches(self, scores_mat):
-        max0, max1 = scores_mat[:, :-1, :-1].max(2), scores_mat[
-            :, :-1, :-1
-        ].max(1)
+        max0, max1 = (
+            scores_mat[:, :-1, :-1].max(2),
+            scores_mat[:, :-1, :-1].max(1),
+        )
         m0, m1 = max0.indices, max1.indices
         mutual0 = arange_like(m0, 1)[None] == m1.gather(1, m0)
         mutual1 = arange_like(m1, 1)[None] == m0.gather(1, m1)

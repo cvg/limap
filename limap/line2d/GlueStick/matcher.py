@@ -1,13 +1,15 @@
 import os
+
 import numpy as np
 import torch
 from gluestick.models.gluestick import GlueStick
+
 from ..base_matcher import BaseMatcher, BaseMatcherOptions
 
 
 class GlueStickMatcher(BaseMatcher):
     def __init__(self, extractor, options=BaseMatcherOptions(), device=None):
-        super(GlueStickMatcher, self).__init__(extractor, options)
+        super().__init__(extractor, options)
         self.device = "cuda" if device is None else device
         self.gs = GlueStick({}).eval().to(self.device)
         if self.weight_path is None:

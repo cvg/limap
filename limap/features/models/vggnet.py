@@ -1,3 +1,7 @@
+import torch
+import torch.nn as nn
+import torchvision.models as models
+
 from limap.features.models.s2dnet import *
 
 
@@ -31,7 +35,7 @@ class VGGNet(BaseModel):
             if isinstance(layer, torch.nn.MaxPool2d):
                 current_scale += 1
             if i in self.hypercolumn_indices:
-                self.scales.append(2 ** current_scale)
+                self.scales.append(2**current_scale)
 
     def _forward(self, data):
         image = data  # data['image']

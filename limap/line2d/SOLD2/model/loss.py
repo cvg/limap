@@ -6,10 +6,11 @@ import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
 from ..misc.geometry_utils import (
-    keypoints_to_grid,
-    get_dist_mask,
     get_common_line_mask,
+    get_dist_mask,
+    keypoints_to_grid,
 )
 
 
@@ -17,7 +18,7 @@ def get_loss_and_weights(model_cfg, device=torch.device("cuda")):
     """Get loss functions and either static or dynamic weighting."""
     # Get the global weighting policy
     w_policy = model_cfg.get("weighting_policy", "static")
-    if not w_policy in ["static", "dynamic"]:
+    if w_policy not in ["static", "dynamic"]:
         raise ValueError("[Error] Not supported weighting policy.")
 
     loss_func = {}
@@ -154,7 +155,7 @@ def space_to_depth(input_tensor, grid_size):
     # (N, bs, bs, C, H//bs, W//bs)
     x = x.permute(0, 3, 5, 1, 2, 4).contiguous()
     # (N, C*bs^2, H//bs, W//bs)
-    x = x.view(N, C * (grid_size ** 2), H // grid_size, W // grid_size)
+    x = x.view(N, C * (grid_size**2), H // grid_size, W // grid_size)
     return x
 
 
@@ -253,7 +254,7 @@ class JunctionDetectionLoss(nn.Module):
     """Junction detection loss."""
 
     def __init__(self, grid_size, keep_border):
-        super(JunctionDetectionLoss, self).__init__()
+        super().__init__()
         self.grid_size = grid_size
         self.keep_border = keep_border
 
@@ -267,7 +268,7 @@ class HeatmapLoss(nn.Module):
     """Heatmap prediction loss."""
 
     def __init__(self, class_weight):
-        super(HeatmapLoss, self).__init__()
+        super().__init__()
         self.class_weight = class_weight
 
     def forward(self, prediction, target, valid_mask=None):
@@ -278,7 +279,7 @@ class RegularizationLoss(nn.Module):
     """Module for regularization loss."""
 
     def __init__(self):
-        super(RegularizationLoss, self).__init__()
+        super().__init__()
         self.name = "regularization_loss"
         self.loss_init = torch.zeros([])
 
@@ -366,7 +367,7 @@ class TripletDescriptorLoss(nn.Module):
     """Triplet descriptor loss."""
 
     def __init__(self, grid_size, dist_threshold, margin):
-        super(TripletDescriptorLoss, self).__init__()
+        super().__init__()
         self.grid_size = grid_size
         self.init_dist_threshold = 64
         self.dist_threshold = dist_threshold
@@ -404,9 +405,9 @@ class TotalLoss(nn.Module):
     and regularization losses."""
 
     def __init__(self, loss_funcs, loss_weights, weighting_policy):
-        super(TotalLoss, self).__init__()
+        super().__init__()
         # Whether we need to compute the descriptor loss
-        self.compute_descriptors = "descriptor_loss" in loss_funcs.keys()
+        self.compute_descriptors = "descriptor_loss" in loss_funcs
 
         self.loss_funcs = loss_funcs
         self.loss_weights = loss_weights

@@ -3,7 +3,7 @@ from .base import BaseTrackVisualizer
 
 class PyVistaTrackVisualizer(BaseTrackVisualizer):
     def __init__(self, tracks):
-        super(PyVistaTrackVisualizer, self).__init__(tracks)
+        super().__init__(tracks)
         self.reset()
 
     def reset(self, img_hw=(600, 800)):
@@ -21,6 +21,7 @@ class PyVistaTrackVisualizer(BaseTrackVisualizer):
 
     def vis_all_lines(self, n_visible_views=4, width=2, scale=1.0):
         lines = self.get_lines_n_visible_views(n_visible_views)
+        color = "#ff0000"
         for line in lines:
             self.plotter.add_lines(line.as_array() * scale, color, width=width)
         self.plotter.show()

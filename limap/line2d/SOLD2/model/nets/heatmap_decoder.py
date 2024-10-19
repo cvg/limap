@@ -5,7 +5,7 @@ class PixelShuffleDecoder(nn.Module):
     """Pixel shuffle decoder."""
 
     def __init__(self, input_feat_dim=128, num_upsample=2, output_channel=2):
-        super(PixelShuffleDecoder, self).__init__()
+        super().__init__()
         # Get channel parameters
         self.channel_conf = self.get_channel_conf(num_upsample)
 

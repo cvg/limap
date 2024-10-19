@@ -1,2 +1,2 @@
-from .solve import *
 from .functions import *
+from .solve import *

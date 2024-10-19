@@ -106,16 +106,18 @@ def reprojection_filter_matches_2to3(
     matches = []
     for ref_line_id in all_pairs_2to3:
         ref_line = ref_lines[ref_line_id]
-        mp_ref, dir_ref = ref_line.midpoint(), ref_line.direction()
+        # mp_ref = ref_line.midpoint()
+        dir_ref = ref_line.direction()
         track_ids = np.unique(all_pairs_2to3[ref_line_id])
 
         min_loss = np.inf
         best_id = None
         for id in track_ids:
             l3d = linetracks[id].line
-            l2d_start, l2d_end = ref_camview.projection(
-                l3d.start
-            ), ref_camview.projection(l3d.end)
+            l2d_start, l2d_end = (
+                ref_camview.projection(l3d.start),
+                ref_camview.projection(l3d.end),
+            )
             l2d = _base.Line2d(l2d_start, l2d_end)
 
             dist = dist_func(ref_line, l2d)

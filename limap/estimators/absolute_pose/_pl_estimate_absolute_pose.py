@@ -1,8 +1,9 @@
-from _limap import _ceresbase
-import limap.optimize as _optimize
-import limap.estimators as _estimators
-import limap.base as _base
 import numpy as np
+from _limap import _ceresbase
+
+import limap.base as _base
+import limap.estimators as _estimators
+import limap.optimize as _optimize
 
 
 def _pl_estimate_absolute_pose(
@@ -110,15 +111,12 @@ def _pl_estimate_absolute_pose(
         ransac_options.data_type_weights_ = np.array(
             [ransac_cfg["weight_point"], ransac_cfg["weight_line"]]
         )
-        ransac_options.data_type_weights_ *= (
-            np.array(
-                [
-                    ransac_options.squared_inlier_thresholds_[1],
-                    ransac_options.squared_inlier_thresholds_[0],
-                ]
-            )
-            / np.sum(ransac_options.squared_inlier_thresholds_)
-        )
+        ransac_options.data_type_weights_ *= np.array(
+            [
+                ransac_options.squared_inlier_thresholds_[1],
+                ransac_options.squared_inlier_thresholds_[0],
+            ]
+        ) / np.sum(ransac_options.squared_inlier_thresholds_)
         ransac_options.min_num_iterations_ = ransac_cfg["min_num_iterations"]
         ransac_options.final_least_squares_ = ransac_cfg["final_least_squares"]
 

@@ -3,11 +3,12 @@ Implementation of the line segment detection module.
 """
 
 import math
+
 import numpy as np
 import torch
 
 
-class LineSegmentDetectionModule(object):
+class LineSegmentDetectionModule:
     """Module extracting line segments from junctions and line heatmaps."""
 
     def __init__(
@@ -178,9 +179,7 @@ class LineSegmentDetectionModule(object):
                     dim=-1,
                 )
             )
-            normalized_seg_length = segments_length / (
-                ((H ** 2) + (W ** 2)) ** 0.5
-            )
+            normalized_seg_length = segments_length / (((H**2) + (W**2)) ** 0.5)
 
             # Perform local max search
             num_cand = cand_h.shape[0]
@@ -189,7 +188,7 @@ class LineSegmentDetectionModule(object):
                 num_iter = math.ceil(num_cand / group_size)
                 sampled_feat_lst = []
                 for iter_idx in range(num_iter):
-                    if not iter_idx == num_iter - 1:
+                    if iter_idx != num_iter - 1:
                         cand_h_ = cand_h[
                             iter_idx * group_size : (iter_idx + 1) * group_size,
                             :,
@@ -552,7 +551,7 @@ class LineSegmentDetectionModule(object):
         """Detection by local maximum search."""
         # Compute the distance threshold
         dist_thresh = (
-            0.5 * (2 ** 0.5) + self.lambda_radius * normalized_seg_length
+            0.5 * (2**0.5) + self.lambda_radius * normalized_seg_length
         )
         # Make it N x 64
         dist_thresh = torch.repeat_interleave(

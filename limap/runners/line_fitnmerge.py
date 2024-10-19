@@ -1,7 +1,8 @@
 import os
+
+import joblib
 import numpy as np
 from tqdm import tqdm
-import joblib
 
 import limap.base as _base
 import limap.fitting as _fit
@@ -24,7 +25,6 @@ def fit_3d_segs(all_2d_segs, imagecols, depths, fitting_config):
     Returns:
         output (dict[int -> list[(:class:`np.array`, :class:`np.array`)]]): for each image, output a list of :class:`np.array` pair, representing two endpoints
     """
-    n_images = len(all_2d_segs)
     seg3d_list = []
 
     def process(all_2d_segs, imagecols, depths, fitting_config, img_id):
@@ -127,8 +127,8 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
         list[:class:`limap.base.LineTrack`]: list of output 3D line tracks
     """
     # assertion check
-    assert imagecols.IsUndistorted() == True
-    print("[LOG] Number of images: {0}".format(imagecols.NumImages()))
+    assert imagecols.IsUndistorted()
+    print(f"[LOG] Number of images: {imagecols.NumImages()}")
     cfg = _runners.setup(cfg)
     detector_name = cfg["line2d"]["detector"]["method"]
     if cfg["fitting"]["var2d"] == -1:
@@ -298,8 +298,8 @@ def line_fitting_with_3Dpoints(
         list[:class:`limap.base.LineTrack`]: list of output 3D line tracks
     """
     # assertion check
-    assert imagecols.IsUndistorted() == True
-    print("[LOG] Number of images: {0}".format(imagecols.NumImages()))
+    assert imagecols.IsUndistorted()
+    print(f"[LOG] Number of images: {imagecols.NumImages()}")
     cfg = _runners.setup(cfg)
     detector_name = cfg["line2d"]["detector"]["method"]
     if cfg["fitting"]["var2d"] == -1:

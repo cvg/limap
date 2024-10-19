@@ -2,11 +2,10 @@
 Main file to launch training and testing experiments.
 """
 
-import yaml
 import os
-import argparse
-import numpy as np
+
 import torch
+import yaml
 
 # Pytorch configurations
 torch.cuda.empty_cache()
@@ -20,7 +19,7 @@ def load_config(config_path):
         raise ValueError("[Error] The provided config path is not valid.")
 
     # Load the configuration
-    with open(config_path, "r") as f:
+    with open(config_path) as f:
         config = yaml.safe_load(f)
 
     return config
@@ -33,18 +32,18 @@ def update_config(path, model_cfg=None, dataset_cfg=None):
     dataset_cfg = {} if dataset_cfg is None else dataset_cfg
 
     # Load saved configs
-    with open(os.path.join(path, "model_cfg.yaml"), "r") as f:
+    with open(os.path.join(path, "model_cfg.yaml")) as f:
         model_cfg_saved = yaml.safe_load(f)
         model_cfg.update(model_cfg_saved)
-    with open(os.path.join(path, "dataset_cfg.yaml"), "r") as f:
+    with open(os.path.join(path, "dataset_cfg.yaml")) as f:
         dataset_cfg_saved = yaml.safe_load(f)
         dataset_cfg.update(dataset_cfg_saved)
 
     # Update the saved yaml file
-    if not model_cfg == model_cfg_saved:
+    if model_cfg != model_cfg_saved:
         with open(os.path.join(path, "model_cfg.yaml"), "w") as f:
             yaml.dump(model_cfg, f)
-    if not dataset_cfg == dataset_cfg_saved:
+    if dataset_cfg != dataset_cfg_saved:
         with open(os.path.join(path, "dataset_cfg.yaml"), "w") as f:
             yaml.dump(dataset_cfg, f)
 

@@ -1,15 +1,15 @@
-import os, sys
-import shutil
-import numpy as np
-import cv2
 import copy
+import os
+import shutil
 import subprocess
+import sys
 from pathlib import Path
-from tqdm import tqdm
+
+import cv2
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-import read_write_model as colmap_utils
 import database
+import read_write_model as colmap_utils
 from model_converter import convert_imagecols_to_colmap
 
 
@@ -60,7 +60,7 @@ def write_pairs_from_neighbors(output_path, image_path, neighbors, image_ids):
                 if id2 in m_pairs[id1]:
                     continue
                 m_pairs[id1].append(id2)
-                f.write("{0} {1}\n".format(name1, name2))
+                f.write(f"{name1} {name2}\n")
 
 
 def run_hloc_matches(
@@ -174,9 +174,7 @@ def run_colmap_sfm(
     keypoints_in_order = []
     for idx, img_id in enumerate(imagecols.get_img_ids()):
         img = imagecols.read_image(img_id)
-        fname_to_save = os.path.join(
-            image_path, "image{0:08d}.png".format(img_id)
-        )
+        fname_to_save = os.path.join(image_path, f"image{img_id:08d}.png")
         cv2.imwrite(fname_to_save, img)
         if keypoints is not None:
             keypoints_in_order.append(keypoints[img_id])
@@ -251,15 +249,11 @@ def run_colmap_sfm_with_known_poses(
     imagecols_tmp = copy.deepcopy(imagecols)
     for idx, img_id in enumerate(imagecols.get_img_ids()):
         img = imagecols.read_image(img_id)
-        fname_to_save = os.path.join(
-            image_path, "image{0:08d}.png".format(img_id)
-        )
+        fname_to_save = os.path.join(image_path, f"image{img_id:08d}.png")
         cv2.imwrite(fname_to_save, img)
         if keypoints is not None:
             keypoints_in_order.append(keypoints[img_id])
-        imagecols_tmp.change_image_name(
-            img_id, "image{0:08d}.png".format(img_id)
-        )
+        imagecols_tmp.change_image_name(img_id, f"image{img_id:08d}.png")
 
     # feature extraction and matching
     run_hloc_matches(

@@ -1,12 +1,12 @@
-import os
 import numpy as np
 import pytlbd
+
 from ..base_matcher import BaseMatcher, BaseMatcherOptions
 
 
 class LBDMatcher(BaseMatcher):
     def __init__(self, extractor, options=BaseMatcherOptions()):
-        super(LBDMatcher, self).__init__(extractor, options)
+        super().__init__(extractor, options)
 
     def get_module_name(self):
         return "lbd"

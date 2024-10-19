@@ -1,15 +1,15 @@
-import os, sys
-import numpy as np
+import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from ScanNet import ScanNet
 from loader import read_scene_scannet
+from ScanNet import ScanNet
 
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
-import limap.util.config as cfgutils
 import limap.runners
+import limap.util.config as cfgutils
 
 
 def run_scene_scannet(cfg, dataset, scene_id):

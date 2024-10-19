@@ -1,3 +1,3 @@
-from .colmap_triangulation import read_scene_colmap
 from .bundler_triangulation import read_scene_bundler
+from .colmap_triangulation import read_scene_colmap
 from .visualsfm_triangulation import read_scene_visualsfm

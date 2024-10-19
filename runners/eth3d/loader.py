@@ -1,6 +1,8 @@
-import os, sys
-import numpy as np
+import os
+import sys
+
 import cv2
+import numpy as np
 
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -11,7 +13,7 @@ import limap.pointsfm as _psfm
 
 class ETH3DDepthReader(_base.BaseDepthReader):
     def __init__(self, filename):
-        super(ETH3DDepthReader, self).__init__(filename)
+        super().__init__(filename)
 
     def read(self, filename):
         ref_depth = cv2.imread(filename, cv2.IMREAD_ANYDEPTH)

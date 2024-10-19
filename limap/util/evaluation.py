@@ -1,5 +1,6 @@
-import numpy as np
 import cv2
+import numpy as np
+
 import limap.base as _base
 
 
@@ -26,15 +27,9 @@ def eval_imagecols(
     imagecols, imagecols_gt, max_error=0.01, enable_logging=True
 ):
     if enable_logging:
+        print(f"[LOG EVAL] imagecols.NumImages() = {imagecols.NumImages()}")
         print(
-            "[LOG EVAL] imagecols.NumImages() = {0}".format(
-                imagecols.NumImages()
-            )
-        )
-        print(
-            "[LOG EVAL] imagecols_gt.NumImages() = {0}".format(
-                imagecols_gt.NumImages()
-            )
+            f"[LOG EVAL] imagecols_gt.NumImages() = {imagecols_gt.NumImages()}"
         )
     _, imagecols_aligned = _base.align_imagecols(
         imagecols,
@@ -64,15 +59,9 @@ def eval_imagecols_relpose(
     )
     assert len(shared_img_ids) == imagecols.NumImages()
     if enable_logging:
+        print(f"[LOG EVAL] imagecols.NumImages() = {imagecols.NumImages()}")
         print(
-            "[LOG EVAL] imagecols.NumImages() = {0}".format(
-                imagecols.NumImages()
-            )
-        )
-        print(
-            "[LOG EVAL] imagecols_gt.NumImages() = {0}".format(
-                imagecols_gt.NumImages()
-            )
+            f"[LOG EVAL] imagecols_gt.NumImages() = {imagecols_gt.NumImages()}"
         )
     if fill_uninitialized:
         img_ids = imagecols_gt.get_img_ids()

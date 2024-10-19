@@ -1,16 +1,18 @@
-import torch
-import numpy as np
-import h5py
-from tqdm import tqdm
-from pathlib import Path
-from typing import Dict, List, Union, Optional
 import pprint
+from pathlib import Path
+from typing import Dict, List, Optional, Union
+
+import h5py
+import numpy as np
+import torch
+from tqdm import tqdm
 
 string_classes = str
 import collections.abc as collections
 
 from hloc import extract_features
 from hloc.utils.io import list_h5_names
+
 from .superpoint import SuperPoint
 
 
@@ -120,20 +122,3 @@ def run_superpoint(
 
     print("[SuperPoint] Finished exporting features.")
     return feature_path
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--image_dir", type=Path, required=True)
-    parser.add_argument("--export_dir", type=Path, required=True)
-    parser.add_argument(
-        "--conf",
-        type=str,
-        default="superpoint_aachen",
-        choices=list(confs.keys()),
-    )
-    parser.add_argument("--as_half", action="store_true")
-    parser.add_argument("--image_list", type=Path)
-    parser.add_argument("--feature_path", type=Path)
-    args = parser.parse_args()
-    main(confs[args.conf], args.image_dir, args.export_dir, args.as_half)

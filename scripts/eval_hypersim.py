@@ -1,18 +1,16 @@
-import os, sys
+import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 
-import limap.base as _base
 import limap.evaluation as _eval
 import limap.util.config as cfgutils
 import limap.util.io as limapio
 import limap.visualize as limapvis
 from runners.hypersim.Hypersim import Hypersim
-
-import matplotlib as mpl
-import matplotlib.pyplot as plt
 
 # hypersim
 MPAU = 0.02539999969303608
@@ -29,7 +27,6 @@ def visualize_error_to_GT(evaluator, lines, threshold):
     outlier_lines = evaluator.ComputeOutlierSegs(lines, threshold)
 
     # visualize
-    import limap.visualize as limapvis
     import open3d as o3d
 
     vis = o3d.visualization.Visualizer()
@@ -51,7 +48,6 @@ def report_error_to_GT(evaluator, lines, vis_err_th=None):
     if vis_err_th is not None:
         visualize_error_to_GT(evaluator, lines, vis_err_th)
     lengths = np.array([line.length() for line in lines])
-    sum_length = lengths.sum()
     thresholds = [0.001, 0.005, 0.01]
     list_recall, list_precision = [], []
     for threshold in thresholds:
@@ -65,22 +61,20 @@ def report_error_to_GT(evaluator, lines, vis_err_th=None):
     print("R: recall, P: precision")
     for idx, threshold in enumerate(thresholds):
         print(
-            "R / P at {0}mm: {1:.2f} / {2:.2f}".format(
-                int(threshold * 1000), list_recall[idx], list_precision[idx]
-            )
+            f"R / P at {int(threshold * 1000)}mm: {list_recall[idx]:.2f} / {list_precision[idx]:.2f}"
         )
     return evaluator
 
 
 def read_ply(fname):
-    from plyfile import PlyData, PlyElement
+    from plyfile import PlyData
 
     plydata = PlyData.read(fname)
     x = np.asarray(plydata.elements[0].data["x"])
     y = np.asarray(plydata.elements[0].data["y"])
     z = np.asarray(plydata.elements[0].data["z"])
     points = np.stack([x, y, z], axis=1)
-    print("number of points: {0}".format(points.shape[0]))
+    print(f"number of points: {points.shape[0]}")
     return points
 
 
@@ -153,15 +147,14 @@ def eval_hypersim(
                 [line.as_array() for line in inlier_lines]
             )
             limapio.save_obj(
-                "tmp/inliers_th_{0:.4f}.obj".format(threshold), inlier_lines_np
+                f"tmp/inliers_th_{threshold:.4f}.obj", inlier_lines_np
             )
             outlier_lines = evaluator.ComputeOutlierSegs(lines, threshold)
             outlier_lines_np = np.array(
                 [line.as_array() for line in outlier_lines]
             )
-            limap.save_obj(
-                "tmp/outliers_th_{0:.4f}.obj".format(threshold),
-                outlier_lines_np,
+            limapio.save_obj(
+                f"tmp/outliers_th_{threshold:.4f}.obj", outlier_lines_np
             )
 
 
@@ -289,9 +282,7 @@ def main():
             [track.count_lines() for track in linetracks]
         )
         print(
-            "supporting images / lines: ({0:.2f} / {1:.2f})".format(
-                sup_image_counts.mean(), sup_line_counts.mean()
-            )
+            f"supporting images / lines: ({sup_image_counts.mean():.2f} / {sup_line_counts.mean():.2f})"
         )
 
 

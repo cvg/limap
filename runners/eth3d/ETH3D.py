@@ -1,4 +1,5 @@
-import os, sys
+import os
+
 import cv2
 import numpy as np
 
@@ -70,11 +71,9 @@ class ETH3D:
             self.sparse_folder = "rig_calibration_undistorted"
         else:
             raise NotImplementedError
-        if not (scene_id in self.scenes[reso_type]):
+        if scene_id not in self.scenes[reso_type]:
             raise ValueError(
-                "Scene {0} does not exist in ETH3D {1} data.".format(
-                    scene_id, reso_type
-                )
+                f"Scene {scene_id} does not exist in ETH3D {reso_type} data."
             )
         self.scene_dir = os.path.join(self.data_dir, self.reso_type, scene_id)
         self.cam_id = cam_id
@@ -89,11 +88,11 @@ class ETH3D:
         imname = os.path.basename(imname)
         if use_inpainted:
             fname_depth = os.path.join(
-                self.scene_dir, "inpainted_depth", "{0}.png".format(imname)
+                self.scene_dir, "inpainted_depth", f"{imname}.png"
             )
         else:
             fname_depth = os.path.join(
-                self.scene_dir, "ground_truth_depth", "{0}.png".format(imname)
+                self.scene_dir, "ground_truth_depth", f"{imname}.png"
             )
         return fname_depth
 

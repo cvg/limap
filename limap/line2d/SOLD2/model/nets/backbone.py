@@ -15,7 +15,7 @@ class HourglassBackbone(nn.Module):
         num_blocks=1,
         num_classes=5,
     ):
-        super(HourglassBackbone, self).__init__()
+        super().__init__()
         self.head = MultitaskHead
         self.net = hg(
             **{
@@ -36,7 +36,7 @@ class SuperpointBackbone(nn.Module):
     """SuperPoint backbone."""
 
     def __init__(self):
-        super(SuperpointBackbone, self).__init__()
+        super().__init__()
         self.relu = torch.nn.ReLU(inplace=True)
         self.pool = torch.nn.MaxPool2d(kernel_size=2, stride=2)
         c1, c2, c3, c4 = 64, 64, 128, 128
