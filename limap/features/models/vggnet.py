@@ -2,7 +2,42 @@ import torch
 import torch.nn as nn
 import torchvision.models as models
 
-from limap.features.models.s2dnet import *
+from .base_model import BaseModel
+
+# VGG-16 Layer Names and Channels
+vgg16_layers = {
+    "conv1_1": 64,
+    "relu1_1": 64,
+    "conv1_2": 64,
+    "relu1_2": 64,
+    "pool1": 64,
+    "conv2_1": 128,
+    "relu2_1": 128,
+    "conv2_2": 128,
+    "relu2_2": 128,
+    "pool2": 128,
+    "conv3_1": 256,
+    "relu3_1": 256,
+    "conv3_2": 256,
+    "relu3_2": 256,
+    "conv3_3": 256,
+    "relu3_3": 256,
+    "pool3": 256,
+    "conv4_1": 512,
+    "relu4_1": 512,
+    "conv4_2": 512,
+    "relu4_2": 512,
+    "conv4_3": 512,
+    "relu4_3": 512,
+    "pool4": 512,
+    "conv5_1": 512,
+    "relu5_1": 512,
+    "conv5_2": 512,
+    "relu5_2": 512,
+    "conv5_3": 512,
+    "relu5_3": 512,
+    "pool5": 512,
+}
 
 
 class VGGNet(BaseModel):

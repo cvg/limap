@@ -134,7 +134,6 @@ class S2DNet(BaseModel):
                 self.download_s2dnet_model(path)
             logging.info(f"Loading S2DNet checkpoint at {path}.")
             state_dict = torch.load(path, map_location="cpu")["state_dict"]
-            params = self.state_dict()
             state_dict = {k: v for k, v in state_dict.items()}
             self.load_state_dict(state_dict, strict=False)
 
