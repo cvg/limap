@@ -91,7 +91,7 @@ def attention(
     query: torch.Tensor, key: torch.Tensor, value: torch.Tensor
 ) -> Tuple[torch.Tensor, torch.Tensor]:
     dim = query.shape[1]
-    scores = torch.einsum("bdhn,bdhm->bhnm", query, key) / dim ** 0.5
+    scores = torch.einsum("bdhn,bdhm->bhnm", query, key) / dim**0.5
     prob = torch.nn.functional.softmax(scores, dim=-1)
     return torch.einsum("bhnm,bdhm->bdhn", prob, value), prob
 

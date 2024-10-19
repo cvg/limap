@@ -38,7 +38,7 @@ import numpy as np
 
 IS_PYTHON3 = sys.version_info[0] >= 3
 
-MAX_IMAGE_ID = 2 ** 31 - 1
+MAX_IMAGE_ID = 2**31 - 1
 
 CREATE_CAMERAS_TABLE = """CREATE TABLE IF NOT EXISTS cameras (
     camera_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
