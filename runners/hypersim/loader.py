@@ -14,7 +14,7 @@ import limap.base as _base
 
 class HypersimDepthReader(_base.BaseDepthReader):
     def __init__(self, filename, K, img_hw):
-        super(HypersimDepthReader, self).__init__(filename)
+        super().__init__(filename)
         self.K = K
         self.img_hw = img_hw
 

@@ -12,7 +12,7 @@ import limap.base as _base
 
 class ScanNetDepthReader(_base.BaseDepthReader):
     def __init__(self, filename):
-        super(ScanNetDepthReader, self).__init__(filename)
+        super().__init__(filename)
 
     def read(self, filename):
         ref_depth = cv2.imread(filename, cv2.IMREAD_UNCHANGED)

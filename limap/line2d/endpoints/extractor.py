@@ -11,7 +11,7 @@ from ..base_detector import BaseDetector, BaseDetectorOptions
 
 class SuperPointEndpointsExtractor(BaseDetector):
     def __init__(self, options=BaseDetectorOptions(), device=None):
-        super(SuperPointEndpointsExtractor, self).__init__(options)
+        super().__init__(options)
         self.device = "cuda" if device is None else device
         self.sp = (
             SuperPoint({"weight_path": self.weight_path}).eval().to(self.device)

@@ -252,7 +252,7 @@ class Hypersim:
     def get_camera_frustrum(cls, Rt):
         h, w = cls.h, cls.w
         view_camera = pv.Camera()
-        set_camera_properties(view_camera, Rt)
+        Hypersim.set_camera_properties(view_camera, Rt)
         view_camera.clipping_range = (1e-5, 0.5)
         frustum = view_camera.view_frustum(w / h)
         return frustum

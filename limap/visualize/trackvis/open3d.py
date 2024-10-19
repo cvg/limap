@@ -7,14 +7,14 @@ from .base import BaseTrackVisualizer
 
 class Open3DTrackVisualizer(BaseTrackVisualizer):
     def __init__(self, tracks):
-        super(Open3DTrackVisualizer, self).__init__(tracks)
+        super().__init__(tracks)
 
     def reset(self):
         app = o3d.visualization.gui.Application.instance
         app.initialize()
         return app
 
-    def vis_all_lines(self, n_visible_views=4, width=2, scale=1.0):
+    def vis_all_lines(self, n_visible_views=4, width=2, ranges=None, scale=1.0):
         lines = self.get_lines_n_visible_views(n_visible_views)
         vis = o3d.visualization.Visualizer()
         vis.create_window(height=1080, width=1920)

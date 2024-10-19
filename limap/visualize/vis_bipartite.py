@@ -54,12 +54,11 @@ def open3d_draw_bipartite3d_pointline(
     for idx, ptrack in bpt3d.get_dict_points().items():
         p = ptrack.p
         deg = bpt3d.pdegree(idx)
-        if ranges is not None:
-            if not test_point_inside_ranges(p, ranges):
-                continue
+        if (ranges is not None) and (not test_point_inside_ranges(p, ranges)):
+            continue
         points.append(p)
         degrees.append(deg)
-    points_deg0 = [p for p, deg in zip(points, degrees) if deg == 0]
+    # points_deg0 = [p for p, deg in zip(points, degrees) if deg == 0]
     points_deg1 = [p for p, deg in zip(points, degrees) if deg == 1]
     points_deg2 = [p for p, deg in zip(points, degrees) if deg == 2]
     points_deg3p = [p for p, deg in zip(points, degrees) if deg >= 3]
@@ -75,9 +74,10 @@ def open3d_draw_bipartite3d_pointline(
             if bpt3d.pdegree(p_id) == 0:
                 continue
             p = ptrack.p
-            if ranges is not None:
-                if not test_point_inside_ranges(p, ranges):
-                    continue
+            if (ranges is not None) and (
+                not test_point_inside_ranges(p, ranges)
+            ):
+                continue
             for line_id in bpt3d.neighbor_lines(p_id):
                 line = bpt3d.line(line_id).line
                 p_proj = line.point_projection(p)
@@ -142,7 +142,7 @@ def open3d_draw_bipartite3d_pointline(
 
     if planes is not None:
         for plane_id, plane in enumerate(planes):
-            plane_c = (0.5, 0.4, 0.6)
+            # plane_c = (0.5, 0.4, 0.6)
             mesh = o3d.geometry.TriangleMesh()
             np_vertices = np.array(plane)
             np_triangles = np.array([[0, 1, 2], [0, 2, 3]]).astype(np.int32)
@@ -174,9 +174,10 @@ def open3d_draw_bipartite3d_vpline(bpt3d, ranges=None):
     vp_line_sets = {vp_id: [] for vp_id in vp_ids}
     nonvp_line_set = []
     for line_id, ltrack in bpt3d.get_dict_lines().items():
-        if ranges is not None:
-            if not test_line_inside_ranges(ltrack.line, ranges):
-                continue
+        if (ranges is not None) and (
+            not test_line_inside_ranges(ltrack.line, ranges)
+        ):
+            continue
         labels = bpt3d.neighbor_points(line_id)
         if len(labels) == 0:
             nonvp_line_set.append(ltrack.line)

@@ -10,7 +10,7 @@ class LineTRMatcher(BaseMatcher):
     def __init__(
         self, extractor, options=BaseMatcherOptions(), topk=0, device=None
     ):
-        super(LineTRMatcher, self).__init__(extractor, options)
+        super().__init__(extractor, options)
         self.device = "cuda" if device is None else device
         self.linetr = (
             LineTransformer({"weight_path": self.weight_path})

@@ -1,4 +1,6 @@
-from ..vis_utils import *
+import numpy as np
+
+from ..vis_utils import test_line_inside_ranges
 
 
 class BaseTrackVisualizer:

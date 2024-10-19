@@ -300,17 +300,13 @@ def make_bigimage(imgs, pad=20):
 
 def test_point_inside_ranges(point, ranges):
     point = np.array(point)
-    if ~np.all(point > ranges[0]) or ~np.all(point < ranges[1]):
-        return False
-    return True
+    return np.all(point > ranges[0]) and np.all(point < ranges[1])
 
 
 def test_line_inside_ranges(line, ranges):
     if not test_point_inside_ranges(line.start, ranges):
         return False
-    if not test_point_inside_ranges(line.end, ranges):
-        return False
-    return True
+    return test_point_inside_ranges(line.end, ranges)
 
 
 def compute_robust_range(arr, range_robust=[0.05, 0.95], k_stretch=2.0):

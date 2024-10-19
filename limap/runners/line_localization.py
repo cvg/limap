@@ -10,7 +10,13 @@ import limap.estimators as _estimators
 import limap.line2d
 import limap.runners as _runners
 import limap.util.io as limapio
-from limap.optimize.line_localization.functions import *
+from limap.optimize.line_localization.functions import (
+    filter_line_2to2_epipolarIoU,
+    get_reprojection_dist_func,
+    match_line_2to2_epipolarIoU,
+    match_line_2to3,
+    reprojection_filter_matches_2to3,
+)
 
 
 def get_hloc_keypoints(
@@ -37,10 +43,9 @@ def get_hloc_keypoints(
 
     for i, tgt_id in enumerate(target_img_ids):
         image = ref_sfm.images[tgt_id]
-        if image.num_points3D() == 0:
-            if logger:
-                logger.debug(f"No 3D points found for {image.name}.")
-                continue
+        if image.num_points3D() == 0 and logger:
+            logger.debug(f"No 3D points found for {image.name}.")
+            continue
         points3D_ids = np.array(
             [p.point3D_id if p.has_point3D() else -1 for p in image.points2D]
         )

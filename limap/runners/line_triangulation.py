@@ -39,7 +39,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
             n_jobs=cfg["n_jobs"],
         )
     # resize cameras
-    assert imagecols.IsUndistorted() == True
+    assert imagecols.IsUndistorted()
     if cfg["max_image_dim"] != -1 and cfg["max_image_dim"] is not None:
         imagecols.set_max_image_dim(cfg["max_image_dim"])
     limapio.save_txt_imname_dict(

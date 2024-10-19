@@ -29,7 +29,6 @@ def load_list_file(fname):
         imname = k[0]
         # Aachen only uses simple radial model
         assert k[1] == "SIMPLE_RADIAL"
-        h, w = int(k[2]), int(k[3])
         f = float(k[4])
         cx, cy = float(k[5]), float(k[6])
         k1 = float(k[7])

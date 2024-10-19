@@ -153,7 +153,7 @@ def create_query_list(imagecols, out):
 def get_result_filenames(cfg, args):
     ransac_cfg = cfg["ransac"]
     ransac_postfix = ""
-    if ransac_cfg["method"] != None:
+    if ransac_cfg["method"] is not None:
         if ransac_cfg["method"] in ["ransac", "hybrid"]:
             ransac_postfix = "_{}".format(ransac_cfg["method"])
         elif ransac_cfg["method"] == "solver":

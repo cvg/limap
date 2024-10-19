@@ -249,7 +249,8 @@ def main():
             "inliers": inliers,
         }
 
-    final_poses = _runners.line_localization(
+    # can return final_poses
+    _runners.line_localization(
         cfg,
         imagecols_train,
         imagecols_query,

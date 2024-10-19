@@ -54,7 +54,7 @@ def update_config(cfg, unknown, shortcuts):
         keys = arg.replace("--", "").split(".")
         val = get_val_from_keys(cfg, keys)
         argtype = type(val)
-        if argtype == bool:
+        if argtype is bool:
             # test if it is a store action
             if idx == len(unknown) - 1 or unknown[idx + 1].startswith("--"):
                 v = True
@@ -63,7 +63,7 @@ def update_config(cfg, unknown, shortcuts):
         else:
             v = unknown[idx + 1]
             if val is not None:
-                if argtype == list:
+                if argtype is list:
                     if v.startswith("["):
                         v = eval(v)
                     else:

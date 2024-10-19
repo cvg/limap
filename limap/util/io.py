@@ -179,8 +179,8 @@ def read_txt_imname_dict(fname):
 
 def save_obj(fname, lines):
     # save obj for CloudCompare visualization
-    if type(lines) == list:
-        if type(lines[0]) == np.ndarray:
+    if isinstance(lines, list):
+        if isinstance(lines[0], np.ndarray):
             lines = np.array(lines)
         else:
             lines = np.array([line.as_array() for line in lines])
@@ -220,7 +220,6 @@ def save_l3dpp(folder, imagecols, all_2d_segs):
     if os.path.exists(folder):
         shutil.rmtree(folder)
     os.makedirs(folder)
-    n_images = len(all_2d_segs)
     assert imagecols.NumImages() == len(all_2d_segs)
     image_names = imagecols.get_image_name_list()
 
@@ -423,7 +422,7 @@ def read_lines_from_input(input_file):
 
     # exception
     raise ValueError(
-        f"Error! File {input_dir} not supported. should be txt, obj, or folder to the linetracks."
+        f"Error! File {input_file} not supported. should be txt, obj, or folder to the linetracks."
     )
 
 

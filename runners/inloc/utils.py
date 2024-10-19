@@ -14,7 +14,7 @@ import limap.util.io as limapio
 
 class InLocP3DReader(_base.BaseP3DReader):
     def __init__(self, filename):
-        super(InLocP3DReader, self).__init__(filename)
+        super().__init__(filename)
 
     def read(self, filename):
         scan = loadmat(str(filename) + ".mat")["XYZcut"]
@@ -117,7 +117,7 @@ def read_dataset_inloc(
 def get_result_filenames(cfg, use_temporal=True):
     ransac_cfg = cfg["ransac"]
     ransac_postfix = ""
-    if ransac_cfg["method"] != None:
+    if ransac_cfg["method"] is not None:
         if ransac_cfg["method"] in ["ransac", "hybrid"]:
             ransac_postfix = "_{}".format(ransac_cfg["method"])
         elif ransac_cfg["method"] == "solver":
@@ -196,7 +196,6 @@ def run_hloc_inloc(
     # Read coarse poses and inliers
     poses = {}
     with open(results_file) as f:
-        lines = []
         for data in f.read().rstrip().split("\n"):
             data = data.split()
             name = data[0]

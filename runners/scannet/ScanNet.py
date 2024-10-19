@@ -83,8 +83,8 @@ class ScanNet:
 
     def loadinfos(self):
         img_folder = os.path.join(self.scene_dir, "color")
-        pose_folder = os.path.join(self.scene_dir, "pose")
-        depth_folder = os.path.join(self.scene_dir, "depth")
+        # pose_folder = os.path.join(self.scene_dir, "pose")
+        # depth_folder = os.path.join(self.scene_dir, "depth")
         n_images = len(os.listdir(img_folder))
         index_list = np.arange(0, n_images, self.stride).tolist()
 

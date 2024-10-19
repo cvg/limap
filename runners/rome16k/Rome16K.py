@@ -64,13 +64,13 @@ class Rome16K:
         return len(self.component_names)
 
     def count_images_in_component(self, c_id):
-        if type(c_id) == str:
+        if isinstance(c_id, str):
             return len(self.components[c_id])
         else:
             return self.count_images_in_component(self.component_names[c_id])
 
     def get_images_in_component(self, c_id):
-        if type(c_id) == str:
+        if isinstance(c_id, str):
             images = self.components[c_id]
             images = [self.get_fullname(imname) for imname in images]
             imname_list = []

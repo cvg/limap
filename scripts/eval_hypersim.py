@@ -48,7 +48,6 @@ def report_error_to_GT(evaluator, lines, vis_err_th=None):
     if vis_err_th is not None:
         visualize_error_to_GT(evaluator, lines, vis_err_th)
     lengths = np.array([line.length() for line in lines])
-    sum_length = lengths.sum()
     thresholds = [0.001, 0.005, 0.01]
     list_recall, list_precision = [], []
     for threshold in thresholds:
@@ -154,7 +153,7 @@ def eval_hypersim(
             outlier_lines_np = np.array(
                 [line.as_array() for line in outlier_lines]
             )
-            limap.save_obj(
+            limapio.save_obj(
                 f"tmp/outliers_th_{threshold:.4f}.obj", outlier_lines_np
             )
 

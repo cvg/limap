@@ -57,7 +57,7 @@ def to_multiscale_lines(lines):
 
 class LBDExtractor(BaseDetector):
     def __init__(self, options=BaseDetectorOptions()):
-        super(LBDExtractor, self).__init__(options)
+        super().__init__(options)
 
     def get_module_name(self):
         return "lbd"

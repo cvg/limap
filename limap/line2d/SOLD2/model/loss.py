@@ -254,7 +254,7 @@ class JunctionDetectionLoss(nn.Module):
     """Junction detection loss."""
 
     def __init__(self, grid_size, keep_border):
-        super(JunctionDetectionLoss, self).__init__()
+        super().__init__()
         self.grid_size = grid_size
         self.keep_border = keep_border
 
@@ -268,7 +268,7 @@ class HeatmapLoss(nn.Module):
     """Heatmap prediction loss."""
 
     def __init__(self, class_weight):
-        super(HeatmapLoss, self).__init__()
+        super().__init__()
         self.class_weight = class_weight
 
     def forward(self, prediction, target, valid_mask=None):
@@ -279,7 +279,7 @@ class RegularizationLoss(nn.Module):
     """Module for regularization loss."""
 
     def __init__(self):
-        super(RegularizationLoss, self).__init__()
+        super().__init__()
         self.name = "regularization_loss"
         self.loss_init = torch.zeros([])
 
@@ -367,7 +367,7 @@ class TripletDescriptorLoss(nn.Module):
     """Triplet descriptor loss."""
 
     def __init__(self, grid_size, dist_threshold, margin):
-        super(TripletDescriptorLoss, self).__init__()
+        super().__init__()
         self.grid_size = grid_size
         self.init_dist_threshold = 64
         self.dist_threshold = dist_threshold
@@ -405,7 +405,7 @@ class TotalLoss(nn.Module):
     and regularization losses."""
 
     def __init__(self, loss_funcs, loss_weights, weighting_policy):
-        super(TotalLoss, self).__init__()
+        super().__init__()
         # Whether we need to compute the descriptor loss
         self.compute_descriptors = "descriptor_loss" in loss_funcs.keys()
 

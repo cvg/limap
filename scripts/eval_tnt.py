@@ -20,7 +20,6 @@ def plot_curve(fname, thresholds, data):
 
 def report_error_to_GT(evaluator, lines):
     lengths = np.array([line.length() for line in lines])
-    sum_length = lengths.sum()
     thresholds = np.array([0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1.0])
     list_recall, list_precision = [], []
     for threshold in thresholds:
@@ -82,6 +81,8 @@ def write_ply(fname, points):
 
 
 def report_error_to_mesh(mesh_fname, lines):
+    # Hypersim
+    MPAU = 0.02539999969303608
     evaluator = _eval.MeshEvaluator(mesh_fname, MPAU)
     return report_error_to_GT(evaluator, lines)
 

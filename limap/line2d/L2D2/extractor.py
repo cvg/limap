@@ -11,7 +11,7 @@ from ..base_detector import BaseDetector, BaseDetectorOptions
 
 class L2D2Extractor(BaseDetector):
     def __init__(self, options=BaseDetectorOptions(), device=None):
-        super(L2D2Extractor, self).__init__(options)
+        super().__init__(options)
         self.mini_batch = 20
         self.device = "cuda" if device is None else device
         if self.weight_path is None:

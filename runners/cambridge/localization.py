@@ -107,6 +107,7 @@ def parse_config():
     cfg["n_neighbors_loc"] = args.num_loc
     # Output path for LIMAP results (tmp)
     if cfg["output_dir"] is None:
+        scene_id = os.path.basename(cfg["vsfm_path"])
         cfg["output_dir"] = f"tmp/cambridge/{scene_id}"
     # Output folder for LIMAP linetracks (in tmp)
     if cfg["output_folder"] is None:
@@ -231,7 +232,8 @@ def main():
             "inliers": inliers,
         }
 
-    final_poses = _runners.line_localization(
+    # can return final_poses
+    _runners.line_localization(
         cfg,
         imagecols_train,
         imagecols_query,

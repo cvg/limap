@@ -188,7 +188,7 @@ def correct_sfm_with_gt_depth(sfm_path, depth_folder_path, output_path):
 
 class DepthReader(_base.BaseDepthReader):
     def __init__(self, filename, depth_folder):
-        super(DepthReader, self).__init__(filename)
+        super().__init__(filename)
         self.depth_folder = depth_folder
 
     def read(self, filename):
@@ -237,7 +237,7 @@ def read_scene_7scenes(cfg, root_path, model_path, image_path, n_neighbors=20):
 def get_result_filenames(cfg, use_dense_depth=False):
     ransac_cfg = cfg["ransac"]
     ransac_postfix = ""
-    if ransac_cfg["method"] != None:
+    if ransac_cfg["method"] is not None:
         if ransac_cfg["method"] in ["ransac", "hybrid"]:
             ransac_postfix = "_{}".format(ransac_cfg["method"])
         elif ransac_cfg["method"] == "solver":
@@ -396,7 +396,6 @@ def run_hloc_7scenes(
     # Read coarse poses
     poses = {}
     with open(results_file) as f:
-        lines = []
         for data in f.read().rstrip().split("\n"):
             data = data.split()
             name = data[0]

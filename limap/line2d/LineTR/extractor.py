@@ -13,7 +13,7 @@ from .line_transformer import LineTransformer
 
 class LineTRExtractor(BaseDetector):
     def __init__(self, options=BaseDetectorOptions(), device=None):
-        super(LineTRExtractor, self).__init__(options)
+        super().__init__(options)
         self.device = "cuda" if device is None else device
         self.sp = SuperPoint({}).eval().to(self.device)
         self.linetr = (
