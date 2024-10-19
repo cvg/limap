@@ -1,16 +1,12 @@
-import numpy as np
+import logging
 import os
+from pathlib import Path
+
+import numpy as np
 import PIL
+import PIL.Image
 import pycolmap
 import torch
-from pathlib import Path
-from tqdm import tqdm
-import logging
-import PIL.Image
-import limap.base as _base
-import limap.pointsfm as _psfm
-import limap.util.io as limapio
-
 from hloc import (
     extract_features,
     localize_sfm,
@@ -18,12 +14,17 @@ from hloc import (
     pairs_from_covisibility,
     triangulation,
 )
-from hloc.utils.read_write_model import read_model, write_model
 from hloc.pipelines.Cambridge.utils import (
     create_query_list_with_intrinsics,
     evaluate,
 )
 from hloc.utils.parsers import *
+from hloc.utils.read_write_model import read_model, write_model
+from tqdm import tqdm
+
+import limap.base as _base
+import limap.pointsfm as _psfm
+import limap.util.io as limapio
 
 ###############################################################################
 # The following utils functions are taken/modified from hloc.pipelines.7scenes
@@ -39,7 +40,7 @@ def create_reference_sfm(full_model, ref_model, blacklist=None, ext=".bin"):
     cameras, images, points3D = read_model(full_model, ext)
 
     if blacklist is not None:
-        with open(blacklist, "r") as f:
+        with open(blacklist) as f:
             blacklist = f.read().rstrip().split("\n")
 
     train_ids = []
@@ -187,7 +188,7 @@ def correct_sfm_with_gt_depth(sfm_path, depth_folder_path, output_path):
 
 class DepthReader(_base.BaseDepthReader):
     def __init__(self, filename, depth_folder):
-        super(DepthReader, self).__init__(filename)
+        super().__init__(filename)
         self.depth_folder = depth_folder
 
     def read(self, filename):
@@ -236,7 +237,7 @@ def read_scene_7scenes(cfg, root_path, model_path, image_path, n_neighbors=20):
 def get_result_filenames(cfg, use_dense_depth=False):
     ransac_cfg = cfg["ransac"]
     ransac_postfix = ""
-    if ransac_cfg["method"] != None:
+    if ransac_cfg["method"] is not None:
         if ransac_cfg["method"] in ["ransac", "hybrid"]:
             ransac_postfix = "_{}".format(ransac_cfg["method"])
         elif ransac_cfg["method"] == "solver":
@@ -282,7 +283,7 @@ def get_train_test_ids_from_sfm(full_model, blacklist=None, ext=".bin"):
     cameras, images, points3D = read_model(full_model, ext)
 
     if blacklist is not None:
-        with open(blacklist, "r") as f:
+        with open(blacklist) as f:
             blacklist = f.read().rstrip().split("\n")
 
     train_ids, test_ids = [], []
@@ -390,12 +391,11 @@ def run_hloc_7scenes(
         evaluate(gt_dir, results_file, test_list)
     else:
         if logger:
-            logger.info(f"Point-only localization skipped.")
+            logger.info("Point-only localization skipped.")
 
     # Read coarse poses
     poses = {}
-    with open(results_file, "r") as f:
-        lines = []
+    with open(results_file) as f:
         for data in f.read().rstrip().split("\n"):
             data = data.split()
             name = data[0]

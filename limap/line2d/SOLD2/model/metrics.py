@@ -2,15 +2,14 @@
 This file implements the evaluation metrics.
 """
 
+import numpy as np
 import torch
 import torch.nn.functional as F
-import numpy as np
-from torchvision.ops.boxes import batched_nms
 
 from ..misc.geometry_utils import keypoints_to_grid
 
 
-class Metrics(object):
+class Metrics:
     """Metric evaluation calculator."""
 
     def __init__(
@@ -75,7 +74,7 @@ class Metrics(object):
 
         # Initialize the results
         self.metric_results = {}
-        for key in self.metric_table.keys():
+        for key in self.metric_table:
             self.metric_results[key] = 0.0
 
     def evaluate(
@@ -128,22 +127,22 @@ class Metrics(object):
         """Check if all input metrics are valid."""
         flag = True
         for metric in self.junc_metric_lst:
-            if not metric in self.supported_junc_metrics:
+            if metric not in self.supported_junc_metrics:
                 flag = False
                 break
         for metric in self.heatmap_metric_lst:
-            if not metric in self.supported_heatmap_metrics:
+            if metric not in self.supported_heatmap_metrics:
                 flag = False
                 break
         for metric in self.desc_metric_lst:
-            if not metric in self.supported_desc_metrics:
+            if metric not in self.supported_desc_metrics:
                 flag = False
                 break
 
         return flag
 
 
-class AverageMeter(object):
+class AverageMeter:
     def __init__(
         self,
         junc_metric_lst=None,
@@ -238,13 +237,13 @@ class AverageMeter(object):
             )
 
         # Update all the losses
-        for loss in loss_dict.keys():
+        for loss in loss_dict:
             self.metric_results[loss] += num_samples * loss_dict[loss]
 
         # Update all pr counts
         for pr_met in self.supported_pr_metrics:
             # Update all tp, tn, fp, fn, precision, and recall.
-            for key in metrics.metric_results[pr_met].keys():
+            for key in metrics.metric_results[pr_met]:
                 # Update each interval
                 for idx in range(len(self.metric_results[pr_met][key])):
                     self.metric_results[pr_met][key][idx] += (
@@ -253,9 +252,9 @@ class AverageMeter(object):
 
     def average(self):
         results = {}
-        for met in self.metric_results.keys():
+        for met in self.metric_results:
             # Skip pr curve metrics
-            if not met in self.supported_pr_metrics:
+            if met not in self.supported_pr_metrics:
                 results[met] = self.metric_results[met] / self.count
             # Only update precision and recall in pr metrics
             else:
@@ -283,22 +282,22 @@ class AverageMeter(object):
         """Check if all input metrics are valid."""
         flag = True
         for metric in self.junc_metric_lst:
-            if not metric in self.supported_junc_metrics:
+            if metric not in self.supported_junc_metrics:
                 flag = False
                 break
         for metric in self.heatmap_metric_lst:
-            if not metric in self.supported_heatmap_metrics:
+            if metric not in self.supported_heatmap_metrics:
                 flag = False
                 break
         for metric in self.desc_metric_lst:
-            if not metric in self.supported_desc_metrics:
+            if metric not in self.supported_desc_metrics:
                 flag = False
                 break
 
         return flag
 
 
-class junction_precision(object):
+class junction_precision:
     """Junction precision."""
 
     def __init__(self, detection_thresh):
@@ -321,7 +320,7 @@ class junction_precision(object):
         return float(precision)
 
 
-class junction_recall(object):
+class junction_recall:
     """Junction recall."""
 
     def __init__(self, detection_thresh):
@@ -342,7 +341,7 @@ class junction_recall(object):
         return float(recall)
 
 
-class junction_pr(object):
+class junction_pr:
     """Junction precision-recall info."""
 
     def __init__(self, num_threshold=50):
@@ -402,7 +401,7 @@ class junction_pr(object):
         }
 
 
-class heatmap_precision(object):
+class heatmap_precision:
     """Heatmap precision."""
 
     def __init__(self, prob_thresh):
@@ -424,7 +423,7 @@ class heatmap_precision(object):
         return precision
 
 
-class heatmap_recall(object):
+class heatmap_recall:
     """Heatmap recall."""
 
     def __init__(self, prob_thresh):
@@ -446,7 +445,7 @@ class heatmap_recall(object):
         return recall
 
 
-class matching_score(object):
+class matching_score:
     """Descriptors matching score."""
 
     def __init__(self, grid_size):
@@ -576,7 +575,7 @@ def nms_fast(in_corners, H, W, dist_thresh):
         return np.zeros((3, 0)).astype(int), np.zeros(0).astype(int)
     if rcorners.shape[1] == 1:
         out = np.vstack((rcorners, in_corners[2])).reshape(3, 1)
-        return out, np.zeros((1)).astype(int)
+        return out, np.zeros(1).astype(int)
     # Initialize the grid.
     for i, rc in enumerate(rcorners.T):
         grid[rcorners[1, i], rcorners[0, i]] = 1

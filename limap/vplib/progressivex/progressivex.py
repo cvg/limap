@@ -1,10 +1,10 @@
-from ..base_vp_detector import BaseVPDetector, BaseVPDetectorOptions
-
-from _limap import _vplib
-import pyprogressivex
-import numpy as np
-
 from collections import namedtuple
+
+import numpy as np
+import pyprogressivex
+from _limap import _vplib
+
+from ..base_vp_detector import BaseVPDetector, BaseVPDetectorOptions
 
 ProgressiveXOptions = namedtuple(
     "ProgressiveXOptions",
@@ -15,7 +15,7 @@ ProgressiveXOptions = namedtuple(
 
 class ProgressiveX(BaseVPDetector):
     def __init__(self, cfg, options=BaseVPDetectorOptions()):
-        super(ProgressiveX, self).__init__(options)
+        super().__init__(options)
         self.options = ProgressiveXOptions()
         for fld in self.options._fields:
             if fld in cfg:
@@ -30,10 +30,7 @@ class ProgressiveX(BaseVPDetector):
 
         # Initialize
         labels = (np.ones(len(lines)) * -1).astype(int)
-        flags = [
-            True if line.length() >= self.options.min_length else False
-            for line in lines
-        ]
+        flags = [line.length() >= self.options.min_length for line in lines]
 
         # Progressive-X inference
         lines = [

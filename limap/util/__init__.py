@@ -1,3 +1,3 @@
-from .io import *
-from .geometry import *
 from .config import *
+from .geometry import *
+from .io import *

@@ -1,7 +1,7 @@
-import numpy as np
-import cv2
-import torch
 import math
+
+import numpy as np
+import torch
 
 
 def filter_by_length(lines, min_length, max_sublines):
@@ -94,10 +94,8 @@ def remove_borders(
         sp = np.floor(klines[:, 0]).astype(int)
         ep = np.floor(klines[:, 1]).astype(int)
         valid_mask_given = (
-            (
-                valid_mask_given[sp[:, 1], sp[:, 0]]
-                + valid_mask_given[ep[:, 1], ep[:, 0]]
-            )
+            valid_mask_given[sp[:, 1], sp[:, 0]]
+            + valid_mask_given[ep[:, 1], ep[:, 0]]
         ).astype(bool)
         valid_mask = valid_mask & valid_mask_given
 

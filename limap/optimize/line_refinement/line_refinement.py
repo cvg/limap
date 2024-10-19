@@ -1,10 +1,11 @@
 import os
+
 import numpy as np
 from tqdm import tqdm
 
 import limap.base as _base
-import limap.features as _features
 import limap.evaluation as _eval
+import limap.features as _features
 import limap.optimize as _optim
 import limap.util.io as limapio
 import limap.visualize as limapvis
@@ -56,15 +57,15 @@ def line_refinement(
                 p_vpresults.append(vpresults[img_id])
             if cfg["use_heatmap"]:
                 heatmap = limapio.read_npy(
-                    os.path.join(heatmap_dir, "heatmap_{0}.npy".format(img_id))
+                    os.path.join(heatmap_dir, f"heatmap_{img_id}.npy")
                 )
                 p_heatmaps.append(heatmap)
             if cfg["use_feature"]:
                 if patch_dir is not None:
                     fname = os.path.join(
                         patch_dir,
-                        "track{0}".format(track_id),
-                        "track{0}_img{1}.npy".format(track_id, img_id),
+                        f"track{track_id}",
+                        f"track{track_id}_img{img_id}.npy",
                     )
                     patch = _features.load_patch(fname, dtype=cfg["dtype"])
                     p_patches.append(patch)
@@ -104,14 +105,10 @@ def line_refinement(
             newratio = evaluator.ComputeInlierRatio(newtrack.line, 0.001)
             if newdist > dist and newratio < ratio:
                 print(
-                    "[DEBUG] t_id = {0}, original: dist = {1:.4f}, ratio = {2:.4f}".format(
-                        t_id, dist * 1000, ratio
-                    )
+                    f"[DEBUG] t_id = {t_id}, original: dist = {dist * 1000:.4f}, ratio = {ratio:.4f}"
                 )
                 print(
-                    "[DEBUG] t_id = {0}, optimized: dist = {1:.4f}, ratio = {2:.4f}".format(
-                        t_id, newdist * 1000, newratio
-                    )
+                    f"[DEBUG] t_id = {t_id}, optimized: dist = {newdist * 1000:.4f}, ratio = {newratio:.4f}"
                 )
 
     # output
@@ -126,25 +123,6 @@ def line_refinement(
 
     # debug
     if cfg["visualize"]:
-
-        def report_track(track_id):
-            limapvis.visualize_line_track(
-                imname_list,
-                tracks[track_id],
-                max_image_dim=-1,
-                cameras=cameras,
-                prefix="track.{0}".format(track_id),
-            )
-
-        def report_newtrack(track_id):
-            limapvis.visualize_line_track(
-                imname_list,
-                opttracks[track_id],
-                max_image_dim=-1,
-                cameras=cameras,
-                prefix="newtrack.{0}".format(track_id),
-            )
-
         import pdb
 
         pdb.set_trace()

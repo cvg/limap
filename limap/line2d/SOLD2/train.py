@@ -2,27 +2,22 @@
 This file implements the training process and all the summaries
 """
 
-import os
-import numpy as np
 import cv2
+import numpy as np
 import torch
-from torch.nn.functional import pixel_shuffle, softmax
-from torch.utils.data import DataLoader
 import torch.utils.data.dataloader as torch_loader
-
-# from tensorboardX import SummaryWriter
-
-# from dataset.dataset_util import get_dataset
-# from model.model_util import get_model
-# from model.loss import TotalLoss, get_loss_and_weights
-from .model.metrics import AverageMeter, Metrics, super_nms
+from torch.nn.functional import pixel_shuffle, softmax
 
 # from model.lr_scheduler import get_lr_scheduler
 from .misc.train_utils import (
     convert_image,
-    get_latest_checkpoint,
-    remove_old_checkpoints,
 )
+
+# from tensorboardX import SummaryWriter
+# from dataset.dataset_util import get_dataset
+# from model.model_util import get_model
+# from model.loss import TotalLoss, get_loss_and_weights
+from .model.metrics import AverageMeter, super_nms
 
 
 def customized_collate_fn(batch):
@@ -56,7 +51,7 @@ def restore_weights(model, state_dict, strict=True):
         # Load mismatched keys manually
         model_dict = model.state_dict()
         for idx, key in enumerate(missing_keys):
-            dict_keys = [_ for _ in unexpected_keys if not "tracked" in _]
+            dict_keys = [_ for _ in unexpected_keys if "tracked" not in _]
             model_dict[key] = state_dict[dict_keys[idx]]
         model.load_state_dict(model_dict)
 
@@ -746,12 +741,12 @@ def record_train_summaries(writer, global_step, scalars, images):
         "Train_loss/total_loss", scalars["total_loss"], global_step
     )
     # Add regularization loss
-    if "reg_loss" in scalars.keys():
+    if "reg_loss" in scalars:
         writer.add_scalar(
             "Train_loss/reg_loss", scalars["reg_loss"], global_step
         )
     # Add descriptor loss
-    if "descriptor_loss" in scalars.keys():
+    if "descriptor_loss" in scalars:
         key = "descriptor_loss"
         writer.add_scalar("Train_loss/%s" % (key), scalars[key], global_step)
         writer.add_scalar(
@@ -759,7 +754,7 @@ def record_train_summaries(writer, global_step, scalars, images):
         )
 
     # Record weighting
-    for key in scalars.keys():
+    for key in scalars:
         if "w_" in key:
             writer.add_scalar(
                 "Train_weight/%s" % (key), scalars[key], global_step
@@ -776,7 +771,7 @@ def record_train_summaries(writer, global_step, scalars, images):
         "Train_loss_average/total_loss", average["total_loss"], global_step
     )
     # Add smoothed descriptor loss
-    if "descriptor_loss" in average.keys():
+    if "descriptor_loss" in average:
         writer.add_scalar(
             "Train_loss_average/descriptor_loss",
             average["descriptor_loss"],
@@ -807,7 +802,7 @@ def record_train_summaries(writer, global_step, scalars, images):
         "Train_metrics/heatmap_recall", results["heatmap_recall"], global_step
     )
     # Add descriptor metric
-    if "matching_score" in results.keys():
+    if "matching_score" in results:
         writer.add_scalar(
             "Train_metrics/matching_score",
             results["matching_score"],
@@ -844,7 +839,7 @@ def record_train_summaries(writer, global_step, scalars, images):
         global_step,
     )
     # Add smoothed descriptor metric
-    if "matching_score" in average.keys():
+    if "matching_score" in average:
         writer.add_scalar(
             "Train_metrics_average/matching_score",
             average["matching_score"],
@@ -918,7 +913,7 @@ def record_test_summaries(writer, epoch, scalars):
     writer.add_scalar("Val_loss/heatmap_loss", average["heatmap_loss"], epoch)
     writer.add_scalar("Val_loss/total_loss", average["total_loss"], epoch)
     # Add descriptor loss
-    if "descriptor_loss" in average.keys():
+    if "descriptor_loss" in average:
         key = "descriptor_loss"
         writer.add_scalar("Val_loss/%s" % (key), average[key], epoch)
 
@@ -940,7 +935,7 @@ def record_test_summaries(writer, epoch, scalars):
         "Val_metrics/heatmap_recall", average["heatmap_recall"], epoch
     )
     # Add descriptor metric
-    if "matching_score" in average.keys():
+    if "matching_score" in average:
         writer.add_scalar(
             "Val_metrics/matching_score", average["matching_score"], epoch
         )

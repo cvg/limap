@@ -14,7 +14,7 @@ def umeyama_alignment(x, y, with_scale=True):
     :return: r, t, c - rotation matrix, translation vector and scale factor
     """
     if x.shape != y.shape:
-        assert False, "x.shape not equal to y.shape"
+        raise AssertionError("x.shape not equal to y.shape")
 
     # m = dimension, n = nr. of data points
     m, n = x.shape
@@ -54,10 +54,7 @@ def umeyama_alignment(x, y, with_scale=True):
 def align_imagecols_umeyama(imagecols_src, imagecols_dst):
     # assertion check
     assert imagecols_src.NumImages() == imagecols_dst.NumImages()
-    assert (
-        np.all(imagecols_src.get_img_ids() == imagecols_dst.get_img_ids())
-        == True
-    )
+    assert np.all(imagecols_src.get_img_ids() == imagecols_dst.get_img_ids())
 
     # fit transformation
     xyz_src = np.array(imagecols_src.get_locations()).transpose()
@@ -74,18 +71,17 @@ def align_imagecols_colmap(
     max_error=0.01,
     tmp_folder="tmp/model_convertion",
 ):
-    import os, shutil
-    import numpy as np
-    from limap.pointsfm import convert_imagecols_to_colmap
-    import limap.util.io as limapio
+    import os
     import subprocess
+
+    import numpy as np
+
+    import limap.util.io as limapio
+    from limap.pointsfm import convert_imagecols_to_colmap
 
     # assertion check
     assert imagecols_src.NumImages() == imagecols_dst.NumImages()
-    assert (
-        np.all(imagecols_src.get_img_ids() == imagecols_dst.get_img_ids())
-        == True
-    )
+    assert np.all(imagecols_src.get_img_ids() == imagecols_dst.get_img_ids())
 
     limapio.check_makedirs(tmp_folder)
     src_folder = os.path.join(tmp_folder, "source")
@@ -102,7 +98,7 @@ def align_imagecols_colmap(
         for img_id in imagecols_src.get_img_ids():
             imname = imagecols_src.image_name(img_id)
             pos = imagecols_dst.camview(img_id).pose.center()
-            f.write("{0} {1} {2} {3}\n".format(imname, pos[0], pos[1], pos[2]))
+            f.write(f"{imname} {pos[0]} {pos[1]} {pos[2]}\n")
 
     # call comlap model aligner
     transform_path = os.path.join(tmp_folder, "transform.txt")
@@ -130,7 +126,7 @@ def align_imagecols_colmap(
 
     # read in transformation
     def read_trans(fname):
-        with open(fname, "r") as f:
+        with open(fname) as f:
             lines = f.readlines()
         mat = []
         for idx in range(4):

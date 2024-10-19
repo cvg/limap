@@ -3,11 +3,12 @@ Implementation of the line segment detection module.
 """
 
 import math
+
 import numpy as np
 import torch
 
 
-class LineSegmentDetectionModule(object):
+class LineSegmentDetectionModule:
     """Module extracting line segments from junctions and line heatmaps."""
 
     def __init__(
@@ -187,7 +188,7 @@ class LineSegmentDetectionModule(object):
                 num_iter = math.ceil(num_cand / group_size)
                 sampled_feat_lst = []
                 for iter_idx in range(num_iter):
-                    if not iter_idx == num_iter - 1:
+                    if iter_idx != num_iter - 1:
                         cand_h_ = cand_h[
                             iter_idx * group_size : (iter_idx + 1) * group_size,
                             :,

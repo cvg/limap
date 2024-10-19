@@ -1,14 +1,16 @@
 import os
+
 import numpy as np
 from tqdm import tqdm
-import limap.structures as _structures
+
 import limap.pointsfm as _psfm
+import limap.structures as _structures
 
 
 def compute_2d_feature_points_sp(imagecols, output_path="tmp/featurepoints"):
-    import limap.pointsfm as _psfm
-    import cv2
     from pathlib import Path
+
+    import cv2
     import h5py
 
     if not os.path.exists(output_path):
@@ -20,9 +22,7 @@ def compute_2d_feature_points_sp(imagecols, output_path="tmp/featurepoints"):
     ### copy images to tmp folder
     for img_id in imagecols.get_img_ids():
         img = imagecols.read_image(img_id)
-        fname_to_save = os.path.join(
-            image_path, "image{0:08d}.png".format(img_id)
-        )
+        fname_to_save = os.path.join(image_path, f"image{img_id:08d}.png")
         cv2.imwrite(fname_to_save, img)
 
     # run superpoint
@@ -39,7 +39,7 @@ def compute_2d_feature_points_sp(imagecols, output_path="tmp/featurepoints"):
     f = h5py.File(feature_path, "r")
     all_keypoints = {}
     for img_id in imagecols.get_img_ids():
-        fname = "image{0:08d}.png".format(img_id)
+        fname = f"image{img_id:08d}.png"
         keypoints = np.array(f[fname]["keypoints"])
         all_keypoints[img_id] = keypoints
     return all_keypoints

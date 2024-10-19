@@ -3,13 +3,13 @@ Implementation of the line matching methods.
 """
 
 import numpy as np
-import cv2
 import torch
 import torch.nn.functional as F
+
 from ..misc.geometry_utils import keypoints_to_grid
 
 
-class WunschLineMatcher(object):
+class WunschLineMatcher:
     """Class matching two sets of line segments
     with the Needleman-Wunsch algorithm."""
 

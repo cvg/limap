@@ -1,6 +1,5 @@
-from _limap import _merging as _mrg
 from _limap import _base
-import numpy as np
+from _limap import _merging as _mrg
 
 
 def merging(linker, all_2d_segs, imagecols, seg3d_list, neighbors, var2d=5.0):
@@ -36,9 +35,7 @@ def remerge(linker3d, linetracks, num_outliers=2):
             break
         num_tracks = num_tracks_new
     print(
-        "[LOG] tracks after iterative remerging: {0} / {1}".format(
-            len(new_linetracks), len(linetracks)
-        )
+        f"[LOG] tracks after iterative remerging: {len(new_linetracks)} / {len(linetracks)}"
     )
     return new_linetracks
 

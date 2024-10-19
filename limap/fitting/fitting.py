@@ -1,6 +1,5 @@
-from _limap import _base, _estimators, _fitting
-import os
 import numpy as np
+from _limap import _estimators, _fitting
 from bresenham import bresenham
 from hloc.localize_inloc import interpolate_scan
 
@@ -64,7 +63,7 @@ def estimate_seg3d_from_points3d(
     var2d=5.0,
 ):
     h, w = camview.h(), camview.w()
-    K, R, T = camview.K(), camview.R(), camview.T()
+    R, T = camview.R(), camview.T()
 
     # get points and depths
     seg1_pts = np.linspace(

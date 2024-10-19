@@ -41,9 +41,7 @@ def rotation_from_quaternion(quad):
     norm = np.linalg.norm(quad)
     if norm < 1e-10:
         raise ValueError(
-            "Error! the quaternion is not robust. quad.norm() = {0}".format(
-                norm
-            )
+            f"Error! the quaternion is not robust. quad.norm() = {norm}"
         )
     quad = quad / norm
     qr, qi, qj, qk = quad[0], quad[1], quad[2], quad[3]

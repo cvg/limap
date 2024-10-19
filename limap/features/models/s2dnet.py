@@ -1,22 +1,14 @@
+import logging
+import os
+from pathlib import Path
 from typing import List
-import numpy
+
+import numpy as np
 import torch
 import torch.nn as nn
 from torchvision import models
-from pathlib import Path
-import logging
 
-from PIL import Image
 from .base_model import BaseModel
-import os, sys
-from torchvision import transforms
-import numpy as np
-import torch.nn.functional as F
-
-import argparse
-import h5py
-
-from time import time
 
 type_dict = {
     "uint8_t": torch.cuda.ByteTensor,
@@ -90,12 +82,12 @@ class AdapLayers(nn.Module):
                 nn.BatchNorm2d(output_dim),
             )
             self.layers.append(layer)
-            self.add_module("adap_layer_{}".format(i), layer)
+            self.add_module(f"adap_layer_{i}", layer)
 
     def forward(self, features: List[torch.tensor]):
         """Apply adaptation layers."""
         for i, _ in enumerate(features):
-            features[i] = getattr(self, "adap_layer_{}".format(i))(features[i])
+            features[i] = getattr(self, f"adap_layer_{i}")(features[i])
         return features
 
 

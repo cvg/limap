@@ -1,19 +1,20 @@
-import os, sys
+import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import numpy as np
 import math
 
-import limap.util.io as limapio
-import limap.util.config as cfgutils
-import limap.visualize as limapvis
+import numpy as np
+
 import limap.base as _base
-import limap.ceresbase as _ceresbase
-import limap.pointsfm as _psfm
-import limap.vplib as _vplib
 import limap.optimize as _optim
-import limap.structures as _structures
+import limap.pointsfm as _psfm
 import limap.runners
+import limap.structures as _structures
+import limap.util.config as cfgutils
+import limap.util.io as limapio
+import limap.visualize as limapvis
+import limap.vplib as _vplib
 
 
 def report_vp(vpresults, vptracks, print_pairs=False):
@@ -26,24 +27,18 @@ def report_vp(vpresults, vptracks, print_pairs=False):
                 n_pairs_parallel += 1
                 if print_pairs:
                     print(
-                        "[LOG] Parallel pair detected: {0} / {1}, angle = {2:.2f}".format(
-                            i, j, angle
-                        )
+                        f"[LOG] Parallel pair detected: {i} / {j}, angle = {angle:.2f}"
                     )
             if angle >= 87.0:
                 n_pairs_orthogonal += 1
                 if print_pairs:
                     print(
-                        "[LOG] Orthogonal pair detected: {0} / {1}, angle = {2:.2f}".format(
-                            i, j, angle
-                        )
+                        f"[LOG] Orthogonal pair detected: {i} / {j}, angle = {angle:.2f}"
                     )
-    print("[LOG] number of VP tracks: {0}".format(len(vptracks)))
+    print(f"[LOG] number of VP tracks: {len(vptracks)}")
     print("[LOG]", [track.length() for track in vptracks])
     print(
-        "[LOG] parallel pairs: {0}, orthogonal pairs: {1}".format(
-            n_pairs_parallel, n_pairs_orthogonal
-        )
+        f"[LOG] parallel pairs: {n_pairs_parallel}, orthogonal pairs: {n_pairs_orthogonal}"
     )
 
 

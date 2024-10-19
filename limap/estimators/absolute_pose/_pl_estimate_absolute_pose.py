@@ -1,8 +1,9 @@
-from _limap import _ceresbase
-import limap.optimize as _optimize
-import limap.estimators as _estimators
-import limap.base as _base
 import numpy as np
+from _limap import _ceresbase
+
+import limap.base as _base
+import limap.estimators as _estimators
+import limap.optimize as _optimize
 
 
 def _pl_estimate_absolute_pose(

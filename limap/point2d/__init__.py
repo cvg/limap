@@ -1,2 +1,2 @@
-from .superpoint import *
 from .superglue import *
+from .superpoint import *

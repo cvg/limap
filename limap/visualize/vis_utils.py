@@ -1,10 +1,10 @@
-import os
-import cv2
-import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
-import seaborn as sns
 import copy
+import os
+
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
 
 
 def random_color():
@@ -300,17 +300,13 @@ def make_bigimage(imgs, pad=20):
 
 def test_point_inside_ranges(point, ranges):
     point = np.array(point)
-    if ~np.all(point > ranges[0]) or ~np.all(point < ranges[1]):
-        return False
-    return True
+    return np.all(point > ranges[0]) and np.all(point < ranges[1])
 
 
 def test_line_inside_ranges(line, ranges):
     if not test_point_inside_ranges(line.start, ranges):
         return False
-    if not test_point_inside_ranges(line.end, ranges):
-        return False
-    return True
+    return test_point_inside_ranges(line.end, ranges)
 
 
 def compute_robust_range(arr, range_robust=[0.05, 0.95], k_stretch=2.0):
@@ -369,15 +365,11 @@ def report_dist_reprojection(line3d, line2d, camview, prefix=None):
     sensitivity = line3d.sensitivity(camview)
     if prefix is None:
         print(
-            "angle = {0:.4f}, perp = {1:.4f}, overlap = {2:.4f}, sensi = {3:.4f}".format(
-                angle, perp_dist, overlap, sensitivity
-            )
+            f"angle = {angle:.4f}, perp = {perp_dist:.4f}, overlap = {overlap:.4f}, sensi = {sensitivity:.4f}"
         )
     else:
         print(
-            "{4}: angle = {0:.4f}, perp = {1:.4f}, overlap = {2:.4f}, sensi = {3:.4f}".format(
-                angle, perp_dist, overlap, sensitivity, prefix
-            )
+            f"{prefix}: angle = {angle:.4f}, perp = {perp_dist:.4f}, overlap = {overlap:.4f}, sensi = {sensitivity:.4f}"
         )
 
 
@@ -393,9 +385,7 @@ def visualize_line_track(
     imagecols, linetrack, prefix="linetrack", report=False
 ):
     print(
-        "[VISUALIZE]: line length: {0}, num_supporting_lines: {1}".format(
-            linetrack.line.length(), len(linetrack.image_id_list)
-        )
+        f"[VISUALIZE]: line length: {linetrack.line.length()}, num_supporting_lines: {len(linetrack.image_id_list)}"
     )
     for idx, (img_id, line2d) in enumerate(
         zip(linetrack.image_id_list, linetrack.line2d_list)
@@ -407,9 +397,7 @@ def visualize_line_track(
             linetrack.line,
             line2d,
             imagecols.camview(img_id),
-            prefix="Reprojecting to line {0} (img {1}, line {2})".format(
-                idx, img_id, linetrack.line_id_list[idx]
-            ),
+            prefix=f"Reprojecting to line {idx} (img {img_id}, line {linetrack.line_id_list[idx]})",
         )
         line2d_proj = linetrack.line.projection(imagecols.camview(img_id))
         img = draw_segments(
@@ -420,11 +408,7 @@ def visualize_line_track(
         )
         fname = os.path.join(
             "tmp",
-            "{0}.{1}.{2}.png".format(
-                prefix,
-                idx,
-                os.path.basename(imagecols.camimage(img_id).image_name())[:-4],
-            ),
+            f"{prefix}.{idx}.{os.path.basename(imagecols.camimage(img_id).image_name())[:-4]}.png",
         )
         cv2.imwrite(fname, img)
 
@@ -432,7 +416,6 @@ def visualize_line_track(
 def vis_vpresult(
     img, lines, vpres, vp_id=-1, show_original=False, endpoints=False
 ):
-    import seaborn as sns
     import cv2
 
     n_vps = vpres.count_vps()
@@ -442,10 +425,11 @@ def vis_vpresult(
         colors = [[255, 0, 0]]
     for line_id, line in enumerate(lines):
         c = [255, 255, 255]  # default color: white
-        if not vpres.HasVP(line_id):
-            if not show_original:
-                continue
-        elif vp_id >= 0 and vpres.labels[line_id] != vp_id:
+        if (
+            not vpres.HasVP(line_id)
+            or vp_id >= 0
+            and vpres.labels[line_id] != vp_id
+        ):
             if not show_original:
                 continue
         else:

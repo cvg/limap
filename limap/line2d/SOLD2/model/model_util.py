@@ -1,11 +1,10 @@
-import torch
 import torch.nn as nn
 import torch.nn.init as init
 
 from .nets.backbone import HourglassBackbone, SuperpointBackbone
-from .nets.junction_decoder import SuperpointDecoder
-from .nets.heatmap_decoder import PixelShuffleDecoder
 from .nets.descriptor_decoder import SuperpointDescriptor
+from .nets.heatmap_decoder import PixelShuffleDecoder
+from .nets.junction_decoder import SuperpointDecoder
 
 
 def get_model(model_cfg=None, loss_weights=None, mode="train", printing=False):
@@ -18,7 +17,7 @@ def get_model(model_cfg=None, loss_weights=None, mode="train", printing=False):
     if printing:
         print("\n\n\t--------Initializing model----------")
     supported_arch = ["simple"]
-    if not model_cfg["model_architecture"] in supported_arch:
+    if model_cfg["model_architecture"] not in supported_arch:
         raise ValueError(
             "[Error] The model architecture is not in supported arch!"
         )
@@ -61,7 +60,7 @@ class SOLD2Net(nn.Module):
     """Full network for SOLD²."""
 
     def __init__(self, model_cfg):
-        super(SOLD2Net, self).__init__()
+        super().__init__()
         self.name = model_cfg["model_name"]
         self.cfg = model_cfg
 
@@ -108,7 +107,7 @@ class SOLD2Net(nn.Module):
 
     def get_backbone(self):
         """Retrieve the backbone encoder network."""
-        if not self.cfg["backbone"] in self.supported_backbone:
+        if self.cfg["backbone"] not in self.supported_backbone:
             raise ValueError("[Error] The backbone selection is not supported.")
 
         # lcnn backbone (stacked hourglass)
@@ -129,7 +128,7 @@ class SOLD2Net(nn.Module):
 
     def get_junction_decoder(self):
         """Get the junction decoder."""
-        if not self.cfg["junction_decoder"] in self.supported_junction_decoder:
+        if self.cfg["junction_decoder"] not in self.supported_junction_decoder:
             raise ValueError(
                 "[Error] The junction decoder selection is not supported."
             )
@@ -146,7 +145,7 @@ class SOLD2Net(nn.Module):
 
     def get_heatmap_decoder(self):
         """Get the heatmap decoder."""
-        if not self.cfg["heatmap_decoder"] in self.supported_heatmap_decoder:
+        if self.cfg["heatmap_decoder"] not in self.supported_heatmap_decoder:
             raise ValueError(
                 "[Error] The heatmap decoder selection is not supported."
             )
@@ -181,8 +180,8 @@ class SOLD2Net(nn.Module):
     def get_descriptor_decoder(self):
         """Get the descriptor decoder."""
         if (
-            not self.cfg["descriptor_decoder"]
-            in self.supported_descriptor_decoder
+            self.cfg["descriptor_decoder"]
+            not in self.supported_descriptor_decoder
         ):
             raise ValueError(
                 "[Error] The descriptor decoder selection is not supported."

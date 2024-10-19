@@ -1,7 +1,8 @@
 import os
-import numpy as np
 import warnings
+
 from tqdm import tqdm
+
 import limap.util.io as limapio
 
 
@@ -49,9 +50,7 @@ def undistort_images(
     unload_ids = imagecols.get_img_ids()
     if skip_exists:
         print(
-            "[LOG] Loading undistorted images (n_images = {0})...".format(
-                imagecols.NumImages()
-            )
+            f"[LOG] Loading undistorted images (n_images = {imagecols.NumImages()})..."
         )
         fname_in = os.path.join(output_dir, fname)
         if os.path.isfile(fname_in):
@@ -70,14 +69,12 @@ def undistort_images(
     # start undistortion
     if n_jobs == -1:
         n_jobs = os.cpu_count()
-    print(
-        "[LOG] Start undistorting images (n_images = {0})...".format(
-            len(unload_ids)
-        )
-    )
-    import limap.undistortion as _undist
-    import cv2, imagesize
+    print(f"[LOG] Start undistorting images (n_images = {len(unload_ids)})...")
+    import cv2
+    import imagesize
     import joblib
+
+    import limap.undistortion as _undist
 
     # limapio.delete_folder(output_dir)
     limapio.check_makedirs(output_dir)
@@ -87,7 +84,7 @@ def undistort_images(
         cam_id = imagecols.camimage(img_id).cam_id
         cam = imagecols.cam(cam_id)
         imname_in = imagecols.camimage(img_id).image_name()
-        imname_out = os.path.join(output_dir, "image{0:08d}.png".format(img_id))
+        imname_out = os.path.join(output_dir, f"image{img_id:08d}.png")
         # save image if resizing is needed
         width, height = imagesize.get(imname_in)
         if height != cam.h() or width != cam.w():
@@ -109,7 +106,7 @@ def undistort_images(
     imagecols_undistorted = _base.ImageCollection(imagecols)
     cam_dict = {}
     for idx, img_id in enumerate(unload_ids):
-        imname_out = os.path.join(output_dir, "image{0:08d}.png".format(img_id))
+        imname_out = os.path.join(output_dir, f"image{img_id:08d}.png")
         cam_undistorted = outputs[idx]
         cam_id = cam_undistorted.cam_id()
         if cam_id not in cam_dict:
@@ -117,7 +114,7 @@ def undistort_images(
             imagecols_undistorted.change_camera(cam_id, cam_undistorted)
         imagecols_undistorted.change_image_name(img_id, imname_out)
     for idx, img_id in enumerate(loaded_ids):
-        imname_out = os.path.join(output_dir, "image{0:08d}.png".format(img_id))
+        imname_out = os.path.join(output_dir, f"image{img_id:08d}.png")
         cam_id = loaded_imagecols.camimage(img_id).cam_id
         cam_undistorted = loaded_imagecols.cam(cam_id)
         if cam_id not in cam_dict:
@@ -192,7 +189,7 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
         all_2d_segs (dict[int -> :class:`np.array`], each with shape (N, 4) or (N, 5)): all the line detections for each image
         descinfo_folder (str): folder to store the descriptors
     """
-    weight_path = None if "weight_path" not in cfg else cfg["weight_path"]
+    weight_path = cfg.get("weight_path", None)
     if "extractor" in cfg["line2d"]:
         print(
             "[LOG] Start 2D line detection and description (detector = {0}, extractor = {1}, n_images = {2})...".format(
@@ -283,7 +280,7 @@ def compute_matches(cfg, descinfo_folder, image_ids, neighbors):
     Returns:
         matches_folder (str): path to store the computed matches
     """
-    weight_path = None if "weight_path" not in cfg else cfg["weight_path"]
+    weight_path = cfg.get("weight_path", None)
     print(
         "[LOG] Start matching 2D lines... (extractor = {0}, matcher = {1}, n_images = {2}, n_neighbors = {3})".format(
             cfg["line2d"]["extractor"]["method"],

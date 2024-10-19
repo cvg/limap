@@ -1,5 +1,5 @@
-import os, sys
-import numpy as np
+import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from Rome16K import Rome16K
@@ -7,12 +7,8 @@ from Rome16K import Rome16K
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
-import limap.base as _base
-import limap.pointsfm as _psfm
-import limap.util.io as limapio
-import limap.util.config as cfgutils
 import limap.runners
-
+import limap.util.config as cfgutils
 from runners.bundler_triangulation import read_scene_bundler
 
 
@@ -113,7 +109,7 @@ def parse_config():
     cfg["list_path"] = args.list_path
     cfg["model_path"] = args.model_path
     cfg["info_path"] = args.info_path
-    if ("max_image_dim" not in cfg.keys()) or args.max_image_dim is not None:
+    if ("max_image_dim" not in cfg) or args.max_image_dim is not None:
         cfg["max_image_dim"] = args.max_image_dim
     # components
     cfg["component_folder"] = args.component_folder

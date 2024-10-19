@@ -1,7 +1,6 @@
 import numpy as np
 import torch
 
-
 ### Point-related utils
 
 

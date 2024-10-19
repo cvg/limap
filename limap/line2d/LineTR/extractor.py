@@ -1,17 +1,19 @@
 import os
-import numpy as np
+
 import cv2
+import numpy as np
 import torch
 
 import limap.util.io as limapio
-from limap.point2d.superpoint.superpoint import SuperPoint, sample_descriptors
-from .line_transformer import LineTransformer
+from limap.point2d.superpoint.superpoint import SuperPoint
+
 from ..base_detector import BaseDetector, BaseDetectorOptions
+from .line_transformer import LineTransformer
 
 
 class LineTRExtractor(BaseDetector):
     def __init__(self, options=BaseDetectorOptions(), device=None):
-        super(LineTRExtractor, self).__init__(options)
+        super().__init__(options)
         self.device = "cuda" if device is None else device
         self.sp = SuperPoint({}).eval().to(self.device)
         self.linetr = (
@@ -24,7 +26,7 @@ class LineTRExtractor(BaseDetector):
         return "linetr"
 
     def get_descinfo_fname(self, descinfo_folder, img_id):
-        fname = os.path.join(descinfo_folder, "descinfo_{0}.npz".format(img_id))
+        fname = os.path.join(descinfo_folder, f"descinfo_{img_id}.npz")
         return fname
 
     def save_descinfo(self, descinfo_folder, img_id, descinfo):
