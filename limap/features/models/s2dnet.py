@@ -70,7 +70,7 @@ class AdapLayers(nn.Module):
             hypercolumn_layers: The list of the hypercolumn layer names.
             output_dim: The output channel dimension.
         """
-        super(AdapLayers, self).__init__()
+        super().__init__()
         self.layers = []
         channel_sizes = [vgg16_layers[name] for name in hypercolumn_layers]
         print(channel_sizes)
