@@ -60,7 +60,7 @@ def read_scene_visualsfm(
 def get_scene_info(vsfm_path, imagecols, query_images):
     with open(os.path.join(vsfm_path, "dataset_train.txt")) as f:
         lines = f.readlines()[3:]
-    train_names = [l.split()[0] for l in lines]
+    train_names = [line.split()[0] for line in lines]
 
     query_start_idx = 0
     if query_images is None:
@@ -68,7 +68,7 @@ def get_scene_info(vsfm_path, imagecols, query_images):
         query_start_idx = 3
     with open(query_images) as f:
         lines = f.readlines()[query_start_idx:]
-    query_names = [l.split()[0] for l in lines]
+    query_names = [line.split()[0] for line in lines]
 
     train_ids = []
     query_ids = []

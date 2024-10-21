@@ -18,7 +18,7 @@ def process_pyramid(
     cur_sigma2 = 1.0
     pyramid = []
     multiscale_segs = []
-    for i in range(n_levels):
+    for _ in range(n_levels):
         increase_sigma = np.sqrt(cur_sigma2 - pre_sigma2)
         blurred = cv2.GaussianBlur(
             octave_img, (5, 5), increase_sigma, borderType=cv2.BORDER_REPLICATE
@@ -47,8 +47,8 @@ def process_pyramid(
 
 def to_multiscale_lines(lines):
     ms_lines = []
-    for l in lines.reshape(-1, 4):
-        ll = np.append(l, [0, np.linalg.norm(l[:2] - l[2:4])])
+    for line in lines.reshape(-1, 4):
+        ll = np.append(line, [0, np.linalg.norm(line[:2] - line[2:4])])
         ms_lines.append(
             [(0, ll)] + [(i, ll / (i * np.sqrt(2))) for i in range(1, 5)]
         )

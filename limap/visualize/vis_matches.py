@@ -72,7 +72,7 @@ def plot_lines(
         alpha: alpha transparency.
     """
     if not isinstance(line_colors, list):
-        line_colors = [[line_colors] * len(l) for l in lines]
+        line_colors = [[line_colors] * len(line) for line in lines]
     for i in range(len(lines)):
         if (not isinstance(line_colors[i], list)) and (
             not isinstance(line_colors[i], np.ndarray)
@@ -86,18 +86,18 @@ def plot_lines(
     fig.canvas.draw()
 
     # Plot the lines and junctions
-    for a, l, lc in zip(axes, lines, line_colors):
-        for i in range(len(l)):
-            line = matplotlib.lines.Line2D(
-                (l[i, 0, 0], l[i, 1, 0]),
-                (l[i, 0, 1], l[i, 1, 1]),
+    for a, line, lc in zip(axes, lines, line_colors):
+        for i in range(len(line)):
+            mpl_line = matplotlib.lines.Line2D(
+                (line[i, 0, 0], line[i, 1, 0]),
+                (line[i, 0, 1], line[i, 1, 1]),
                 zorder=1,
                 c=lc[i],
                 linewidth=lw,
                 alpha=alpha,
             )
-            a.add_line(line)
-        pts = l.reshape(-1, 2)
+            a.add_line(mpl_line)
+        pts = line.reshape(-1, 2)
         a.scatter(
             pts[:, 0],
             pts[:, 1],
@@ -132,11 +132,11 @@ def plot_color_line_matches(lines, correct_matches=None, lw=2, indices=(0, 1)):
     fig.canvas.draw()
 
     # Plot the lines
-    for a, l in zip(axes, lines):
+    for a, line in zip(axes, lines):
         # Transform the points into the figure coordinate system
         transFigure = fig.transFigure.inverted()
-        endpoint0 = transFigure.transform(a.transData.transform(l[:, 0]))
-        endpoint1 = transFigure.transform(a.transData.transform(l[:, 1]))
+        endpoint0 = transFigure.transform(a.transData.transform(line[:, 0]))
+        endpoint1 = transFigure.transform(a.transData.transform(line[:, 1]))
         fig.lines += [
             matplotlib.lines.Line2D(
                 (endpoint0[i, 0], endpoint1[i, 0]),
@@ -168,7 +168,7 @@ def plot_color_lines(
     blue = palette[5]  # palette[0]
     red = palette[0]  # palette[3]
     green = palette[2]  # palette[2]
-    colors = [np.array([blue] * len(l)) for l in lines]
+    colors = [np.array([blue] * len(line)) for line in lines]
     for i, c in enumerate(colors):
         c[np.array(correct_matches[i])] = green
         c[np.array(wrong_matches[i])] = red
@@ -180,11 +180,11 @@ def plot_color_lines(
     fig.canvas.draw()
 
     # Plot the lines
-    for a, l, c in zip(axes, lines, colors):
+    for a, line, c in zip(axes, lines, colors):
         # Transform the points into the figure coordinate system
         transFigure = fig.transFigure.inverted()
-        endpoint0 = transFigure.transform(a.transData.transform(l[:, 0]))
-        endpoint1 = transFigure.transform(a.transData.transform(l[:, 1]))
+        endpoint0 = transFigure.transform(a.transData.transform(line[:, 0]))
+        endpoint1 = transFigure.transform(a.transData.transform(line[:, 1]))
         fig.lines += [
             matplotlib.lines.Line2D(
                 (endpoint0[i, 0], endpoint1[i, 0]),
@@ -194,7 +194,7 @@ def plot_color_lines(
                 c=c[i],
                 linewidth=lw,
             )
-            for i in range(len(l))
+            for i in range(len(line))
         ]
 
 

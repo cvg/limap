@@ -88,7 +88,7 @@ def ReadModelBundler(bundler_path, list_path, model_path):
     imagecols = _base.ImageCollection(cameras, camimages)
 
     # read points
-    for point_id in tqdm(range(n_points)):
+    for _ in tqdm(range(n_points)):
         line = lines[counter].strip("\n").split(" ")
         x, y, z = float(line[0]), float(line[1]), float(line[2])
         counter += 1
@@ -97,7 +97,7 @@ def ReadModelBundler(bundler_path, list_path, model_path):
         n_views = int(line[0])
         subcounter = 1
         track = []
-        for view_id in range(n_views):
+        for _ in range(n_views):
             track.append(int(line[subcounter]))
             subcounter += 4
         model.addPoint(x, y, z, track)

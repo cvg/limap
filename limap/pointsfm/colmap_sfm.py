@@ -172,7 +172,7 @@ def run_colmap_sfm(
 
     ### copy images to tmp folder
     keypoints_in_order = []
-    for idx, img_id in enumerate(imagecols.get_img_ids()):
+    for img_id in imagecols.get_img_ids():
         img = imagecols.read_image(img_id)
         fname_to_save = os.path.join(image_path, f"image{img_id:08d}.png")
         cv2.imwrite(fname_to_save, img)
@@ -247,7 +247,7 @@ def run_colmap_sfm_with_known_poses(
     ### copy images to tmp folder
     keypoints_in_order = []
     imagecols_tmp = copy.deepcopy(imagecols)
-    for idx, img_id in enumerate(imagecols.get_img_ids()):
+    for img_id in imagecols.get_img_ids():
         img = imagecols.read_image(img_id)
         fname_to_save = os.path.join(image_path, f"image{img_id:08d}.png")
         cv2.imwrite(fname_to_save, img)

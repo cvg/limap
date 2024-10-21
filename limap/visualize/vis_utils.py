@@ -70,21 +70,29 @@ def draw_multiscale_segments(
     img = copy.deepcopy(img)
     for s in segs:
         mycolor = random_color() if color is None else color
-        octave, l = s[0]
-        l = l * np.sqrt(2) ** octave
+        octave, line = s[0]
+        line = line * np.sqrt(2) ** octave
         cv2.line(
             img,
-            (int(l[0]), int(l[1])),
-            (int(l[2]), int(l[3])),
+            (int(line[0]), int(line[1])),
+            (int(line[2]), int(line[3])),
             mycolor,
             thickness,
         )
         if endpoints:
             cv2.circle(
-                img, (int(l[0]), int(l[1])), int(thickness * 1.5), mycolor, -1
+                img,
+                (int(line[0]), int(line[1])),
+                int(thickness * 1.5),
+                mycolor,
+                -1,
             )
             cv2.circle(
-                img, (int(l[2]), int(l[3])), int(thickness * 1.5), mycolor, -1
+                img,
+                (int(line[2]), int(line[3])),
+                int(thickness * 1.5),
+                mycolor,
+                -1,
             )
     return img
 
@@ -107,22 +115,22 @@ def draw_multiscale_matches(
         b1.append(b)
         line_id_l, line_id_r = matches[pair]
 
-        octave, l = segs_left[line_id_l][0]
-        l = l * np.sqrt(2) ** octave
+        octave, line = segs_left[line_id_l][0]
+        line = line * np.sqrt(2) ** octave
         cv2.line(
             left_color_img,
-            (int(l[0]), int(l[1])),
-            (int(l[2]), int(l[3])),
+            (int(line[0]), int(line[1])),
+            (int(line[2]), int(line[3])),
             (r1[pair], g1[pair], b1[pair]),
             3,
         )
 
-        octave, l = segs_right[line_id_r][0]
-        l = l * np.sqrt(2) ** octave
+        octave, line = segs_right[line_id_r][0]
+        line = line * np.sqrt(2) ** octave
         cv2.line(
             right_color_img,
-            (int(l[0]), int(l[1])),
-            (int(l[2]), int(l[3])),
+            (int(line[0]), int(line[1])),
+            (int(line[2]), int(line[3])),
             (r1[pair], g1[pair], b1[pair]),
             3,
         )
@@ -160,37 +168,37 @@ def draw_singlescale_matches(img_left, img_right, matched_segs, mask=None):
     right_color_img = cv2.cvtColor(img_right, cv2.COLOR_GRAY2BGR)
     colors = []
     if mask is None:
-        for l, r in matched_segs:
+        for left, right in matched_segs:
             color = random_color()
             colors.append(color)
             cv2.line(
                 left_color_img,
-                (int(l[0]), int(l[1])),
-                (int(l[2]), int(l[3])),
+                (int(left[0]), int(left[1])),
+                (int(left[2]), int(left[3])),
                 color,
                 3,
             )
             cv2.line(
                 right_color_img,
-                (int(r[0]), int(r[1])),
-                (int(r[2]), int(r[3])),
+                (int(right[0]), int(right[1])),
+                (int(right[2]), int(right[3])),
                 color,
                 3,
             )
     else:
-        for correct, (l, r) in zip(mask, matched_segs):
+        for correct, (left, right) in zip(mask, matched_segs):
             color = (0, 255, 0) if correct else (0, 0, 255)
             cv2.line(
                 left_color_img,
-                (int(l[0]), int(l[1])),
-                (int(l[2]), int(l[3])),
+                (int(left[0]), int(left[1])),
+                (int(left[2]), int(left[3])),
                 color,
                 3,
             )
             cv2.line(
                 right_color_img,
-                (int(r[0]), int(r[1])),
-                (int(r[2]), int(r[3])),
+                (int(right[0]), int(right[1])),
+                (int(right[2]), int(right[3])),
                 color,
                 3,
             )
@@ -199,17 +207,17 @@ def draw_singlescale_matches(img_left, img_right, matched_segs, mask=None):
     result_img_tmp = result_img.copy()
     if mask is None:
         for i in range(len(matched_segs)):
-            l, r = matched_segs[i]
-            start_ptn = (int(l[0]), int(l[1]))
-            end_ptn = (int(r[0] + w), int(r[1]))
+            left, right = matched_segs[i]
+            start_ptn = (int(left[0]), int(left[1]))
+            end_ptn = (int(right[0] + w), int(right[1]))
             cv2.line(
                 result_img_tmp, start_ptn, end_ptn, colors[i], 2, cv2.LINE_AA
             )
     else:
-        for correct, (l, r) in zip(mask, matched_segs):
+        for correct, (left, right) in zip(mask, matched_segs):
             color = (0, 255, 0) if correct else (0, 0, 255)
-            start_ptn = (int(l[0]), int(l[1]))
-            end_ptn = (int(r[0] + w), int(r[1]))
+            start_ptn = (int(left[0]), int(left[1]))
+            end_ptn = (int(right[0] + w), int(right[1]))
             cv2.line(result_img_tmp, start_ptn, end_ptn, color, 2, cv2.LINE_AA)
 
     result_img = cv2.addWeighted(result_img, 0.5, result_img_tmp, 0.5, 0.0)

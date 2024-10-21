@@ -15,15 +15,12 @@ select = [
     # isort
     "I",
 ]
-ignore = ["SIM113", "SIM117", "E501", "F401", "F403", 
-          "UP030", "B007", "E402", "E741", "B006", 
-          "B008", "B028", "B904", "UP031", "E722"]
+ignore = ["E501", "F401", "F403", "UP030", "B006", "B008"]
 
 [lint.per-file-ignores]
-"limap/line2d/SOLD2/model/*.py" = ["SIM"]
-"limap/line2d/SOLD2/misc/*.py" = ["SIM"]
-"limap/line2d/LineTR/*.py" = ["F", "SIM"]
 "limap/line2d/L2D2/RAL_net_cov.py" = ["SIM"]
-"limap/features/models/s2dnet.py" = ["F", "UP"]
-"limap/features/models/vggnet.py" = ["F"]
-"limap/estimators/absolute_pose/_pl_estimate_absolute_pose.py" = ["F"]
+"limap/line2d/LineTR/*.py" = ["F405", "F841", "SIM"]
+"limap/line2d/SOLD2/model/*.py" = ["UP031", "SIM"]
+"limap/line2d/SOLD2/misc/*.py" = ["E741", "UP031", "SIM"]
+"limap/line2d/SOLD2/train.py" = ["UP031"]
+"limap/point2d/superpoint/main.py" = ["B904"]

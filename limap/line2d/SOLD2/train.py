@@ -40,7 +40,7 @@ def restore_weights(model, state_dict, strict=True):
     try:
         model.load_state_dict(state_dict, strict=strict)
     # Deal with some version compatibility issue (catch version incompatible)
-    except:
+    except KeyError:
         err = model.load_state_dict(state_dict, strict=False)
 
         # missing keys are those in model but not in state_dict

@@ -114,7 +114,7 @@ def line_refinement(
     # output
     newtracks = []
     counter = 0
-    for idx, track in enumerate(tracks):
+    for track in tracks:
         if track.count_images() < n_visible_views:
             newtracks.append(track)
         else:

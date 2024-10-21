@@ -40,7 +40,7 @@ class PyVistaTrackVisualizer(BaseTrackVisualizer):
         self.plotter.show()
 
     def vis_additional_lines(self, lines, img_hw=(600, 800), width=2):
-        for track_id, line in enumerate(self.lines):
+        for line in self.lines:
             color = "#ff0000"
             self.plotter.add_lines(line.as_array(), color, width=width)
         for line in lines:
