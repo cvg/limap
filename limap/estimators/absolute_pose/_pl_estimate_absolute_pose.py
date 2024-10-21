@@ -47,18 +47,23 @@ def _pl_estimate_absolute_pose(
     ransac_cfg = cfg["ransac"]
     if ransac_cfg["method"] is None:
         if inliers_point is not None:
+            original_len = len(p2ds)
             p2ds = np.array(p2ds)[inliers_point]
             p3ds = np.array(p3ds)[inliers_point]
             if logger:
                 logger.info(
-                    f"{len(p2ds)} inliers reserved from {len(inliers_point)} point matches"
+                    f"{len(p2ds)} inliers reserved from {original_len} point matches"
                 )
+
         if inliers_line is not None:
-            line_matches_2to3 = np.array(line_matches_2to3)[inliers_line]
+            original_len = len(l3d_ids)
+            l3d_ids = np.array(l3d_ids)[inliers_line]
+            l2ds = np.array(l2ds)[inliers_line]
             if logger:
                 logger.info(
-                    f"{len(line_matches_2to3)} inliers reserved from {len(inliers_line)} line matches"
+                    f"{len(l3d_ids)} inliers reserved from {original_len} line matches"
                 )
+
         jointloc = _optimize.solve_jointloc(
             cfg["line_cost_func"],
             jointloc_cfg,
