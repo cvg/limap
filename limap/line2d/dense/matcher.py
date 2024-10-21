@@ -8,6 +8,7 @@ import torch.nn.functional as F
 import limap.util.io as limapio
 
 from ..base_matcher import BaseMatcher, BaseMatcherOptions
+from .dense_matcher import BaseDenseMatcher
 
 
 class BaseDenseLineMatcherOptions(NamedTuple):
@@ -27,9 +28,10 @@ class BaseDenseLineMatcher(BaseMatcher):
     ):
         super().__init__(extractor, options)
         assert self.extractor.get_module_name() == "dense_naive"
-        self.dense_matcher = dense_matcher
+        assert dense_options.n_samples >= 2
         self.dense_options = dense_options
-        assert self.dense_options.n_samples >= 2
+        assert isinstance(dense_matcher, BaseDenseMatcher)
+        self.dense_matcher = dense_matcher
 
     def get_module_name(self):
         raise NotImplementedError

@@ -13,6 +13,8 @@ class RoMa(BaseDenseMatcher):
             self.model = romatch.roma_outdoor(device=device, coarse_res=560)
         elif mode == "indoor":
             self.model = romatch.roma_indoor(device=device, coarse_res=560)
+        elif mode == "tiny_outdoor":
+            self.model = romatch.tiny_roma_v1_outdoor(device=device)
 
     def get_sample_thresh(self):
         return self.model.sample_thresh
