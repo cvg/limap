@@ -81,7 +81,3 @@ cv2.imwrite("tmp/img2_det.png", img2_det)
 img1_draw, img2_draw = vis_matches(img1, img2, segs1, segs2, matches)
 cv2.imwrite("tmp/img1_draw.png", img1_draw)
 cv2.imwrite("tmp/img2_draw.png", img2_draw)
-
-import pdb
-
-pdb.set_trace()
