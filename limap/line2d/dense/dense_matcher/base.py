@@ -29,7 +29,7 @@ class BaseDenseMatcher:
         """
         raise NotImplementedError
 
-    def get_warpping_symmetric(self, img1, img2):
+    def get_warping_symmetric(self, img1, img2):
         """
         return warp_1to2 ([-1, 1]), cert_1to2, warp_2to1([-1, 1]), cert_2to1
         """

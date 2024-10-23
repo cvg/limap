@@ -158,7 +158,7 @@ class BaseDenseLineMatcher(BaseMatcher):
             cert_1to2,
             warp_2to1,
             cert_2to1,
-        ) = self.dense_matcher.get_warpping_symmetric(img1, img2)
+        ) = self.dense_matcher.get_warping_symmetric(img1, img2)
 
         # compute distance and overlap
         dists_1to2, overlap_1to2 = self.compute_distance_one_direction(
