@@ -33,10 +33,16 @@ class RoMa(BaseDenseMatcher):
             warp2_to_1, certainty2_to_1 = self.model.match(
                 Image.fromarray(img2), Image.fromarray(img1), batched=False
             )
-            return warp[:, :, 2:], certainty, warp2_to_1[:, :, 2:], certainty2_to_1
-        return (
-            warp[:, : self.output_res, 2:],
-            certainty[:, : self.output_res],
-            warp[:, self.output_res :, :2],
-            certainty[:, self.output_res :],
-        )
+            return (
+                warp[:, :, 2:],
+                certainty,
+                warp2_to_1[:, :, 2:],
+                certainty2_to_1,
+            )
+        else:
+            return (
+                warp[:, : self.output_res, 2:],
+                certainty[:, : self.output_res],
+                warp[:, self.output_res :, :2],
+                certainty[:, self.output_res :],
+            )
