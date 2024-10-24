@@ -13,7 +13,7 @@ from .dense_matcher import BaseDenseMatcher
 
 class BaseDenseLineMatcherOptions(NamedTuple):
     n_samples: int = 21
-    segment_percentage_th: float = 0.5
+    segment_percentage_th: float = 0.2
     device = "cuda"
     pixel_th: float = 10.0
 
@@ -111,19 +111,19 @@ class BaseDenseLineMatcher(BaseMatcher):
         )
         coords_proj = torch.matmul(coords_to_2, directions.T)
         dists = torch.abs(torch.matmul(coords_to_2_homo, lines2_homo.T))
-        overlap = torch.where(
+        has_overlap = torch.where(
             coords_proj > starts2_proj,
             torch.ones_like(dists),
             torch.zeros_like(dists),
         )
-        overlap = torch.where(
-            coords_proj < ends2_proj, overlap, torch.zeros_like(dists)
+        has_overlap = torch.where(
+            coords_proj < ends2_proj, has_overlap, torch.zeros_like(dists)
         )
         dists = dists.reshape(
             n_segs1, self.dense_options.n_samples, n_segs2
         ).permute(0, 2, 1)
-        overlap = (
-            overlap.reshape(n_segs1, self.dense_options.n_samples, n_segs2)
+        has_overlap = (
+            has_overlap.reshape(n_segs1, self.dense_options.n_samples, n_segs2)
             .permute(0, 2, 1)
             .to(torch.bool)
         )
@@ -132,23 +132,22 @@ class BaseDenseLineMatcher(BaseMatcher):
         sample_thresh = self.dense_matcher.get_sample_thresh()
         good_sample = cert_to_2 > sample_thresh
         good_sample = torch.logical_and(
-            good_sample[:, None, :].repeat(1, overlap.shape[1], 1), overlap
+            good_sample[:, None, :].repeat(1, has_overlap.shape[1], 1),
+            has_overlap,
         )
         sample_weight = good_sample.to(torch.float)
         sample_weight_sum = sample_weight.sum(2)
+        overlap = sample_weight_sum / self.dense_options.n_samples
         sample_weight[sample_weight_sum > 0] /= sample_weight_sum[
             sample_weight_sum > 0
         ][:, None].repeat(1, sample_weight.shape[2])
-        # is_active = (
-        #     sample_weight_sum
-        #     > self.dense_options.segment_percentage_th
-        #     * self.dense_options.n_samples
-        # )
 
         # get weighted dists
         weighted_dists = (dists * sample_weight).sum(2)
-        weighted_dists[weighted_dists == 0] = 10000.0
-        return weighted_dists, sample_weight_sum / self.dense_options.n_samples
+        weighted_dists[overlap < self.dense_options.segment_percentage_th] = (
+            10000.0  # ensure that there is overlap
+        )
+        return weighted_dists, overlap
 
     def match_segs_with_descinfo(self, descinfo1, descinfo2):
         img1 = descinfo1["camview"].read_image()
