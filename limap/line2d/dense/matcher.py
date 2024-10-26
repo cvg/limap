@@ -52,15 +52,13 @@ class BaseDenseLineMatcher(BaseMatcher):
             self.dense_options.device
         )
         n_segs1 = segs1.shape[0]
-        ratio = torch.arange(
-            0,
-            1 + 0.5 / (self.dense_options.n_samples - 1),
-            1.0 / (self.dense_options.n_samples - 1),
-        ).to(self.dense_options.device)
+        ratio = torch.linspace(
+            0, 1, self.dense_options.n_samples, device=self.dense_options.device
+        )
         ratio = ratio[:, None].repeat(1, 2)
-        coords_1 = ratio * segs1[:, [0], :].repeat(
+        coords_1 = ratio * segs1[:, [0]].repeat(
             1, self.dense_options.n_samples, 1
-        ) + (1 - ratio) * segs1[:, [1], :].repeat(
+        ) + (1 - ratio) * segs1[:, [1]].repeat(
             1, self.dense_options.n_samples, 1
         )
         coords_1 = coords_1.reshape(-1, 2)
@@ -79,7 +77,7 @@ class BaseDenseLineMatcher(BaseMatcher):
             descinfo2["image_shape"][1],
         )
         cert_to_2 = F.grid_sample(
-            cert_1to2[None, None, ...],
+            cert_1to2[None, None],
             coords[None, None],
             align_corners=False,
             mode="bilinear",
@@ -91,7 +89,7 @@ class BaseDenseLineMatcher(BaseMatcher):
             self.dense_options.device
         )
         n_segs2 = segs2.shape[0]
-        starts2, ends2 = segs2[:, 0, :], segs2[:, 1, :]
+        starts2, ends2 = segs2[:, 0], segs2[:, 1]
         directions = ends2 - starts2
         directions /= torch.norm(directions, dim=1, keepdim=True)
         starts2_proj = (starts2 * directions).sum(1)
@@ -132,7 +130,7 @@ class BaseDenseLineMatcher(BaseMatcher):
         sample_thresh = self.dense_matcher.get_sample_thresh()
         good_sample = cert_to_2 > sample_thresh
         good_sample = torch.logical_and(
-            good_sample[:, None, :].repeat(1, has_overlap.shape[1], 1),
+            good_sample[:, None].repeat(1, has_overlap.shape[1], 1),
             has_overlap,
         )
         sample_weight = good_sample.to(torch.float)
