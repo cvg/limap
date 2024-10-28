@@ -1,2 +1,2 @@
 from .extractor import DenseNaiveExtractor
-from .matcher import RoMaLineMatcher
+from .matcher import BaseDenseLineMatcherOptions, RoMaLineMatcher

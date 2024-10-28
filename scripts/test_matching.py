@@ -1,4 +1,8 @@
+import os
+import time
+
 import cv2
+import torch
 
 import limap.base
 import limap.line2d
@@ -11,22 +15,34 @@ extractor = limap.line2d.get_extractor(
     {"method": "dense_naive", "skip_exists": False}
 )  # get a line extractor
 matcher = limap.line2d.get_matcher(
-    {"method": "dense_roma", "skip_exists": False, "n_jobs": 1, "topk": 0},
+    {
+        "method": "dense_roma",
+        "dense_roma": {"mode": "outdoor"},
+        "one_to_many": False,
+        "skip_exists": False,
+        "n_jobs": 1,
+        "topk": 0,
+    },
     extractor,
 )  # initiate a line matcher
 
+current_dir = os.path.abspath(os.path.dirname(__file__))
 view1 = limap.base.CameraView(
-    "/home/shaoliu/workspace/GlueStick/resources/img1.jpg"
+    os.path.join(current_dir, "../third-party/GlueStick/resources/img1.jpg")
 )  # initiate an limap.base.CameraView instance for detection.
 view2 = limap.base.CameraView(
-    "/home/shaoliu/workspace/GlueStick/resources/img2.jpg"
+    os.path.join(current_dir, "../third-party/GlueStick/resources/img2.jpg")
 )  # initiate an limap.base.CameraView instance for detection.
 
 segs1 = detector.detect(view1)  # detection
 desc1 = extractor.extract(view1, segs1)  # description
 segs2 = detector.detect(view2)  # detection
 desc2 = extractor.extract(view2, segs2)  # description
+torch.cuda.synchronize()
+start = time.time()
 matches = matcher.match_pair(desc1, desc2)  # matching
+torch.cuda.synchronize()
+print(f"Matching time: {time.time() - start:.3f}s")
 
 
 def vis_detections(img, segs):
@@ -75,9 +91,9 @@ def vis_matches(img1, img2, segs1, segs2, matches):
 img1 = view1.read_image()
 img2 = view2.read_image()
 img1_det = vis_detections(img1, segs1)
-cv2.imwrite("tmp/img1_det.png", img1_det)
+cv2.imwrite("/tmp/img1_det.png", img1_det)
 img2_det = vis_detections(img2, segs2)
-cv2.imwrite("tmp/img2_det.png", img2_det)
+cv2.imwrite("/tmp/img2_det.png", img2_det)
 img1_draw, img2_draw = vis_matches(img1, img2, segs1, segs2, matches)
-cv2.imwrite("tmp/img1_draw.png", img1_draw)
-cv2.imwrite("tmp/img2_draw.png", img2_draw)
+cv2.imwrite("/tmp/img1_draw.png", img1_draw)
+cv2.imwrite("/tmp/img2_draw.png", img2_draw)

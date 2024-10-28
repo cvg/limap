@@ -49,10 +49,18 @@ def get_matcher(cfg_matcher, extractor, n_neighbors=20, weight_path=None):
 
         return GlueStickMatcher(extractor, options)
     elif method == "dense_roma":
-        from .dense import RoMaLineMatcher
+        from .dense import BaseDenseLineMatcherOptions, RoMaLineMatcher
 
+        dense_options = BaseDenseLineMatcherOptions()
+        if "one_to_many" in cfg_matcher:
+            dense_options = dense_options._replace(
+                one_to_many=cfg_matcher["one_to_many"]
+            )
         return RoMaLineMatcher(
-            extractor, options=options, mode=cfg_matcher["dense_roma"]["mode"]
+            extractor,
+            options=options,
+            dense_options=dense_options,
+            mode=cfg_matcher["dense_roma"]["mode"],
         )
     else:
         raise NotImplementedError

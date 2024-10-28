@@ -28,12 +28,12 @@ class RoMa(BaseDenseMatcher):
         return self.model.sample_thresh
 
     def get_warping_symmetric(self, img1, img2):
-        warp, certainty = self.model.match(
-            Image.fromarray(img1), Image.fromarray(img2), batched=False
-        )
+        pil_img1 = Image.fromarray(img1)
+        pil_img2 = Image.fromarray(img2)
+        warp, certainty = self.model.match(pil_img1, pil_img2, batched=False)
         if self.mode.startswith("tiny"):
             warp2_to_1, certainty2_to_1 = self.model.match(
-                Image.fromarray(img2), Image.fromarray(img1), batched=False
+                pil_img2, pil_img1, batched=False
             )
             return (
                 warp[:, :, 2:],

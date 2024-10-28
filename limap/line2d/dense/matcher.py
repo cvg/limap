@@ -16,6 +16,7 @@ class BaseDenseLineMatcherOptions(NamedTuple):
     segment_percentage_th: float = 0.2
     device = "cuda"
     pixel_th: float = 10.0
+    one_to_many: bool = False
 
 
 class BaseDenseLineMatcher(BaseMatcher):
@@ -98,7 +99,7 @@ class BaseDenseLineMatcher(BaseMatcher):
         # get line equations
         starts_homo = torch.cat([starts2, torch.ones_like(segs2[:, [0], 0])], 1)
         ends_homo = torch.cat([ends2, torch.ones_like(segs2[:, [0], 0])], 1)
-        lines2_homo = torch.cross(starts_homo, ends_homo)
+        lines2_homo = torch.cross(starts_homo, ends_homo, dim=1)
         lines2_homo /= torch.norm(lines2_homo[:, :2], dim=1)[:, None].repeat(
             1, 3
         )
@@ -169,12 +170,15 @@ class BaseDenseLineMatcher(BaseMatcher):
             overlap_1to2 > overlap_2to1.T, dists_1to2, dists_2to1.T
         )
 
-        # match: one-way nearest neighbor
-        # TODO: one-to-many matching
+        # match
+        best_matches = dists <= self.dense_options.pixel_th
+        if not self.dense_options.one_to_many:
+            # one-to-one matching
+            best_matches = best_matches * (
+                dists == dists.min(dim=-1, keepdim=True).values
+            )
         inds_1, inds_2 = torch.nonzero(
-            dists
-            == dists.min(dim=-1, keepdim=True).values
-            * (dists <= self.dense_options.pixel_th),
+            best_matches,
             as_tuple=True,
         )
         inds_1 = inds_1.detach().cpu().numpy()
