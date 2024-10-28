@@ -21,6 +21,8 @@ class RoMa(BaseDenseMatcher):
             )
         elif mode == "tiny_outdoor":
             self.model = romatch.tiny_roma_v1_outdoor(device=device)
+        else:
+            raise ValueError(f"Unknown mode for RoMa: {mode}")
 
     def get_sample_thresh(self):
         return self.model.sample_thresh

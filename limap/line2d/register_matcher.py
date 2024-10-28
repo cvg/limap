@@ -51,6 +51,8 @@ def get_matcher(cfg_matcher, extractor, n_neighbors=20, weight_path=None):
     elif method == "dense_roma":
         from .dense import RoMaLineMatcher
 
-        return RoMaLineMatcher(extractor, options=options)
+        return RoMaLineMatcher(
+            extractor, options=options, mode=cfg_matcher["dense_roma"]["mode"]
+        )
     else:
         raise NotImplementedError
