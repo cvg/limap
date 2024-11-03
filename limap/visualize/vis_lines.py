@@ -56,9 +56,7 @@ def open3d_add_points(
     return w
 
 
-def open3d_get_line_set(
-    lines, color=None, width=2, ranges=None, scale=1.0
-):
+def open3d_get_line_set(lines, color=None, width=2, ranges=None, scale=1.0):
     import open3d as o3d
 
     if color is None:

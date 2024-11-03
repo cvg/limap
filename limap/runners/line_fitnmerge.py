@@ -163,7 +163,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     ##########################################################
     # [C] fit 3d segments
     ##########################################################
-    fname_fit_segs = "{0}_fit_segs.npy".format(
+    fname_fit_segs = "{}_fit_segs.npy".format(
         cfg["line2d"]["detector"]["method"]
     )
     if (not cfg["load_fit"]) and (
@@ -266,7 +266,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     limapio.save_obj(
         os.path.join(
             cfg["dir_save"],
-            "fitnmerge_lines_nv{0}.obj".format(cfg["n_visible_views"]),
+            "fitnmerge_lines_nv{}.obj".format(cfg["n_visible_views"]),
         ),
         VisTrack.get_lines_np(n_visible_views=cfg["n_visible_views"]),
     )
@@ -324,7 +324,7 @@ def line_fitting_with_3Dpoints(
     ##########################################################
     # [B] fit 3d segments
     ##########################################################
-    fname_fit_segs = "{0}_fit_segs.npy".format(
+    fname_fit_segs = "{}_fit_segs.npy".format(
         cfg["line2d"]["detector"]["method"]
     )
     if (not cfg["load_fit"]) and (

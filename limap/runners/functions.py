@@ -18,11 +18,11 @@ def setup(cfg):
         folder_load = folder_save
     cfg["dir_save"] = folder_save
     cfg["dir_load"] = folder_load
-    print("[LOG] Output dir: {0}".format(cfg["dir_save"]))
-    print("[LOG] Loading dir: {0}".format(cfg["dir_load"]))
+    print("[LOG] Output dir: {}".format(cfg["dir_save"]))
+    print("[LOG] Loading dir: {}".format(cfg["dir_load"]))
     if "weight_path" in cfg and cfg["weight_path"] is not None:
         cfg["weight_path"] = os.path.expanduser(cfg["weight_path"])
-        print("[LOG] weight dir: {0}".format(cfg["weight_path"]))
+        print("[LOG] weight dir: {}".format(cfg["weight_path"]))
     return cfg
 
 
@@ -192,7 +192,7 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
     weight_path = cfg.get("weight_path", None)
     if "extractor" in cfg["line2d"]:
         print(
-            "[LOG] Start 2D line detection and description (detector = {0}, extractor = {1}, n_images = {2})...".format(
+            "[LOG] Start 2D line detection and description (detector = {}, extractor = {}, n_images = {})...".format(
                 cfg["line2d"]["detector"]["method"],
                 cfg["line2d"]["extractor"]["method"],
                 imagecols.NumImages(),
@@ -200,7 +200,7 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
         )
     else:
         print(
-            "[LOG] Start 2D line detection and description (detector = {0}, n_images = {1})...".format(
+            "[LOG] Start 2D line detection and description (detector = {}, n_images = {})...".format(
                 cfg["line2d"]["detector"]["method"], imagecols.NumImages()
             )
         )
@@ -282,7 +282,7 @@ def compute_matches(cfg, descinfo_folder, image_ids, neighbors):
     """
     weight_path = cfg.get("weight_path", None)
     print(
-        "[LOG] Start matching 2D lines... (extractor = {0}, matcher = {1}, n_images = {2}, n_neighbors = {3})".format(
+        "[LOG] Start matching 2D lines... (extractor = {}, matcher = {}, n_images = {}, n_neighbors = {})".format(
             cfg["line2d"]["extractor"]["method"],
             cfg["line2d"]["matcher"]["method"],
             len(image_ids),
@@ -294,7 +294,7 @@ def compute_matches(cfg, descinfo_folder, image_ids, neighbors):
     basedir = os.path.join(
         "line_matchings",
         cfg["line2d"]["detector"]["method"],
-        "feats_{0}".format(cfg["line2d"]["extractor"]["method"]),
+        "feats_{}".format(cfg["line2d"]["extractor"]["method"]),
     )
     extractor = limap.line2d.get_extractor(
         cfg["line2d"]["extractor"], weight_path=weight_path
@@ -333,7 +333,7 @@ def compute_exhausive_matches(cfg, descinfo_folder, image_ids):
         matches_folder (str): path to store the computed matches
     """
     print(
-        "[LOG] Start exhausive matching 2D lines... (extractor = {0}, matcher = {1}, n_images = {2})".format(
+        "[LOG] Start exhausive matching 2D lines... (extractor = {}, matcher = {}, n_images = {})".format(
             cfg["line2d"]["extractor"]["method"],
             cfg["line2d"]["matcher"]["method"],
             len(image_ids),
@@ -344,7 +344,7 @@ def compute_exhausive_matches(cfg, descinfo_folder, image_ids):
     basedir = os.path.join(
         "line_matchings",
         cfg["line2d"]["detector"]["method"],
-        "feats_{0}".format(cfg["line2d"]["extractor"]["method"]),
+        "feats_{}".format(cfg["line2d"]["extractor"]["method"]),
     )
     extractor = limap.line2d.get_extractor(cfg["line2d"]["extractor"])
     se_match = cfg["skip_exists"] or cfg["line2d"]["matcher"]["skip_exists"]
