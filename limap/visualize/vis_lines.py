@@ -26,12 +26,14 @@ def pyvista_vis_3d_lines(
 def open3d_add_points(
     w,
     points,
-    color=[0.0, 0.0, 0.0],
+    color=None,
     psize=1.0,
     name="pcd",
     ranges=None,
     scale=1.0,
 ):
+    if color is None:
+        color = [0.0, 0.0, 0.0]
     if np.array(points).shape[0] == 0:
         return w
     import open3d as o3d
@@ -55,10 +57,12 @@ def open3d_add_points(
 
 
 def open3d_get_line_set(
-    lines, color=[0.0, 0.0, 0.0], width=2, ranges=None, scale=1.0
+    lines, color=None, width=2, ranges=None, scale=1.0
 ):
     import open3d as o3d
 
+    if color is None:
+        color = [0.0, 0.0, 0.0]
     o3d_points, o3d_lines, o3d_colors = [], [], []
     counter = 0
     for line in lines:
@@ -79,7 +83,7 @@ def open3d_get_line_set(
 def open3d_add_line_set(
     w,
     lines,
-    color=[0.0, 0.0, 0.0],
+    color=None,
     width=2,
     name="lineset",
     ranges=None,
@@ -87,6 +91,8 @@ def open3d_add_line_set(
 ):
     import open3d as o3d
 
+    if color is None:
+        color = [0.0, 0.0, 0.0]
     o3d_points, o3d_lines, o3d_colors = [], [], []
     counter = 0
     for line in lines:
@@ -110,7 +116,7 @@ def open3d_add_line_set(
 
 def open3d_get_cameras(
     imagecols,
-    color=[1.0, 0.0, 0.0],
+    color=None,
     ranges=None,
     scale_cam_geometry=1.0,
     scale=1.0,
@@ -119,6 +125,8 @@ def open3d_get_cameras(
 
     import open3d as o3d
 
+    if color is None:
+        color = [1.0, 0.0, 0.0]
     cameras = o3d.geometry.LineSet()
 
     camera_lines = {}
@@ -150,7 +158,7 @@ def open3d_get_cameras(
 def open3d_add_cameras(
     w,
     imagecols,
-    color=[1.0, 0.0, 0.0],
+    color=None,
     ranges=None,
     scale_cam_geometry=1.0,
     scale=1.0,
@@ -159,6 +167,8 @@ def open3d_add_cameras(
 
     import open3d as o3d
 
+    if color is None:
+        color = [1.0, 0.0, 0.0]
     camera_lines = {}
     for cam_id in imagecols.get_cam_ids():
         cam = imagecols.cam(cam_id)

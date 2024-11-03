@@ -15,7 +15,7 @@ select = [
     # isort
     "I",
 ]
-ignore = ["E501", "F401", "F403", "UP030", "B006", "B008"]
+ignore = ["E501", "F401", "F403", "UP030", "B008"]
 
 [lint.per-file-ignores]
 "limap/line2d/L2D2/RAL_net_cov.py" = ["SIM"]

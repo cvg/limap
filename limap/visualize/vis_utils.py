@@ -317,7 +317,9 @@ def test_line_inside_ranges(line, ranges):
     return test_point_inside_ranges(line.end, ranges)
 
 
-def compute_robust_range(arr, range_robust=[0.05, 0.95], k_stretch=2.0):
+def compute_robust_range(arr, range_robust=None, k_stretch=2.0):
+    if range_robust is None:
+        range_robust = [0.05, 0.95]
     N = arr.shape[0]
     start_idx = int(round((N - 1) * range_robust[0]))
     end_idx = int(round((N - 1) * range_robust[1]))
@@ -329,7 +331,9 @@ def compute_robust_range(arr, range_robust=[0.05, 0.95], k_stretch=2.0):
     return start_stretched, end_stretched
 
 
-def compute_robust_range_lines(lines, range_robust=[0.05, 0.95], k_stretch=2.0):
+def compute_robust_range_lines(lines, range_robust=None, k_stretch=2.0):
+    if range_robust is None:
+        range_robust = [0.05, 0.95]
     lines_array = np.array([line.as_array() for line in lines])
     x_array = lines_array.reshape(-1, 3)[:, 0]
     y_array = lines_array.reshape(-1, 3)[:, 1]

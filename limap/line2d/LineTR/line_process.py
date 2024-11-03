@@ -287,7 +287,9 @@ def change_cv2_T_np(klines_cv):
     return {"klines": klines, "length_klines": length, "angles": angles}
 
 
-def preprocess(klines_cv, image_shape, pred_superpoint, mask=None, conf={}):
+def preprocess(klines_cv, image_shape, pred_superpoint, mask=None, conf=None):
+    if conf is None:
+        conf = {}
     default_conf = {
         "min_length": 16,
         "max_sublines": 256,

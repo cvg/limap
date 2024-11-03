@@ -42,8 +42,10 @@ class BaseModel(nn.Module, metaclass=ABCMeta):
     required_data_keys = []
     strict_conf = True
 
-    def __init__(self, conf={}):
+    def __init__(self, conf=None):
         """Perform some logic and call the _init method of the child model."""
+        if conf is None:
+            conf = {}
         super().__init__()
         default_conf = OmegaConf.merge(
             OmegaConf.create(self.base_default_conf),
