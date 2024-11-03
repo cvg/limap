@@ -30,7 +30,7 @@ for folder in folder_list:
     cmd = f"colmap mapper --database_path {database_path} --image_path {input_folder} --output_path {sparse_folder}"
     print(cmd)
     os.system(cmd)
-    cmd = "colmap image_undistorter --image_path {0} --input_path {1} --output_path {2} --output_type COLMAP".format(
+    cmd = "colmap image_undistorter --image_path {} --input_path {} --output_path {} --output_type COLMAP".format(
         input_folder, os.path.join(sparse_folder, "0"), dense_folder
     )
     print(cmd)
