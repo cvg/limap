@@ -1,11 +1,8 @@
-import os
 from typing import NamedTuple
 
 import numpy as np
 import torch
 import torch.nn.functional as F
-
-import limap.util.io as limapio
 
 from ..base_matcher import BaseMatcher, BaseMatcherOptions
 from .dense_matcher import BaseDenseMatcher
@@ -49,8 +46,10 @@ class BaseDenseLineMatcher(BaseMatcher):
         self, descinfo1, descinfo2, warp_1to2, cert_1to2
     ):
         # get point samples along lines
-        segs1 = torch.from_numpy(descinfo1["lines"]).to(
-            self.dense_options.device
+        segs1 = (
+            torch.from_numpy(descinfo1["lines"])
+            .to(self.dense_options.device)
+            .float()
         )
         n_segs1 = segs1.shape[0]
         ratio = torch.linspace(
@@ -86,8 +85,10 @@ class BaseDenseLineMatcher(BaseMatcher):
         cert_to_2 = cert_to_2.reshape(-1, self.dense_options.n_samples)
 
         # get projections
-        segs2 = torch.from_numpy(descinfo2["lines"]).to(
-            self.dense_options.device
+        segs2 = (
+            torch.from_numpy(descinfo2["lines"])
+            .to(self.dense_options.device)
+            .float()
         )
         n_segs2 = segs2.shape[0]
         starts2, ends2 = segs2[:, 0], segs2[:, 1]
@@ -149,14 +150,14 @@ class BaseDenseLineMatcher(BaseMatcher):
         return weighted_dists, overlap
 
     def match_segs_with_descinfo(self, descinfo1, descinfo2):
-        img1 = descinfo1["camview"].read_image()
-        img2 = descinfo2["camview"].read_image()
         (
             warp_1to2,
             cert_1to2,
             warp_2to1,
             cert_2to1,
-        ) = self.dense_matcher.get_warping_symmetric(img1, img2)
+        ) = self.dense_matcher.get_warping_symmetric(
+            descinfo1["image"], descinfo2["image"]
+        )
 
         # compute distance and overlap
         dists_1to2, overlap_1to2 = self.compute_distance_one_direction(
@@ -165,10 +166,16 @@ class BaseDenseLineMatcher(BaseMatcher):
         dists_2to1, overlap_2to1 = self.compute_distance_one_direction(
             descinfo2, descinfo1, warp_2to1, cert_2to1
         )
-        # overlap = torch.maximum(overlap_1to2, overlap_2to1.T)
         dists = torch.where(
             overlap_1to2 > overlap_2to1.T, dists_1to2, dists_2to1.T
         )
+        # Both warps must have a minimum overlap and close distance (= equivalent of mutual nearest neighbor)
+        overlap = torch.minimum(overlap_1to2, overlap_2to1.T)
+        dists[overlap < self.dense_options.segment_percentage_th] = 10000
+        dists[
+            torch.maximum(dists_1to2, dists_2to1.T)
+            > self.dense_options.pixel_th
+        ] = 10000
 
         # match
         best_matches = dists <= self.dense_options.pixel_th
@@ -187,7 +194,43 @@ class BaseDenseLineMatcher(BaseMatcher):
         return matches_t
 
     def match_segs_with_descinfo_topk(self, descinfo1, descinfo2, topk=10):
-        raise NotImplementedError
+        (
+            warp_1to2,
+            cert_1to2,
+            warp_2to1,
+            cert_2to1,
+        ) = self.dense_matcher.get_warping_symmetric(
+            descinfo1["image"], descinfo2["image"]
+        )
+
+        # compute distance and overlap
+        dists_1to2, overlap_1to2 = self.compute_distance_one_direction(
+            descinfo1, descinfo2, warp_1to2, cert_1to2
+        )
+        dists_2to1, overlap_2to1 = self.compute_distance_one_direction(
+            descinfo2, descinfo1, warp_2to1, cert_2to1
+        )
+        dists = torch.where(
+            overlap_1to2 > overlap_2to1.T, dists_1to2, dists_2to1.T
+        )
+        # Both warps must have a minimum overlap and close distance (= equivalent of mutual nearest neighbor)
+        overlap = torch.minimum(overlap_1to2, overlap_2to1.T)
+        dists[overlap < self.dense_options.segment_percentage_th] = 10000
+        dists[
+            torch.maximum(dists_1to2, dists_2to1.T)
+            > self.dense_options.pixel_th
+        ] = 10000
+
+        # match
+        best_matches = dists <= self.dense_options.pixel_th
+        inds_1, inds_2 = torch.nonzero(
+            best_matches,
+            as_tuple=True,
+        )
+        inds_1 = inds_1.detach().cpu().numpy()
+        inds_2 = inds_2.detach().cpu().numpy()
+        matches_t = np.stack([inds_1, inds_2], axis=1)
+        return matches_t
 
 
 class RoMaLineMatcher(BaseDenseLineMatcher):

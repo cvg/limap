@@ -60,7 +60,7 @@ def get_matcher(cfg_matcher, extractor, n_neighbors=20, weight_path=None):
             extractor,
             options=options,
             dense_options=dense_options,
-            mode=cfg_matcher["dense_roma"]["mode"],
+            mode=cfg_matcher["mode"],
         )
     else:
         raise NotImplementedError
