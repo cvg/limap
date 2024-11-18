@@ -64,7 +64,7 @@ def parse_config():
         "precomputed",
         "eth3d",
         cfg["reso_type"],
-        "{0}_cam{1}".format(cfg["scene_id"], cfg["cam_id"]),
+        "{}_cam{}".format(cfg["scene_id"], cfg["cam_id"]),
     )
     return cfg
 

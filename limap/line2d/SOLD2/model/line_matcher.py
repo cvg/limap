@@ -31,9 +31,11 @@ class LineMatcher:
         line_detector_cfg,
         line_matcher_cfg,
         multiscale=False,
-        scales=[1.0, 2.0],
+        scales=None,
     ):
         # Get loss weights if dynamic weighting
+        if scales is None:
+            scales = [1.0, 2.0]
         _, loss_weights = get_loss_and_weights(model_cfg, device)
         self.device = device
 
@@ -162,10 +164,12 @@ class LineMatcher:
         valid_mask=None,
         desc_only=False,
         profile=False,
-        scales=[1.0, 2.0],
+        scales=None,
         aggregation="mean",
     ):
         # Restrict input_image to 4D torch tensor
+        if scales is None:
+            scales = [1.0, 2.0]
         if (not len(input_image.shape) == 4) or (
             not isinstance(input_image, torch.Tensor)
         ):
@@ -291,8 +295,10 @@ class LineMatcher:
 
         return outputs
 
-    def __call__(self, images, valid_masks=[None, None], profile=False):
+    def __call__(self, images, valid_masks=None, profile=False):
         # Line detection and descriptor inference on both images
+        if valid_masks is None:
+            valid_masks = [None, None]
         if self.multiscale:
             forward_outputs = [
                 self.multiscale_line_detection(

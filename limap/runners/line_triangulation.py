@@ -231,7 +231,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     limapio.save_obj(
         os.path.join(
             cfg["dir_save"],
-            "triangulated_lines_nv{0}.obj".format(cfg["n_visible_views"]),
+            "triangulated_lines_nv{}.obj".format(cfg["n_visible_views"]),
         ),
         VisTrack.get_lines_np(n_visible_views=cfg["n_visible_views"]),
     )

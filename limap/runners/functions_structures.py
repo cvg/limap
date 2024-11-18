@@ -77,8 +77,10 @@ def compute_colmap_model_with_junctions(
 
 
 def compute_2d_bipartites_from_colmap(
-    reconstruction, imagecols, all_2d_lines, cfg=dict()
+    reconstruction, imagecols, all_2d_lines, cfg=None
 ):
+    if cfg is None:
+        cfg = dict()
     all_bpt2ds = {}
     cfg_bpt2d = _structures.PL_Bipartite2dConfig(cfg)
     colmap_cameras, colmap_images, colmap_points = (
