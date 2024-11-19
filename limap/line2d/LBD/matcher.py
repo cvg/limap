@@ -3,13 +3,12 @@ import pytlbd
 
 from ..base_matcher import (
     BaseMatcher,
-    BaseMatcherOptions,
-    DefaultBaseMatcherOptions,
+    DefaultMatcherOptions,
 )
 
 
 class LBDMatcher(BaseMatcher):
-    def __init__(self, extractor, options=DefaultBaseMatcherOptions):
+    def __init__(self, extractor, options=DefaultMatcherOptions):
         super().__init__(extractor, options)
 
     def get_module_name(self):

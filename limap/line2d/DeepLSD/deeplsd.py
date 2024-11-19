@@ -6,13 +6,12 @@ from deeplsd.models.deeplsd_inference import DeepLSD
 
 from ..base_detector import (
     BaseDetector,
-    BaseDetectorOptions,
-    DefaultBaseDetectorOptions,
+    DefaultDetectorOptions,
 )
 
 
 class DeepLSDDetector(BaseDetector):
-    def __init__(self, options=DefaultBaseDetectorOptions):
+    def __init__(self, options=DefaultDetectorOptions):
         super().__init__(options)
 
         conf = {

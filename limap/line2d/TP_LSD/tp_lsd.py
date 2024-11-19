@@ -9,13 +9,12 @@ from tp_lsd.utils.utils import load_model
 
 from ..base_detector import (
     BaseDetector,
-    BaseDetectorOptions,
-    DefaultBaseDetectorOptions,
+    DefaultDetectorOptions,
 )
 
 
 class TPLSDDetector(BaseDetector):
-    def __init__(self, options=DefaultBaseDetectorOptions):
+    def __init__(self, options=DefaultDetectorOptions):
         super().__init__(options)
         # Load the TP-LSD model
         head = {"center": 1, "dis": 4, "line": 1}

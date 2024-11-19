@@ -8,13 +8,12 @@ from hawp.ssl.models import MODELS
 
 from ..base_detector import (
     BaseDetector,
-    BaseDetectorOptions,
-    DefaultBaseDetectorOptions,
+    DefaultDetectorOptions,
 )
 
 
 class HAWPv3Detector(BaseDetector):
-    def __init__(self, options=DefaultBaseDetectorOptions):
+    def __init__(self, options=DefaultDetectorOptions):
         super().__init__(options)
         # Load the HAWPv3 model
         if self.weight_path is None:

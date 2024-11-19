@@ -2,13 +2,12 @@ import pytlsd
 
 from ..base_detector import (
     BaseDetector,
-    BaseDetectorOptions,
-    DefaultBaseDetectorOptions,
+    DefaultDetectorOptions,
 )
 
 
 class LSDDetector(BaseDetector):
-    def __init__(self, options=DefaultBaseDetectorOptions):
+    def __init__(self, options=DefaultDetectorOptions):
         super().__init__(options)
 
     def get_module_name(self):

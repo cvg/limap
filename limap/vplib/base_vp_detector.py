@@ -14,8 +14,11 @@ class BaseVPDetectorOptions(NamedTuple):
     n_jobs: int = 1
 
 
+DefaultVPDetectorOptions = BaseVPDetectorOptions()
+
+
 class BaseVPDetector:
-    def __init__(self, options=BaseVPDetectorOptions()):
+    def __init__(self, options=DefaultVPDetectorOptions):
         self.n_jobs = options.n_jobs
 
     # Module name needs to be set

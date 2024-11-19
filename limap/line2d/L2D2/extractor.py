@@ -8,13 +8,12 @@ import limap.util.io as limapio
 
 from ..base_detector import (
     BaseDetector,
-    BaseDetectorOptions,
-    DefaultBaseDetectorOptions,
+    DefaultDetectorOptions,
 )
 
 
 class L2D2Extractor(BaseDetector):
-    def __init__(self, options=DefaultBaseDetectorOptions, device=None):
+    def __init__(self, options=DefaultDetectorOptions, device=None):
         super().__init__(options)
         self.mini_batch = 20
         self.device = "cuda" if device is None else device

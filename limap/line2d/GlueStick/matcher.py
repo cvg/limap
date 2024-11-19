@@ -6,15 +6,12 @@ from gluestick.models.gluestick import GlueStick
 
 from ..base_matcher import (
     BaseMatcher,
-    BaseMatcherOptions,
-    DefaultBaseMatcherOptions,
+    DefaultMatcherOptions,
 )
 
 
 class GlueStickMatcher(BaseMatcher):
-    def __init__(
-        self, extractor, options=DefaultBaseMatcherOptions, device=None
-    ):
+    def __init__(self, extractor, options=DefaultMatcherOptions, device=None):
         super().__init__(extractor, options)
         self.device = "cuda" if device is None else device
         self.gs = GlueStick({}).eval().to(self.device)

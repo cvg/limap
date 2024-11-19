@@ -8,13 +8,12 @@ from limap.point2d.superpoint.superpoint import SuperPoint
 
 from ..base_detector import (
     BaseDetector,
-    BaseDetectorOptions,
-    DefaultBaseDetectorOptions,
+    DefaultDetectorOptions,
 )
 
 
 class SuperPointEndpointsExtractor(BaseDetector):
-    def __init__(self, options=DefaultBaseDetectorOptions, device=None):
+    def __init__(self, options=DefaultDetectorOptions, device=None):
         super().__init__(options)
         self.device = "cuda" if device is None else device
         self.sp = (

@@ -2,8 +2,7 @@ import numpy as np
 
 from ..base_matcher import (
     BaseMatcher,
-    BaseMatcherOptions,
-    DefaultBaseMatcherOptions,
+    DefaultMatcherOptions,
 )
 from .line_process import get_dist_matrix
 from .line_transformer import LineTransformer
@@ -12,7 +11,7 @@ from .nn_matcher import nn_matcher_distmat
 
 class LineTRMatcher(BaseMatcher):
     def __init__(
-        self, extractor, options=DefaultBaseMatcherOptions, topk=0, device=None
+        self, extractor, options=DefaultMatcherOptions, topk=0, device=None
     ):
         super().__init__(extractor, options)
         self.device = "cuda" if device is None else device

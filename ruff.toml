@@ -15,7 +15,7 @@ select = [
     # isort
     "I",
 ]
-ignore = ["E501", "F401", "F403", "B008"]
+ignore = ["E501", "F401", "F403"]
 
 [lint.per-file-ignores]
 "limap/line2d/L2D2/RAL_net_cov.py" = ["SIM"]
@@ -24,3 +24,4 @@ ignore = ["E501", "F401", "F403", "B008"]
 "limap/line2d/SOLD2/misc/*.py" = ["E741", "UP031", "SIM"]
 "limap/line2d/SOLD2/train.py" = ["UP031"]
 "limap/point2d/superpoint/main.py" = ["B904"]
+"limap/pointsfm/database.py" = ["B008"]

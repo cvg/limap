@@ -5,15 +5,12 @@ from limap.point2d.superglue.superglue import SuperGlue
 
 from ..base_matcher import (
     BaseMatcher,
-    BaseMatcherOptions,
-    DefaultBaseMatcherOptions,
+    DefaultMatcherOptions,
 )
 
 
 class NNEndpointsMatcher(BaseMatcher):
-    def __init__(
-        self, extractor, options=DefaultBaseMatcherOptions, device=None
-    ):
+    def __init__(self, extractor, options=DefaultMatcherOptions, device=None):
         super().__init__(extractor, options)
         assert self.extractor.get_module_name() == "superpoint_endpoints"
         self.device = "cuda" if device is None else device
@@ -118,7 +115,7 @@ class SuperGlueEndpointsMatcher(BaseMatcher):
     def __init__(
         self,
         extractor,
-        options=DefaultBaseMatcherOptions,
+        options=DefaultMatcherOptions,
         weights="outdoor",
         device=None,
     ):
