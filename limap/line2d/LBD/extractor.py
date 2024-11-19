@@ -7,7 +7,11 @@ import pytlsd
 
 import limap.util.io as limapio
 
-from ..base_detector import BaseDetector, BaseDetectorOptions
+from ..base_detector import (
+    BaseDetector,
+    BaseDetectorOptions,
+    DefaultBaseDetectorOptions,
+)
 
 
 def process_pyramid(
@@ -56,7 +60,7 @@ def to_multiscale_lines(lines):
 
 
 class LBDExtractor(BaseDetector):
-    def __init__(self, options=BaseDetectorOptions()):
+    def __init__(self, options=DefaultBaseDetectorOptions):
         super().__init__(options)
 
     def get_module_name(self):

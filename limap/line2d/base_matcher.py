@@ -23,12 +23,15 @@ class BaseMatcherOptions(NamedTuple):
     weight_path: str = None
 
 
+DefaultBaseMatcherOptions = BaseMatcherOptions()
+
+
 class BaseMatcher:
     """
     Virtual class for line matcher
     """
 
-    def __init__(self, extractor, options=BaseMatcherOptions()):
+    def __init__(self, extractor, options=DefaultBaseMatcherOptions):
         self.extractor = extractor
         self.topk = options.topk
         self.n_neighbors = options.n_neighbors

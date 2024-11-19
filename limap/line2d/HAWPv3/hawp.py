@@ -6,11 +6,15 @@ import torch
 from hawp.fsl.config import cfg as model_config
 from hawp.ssl.models import MODELS
 
-from ..base_detector import BaseDetector, BaseDetectorOptions
+from ..base_detector import (
+    BaseDetector,
+    BaseDetectorOptions,
+    DefaultBaseDetectorOptions,
+)
 
 
 class HAWPv3Detector(BaseDetector):
-    def __init__(self, options=BaseDetectorOptions()):
+    def __init__(self, options=DefaultBaseDetectorOptions):
         super().__init__(options)
         # Load the HAWPv3 model
         if self.weight_path is None:

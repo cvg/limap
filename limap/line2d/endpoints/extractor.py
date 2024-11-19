@@ -6,11 +6,15 @@ import torch
 import limap.util.io as limapio
 from limap.point2d.superpoint.superpoint import SuperPoint
 
-from ..base_detector import BaseDetector, BaseDetectorOptions
+from ..base_detector import (
+    BaseDetector,
+    BaseDetectorOptions,
+    DefaultBaseDetectorOptions,
+)
 
 
 class SuperPointEndpointsExtractor(BaseDetector):
-    def __init__(self, options=BaseDetectorOptions(), device=None):
+    def __init__(self, options=DefaultBaseDetectorOptions, device=None):
         super().__init__(options)
         self.device = "cuda" if device is None else device
         self.sp = (

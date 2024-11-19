@@ -3,13 +3,21 @@ import os
 
 import limap.util.io as limapio
 
-from ..base_detector import BaseDetector, BaseDetectorOptions
-from ..base_matcher import BaseMatcher, BaseMatcherOptions
+from ..base_detector import (
+    BaseDetector,
+    BaseDetectorOptions,
+    DefaultBaseDetectorOptions,
+)
+from ..base_matcher import (
+    BaseMatcher,
+    BaseMatcherOptions,
+    DefaultBaseMatcherOptions,
+)
 from .sold2_wrapper import SOLD2LineDetector
 
 
 class SOLD2Detector(BaseDetector):
-    def __init__(self, options=BaseDetectorOptions()):
+    def __init__(self, options=DefaultBaseDetectorOptions):
         super().__init__(options)
         self.detector = SOLD2LineDetector(weight_path=self.weight_path)
 
@@ -93,7 +101,7 @@ class SOLD2Detector(BaseDetector):
 
 
 class SOLD2Matcher(BaseMatcher):
-    def __init__(self, extractor, options=BaseMatcherOptions()):
+    def __init__(self, extractor, options=DefaultBaseMatcherOptions):
         super().__init__(extractor, options)
         assert self.extractor.get_module_name() == "sold2"
         self.detector = SOLD2LineDetector(weight_path=self.weight_path)

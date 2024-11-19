@@ -4,11 +4,17 @@ import numpy as np
 import torch
 from gluestick.models.gluestick import GlueStick
 
-from ..base_matcher import BaseMatcher, BaseMatcherOptions
+from ..base_matcher import (
+    BaseMatcher,
+    BaseMatcherOptions,
+    DefaultBaseMatcherOptions,
+)
 
 
 class GlueStickMatcher(BaseMatcher):
-    def __init__(self, extractor, options=BaseMatcherOptions(), device=None):
+    def __init__(
+        self, extractor, options=DefaultBaseMatcherOptions, device=None
+    ):
         super().__init__(extractor, options)
         self.device = "cuda" if device is None else device
         self.gs = GlueStick({}).eval().to(self.device)

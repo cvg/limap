@@ -27,12 +27,15 @@ class BaseDetectorOptions(NamedTuple):
     weight_path: str = None
 
 
+DefaultBaseDetectorOptions = BaseDetectorOptions()
+
+
 class BaseDetector:
     """
     Virtual class for line detector
     """
 
-    def __init__(self, options=BaseDetectorOptions()):
+    def __init__(self, options=DefaultBaseDetectorOptions):
         self.set_gray = options.set_gray
         self.max_num_2d_segs = options.max_num_2d_segs
         self.do_merge_lines = options.do_merge_lines

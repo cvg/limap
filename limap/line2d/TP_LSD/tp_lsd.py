@@ -7,11 +7,15 @@ from tp_lsd.modeling.TP_Net import Res320
 from tp_lsd.utils.reconstruct import TPS_line
 from tp_lsd.utils.utils import load_model
 
-from ..base_detector import BaseDetector, BaseDetectorOptions
+from ..base_detector import (
+    BaseDetector,
+    BaseDetectorOptions,
+    DefaultBaseDetectorOptions,
+)
 
 
 class TPLSDDetector(BaseDetector):
-    def __init__(self, options=BaseDetectorOptions()):
+    def __init__(self, options=DefaultBaseDetectorOptions):
         super().__init__(options)
         # Load the TP-LSD model
         head = {"center": 1, "dis": 4, "line": 1}

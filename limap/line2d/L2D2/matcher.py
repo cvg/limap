@@ -1,10 +1,14 @@
 import numpy as np
 
-from ..base_matcher import BaseMatcher, BaseMatcherOptions
+from ..base_matcher import (
+    BaseMatcher,
+    BaseMatcherOptions,
+    DefaultBaseMatcherOptions,
+)
 
 
 class L2D2Matcher(BaseMatcher):
-    def __init__(self, extractor, options=BaseMatcherOptions()):
+    def __init__(self, extractor, options=DefaultBaseMatcherOptions):
         super().__init__(extractor, options)
 
     def get_module_name(self):
