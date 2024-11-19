@@ -18,10 +18,16 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     Main interface of line triangulation over multi-view images.
 
     Args:
-        cfg (dict): Configuration. Fields refer to :file:`cfgs/triangulation/default.yaml` as an example
-        imagecols (:class:`limap.base.ImageCollection`): The image collection corresponding to all the images of interest
-        neighbors (dict[int -> list[int]], optional): visual neighbors for each image. By default we compute neighbor information from the covisibility of COLMAP triangulation.
-        ranges (pair of :class:`np.array` each of shape (3,), optional): robust 3D ranges for the scene. By default we compute range information from the COLMAP triangulation.
+        cfg (dict): Configuration. \
+            Refer to :file:`cfgs/triangulation/default.yaml` as an example
+        imagecols (:class:`limap.base.ImageCollection`): \
+            The image collection corresponding to all the images of interest
+        neighbors (dict[int -> list[int]], optional): \
+            visual neighbors for each image. By default we compute \
+            neighbor information from the covisibility of COLMAP triangulation.
+        ranges (pair of :class:`np.array` each of shape (3,), optional): \
+            robust 3D ranges for the scene. By default we compute \
+            range information from the COLMAP triangulation.
     Returns:
         list[:class:`limap.base.LineTrack`]: list of output 3D line tracks
     """

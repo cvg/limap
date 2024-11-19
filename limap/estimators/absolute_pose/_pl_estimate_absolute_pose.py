@@ -52,7 +52,8 @@ def _pl_estimate_absolute_pose(
             p3ds = np.array(p3ds)[inliers_point]
             if logger:
                 logger.info(
-                    f"{len(p2ds)} inliers reserved from {original_len} point matches"
+                    f"{len(p2ds)} inliers reserved from \
+                      {original_len} point matches"
                 )
 
         if inliers_line is not None:
@@ -61,7 +62,8 @@ def _pl_estimate_absolute_pose(
             l2ds = np.array(l2ds)[inliers_line]
             if logger:
                 logger.info(
-                    f"{len(l3d_ids)} inliers reserved from {original_len} line matches"
+                    f"{len(l3d_ids)} inliers reserved from \
+                      {original_len} line matches"
                 )
 
         jointloc = _optimize.solve_jointloc(

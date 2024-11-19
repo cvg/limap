@@ -11,10 +11,15 @@ class BaseMatcherOptions(NamedTuple):
     """
     Base options for the line matcher
 
-    :param topk: number of top matches for each line (if equal to 0, do mutual nearest neighbor matching)
-    :param n_neighbors: number of visual neighbors, only for naming the output folder
-    :param n_jobs: number of jobs at multi-processing (please make sure not to exceed the GPU memory limit with learning methods)
-    :param weight_path: specify path to load weights (at default, weights will be downloaded to ~/.local)
+    :param topk: number of top matches for each line \
+        (if equal to 0, do mutual nearest neighbor matching)
+    :param n_neighbors: number of visual neighbors, \
+        only for naming the output folder
+    :param n_jobs: number of jobs at multi-processing \
+        (please make sure not to exceed the GPU memory limit \
+        with learning methods)
+    :param weight_path: specify path to load weights \
+        (at default, weights will be downloaded to ~/.local)
     """
 
     topk: int = 10
@@ -47,7 +52,8 @@ class BaseMatcher:
 
     def match_pair(self, descinfo1, descinfo2):
         """
-        Virtual method (need to be implemented) - match two set of lines based on the descriptors
+        Virtual method (need to be implemented) - match two set \
+            of lines based on the descriptors
         """
         raise NotImplementedError
 
@@ -86,7 +92,9 @@ class BaseMatcher:
         Args:
             matches_folder (str): The output matching folder
             idx (int): image id
-            matches (dict[int -> :class:`np.array`]): The output matches for each neighboring image, each with shape (N, 2)
+            matches (dict[int -> :class:`np.array`]): \
+                The output matches for each neighboring image, \
+                each with shape (N, 2)
         """
         fname = self.get_match_filename(matches_folder, idx)
         limapio.save_npy(fname, matches)
@@ -99,7 +107,9 @@ class BaseMatcher:
             matches_folder (str): The output matching folder
             idx (int): image id
         Returns:
-            matches (dict[int -> :class:`np.array`]): The output matches for each neighboring image, each with shape (N, 2)
+            matches (dict[int -> :class:`np.array`]): \
+                The output matches for each neighboring image, \
+                each with shape (N, 2)
         """
         fname = self.get_match_filename(matches_folder, idx)
         return limapio.read_npy(fname).item()

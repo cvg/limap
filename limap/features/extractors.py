@@ -63,7 +63,8 @@ class Extractor(torch.nn.Module):
             image_batch: [BxHxWxC] Tensor.
 
         Returns:
-            List of self.num_levels featuremaps as torch.Tensor[HxWxC] on device.
+            List of self.num_levels featuremaps as \
+            torch.Tensor[HxWxC] on device.
         """
         raise NotImplementedError()
 
@@ -159,7 +160,6 @@ class VGGNetExtractor(Extractor):
                 maps[i] = maps[i][:, :channels]
         early = maps[0]
         middle = maps[1]
-        # combined = early + nn.Upsample(size = early.shape[2:], mode="bilinear", align_corners=True)(middle)
         return [early, middle]
 
     def adapt_image(self, pil_img: PIL.Image) -> torch.Tensor:
@@ -178,7 +178,6 @@ class ImageExtractor(Extractor):
 
     def adapt_image(self, pil_img: PIL.Image) -> torch.Tensor:
         return tvf.to_tensor(pil_img).unsqueeze(0)
-        # return torch.from_numpy(np.asarray(pil_img) / 255.0).permute(2,0,1).unsqueeze(0)
 
 
 class GrayscaleExtractor(Extractor):

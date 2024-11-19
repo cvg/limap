@@ -8,7 +8,8 @@ class BaseVPDetectorOptions(NamedTuple):
     """
     Base options for the vanishing point detector
 
-    :param n_jobs: number of jobs at multi-processing (please make sure not to exceed the GPU memory limit with learning methods)
+    :param n_jobs: number of jobs at multi-processing (please make sure \
+                   not to exceed the GPU memory limit with learning methods)
     """
 
     n_jobs: int = 1
@@ -35,7 +36,8 @@ class BaseVPDetector:
 
         Args:
             lines (list[:class:`limap.base.Line2d`]): list of input 2D lines.
-            camview (:class:`limap.base.CameraView`): optional, the `limap.base.CameraView` instance corresponding to the image.
+            camview (:class:`limap.base.CameraView`): optional, \
+                the `limap.base.CameraView` instance corresponding to the image.
         Returns:
             vpresult  type: list[:class:`limap.vplib.VPResult`]
         """
@@ -46,8 +48,11 @@ class BaseVPDetector:
         Detect vanishing points on multiple images with multiple processes
 
         Args:
-            all_lines (dict[int, list[:class:`limap.base.Line2d`]]): map storing all the lines for each image
-            camviews (dict[int, :class:`limap.base.CameraView`]): optional, the `limap.base.CameraView` instances, each corresponding to one image
+            all_lines (dict[int, list[:class:`limap.base.Line2d`]]): \
+                map storing all the lines for each image
+            camviews (dict[int, :class:`limap.base.CameraView`]): \
+                optional, the `limap.base.CameraView` instances, \
+                each corresponding to one image
         """
 
         def process(self, lines):

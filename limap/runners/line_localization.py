@@ -30,7 +30,8 @@ def get_hloc_keypoints(
     if ref_sfm is None or features_path is None or matches_path is None:
         if logger:
             logger.debug(
-                "Not retrieving keypoint correspondences because at least one parameter is not provided."
+                "Not retrieving keypoint correspondences because \
+                 at least one parameter is not provided."
             )
         return np.array([]), np.array([])
 
@@ -101,23 +102,40 @@ def line_localization(
     logger=None,
 ):
     """
-    Run visual localization on query images with `imagecols`, it takes 2D-3D point correspondences from HLoc;
-    runs line matching using 2D line matcher ("epipolar" for Gao et al. "Pose Refinement with Joint Optimization of Visual Points and Lines");
-    calls :func:`~limap.estimators.absolute_pose.pl_estimate_absolute_pose` to estimate the absolute camera pose for all query images,
+    Run visual localization on query images with `imagecols`, \
+    it takes 2D-3D point correspondences from HLoc;
+    runs line matching using 2D line matcher ("epipolar" for Gao et al. \
+    "Pose Refinement with Joint Optimization of Visual Points and Lines");
+    calls :func:`~limap.estimators.absolute_pose.pl_estimate_absolute_pose` \
+    to estimate the absolute camera pose for all query images,
     and writes results in results file in `results_path`.
 
     Args:
-        cfg (dict): Configuration, fields refer to :file:`cfgs/localization/default.yaml`
-        imagecols_db (:class:`limap.base.ImageCollection`): Image collection of database images, with triangulated camera poses
-        imagecols_query (:class:`limap.base.ImageCollection`): Image collection of query images, camera poses only used for epipolar matcher/filter as coarse poses, can be left uninitialized otherwise
-        linemap_db (list[:class:`limap.base.LineTrack`]): LIMAP triangulated/fitted line tracks
-        retrieval (dict): Mapping of query image file path to list of neighbor image file paths, e.g. returned from :func:`hloc.utils.parsers.parse_retrieval`
-        results_path (str | Path): File path to write the localization results
-        img_name_dict(dict, optional): Mapping of query image IDs to the image file path, by default the image names from `imagecols`
-        logger (:class:`logging.Logger`, optional): Logger to print logs for information
+        cfg (dict): Configuration, \
+            fields refer to :file:`cfgs/localization/default.yaml`
+        imagecols_db (:class:`limap.base.ImageCollection`): \
+            Image collection of database images, with triangulated camera poses
+        imagecols_query (:class:`limap.base.ImageCollection`): \
+            Image collection of query images, camera poses only used for \
+            epipolar matcher/filter as coarse poses, \
+            can be left uninitialized otherwise
+        linemap_db (list[:class:`limap.base.LineTrack`]): \
+            LIMAP triangulated/fitted line tracks
+        retrieval (dict): Mapping of query image file path to \
+            list of neighbor image file paths, e.g. returned from \
+            :func:`hloc.utils.parsers.parse_retrieval`
+        results_path (str | Path): \
+            File path to write the localization results
+        img_name_dict(dict, optional): \
+            Mapping of query image IDs to the image file path, by default \
+            the image names from `imagecols`
+        logger (:class:`logging.Logger`, optional): \
+            Logger to print logs for information
 
     Returns:
-        Dict[int -> :class:`limap.base.CameraPose`]: Mapping of query image IDs to the localized camera poses for all query images.
+        Dict[int -> :class:`limap.base.CameraPose`]: \
+            Mapping of query image IDs to the localized camera poses \
+            for all query images.
     """
 
     if cfg["localization"]["2d_matcher"] not in [
@@ -155,7 +173,8 @@ def line_localization(
         img_id: imagecols_db.camimage(img_id).pose for img_id in train_ids
     }
 
-    # line detection of query images, fetch detection of db images (generally already be detected during triangulation)
+    # line detection of query images, fetch detection of
+    # db images (generally already be detected during triangulation)
     all_db_segs, _ = _runners.compute_2d_segs(
         cfg, imagecols_db, compute_descinfo=False
     )
@@ -168,7 +187,8 @@ def line_localization(
         all_db_lines, linemap_db
     )
 
-    # Do matches for query images and retrieved neighbors for superglue endpoints matcher
+    # Do matches for query images and retrieved neighbors
+    # for superglue endpoints matcher
     if cfg["localization"]["2d_matcher"] != "epipolar":
         weight_path = cfg.get("weight_path", None)
         if cfg["localization"]["2d_matcher"] == "superglue_endpoints":
@@ -300,7 +320,8 @@ def line_localization(
                     query_line_id, track_id = pair
                     all_line_pairs_2to3[query_line_id].append(track_id)
 
-        # filter based on reprojection distance (to 1-1 correspondences), mainly for "OPPO method"
+        # filter based on reprojection distance (to 1-1 correspondences),
+        # mainly for "OPPO method"
         if cfg["localization"]["reprojection_filter"] is not None:
             line_matches_2to3 = reprojection_filter_matches_2to3(
                 query_lines,
@@ -322,7 +343,8 @@ def line_localization(
         num_matches_line = len(line_matches_2to3)
         if logger:
             logger.info(
-                f"{num_matches_line} line matches found for {len(query_lines)} 2D lines"
+                f"{num_matches_line} line matches found \
+                  for {len(query_lines)} 2D lines"
             )
 
         l3ds = [track.line for track in linemap_db]

@@ -34,15 +34,23 @@ def undistort_images(
     n_jobs=-1,
 ):
     """
-    Run undistortion on the images stored in the :class:`limap.base.ImageCollection` instance `imagecols` (only distorted images are undistorted), and store the undistorted images into `output_dir`. The function will return a corresponding `limap.base.ImageCollection` instance for the undistorted images.
+    Run undistortion on the images stored in the \
+    :class:`limap.base.ImageCollection` instance `imagecols` \
+    (only distorted images are undistorted), and store the undistorted \
+    images into `output_dir`. The function will return a corresponding \
+    `limap.base.ImageCollection` instance for the undistorted images.
 
     Args:
-        imagecols (:class:`limap.base.ImageCollection`): Image collection of the images to be undistorted.
-        output_dir (str): output folder for storing the undistorted images
-        skip_exists (bool): whether to skip already undistorted images in the output folder.
+        imagecols (:class:`limap.base.ImageCollection`): \
+            Image collection of the images to be undistorted.
+        output_dir (str): \
+            output folder for storing the undistorted images
+        skip_exists (bool): \
+            whether to skip already undistorted images in the output folder.
 
     Returns:
-        :class:`limap.base.ImageCollection`: New image collection for the undistorted images
+        :class:`limap.base.ImageCollection`: \
+            New image collection for the undistorted images
     """
     import limap.base as _base
 
@@ -50,7 +58,8 @@ def undistort_images(
     unload_ids = imagecols.get_img_ids()
     if skip_exists:
         print(
-            f"[LOG] Loading undistorted images (n_images = {imagecols.NumImages()})..."
+            f"[LOG] Loading undistorted images \
+             (n_images = {imagecols.NumImages()})..."
         )
         fname_in = os.path.join(output_dir, fname)
         if os.path.isfile(fname_in):
@@ -133,15 +142,20 @@ def undistort_images(
 
 def compute_sfminfos(cfg, imagecols, fname="metainfos.txt"):
     """
-    Compute visual neighbors and robust 3D ranges from COLMAP point triangulation.
+    Compute visual neighbors and robust 3D ranges from \
+    COLMAP point triangulation.
 
     Args:
-        cfg (dict): Configuration, fields refer to :file:`cfgs/examples/pointsfm.yaml` as a minimal example
-        imagecols (:class:`limap.base.ImageCollection`): image collection for the images of interest, storing intrinsics and triangulated poses
+        cfg (dict): Configuration, \
+            fields refer to :file:`cfgs/examples/pointsfm.yaml`
+        imagecols (:class:`limap.base.ImageCollection`): \
+            image collection for the images of interest, \
+            storing intrinsics and triangulated poses
     Returns:
         colmap_output_path (str): path to store the colmap output
         neighbors (dict[int -> list[int]]): visual neighbors for each image
-        ranges (pair of :class:`np.array`, each of shape (3,)): robust 3D ranges for the scene computed from the sfm point cloud.
+        ranges (pair of :class:`np.array`, each of shape (3,)): \
+            robust 3D ranges for the scene computed from the sfm point cloud.
     """
     import limap.pointsfm as _psfm
 
@@ -182,17 +196,22 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
     Detect and desribe 2D lines for each image in the image collection
 
     Args:
-        cfg (dict): Configuration, fields refer to :file:`cfgs/examples/line2d_detect.yaml` as a minimal example
-        imagecols (:class:`limap.base.ImageCollection`): image collection for the images of interest
-        compute_descinfo (bool, optional, default=True): whether to extract the line descriptors
+        cfg (dict): Configuration, \
+            fields refer to :file:`cfgs/examples/line2d_detect.yaml`
+        imagecols (:class:`limap.base.ImageCollection`): \
+            image collection for the images of interest
+        compute_descinfo (bool, optional, default=True): \
+            whether to extract the line descriptors
     Returns:
-        all_2d_segs (dict[int -> :class:`np.array`], each with shape (N, 4) or (N, 5)): all the line detections for each image
+        all_2d_segs (dict[int -> :class:`np.array`], each with \
+        shape (N, 4) or (N, 5)): all the line detections for each image
         descinfo_folder (str): folder to store the descriptors
     """
     weight_path = cfg.get("weight_path", None)
     if "extractor" in cfg["line2d"]:
         print(
-            "[LOG] Start 2D line detection and description (detector = {}, extractor = {}, n_images = {})...".format(
+            "[LOG] Start 2D line detection and description \
+             (detector = {}, extractor = {}, n_images = {})...".format(
                 cfg["line2d"]["detector"]["method"],
                 cfg["line2d"]["extractor"]["method"],
                 imagecols.NumImages(),
@@ -200,7 +219,8 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
         )
     else:
         print(
-            "[LOG] Start 2D line detection and description (detector = {}, n_images = {})...".format(
+            "[LOG] Start 2D line detection and description \
+             (detector = {}, n_images = {})...".format(
                 cfg["line2d"]["detector"]["method"], imagecols.NumImages()
             )
         )
@@ -273,7 +293,8 @@ def compute_matches(cfg, descinfo_folder, image_ids, neighbors):
     Match lines for each image with its visual neighbors
 
     Args:
-        cfg (dict): Configuration, fields refeer to :file:`cfgs/examples/line2d_match.yaml` as a minimal example
+        cfg (dict): Configuration, \
+            fields refeer to :file:`cfgs/examples/line2d_match.yaml`
         descinfo_folder (str): path to store the descriptors
         image_ids (list[int]): list of image ids
         neighbors (dict[int -> list[int]]): visual neighbors for each image
@@ -282,7 +303,8 @@ def compute_matches(cfg, descinfo_folder, image_ids, neighbors):
     """
     weight_path = cfg.get("weight_path", None)
     print(
-        "[LOG] Start matching 2D lines... (extractor = {}, matcher = {}, n_images = {}, n_neighbors = {})".format(
+        "[LOG] Start matching 2D lines... (extractor = {}, matcher = {}, \
+         n_images = {}, n_neighbors = {})".format(
             cfg["line2d"]["extractor"]["method"],
             cfg["line2d"]["matcher"]["method"],
             len(image_ids),
@@ -326,14 +348,16 @@ def compute_exhausive_matches(cfg, descinfo_folder, image_ids):
     Match lines for each image with all the other images exhaustively
 
     Args:
-        cfg (dict): Configuration, fields refeer to :file:`cfgs/examples/line2d_match.yaml` as a minimal example
+        cfg (dict): Configuration, \
+            fields refer to :file:`cfgs/examples/line2d_match.yaml`
         descinfo_folder (str): path to store the descriptors
         image_ids (list[int]): list of image ids
     Returns:
         matches_folder (str): path to store the computed matches
     """
     print(
-        "[LOG] Start exhausive matching 2D lines... (extractor = {}, matcher = {}, n_images = {})".format(
+        "[LOG] Start exhausive matching 2D lines... \
+         (extractor = {}, matcher = {}, n_images = {})".format(
             cfg["line2d"]["extractor"]["method"],
             cfg["line2d"]["matcher"]["method"],
             len(image_ids),

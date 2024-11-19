@@ -7,7 +7,8 @@ def get_matcher(cfg_matcher, extractor, n_neighbors=20, weight_path=None):
 
     Args:
         cfg_matcher: config for line matcher
-        extractor: line extractor inherited from :class:`limap.line2d.base_matcher.BaseMatcher`
+        extractor: line extractor inherited from \
+            :class:`limap.line2d.base_matcher.BaseMatcher`
     """
     options = BaseMatcherOptions()
     options = options._replace(

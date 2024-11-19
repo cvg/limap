@@ -223,11 +223,12 @@ def save_l3dpp(folder, imagecols, all_2d_segs):
     assert imagecols.NumImages() == len(all_2d_segs)
     image_names = imagecols.get_image_name_list()
 
-    # TODO make this function general for different input resolution within the set
+    # TODO make this function general for different input resolution
     first_cam = imagecols.cam(imagecols.get_cam_ids()[0])
     height, width = first_cam.h(), first_cam.w()
 
-    # TODO now it is hard-coded here (need to deal with the weird id mapping of Line3D++)
+    # TODO now it is hard-coded here
+    # (need to deal with the weird id mapping of Line3D++)
     mode = "default"
     if os.path.basename(image_names[0])[0] == "0":  # tnt
         mode = "tnt"
@@ -273,10 +274,14 @@ def save_txt_linetracks(fname, linetracks, n_visible_views=4):
                 f"{track_id} {track.count_lines()} {track.count_images()}\n"
             )
             f.write(
-                f"{track.line.start[0]:.10f} {track.line.start[1]:.10f} {track.line.start[2]:.10f}\n"
+                f"{track.line.start[0]:.10f} \
+                  {track.line.start[1]:.10f} \
+                  {track.line.start[2]:.10f}\n"
             )
             f.write(
-                f"{track.line.end[0]:.10f} {track.line.end[1]:.10f} {track.line.end[2]:.10f}\n"
+                f"{track.line.end[0]:.10f} \
+                  {track.line.end[1]:.10f} \
+                  {track.line.end[2]:.10f}\n"
             )
             for idx in range(track.count_lines()):
                 f.write(f"{track.image_id_list[idx]} ")
@@ -422,7 +427,8 @@ def read_lines_from_input(input_file):
 
     # exception
     raise ValueError(
-        f"Error! File {input_file} not supported. should be txt, obj, or folder to the linetracks."
+        f"Error! File {input_file} not supported. \
+          should be txt, obj, or folder to the linetracks."
     )
 
 

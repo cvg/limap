@@ -311,7 +311,8 @@ class SuperGlue(nn.Module):
     def log_optimal_transport(
         self, scores: torch.Tensor, alpha: torch.Tensor, iters: int
     ) -> torch.Tensor:
-        """Perform Differentiable Optimal Transport in Log-space for stability"""
+        """Perform Differentiable Optimal Transport in Log-space \
+            for stability"""
         b, m, n = scores.shape
         one = scores.new_tensor(1)
         ms, ns = (m * one).to(scores), (n * one).to(scores)

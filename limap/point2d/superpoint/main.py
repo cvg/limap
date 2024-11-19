@@ -111,7 +111,8 @@ def run_superpoint(
             except OSError as error:
                 if "No space left on device" in error.args[0]:
                     raise ValueError(
-                        "[SuperPoint] Out of disk space: storing features on disk can take "
+                        "[SuperPoint] Out of disk space: storing features \
+                            on disk can take "
                         "significant space, did you enable the as_half flag?"
                     )
                     del grp, fd[name]

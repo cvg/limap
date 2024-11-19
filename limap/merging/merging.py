@@ -35,7 +35,8 @@ def remerge(linker3d, linetracks, num_outliers=2):
             break
         num_tracks = num_tracks_new
     print(
-        f"[LOG] tracks after iterative remerging: {len(new_linetracks)} / {len(linetracks)}"
+        f"[LOG] tracks after iterative remerging: \
+          {len(new_linetracks)} / {len(linetracks)}"
     )
     return new_linetracks
 

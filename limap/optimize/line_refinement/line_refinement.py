@@ -105,10 +105,12 @@ def line_refinement(
             newratio = evaluator.ComputeInlierRatio(newtrack.line, 0.001)
             if newdist > dist and newratio < ratio:
                 print(
-                    f"[DEBUG] t_id = {t_id}, original: dist = {dist * 1000:.4f}, ratio = {ratio:.4f}"
+                    f"[DEBUG] t_id = {t_id}, \
+                      original: dist = {dist * 1000:.4f}, ratio = {ratio:.4f}"
                 )
                 print(
-                    f"[DEBUG] t_id = {t_id}, optimized: dist = {newdist * 1000:.4f}, ratio = {newratio:.4f}"
+                    f"[DEBUG] t_id = {t_id}, optimized: \
+                      dist = {newdist * 1000:.4f}, ratio = {newratio:.4f}"
                 )
 
     # output

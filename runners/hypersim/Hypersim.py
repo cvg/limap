@@ -71,7 +71,8 @@ class Hypersim:
     # constants
     default_h, default_w = 768, 1024
     h, w = default_h, default_w
-    # fov_x = 60 * np.pi / 180  # set fov_x to pi/3 to match DIODE dataset (60 degrees)
+    # fov_x = 60 * np.pi / 180
+    # set fov_x to pi/3 to match DIODE dataset (60 degrees)
     fov_x = np.pi / 3  # set fov_x to pi/3 to match DIODE dataset (60 degrees)
     f = w / (2 * np.tan(fov_x / 2))
     fov_y = 2 * np.arctan(h / (2 * f))
@@ -84,7 +85,8 @@ class Hypersim:
 
         # scene to load
         self.scene_dir = None
-        self.mpau = None  # meters per asset unit, initialized when set_scene_id is called
+        # meters per asset unit, initialized when set_scene_id is called
+        self.mpau = None
         self.cam_id = -1
         self.Tvecs, self.Rvecs = None, None
 

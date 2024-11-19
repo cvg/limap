@@ -69,7 +69,8 @@ def run_hloc_matches(
     """
     Inputs:
     - neighbors: map<int, std::vector<int>> to avoid exhaustive matches
-    - imagecols: optionally use the id mapping from _base.ImageCollection to do the match
+    - imagecols: optionally use the id mapping from \
+        _base.ImageCollection to do the match
     """
     image_path = Path(image_path)
     from hloc import (
@@ -94,7 +95,8 @@ def run_hloc_matches(
     if keypoints is not None and keypoints != []:
         if cfg["descriptor"][:10] != "superpoint":
             raise ValueError(
-                "Error! Non-superpoint feature extraction is unfortunately not supported in the current implementation."
+                "Error! Non-superpoint feature extraction is unfortunately \
+                 not supported in the current implementation."
             )
         # run superpoint
         from limap.point2d import run_superpoint

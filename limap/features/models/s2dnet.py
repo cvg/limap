@@ -138,7 +138,8 @@ class S2DNet(BaseModel):
             self.load_state_dict(state_dict, strict=False)
 
     def download_s2dnet_model(self, path):
-        # TODO: not supporting global weight_path now. Downloading to current directory.
+        # TODO: not supporting global weight_path now.
+        # Downloading to current directory.
         import subprocess
 
         if not os.path.exists(os.path.dirname(path)):

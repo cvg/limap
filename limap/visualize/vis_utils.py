@@ -103,7 +103,8 @@ def draw_multiscale_matches(
     assert img_left.ndim == 2
     h, w = img_left.shape
 
-    # store the matching results of the first and second images into a single image
+    # store the matching results of the first and second images
+    # into a single image
     left_color_img = cv2.cvtColor(img_left, cv2.COLOR_GRAY2BGR)
     right_color_img = cv2.cvtColor(img_right, cv2.COLOR_GRAY2BGR)
     r1, g1, b1 = [], [], []  # the line colors
@@ -163,7 +164,8 @@ def draw_singlescale_matches(img_left, img_right, matched_segs, mask=None):
     assert img_left.ndim == 2
     h, w = img_left.shape
 
-    # store the matching results of the first and second images into a single image
+    # store the matching results of the first and second images
+    # into a single image
     left_color_img = cv2.cvtColor(img_left, cv2.COLOR_GRAY2BGR)
     right_color_img = cv2.cvtColor(img_right, cv2.COLOR_GRAY2BGR)
     colors = []
@@ -377,11 +379,13 @@ def report_dist_reprojection(line3d, line2d, camview, prefix=None):
     sensitivity = line3d.sensitivity(camview)
     if prefix is None:
         print(
-            f"angle = {angle:.4f}, perp = {perp_dist:.4f}, overlap = {overlap:.4f}, sensi = {sensitivity:.4f}"
+            f"angle = {angle:.4f}, perp = {perp_dist:.4f}, \
+              overlap = {overlap:.4f}, sensi = {sensitivity:.4f}"
         )
     else:
         print(
-            f"{prefix}: angle = {angle:.4f}, perp = {perp_dist:.4f}, overlap = {overlap:.4f}, sensi = {sensitivity:.4f}"
+            f"{prefix}: angle = {angle:.4f}, perp = {perp_dist:.4f}, \
+              overlap = {overlap:.4f}, sensi = {sensitivity:.4f}"
         )
 
 
@@ -397,7 +401,8 @@ def visualize_line_track(
     imagecols, linetrack, prefix="linetrack", report=False
 ):
     print(
-        f"[VISUALIZE]: line length: {linetrack.line.length()}, num_supporting_lines: {len(linetrack.image_id_list)}"
+        f"[VISUALIZE]: line length: {linetrack.line.length()}, \
+          num_supporting_lines: {len(linetrack.image_id_list)}"
     )
     for idx, (img_id, line2d) in enumerate(
         zip(linetrack.image_id_list, linetrack.line2d_list)
@@ -409,7 +414,8 @@ def visualize_line_track(
             linetrack.line,
             line2d,
             imagecols.camview(img_id),
-            prefix=f"Reprojecting to line {idx} (img {img_id}, line {linetrack.line_id_list[idx]})",
+            prefix=f"Reprojecting to line {idx} (img {img_id}, \
+                     line {linetrack.line_id_list[idx]})",
         )
         line2d_proj = linetrack.line.projection(imagecols.camview(img_id))
         img = draw_segments(
