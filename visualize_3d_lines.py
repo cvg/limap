@@ -14,7 +14,8 @@ def parse_args():
         "--input_dir",
         type=str,
         required=True,
-        help="input line file. Format supported now: .obj, .npy, linetrack folder.",
+        help="input line file. Format supported now: \
+              .obj, .npy, linetrack folder.",
     )
     arg_parser.add_argument(
         "-nv",
