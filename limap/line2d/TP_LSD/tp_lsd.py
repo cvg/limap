@@ -1,3 +1,4 @@
+import logging
 import os
 
 import cv2
@@ -7,11 +8,14 @@ from tp_lsd.modeling.TP_Net import Res320
 from tp_lsd.utils.reconstruct import TPS_line
 from tp_lsd.utils.utils import load_model
 
-from ..base_detector import BaseDetector, BaseDetectorOptions
+from ..base_detector import (
+    BaseDetector,
+    DefaultDetectorOptions,
+)
 
 
 class TPLSDDetector(BaseDetector):
-    def __init__(self, options=BaseDetectorOptions()):
+    def __init__(self, options=DefaultDetectorOptions):
         super().__init__(options)
         # Load the TP-LSD model
         head = {"center": 1, "dis": 4, "line": 1}
@@ -36,7 +40,7 @@ class TPLSDDetector(BaseDetector):
             os.makedirs(os.path.dirname(path))
         link = "https://github.com/Siyuada7/TP-LSD/blob/master/pretraineds/Res512.pth?raw=true"
         cmd = ["wget", link, "-O", path]
-        print("Downloading TP_LSD model...")
+        logging.info("Downloading TP_LSD model...")
         subprocess.run(cmd, check=True)
 
     def get_module_name(self):

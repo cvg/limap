@@ -1,3 +1,4 @@
+import logging
 import os
 
 import cv2
@@ -6,11 +7,14 @@ import torch
 
 import limap.util.io as limapio
 
-from ..base_detector import BaseDetector, BaseDetectorOptions
+from ..base_detector import (
+    BaseDetector,
+    DefaultDetectorOptions,
+)
 
 
 class L2D2Extractor(BaseDetector):
-    def __init__(self, options=BaseDetectorOptions(), device=None):
+    def __init__(self, options=DefaultDetectorOptions, device=None):
         super().__init__(options)
         self.mini_batch = 20
         self.device = "cuda" if device is None else device
@@ -40,7 +44,7 @@ class L2D2Extractor(BaseDetector):
             os.makedirs(os.path.dirname(path))
         link = "https://github.com/hichem-abdellali/L2D2/blob/main/IN_OUT_DATA/INPUT_NETWEIGHT/checkpoint_line_descriptor.th?raw=true"
         cmd = ["wget", link, "-O", path]
-        print("Downloading L2D2 model...")
+        logging.info("Downloading L2D2 model...")
         subprocess.run(cmd, check=True)
 
     def get_module_name(self):

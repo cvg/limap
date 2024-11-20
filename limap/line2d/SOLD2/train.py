@@ -2,6 +2,8 @@
 This file implements the training process and all the summaries
 """
 
+import logging
+
 import cv2
 import numpy as np
 import torch
@@ -70,7 +72,7 @@ def restore_weights(model, state_dict, strict=True):
 #     test_cfg = model_cfg["test"]
 #
 #     # Create train and test dataset
-#     print("\t Initializing dataset...")
+#     logging.info("\t Initializing dataset...")
 #     train_dataset, train_collate_fn = get_dataset("train", dataset_cfg)
 #     test_dataset, test_collate_fn = get_dataset("test", dataset_cfg)
 #
@@ -85,7 +87,7 @@ def restore_weights(model, state_dict, strict=True):
 #                              num_workers=test_cfg.get("num_workers", 1),
 #                              shuffle=False, pin_memory=False,
 #                              collate_fn=test_collate_fn)
-#     print("\t Successfully intialized dataloaders.")
+#     logging.info("\t Successfully intialized dataloaders.")
 #
 #
 #     # Get the loss function and weight first
@@ -121,13 +123,13 @@ def restore_weights(model, state_dict, strict=True):
 #         model = get_model(model_cfg, loss_weights)
 #         # Optionally get the pretrained wieghts
 #         if args.pretrained:
-#             print("\t [Debug] Loading pretrained weights...")
+#             logging.info("\t [Debug] Loading pretrained weights...")
 #             checkpoint = get_latest_checkpoint(args.pretrained_path,
 #                                                args.checkpoint_name)
 #             # If auto weighting restore from non-auto weighting
 #             model = restore_weights(model, checkpoint["model_state_dict"],
 #                                     strict=False)
-#             print("\t [Debug] Finished loading pretrained weights!")
+#             logging.info("\t [Debug] Finished loading pretrained weights!")
 #
 #         model = model.cuda()
 #         optimizer = torch.optim.Adam(
@@ -142,7 +144,7 @@ def restore_weights(model, state_dict, strict=True):
 #             optimizer=optimizer)
 #         start_epoch = 0
 #
-#     print("\t Successfully initialized model")
+#     logging.info("\t Successfully initialized model")
 #
 #     # Define the total loss
 #     policy = model_cfg.get("weighting_policy", "static")
@@ -168,7 +170,7 @@ def restore_weights(model, state_dict, strict=True):
 #         writer.add_scalar("LR/lr", current_lr, epoch)
 #
 #         # Train for one epochs
-#         print("\n\n================== Training ====================")
+#         logging.info("\n\n================== Training ====================")
 #         train_single_epoch(
 #             model=model,
 #             model_cfg=model_cfg,
@@ -180,7 +182,7 @@ def restore_weights(model, state_dict, strict=True):
 #             epoch=epoch)
 #
 #         # Do the validation
-#         print("\n\n================== Validation ==================")
+#         logging.info("\n\n================== Validation ==================")
 #         validate(
 #             model=model,
 #             model_cfg=model_cfg,
@@ -197,7 +199,7 @@ def restore_weights(model, state_dict, strict=True):
 #         # Save checkpoints
 #         file_name = os.path.join(output_path,
 #                                  "checkpoint-epoch%03d-end.tar"%(epoch))
-#         print("[Info] Saving checkpoint %s ..." % file_name)
+#         logging.info("[Info] Saving checkpoint %s ..." % file_name)
 #         save_dict = {
 #             "epoch": epoch,
 #             "model_state_dict": model.state_dict(),
@@ -370,7 +372,7 @@ def train_single_epoch(
             # Get gpu memory usage in GB
             gpu_mem_usage = torch.cuda.max_memory_allocated() / (1024**3)
             if compute_descriptors:
-                print(
+                logging.info(
                     "Epoch [%d / %d] Iter [%d / %d] loss=%.4f (%.4f), junc_loss=%.4f (%.4f), heatmap_loss=%.4f (%.4f), descriptor_loss=%.4f (%.4f), gpu_mem=%.4fGB"
                     % (
                         epoch,
@@ -389,7 +391,7 @@ def train_single_epoch(
                     )
                 )
             else:
-                print(
+                logging.info(
                     "Epoch [%d / %d] Iter [%d / %d] loss=%.4f (%.4f), junc_loss=%.4f (%.4f), heatmap_loss=%.4f (%.4f), gpu_mem=%.4fGB"
                     % (
                         epoch,
@@ -405,7 +407,7 @@ def train_single_epoch(
                         gpu_mem_usage,
                     )
                 )
-            print(
+            logging.info(
                 "\t Junction     precision=%.4f (%.4f) / recall=%.4f (%.4f)"
                 % (
                     results["junc_precision"],
@@ -414,7 +416,7 @@ def train_single_epoch(
                     average["junc_recall"],
                 )
             )
-            print(
+            logging.info(
                 "\t Junction nms precision=%.4f (%.4f) / recall=%.4f (%.4f)"
                 % (
                     results["junc_precision_nms"],
@@ -423,7 +425,7 @@ def train_single_epoch(
                     average["junc_recall_nms"],
                 )
             )
-            print(
+            logging.info(
                 "\t Heatmap      precision=%.4f (%.4f) / recall=%.4f (%.4f)"
                 % (
                     results["heatmap_precision"],
@@ -433,7 +435,7 @@ def train_single_epoch(
                 )
             )
             if compute_descriptors:
-                print(
+                logging.info(
                     "\t Descriptors  matching score=%.4f (%.4f)"
                     % (results["matching_score"], average["matching_score"])
                 )
@@ -629,7 +631,7 @@ def validate(
             results = metric_func.metric_results
             average = average_meter.average()
             if compute_descriptors:
-                print(
+                logging.info(
                     "Iter [%d / %d] loss=%.4f (%.4f), junc_loss=%.4f (%.4f), heatmap_loss=%.4f (%.4f), descriptor_loss=%.4f (%.4f)"
                     % (
                         idx,
@@ -645,7 +647,7 @@ def validate(
                     )
                 )
             else:
-                print(
+                logging.info(
                     "Iter [%d / %d] loss=%.4f (%.4f), junc_loss=%.4f (%.4f), heatmap_loss=%.4f (%.4f)"
                     % (
                         idx,
@@ -658,7 +660,7 @@ def validate(
                         average["heatmap_loss"],
                     )
                 )
-            print(
+            logging.info(
                 "\t Junction     precision=%.4f (%.4f) / recall=%.4f (%.4f)"
                 % (
                     results["junc_precision"],
@@ -667,7 +669,7 @@ def validate(
                     average["junc_recall"],
                 )
             )
-            print(
+            logging.info(
                 "\t Junction nms precision=%.4f (%.4f) / recall=%.4f (%.4f)"
                 % (
                     results["junc_precision_nms"],
@@ -676,7 +678,7 @@ def validate(
                     average["junc_recall_nms"],
                 )
             )
-            print(
+            logging.info(
                 "\t Heatmap      precision=%.4f (%.4f) / recall=%.4f (%.4f)"
                 % (
                     results["heatmap_precision"],
@@ -686,7 +688,7 @@ def validate(
                 )
             )
             if compute_descriptors:
-                print(
+                logging.info(
                     "\t Descriptors  matching score=%.4f (%.4f)"
                     % (results["matching_score"], average["matching_score"])
                 )

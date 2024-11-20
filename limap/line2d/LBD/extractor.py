@@ -7,12 +7,17 @@ import pytlsd
 
 import limap.util.io as limapio
 
-from ..base_detector import BaseDetector, BaseDetectorOptions
+from ..base_detector import (
+    BaseDetector,
+    DefaultDetectorOptions,
+)
 
 
 def process_pyramid(
-    img, detector, n_levels=5, level_scale=np.sqrt(2), presmooth=True
+    img, detector, n_levels=5, level_scale=None, presmooth=True
 ):
+    if level_scale is None:
+        level_scale = np.sqrt(2)
     octave_img = img.copy()
     pre_sigma2 = 0
     cur_sigma2 = 1.0
@@ -56,7 +61,7 @@ def to_multiscale_lines(lines):
 
 
 class LBDExtractor(BaseDetector):
-    def __init__(self, options=BaseDetectorOptions()):
+    def __init__(self, options=DefaultDetectorOptions):
         super().__init__(options)
 
     def get_module_name(self):

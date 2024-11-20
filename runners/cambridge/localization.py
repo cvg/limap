@@ -78,7 +78,6 @@ def parse_config():
         "--eval", default=None, type=Path, help="Path to the result file"
     )
 
-    # arg_parser.add_argument('--colmap_retriangulate', default=False, action='store_true')
     arg_parser.add_argument(
         "--num_covis",
         type=int,

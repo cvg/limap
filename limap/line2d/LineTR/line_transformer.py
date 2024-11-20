@@ -1,3 +1,4 @@
+import logging
 from copy import deepcopy
 from pathlib import Path
 
@@ -328,7 +329,7 @@ class LineTransformer(nn.Module):
             if not path.is_file():
                 self.download_model(path)
             self.load_state_dict(torch.load(str(path)))
-            print("Loaded Line-Transformer model")
+            logging.info("Loaded Line-Transformer model")
 
     def download_model(self, path):
         import subprocess
@@ -337,7 +338,7 @@ class LineTransformer(nn.Module):
             path.parent.mkdir(parents=True, exist_ok=True)
         link = "https://github.com/yosungho/LineTR/blob/main/models/weights/LineTR_weight.pth?raw=true"
         cmd = ["wget", link, "-O", str(path)]
-        print("Downloading LineTR model...")
+        logging.info("Downloading LineTR model...")
         subprocess.run(cmd, check=True)
 
     def forward(self, data):

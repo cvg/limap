@@ -1,3 +1,4 @@
+import logging
 import os
 
 import imagesize
@@ -11,7 +12,7 @@ def ReadModelBundler(bundler_path, list_path, model_path):
     # read imname_list
     ################################
     list_path = os.path.join(bundler_path, list_path)
-    print(f"Loading bundler list file {list_path}...")
+    logging.info(f"Loading bundler list file {list_path}...")
     with open(list_path) as f:
         lines = f.readlines()
     image_names = [line.strip("\n").split(" ")[0] for line in lines]
@@ -23,7 +24,7 @@ def ReadModelBundler(bundler_path, list_path, model_path):
     # read sfm model
     ################################
     model_path = os.path.join(bundler_path, model_path)
-    print(f"Loading bundler model file {model_path}...")
+    logging.info(f"Loading bundler model file {model_path}...")
     with open(model_path) as f:
         lines = f.readlines()
     counter = 1  # start from the second line

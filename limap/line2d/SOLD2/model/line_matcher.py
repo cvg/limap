@@ -2,6 +2,7 @@
 Implements the full pipeline from raw images to line matches.
 """
 
+import logging
 import time
 
 import cv2
@@ -60,9 +61,9 @@ class LineMatcher:
 
         # Print some debug messages
         # for key, val in line_detector_cfg.items():
-        #     print(f"[Debug] {key}: {val}")
-        # print("[Debug] detect_thresh: %f" % (line_detector_cfg["detect_thresh"]))
-        # print("[Debug] num_samples: %d" % (line_detector_cfg["num_samples"]))
+        #     logging.info(f"[Debug] {key}: {val}")
+        # logging.info("[Debug] detect_thresh: %f" % (line_detector_cfg["detect_thresh"]))
+        # logging.info("[Debug] num_samples: %d" % (line_detector_cfg["num_samples"]))
 
     # Perform line detection and descriptor inference on a single image
     def line_detection(

@@ -82,7 +82,8 @@ def parse_args():
         "--line_cost_func",
         type=str,
         default="PerpendicularDist",
-        help="Line Cost function for scoring and optimization, default: %(default)s",
+        help="Line Cost function for scoring and optimization, \
+              default: %(default)s",
     )
 
     args, unknown = arg_parser.parse_known_args()
@@ -127,8 +128,10 @@ def main():
     log += (
         f"Result(P+L) Pose (qvec, tvec): {final_pose.qvec}, {final_pose.tvec}\n"
     )
-    log += f"HLoc(Point) Pose (qvec, tvec): {data['pose_point'].qvec}, {data['pose_point'].tvec}\n"
-    log += f"GT Pose (qvec, tvec): {data['pose_gt'].qvec}, {data['pose_gt'].tvec}\n\n"
+    log += f"HLoc(Point) Pose (qvec, tvec): \
+             {data['pose_point'].qvec}, {data['pose_point'].tvec}\n"
+    log += f"GT Pose (qvec, tvec): \
+             {data['pose_gt'].qvec}, {data['pose_gt'].tvec}\n\n"
 
     R, t = final_pose.R(), final_pose.tvec
     e_t = np.linalg.norm(-R_gt.T @ t_gt + R.T @ t, axis=0)
