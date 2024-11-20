@@ -1,3 +1,4 @@
+import logging
 import os
 
 import numpy as np
@@ -88,7 +89,7 @@ def compute_2d_bipartites_from_colmap(
         reconstruction["images"],
         reconstruction["points"],
     )
-    print("Start computing 2D bipartites...")
+    logging.info("Start computing 2D bipartites...")
     for img_id, colmap_image in tqdm(colmap_images.items()):
         n_points = colmap_image.xys.shape[0]
         indexes = np.arange(0, n_points)

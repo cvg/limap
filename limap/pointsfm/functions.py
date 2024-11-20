@@ -1,3 +1,5 @@
+import logging
+
 from _limap import _pointsfm
 
 
@@ -39,7 +41,7 @@ def compute_neighbors(
 
 def compute_metainfos(cfg, model, n_neighbors=20):
     # get neighbors
-    print(f"Computing visual neighbors... (n_neighbors = {n_neighbors})")
+    logging.info(f"Computing visual neighbors... (n_neighbors = {n_neighbors})")
     neighbors = compute_neighbors(
         model,
         n_neighbors,

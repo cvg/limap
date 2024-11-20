@@ -7,12 +7,15 @@ import torch
 import limap.util.io as limapio
 from limap.point2d.superpoint import SuperPoint
 
-from ..base_detector import BaseDetector, BaseDetectorOptions
+from ..base_detector import (
+    BaseDetector,
+    DefaultDetectorOptions,
+)
 from .line_transformer import LineTransformer
 
 
 class LineTRExtractor(BaseDetector):
-    def __init__(self, options=BaseDetectorOptions(), device=None):
+    def __init__(self, options=DefaultDetectorOptions, device=None):
         super().__init__(options)
         self.device = "cuda" if device is None else device
         self.sp = SuperPoint({}).eval().to(self.device)

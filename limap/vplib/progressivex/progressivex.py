@@ -4,7 +4,7 @@ import numpy as np
 import pyprogressivex
 from _limap import _vplib
 
-from ..base_vp_detector import BaseVPDetector, BaseVPDetectorOptions
+from ..base_vp_detector import BaseVPDetector, DefaultVPDetectorOptions
 
 ProgressiveXOptions = namedtuple(
     "ProgressiveXOptions",
@@ -14,7 +14,7 @@ ProgressiveXOptions = namedtuple(
 
 
 class ProgressiveX(BaseVPDetector):
-    def __init__(self, cfg, options=BaseVPDetectorOptions()):
+    def __init__(self, cfg, options=DefaultVPDetectorOptions):
         super().__init__(options)
         self.options = ProgressiveXOptions()
         for fld in self.options._fields:

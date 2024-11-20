@@ -205,7 +205,6 @@ def open3d_draw_bipartite3d_vpline(bpt3d, ranges=None):
             width=2,
             name=f"lineset_vp_{vp_id}",
         )
-    # w = open3d_add_line_set(w, nonvp_line_set, color=(0.0, 0.0, 0.0), width=2, name="lineset_nonvp")
     w.reset_camera_to_default()
     w.scene_shader = w.UNLIT
     w.enable_raw_mode(True)

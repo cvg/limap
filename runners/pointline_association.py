@@ -27,18 +27,21 @@ def report_vp(vpresults, vptracks, print_pairs=False):
                 n_pairs_parallel += 1
                 if print_pairs:
                     print(
-                        f"[LOG] Parallel pair detected: {i} / {j}, angle = {angle:.2f}"
+                        f"[LOG] Parallel pair detected: {i} / {j}, \
+                          angle = {angle:.2f}"
                     )
             if angle >= 87.0:
                 n_pairs_orthogonal += 1
                 if print_pairs:
                     print(
-                        f"[LOG] Orthogonal pair detected: {i} / {j}, angle = {angle:.2f}"
+                        f"[LOG] Orthogonal pair detected: {i} / {j}, \
+                          angle = {angle:.2f}"
                     )
     print(f"[LOG] number of VP tracks: {len(vptracks)}")
     print("[LOG]", [track.length() for track in vptracks])
     print(
-        f"[LOG] parallel pairs: {n_pairs_parallel}, orthogonal pairs: {n_pairs_orthogonal}"
+        f"[LOG] parallel pairs: {n_pairs_parallel}, \
+          orthogonal pairs: {n_pairs_orthogonal}"
     )
 
 

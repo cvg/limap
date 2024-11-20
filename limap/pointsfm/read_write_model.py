@@ -31,6 +31,7 @@
 
 import argparse
 import collections
+import logging
 import os
 import struct
 
@@ -310,7 +311,8 @@ def write_images_text(images, path):
         "# Image list with two lines of data per image:\n"
         + "#   IMAGE_ID, QW, QX, QY, QZ, TX, TY, TZ, CAMERA_ID, NAME\n"
         + "#   POINTS2D[] as (X, Y, POINT3D_ID)\n"
-        + f"# Number of images: {len(images)}, mean observations per image: {mean_observations}\n"
+        + f"# Number of images: {len(images)}, mean observations \
+            per image: {mean_observations}\n"
     )
 
     with open(path, "w") as fid:
@@ -437,8 +439,10 @@ def write_points3D_text(points3D, path):
         ) / len(points3D)
     HEADER = (
         "# 3D point list with one line of data per point:\n"
-        + "#   POINT3D_ID, X, Y, Z, R, G, B, ERROR, TRACK[] as (IMAGE_ID, POINT2D_IDX)\n"
-        + f"# Number of points: {len(points3D)}, mean track length: {mean_track_length}\n"
+        + "#   POINT3D_ID, X, Y, Z, R, G, B, ERROR, TRACK[] \
+           as (IMAGE_ID, POINT2D_IDX)\n"
+        + f"# Number of points: {len(points3D)}, mean track length: \
+            {mean_track_length}\n"
     )
 
     with open(path, "w") as fid:
@@ -477,7 +481,7 @@ def detect_model_format(path, ext):
         and os.path.isfile(os.path.join(path, "images" + ext))
         and os.path.isfile(os.path.join(path, "points3D" + ext))
     ):
-        print("Detected model format: '" + ext + "'")
+        logging.info("Detected model format: '" + ext + "'")
         return True
 
     return False
@@ -491,7 +495,7 @@ def read_model(path, ext=""):
         elif detect_model_format(path, ".txt"):
             ext = ".txt"
         else:
-            print("Provide model format: '.bin' or '.txt'")
+            logging.info("Provide model format: '.bin' or '.txt'")
             return
 
     if ext == ".txt":
@@ -583,9 +587,9 @@ def main():
         path=args.input_model, ext=args.input_format
     )
 
-    print("num_cameras:", len(cameras))
-    print("num_images:", len(images))
-    print("num_points3D:", len(points3D))
+    logging.info("num_cameras:", len(cameras))
+    logging.info("num_images:", len(images))
+    logging.info("num_points3D:", len(points3D))
 
     if args.output_model is not None:
         write_model(

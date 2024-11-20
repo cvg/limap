@@ -12,7 +12,9 @@ view1 = limap.base.CameraView(
 view2 = limap.base.CameraView(
     limap.base.Camera("SIMPLE_PINHOLE", hw=(800, 800)),
     "runners/tests/data/line2d/frame.0000.color.jpg",
-)  # You can specify the height and width to resize into in the limap.base.Camera instance at initialization.
+)
+# You can specify the height and width to resize into
+# in the limap.base.Camera instance at initialization.
 detector = limap.line2d.get_detector(
     {"method": "deeplsd", "skip_exists": False}
 )  # get a line detector

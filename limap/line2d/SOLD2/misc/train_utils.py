@@ -2,6 +2,7 @@
 This file contains some useful functions for train / val.
 """
 
+import logging
 import os
 
 import numpy as np
@@ -21,10 +22,10 @@ def convert_image(input_tensor, axis):
 ######################
 ## checkpoint utils ##
 ######################
-def get_latest_checkpoint(
-    checkpoint_root, checkpoint_name, device=torch.device("cuda")
-):
+def get_latest_checkpoint(checkpoint_root, checkpoint_name, device=None):
     """Get the latest checkpoint or by filename."""
+    if device is None:
+        device = torch.device("cuda")
     # Load specific checkpoint
     if checkpoint_name is not None:
         checkpoint = torch.load(
@@ -59,7 +60,7 @@ def remove_old_checkpoints(checkpoint_root, max_ckpt=15):
         for _ in remove_list:
             full_name = os.path.join(checkpoint_root, _)
             os.remove(full_name)
-            print("[Debug] Remove outdated checkpoint %s" % (full_name))
+            logging.info("[Debug] Remove outdated checkpoint %s" % (full_name))
 
 
 ################

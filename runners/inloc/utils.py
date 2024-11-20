@@ -50,7 +50,8 @@ def read_dataset_inloc(
         names = names_
     if logger:
         logger.info(
-            f"Found {len(names)} images in {dataset_dir}, excluding CSE scenes: {exclude_CSE}"
+            f"Found {len(names)} images in {dataset_dir}, \
+              excluding CSE scenes: {exclude_CSE}"
         )
 
     if cfg["info_path"] is None:

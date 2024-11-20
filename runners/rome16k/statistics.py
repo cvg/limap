@@ -33,7 +33,8 @@ def parse_config():
     import argparse
 
     arg_parser = argparse.ArgumentParser(
-        description="triangulate 3d lines from specific component of Rome16k (bundler format)."
+        description="triangulate 3d lines from specific component \
+                     of Rome16k (bundler format)."
     )
     arg_parser.add_argument(
         "-c",

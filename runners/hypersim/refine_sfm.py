@@ -31,7 +31,8 @@ def run_scene_hypersim(cfg, dataset, scene_id, cam_id=0):
         os.path.join(global_dir_save, "imagecols_gt.npy"), imagecols_gt
     )
     colmap_path = os.path.join(cfg["dir_save"], "colmap_sfm")
-    # pointsfm.run_colmap_sfm(cfg["sfm"], imagecols_gt, output_path=colmap_path, skip_exists=cfg["skip_exists"], map_to_original_image_names=False)
+    # _psfm.run_colmap_sfm(cfg["sfm"], imagecols_gt, output_path=colmap_path,
+    # skip_exists=cfg["skip_exists"], map_to_original_image_names=False)
     imagecols, _, _ = pointsfm.read_infos_colmap(
         cfg["sfm"], colmap_path, model_path="sparse/0", image_path="images"
     )
@@ -68,11 +69,13 @@ def run_scene_hypersim(cfg, dataset, scene_id, cam_id=0):
         imagecols, imagecols_gt
     )
     print(
-        f"original: trans: {np.median(trans_errs_orig):.4f}, rot: {np.median(rot_errs_orig):.4f}"
+        f"original: trans: {np.median(trans_errs_orig):.4f}, \
+          rot: {np.median(rot_errs_orig):.4f}"
     )
     trans_errs, rot_errs = limapeval.eval_imagecols(new_imagecols, imagecols_gt)
     print(
-        f"optimized: trans: {np.median(trans_errs):.4f}, rot: {np.median(rot_errs):.4f}"
+        f"optimized: trans: {np.median(trans_errs):.4f}, \
+          rot: {np.median(rot_errs):.4f}"
     )
 
 
