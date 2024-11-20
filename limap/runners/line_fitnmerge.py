@@ -5,7 +5,7 @@ import numpy as np
 from tqdm import tqdm
 
 import limap.base as _base
-import limap.fitting as _fit
+import limap.fitting as fitting
 import limap.merging as _mrg
 import limap.optimize as _optim
 import limap.runners as _runners
@@ -32,7 +32,7 @@ def fit_3d_segs(all_2d_segs, imagecols, depths, fitting_config):
         depth = depths[img_id].read_depth(img_hw=[camview.h(), camview.w()])
         seg3d_list_idx = []
         for s in segs:
-            seg3d = _fit.estimate_seg3d_from_depth(
+            seg3d = fitting.estimate_seg3d_from_depth(
                 s,
                 depth,
                 camview,
@@ -82,7 +82,7 @@ def fit_3d_segs_with_points3d(
         p3ds = p3d_reader[img_id].read_p3ds()
         seg3d_list_idx = []
         for s in segs:
-            seg3d = _fit.estimate_seg3d_from_points3d(
+            seg3d = fitting.estimate_seg3d_from_points3d(
                 s,
                 p3ds,
                 camview,
