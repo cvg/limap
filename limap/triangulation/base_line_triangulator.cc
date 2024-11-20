@@ -183,7 +183,7 @@ void BaseLineTriangulator::triangulateOneNode(const int img_id,
       std::vector<V3D> points;
       for (auto it = points_info.begin(); it != points_info.end(); ++it) {
         if (sfm_points_.empty()) {
-          auto res = point_triangulation(it->second.first, view1,
+          auto res = triangulate_point(it->second.first, view1,
                                          it->second.second, view2);
           if (res.second)
             points.push_back(res.first);
@@ -208,7 +208,7 @@ void BaseLineTriangulator::triangulateOneNode(const int img_id,
         Eigen::JacobiSVD<Eigen::MatrixXd> svd(epoints, Eigen::ComputeThinV);
         V3D direc = svd.matrixV().col(0).normalized();
         InfiniteLine3d inf_line = InfiniteLine3d(center, direc);
-        Line3d line = triangulate_with_infinite_line(l1, view1, inf_line);
+        Line3d line = triangulate_line_with_infinite_line(l1, view1, inf_line);
         if (line.score > 0) {
           double u1 = line.computeUncertainty(view1, config_.var2d);
           double u2 = line.computeUncertainty(view2, config_.var2d);
@@ -221,7 +221,7 @@ void BaseLineTriangulator::triangulateOneNode(const int img_id,
       // Step 1.2 one point triangulation
       if (!config_.disable_one_point_triangulation && !points.empty()) {
         for (const V3D &p : points) {
-          Line3d line = triangulate_with_one_point(l1, view1, l2, view2, p);
+          Line3d line = triangulate_line_with_one_point(l1, view1, l2, view2, p);
           if (line.score > 0) {
             double u1 = line.computeUncertainty(view1, config_.var2d);
             double u2 = line.computeUncertainty(view2, config_.var2d);
@@ -239,7 +239,7 @@ void BaseLineTriangulator::triangulateOneNode(const int img_id,
       if (vpresults_[img_id].HasVP(line_id)) {
         V3D direc =
             getDirectionFromVP(vpresults_[img_id].GetVP(line_id), view1);
-        Line3d line = triangulate_with_direction(l1, view1, l2, view2, direc);
+        Line3d line = triangulate_line_with_direction(l1, view1, l2, view2, direc);
         if (line.score > 0) {
           double u1 = line.computeUncertainty(view1, config_.var2d);
           double u2 = line.computeUncertainty(view2, config_.var2d);
@@ -252,7 +252,7 @@ void BaseLineTriangulator::triangulateOneNode(const int img_id,
       if (vpresults_[ng_img_id].HasVP(ng_line_id)) {
         V3D direc =
             getDirectionFromVP(vpresults_[ng_img_id].GetVP(ng_line_id), view1);
-        Line3d line = triangulate_with_direction(l1, view1, l2, view2, direc);
+        Line3d line = triangulate_line_with_direction(l1, view1, l2, view2, direc);
         if (line.score > 0) {
           double u1 = line.computeUncertainty(view1, config_.var2d);
           double u2 = line.computeUncertainty(view2, config_.var2d);
@@ -285,9 +285,9 @@ void BaseLineTriangulator::triangulateOneNode(const int img_id,
       // triangulation with weak epipolar constraints test
       Line3d line;
       if (!config_.use_endpoints_triangulation)
-        line = triangulate(l1, view1, l2, view2);
+        line = triangulate_line(l1, view1, l2, view2);
       else
-        line = triangulate_endpoints(l1, view1, l2, view2);
+        line = triangulate_line_by_endpoints(l1, view1, l2, view2);
       if (line.sensitivity(view1) > config_.sensitivity_threshold &&
           line.sensitivity(view2) > config_.sensitivity_threshold)
         line.score = -1;
