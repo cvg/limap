@@ -2,7 +2,6 @@
 Implements the full pipeline from raw images to line matches.
 """
 
-import logging
 import time
 
 import cv2

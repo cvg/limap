@@ -304,7 +304,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
 
         pdb.set_trace()
         VisTrack.vis_reconstruction(
-            imagecols, n_visible_views=cfg["n_visible_views"], width=2
+            imagecols, n_visible_views=cfg["n_visible_views"]
         )
         pdb.set_trace()
     return linetracks
