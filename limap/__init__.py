@@ -1,23 +1,7 @@
-import sys
+import _limap
 
-sys.path.append("build/limap/_limap")
-from _limap import *
+from . import base
 
-from . import (
-    base,
-    evaluation,
-    features,
-    fitting,
-    line2d,
-    merging,
-    optimize,
-    point2d,
-    pointsfm,
-    runners,
-    structures,
-    triangulation,
-    undistortion,
-    util,
-    visualize,
-    vplib,
-)
+__all__ = ["base"]
+__version__ = _limap.__version__
+__ceres_version__ = _limap.__ceres_version__
