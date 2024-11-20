@@ -10,7 +10,7 @@ from loader import read_scene_hypersim
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
-import limap.optimize
+import limap.optimize as optimize
 import limap.pointsfm as pointsfm
 import limap.runners
 import limap.util.config as cfgutils
@@ -55,8 +55,8 @@ def run_scene_hypersim(cfg, dataset, scene_id, cam_id=0):
     colmap_folder = os.path.join(colmap_path, "sparse/0")
     reconstruction = pointsfm.PyReadCOLMAP(colmap_folder)
     pointtracks = pointsfm.ReadPointTracks(reconstruction)
-    cfg_ba = limap.optimize.HybridBAConfig()
-    ba_engine = limap.optimize.solve_hybrid_bundle_adjustment(
+    cfg_ba = optimize.HybridBAConfig()
+    ba_engine = optimize.solve_hybrid_bundle_adjustment(
         cfg_ba, imagecols, pointtracks, linetracks
     )
     new_imagecols = ba_engine.GetOutputImagecols()

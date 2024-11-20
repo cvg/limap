@@ -5,7 +5,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 
 import limap.base as _base
-import limap.optimize as _optim
+import limap.optimize as optimize
 import limap.util.config as cfgutils
 import limap.util.io as limapio
 import limap.vplib as vplib
@@ -35,7 +35,7 @@ def one_by_one_refinement(cfg):
         )
 
     # one-by-one refinement
-    newtracks = _optim.line_refinement(
+    newtracks = optimize.line_refinement(
         cfg["refinement"],
         linetracks,
         imagecols,
@@ -79,9 +79,9 @@ def joint_refinement(cfg):
     ) = limapio.read_folder_linetracks_with_info(cfg["input_folder"])
 
     # all refinements in a single problem
-    cfg_ba = _optim.HybridBAConfig(cfg["refinement"])
+    cfg_ba = optimize.HybridBAConfig(cfg["refinement"])
     cfg_ba.set_constant_camera()
-    ba_engine = _optim.solve_line_bundle_adjustment(
+    ba_engine = optimize.solve_line_bundle_adjustment(
         cfg["refinement"], imagecols, linetracks, max_num_iterations=200
     )
     newtracks_map = ba_engine.GetOutputLineTracks(

@@ -7,7 +7,7 @@ import math
 import numpy as np
 
 import limap.base as _base
-import limap.optimize as _optim
+import limap.optimize as optimize
 import limap.pointsfm as pointsfm
 import limap.runners
 import limap.structures as structures
@@ -92,9 +92,9 @@ def pointline_association(cfg, input_folder, output_folder, colmap_folder):
     # Optimization
     ############################################################
     # optimize association # 1
-    cfg_associator = _optim.GlobalAssociatorConfig(cfg["global_pl_association"])
+    cfg_associator = optimize.GlobalAssociatorConfig(cfg["global_pl_association"])
     # cfg_associator.solver_options.logging_type = _ceresbase.LoggingType.STDOUT
-    associator = _optim.GlobalAssociator(cfg_associator)
+    associator = optimize.GlobalAssociator(cfg_associator)
     associator.InitImagecols(imagecols)
     associator.InitPointTracks(pointtracks)
     associator.InitLineTracks(linetracks)
