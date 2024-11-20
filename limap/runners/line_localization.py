@@ -7,7 +7,7 @@ from hloc.utils.io import get_keypoints, get_matches
 from tqdm import tqdm
 
 import limap.base as _base
-import limap.estimators as _estimators
+import limap.estimators as estimators
 import limap.line2d
 import limap.runners as _runners
 import limap.util.io as limapio
@@ -354,7 +354,7 @@ def line_localization(
 
         p3ds, p2ds = point_corresp[qid]["p3ds"], point_corresp[qid]["p2ds"]
         inliers_point = point_corresp[qid].get("inliers")  # default None
-        final_pose, ransac_stats = _estimators.pl_estimate_absolute_pose(
+        final_pose, ransac_stats = estimators.pl_estimate_absolute_pose(
             cfg["localization"],
             l3ds,
             l3d_ids,

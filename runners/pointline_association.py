@@ -92,7 +92,9 @@ def pointline_association(cfg, input_folder, output_folder, colmap_folder):
     # Optimization
     ############################################################
     # optimize association # 1
-    cfg_associator = optimize.GlobalAssociatorConfig(cfg["global_pl_association"])
+    cfg_associator = optimize.GlobalAssociatorConfig(
+        cfg["global_pl_association"]
+    )
     # cfg_associator.solver_options.logging_type = _ceresbase.LoggingType.STDOUT
     associator = optimize.GlobalAssociator(cfg_associator)
     associator.InitImagecols(imagecols)
