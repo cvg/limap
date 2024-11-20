@@ -4,7 +4,7 @@ import numpy as np
 from tqdm import tqdm
 
 import limap.base as _base
-import limap.evaluation as _eval
+import limap.evaluation as limap_eval
 import limap.features as limap_features
 import limap.optimize as _optim
 import limap.util.io as limapio
@@ -27,7 +27,7 @@ def line_refinement(
     evaluator = None
     if cfg["mesh_dir"] is not None:
         MPAU = 0.02539999969303608  # hypersim
-        evaluator = _eval.MeshEvaluator(cfg["mesh_dir"], MPAU)
+        evaluator = limap_eval.MeshEvaluator(cfg["mesh_dir"], MPAU)
 
     ids = [
         k

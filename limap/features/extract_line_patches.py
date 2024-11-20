@@ -33,7 +33,7 @@ def get_line_patch_extractor(cfg, channels):
     return extractor
 
 
-def extract_line_patch_oneimage(cfg, track, img_id, camview, feature):
+def extract_line_patch_one_image(cfg, track, img_id, camview, feature):
     """
     Returns:
     _features.PatchInfo_fx
