@@ -1,3 +1,4 @@
+import logging
 import os
 
 from tqdm import tqdm
@@ -18,14 +19,20 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     Main interface of line triangulation over multi-view images.
 
     Args:
-        cfg (dict): Configuration. Fields refer to :file:`cfgs/triangulation/default.yaml` as an example
-        imagecols (:class:`limap.base.ImageCollection`): The image collection corresponding to all the images of interest
-        neighbors (dict[int -> list[int]], optional): visual neighbors for each image. By default we compute neighbor information from the covisibility of COLMAP triangulation.
-        ranges (pair of :class:`np.array` each of shape (3,), optional): robust 3D ranges for the scene. By default we compute range information from the COLMAP triangulation.
+        cfg (dict): Configuration. \
+            Refer to :file:`cfgs/triangulation/default.yaml` as an example
+        imagecols (:class:`limap.base.ImageCollection`): \
+            The image collection corresponding to all the images of interest
+        neighbors (dict[int -> list[int]], optional): \
+            visual neighbors for each image. By default we compute \
+            neighbor information from the covisibility of COLMAP triangulation.
+        ranges (pair of :class:`np.array` each of shape (3,), optional): \
+            robust 3D ranges for the scene. By default we compute \
+            range information from the COLMAP triangulation.
     Returns:
         list[:class:`limap.base.LineTrack`]: list of output 3D line tracks
     """
-    print(f"[LOG] Number of images: {imagecols.NumImages()}")
+    logging.info(f"[LOG] Number of images: {imagecols.NumImages()}")
     cfg = _runners.setup(cfg)
     detector_name = cfg["line2d"]["detector"]["method"]
     if cfg["triangulation"]["var2d"] == -1:
@@ -146,7 +153,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
         if cfg["triangulation"]["use_pointsfm"]["use_triangulated_points"]:
             Triangulator.SetSfMPoints(sfm_points)
     # triangulate
-    print("Start multi-view triangulation...")
+    logging.info("Start multi-view triangulation...")
     for img_id in tqdm(imagecols.get_img_ids()):
         if cfg["triangulation"]["use_exhaustive_matcher"]:
             Triangulator.TriangulateImageExhaustiveMatch(

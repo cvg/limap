@@ -27,7 +27,6 @@ def solve_line_refinement(
     else:
         channels = 128
     rf_engine_name = f"RefinementEngine_f{dtype[-2:]}_c{channels}"
-    # print("Refinement type: ", rf_engine_name)
     rf_engine = getattr(_optimize, rf_engine_name)(rf_config)
 
     # initialize track and camview

@@ -1,3 +1,5 @@
+import logging
+
 from _limap import _base
 from _limap import _merging as _mrg
 
@@ -34,8 +36,9 @@ def remerge(linker3d, linetracks, num_outliers=2):
         if num_tracks == num_tracks_new:
             break
         num_tracks = num_tracks_new
-    print(
-        f"[LOG] tracks after iterative remerging: {len(new_linetracks)} / {len(linetracks)}"
+    logging.info(
+        f"[LOG] tracks after iterative remerging: \
+          {len(new_linetracks)} / {len(linetracks)}"
     )
     return new_linetracks
 

@@ -14,8 +14,10 @@ from ..misc.geometry_utils import (
 )
 
 
-def get_loss_and_weights(model_cfg, device=torch.device("cuda")):
+def get_loss_and_weights(model_cfg, device=None):
     """Get loss functions and either static or dynamic weighting."""
+    if device is None:
+        device = torch.device("cuda")
     # Get the global weighting policy
     w_policy = model_cfg.get("weighting_policy", "static")
     if w_policy not in ["static", "dynamic"]:

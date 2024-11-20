@@ -2,6 +2,8 @@
 This file implements the evaluation metrics.
 """
 
+import logging
+
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -499,7 +501,6 @@ def super_nms(prob_predictions, dist_thresh, prob_thresh=0.01, top_k=0):
     im_w = prob_predictions.shape[2]
     output_lst = []
     for i in range(prob_predictions.shape[0]):
-        # print(i)
         prob_pred = prob_predictions[i, ...]
         # Filter the points using prob_thresh
         coord = np.where(prob_pred >= prob_thresh)  # HW format

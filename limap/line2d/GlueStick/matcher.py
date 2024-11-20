@@ -1,14 +1,18 @@
+import logging
 import os
 
 import numpy as np
 import torch
 from gluestick.models.gluestick import GlueStick
 
-from ..base_matcher import BaseMatcher, BaseMatcherOptions
+from ..base_matcher import (
+    BaseMatcher,
+    DefaultMatcherOptions,
+)
 
 
 class GlueStickMatcher(BaseMatcher):
-    def __init__(self, extractor, options=BaseMatcherOptions(), device=None):
+    def __init__(self, extractor, options=DefaultMatcherOptions, device=None):
         super().__init__(extractor, options)
         self.device = "cuda" if device is None else device
         self.gs = GlueStick({}).eval().to(self.device)
@@ -37,7 +41,7 @@ class GlueStickMatcher(BaseMatcher):
             os.makedirs(os.path.dirname(path))
         link = "https://github.com/cvg/GlueStick/releases/download/v0.1_arxiv/checkpoint_GlueStick_MD.tar"
         cmd = ["wget", link, "-O", path]
-        print("Downloading GlueStick model...")
+        logging.info("Downloading GlueStick model...")
         subprocess.run(cmd, check=True)
 
     def get_module_name(self):

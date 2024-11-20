@@ -31,6 +31,7 @@
 
 # This script is based on an original implementation by True Price.
 
+import logging
 import sqlite3
 import sys
 
@@ -299,7 +300,9 @@ def example_usage():
     args = parser.parse_args()
 
     if os.path.exists(args.database_path):
-        print("ERROR: database path already exists -- will not modify it.")
+        logging.info(
+            "ERROR: database path already exists -- will not modify it."
+        )
         return
 
     # Open the database.

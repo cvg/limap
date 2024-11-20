@@ -92,8 +92,10 @@ class LineSegmentDetectionModule:
 
         return outputs
 
-    def detect(self, junctions, heatmap, device=torch.device("cpu")):
+    def detect(self, junctions, heatmap, device=None):
         """Main function performing line segment detection."""
+        if device is None:
+            device = torch.device("cpu")
         # Convert inputs to torch tensor
         junctions = self.convert_inputs(junctions, device=device)
         heatmap = self.convert_inputs(heatmap, device=device)
