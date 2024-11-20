@@ -21,7 +21,7 @@ from utils import (
     run_hloc_7scenes,
 )
 
-import limap.pointsfm.read_write_model as colmap_utils
+import hloc.utils.read_write_model as colmap_utils
 import limap.runners as _runners
 import limap.util.config as cfgutils
 import limap.util.io as limapio

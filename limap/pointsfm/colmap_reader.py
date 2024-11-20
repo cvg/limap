@@ -4,7 +4,7 @@ import sys
 from _limap import _base
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from read_write_model import (
+from hloc.utils.read_write_model import (
     read_cameras_binary,
     read_cameras_text,
     read_images_binary,
