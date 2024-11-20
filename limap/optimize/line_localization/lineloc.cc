@@ -2,7 +2,7 @@
 #include "ceresbase/parameterization.h"
 #include "optimize/line_localization/cost_functions.h"
 
-#include <colmap/optim/bundle_adjustment.h>
+#include <colmap/estimators/bundle_adjustment.h>
 #include <colmap/util/logging.h>
 #include <colmap/util/misc.h>
 #include <colmap/util/threading.h>
@@ -83,9 +83,7 @@ bool LineLocEngine::Solve() {
   }
 
   if (config_.print_summary) {
-    colmap::PrintHeading2("Optimization report");
-    colmap::PrintSolverSummary(
-        summary_); // We need to replace this with our own Printer!!!
+    colmap::PrintSolverSummary(summary_, "Optimization report");
   }
   return true;
 }

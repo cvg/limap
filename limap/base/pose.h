@@ -1,7 +1,7 @@
 #ifndef LIMAP_BASE_POSE_H_
 #define LIMAP_BASE_POSE_H_
 
-#include <colmap/base/pose.h>
+#include <colmap/geometry/pose.h>
 
 #include "base/camera.h"
 
