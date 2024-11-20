@@ -7,7 +7,7 @@ import limap.merging as merging
 import limap.optimize as _optim
 import limap.pointsfm as pointsfm
 import limap.runners as _runners
-import limap.triangulation as _tri
+import limap.triangulation as triangulation
 import limap.util.io as limapio
 import limap.visualize as limapvis
 import limap.vplib as vplib
@@ -91,7 +91,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     ##########################################################
     # [D] multi-view triangulation
     ##########################################################
-    Triangulator = _tri.GlobalLineTriangulator(cfg["triangulation"])
+    Triangulator = triangulation.GlobalLineTriangulator(cfg["triangulation"])
     Triangulator.SetRanges(ranges)
     all_2d_lines = _base.get_all_lines_2d(all_2d_segs)
     Triangulator.Init(all_2d_lines, imagecols)

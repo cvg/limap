@@ -6,7 +6,7 @@ import limap.base as _base
 def match_line_2to2_epipolarIoU(
     ref_lines, tgt_lines, ref_cam, ref_pose, tgt_cam, tgt_pose, IoU_threshold
 ):
-    from limap.triangulation.triangulation import compute_epipolar_IoU
+    from limap.triangulation import compute_epipolar_IoU
 
     pairs = []
     if not isinstance(ref_pose, _base.CameraPose):
@@ -33,7 +33,7 @@ def filter_line_2to2_epipolarIoU(
     tgt_pose,
     IoU_threshold,
 ):
-    from limap.triangulation.triangulation import compute_epipolar_IoU
+    from limap.triangulation import compute_epipolar_IoU
 
     if not isinstance(ref_pose, _base.CameraPose):
         ref_pose = _base.CameraPose(ref_pose[0], ref_pose[1])
