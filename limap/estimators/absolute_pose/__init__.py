@@ -69,3 +69,6 @@ def pl_estimate_absolute_pose(
         silent=silent,
         logger=logger,
     )
+
+
+__all__ = ["pl_estimate_absolute_pose"]

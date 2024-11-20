@@ -43,7 +43,7 @@ python -m pip install -Ive .
 ```
 To double check if the package is successfully installed:
 ```
-python -c "import limap"
+python -c "import limap; print(limap.__version__)"
 ```
 
 ## Quickstart

@@ -4,8 +4,8 @@ import sys
 import numpy as np
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import limap.base as _base
-import limap.pointsfm as _psfm
+import limap.base as base
+import limap.pointsfm as pointsfm
 import limap.runners
 import limap.util.config as cfgutils
 import limap.util.io as limapio
@@ -22,7 +22,7 @@ def read_scene_colmap(
     ):
         cfg["info_path"] = os.path.join(output_dir, metainfos_filename)
     if cfg["info_path"] is None:
-        imagecols, neighbors, ranges = _psfm.read_infos_colmap(
+        imagecols, neighbors, ranges = pointsfm.read_infos_colmap(
             cfg["sfm"],
             colmap_path,
             model_path=model_path,
@@ -44,7 +44,7 @@ def read_scene_colmap(
                 data["neighbors"].item(),
                 data["ranges"],
             )
-            imagecols = _base.ImageCollection(imagecols_np)
+            imagecols = base.ImageCollection(imagecols_np)
     return imagecols, neighbors, ranges
 
 

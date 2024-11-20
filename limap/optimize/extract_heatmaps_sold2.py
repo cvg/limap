@@ -1,11 +1,11 @@
-import limap.base as _base
+import limap.base as base
 import limap.line2d
 import limap.util.io as limapio
 
 
 def extract_heatmaps_sold2(output_dir, imagecols, skip_exists=False):
     """
-    Extract sold2 heatmaps from _base.ImageCollection object
+    Extract sold2 heatmaps from base.ImageCollection object
     """
     # detect heatmaps
     detector_cfg = {}
@@ -36,7 +36,7 @@ def parse_config():
 def main(args):
     if not args.input.endswith(".npy"):
         raise ValueError("input file should be with the .npy extension")
-    imagecols = _base.ImageCollection(limapio.read_npy(args.input).item())
+    imagecols = base.ImageCollection(limapio.read_npy(args.input).item())
     extract_heatmaps_sold2(
         args.output_dir, imagecols, skip_exists=args.skip_exists
     )

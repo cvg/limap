@@ -1,2 +1,3 @@
 from .line_refinement import line_refinement
-from .solve import *
+
+__all__ = ["line_refinement"]

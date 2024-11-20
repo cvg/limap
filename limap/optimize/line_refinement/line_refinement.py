@@ -4,10 +4,10 @@ import os
 import numpy as np
 from tqdm import tqdm
 
-import limap.base as _base
-import limap.evaluation as _eval
-import limap.features as _features
-import limap.optimize as _optim
+import limap.base as base
+import limap.evaluation as limap_eval
+import limap.features as limap_features
+import limap.optimize as optimize
 import limap.util.io as limapio
 import limap.visualize as limapvis
 
@@ -28,7 +28,7 @@ def line_refinement(
     evaluator = None
     if cfg["mesh_dir"] is not None:
         MPAU = 0.02539999969303608  # hypersim
-        evaluator = _eval.MeshEvaluator(cfg["mesh_dir"], MPAU)
+        evaluator = limap_eval.MeshEvaluator(cfg["mesh_dir"], MPAU)
 
     ids = [
         k
@@ -68,7 +68,7 @@ def line_refinement(
                         f"track{track_id}",
                         f"track{track_id}_img{img_id}.npy",
                     )
-                    patch = _features.load_patch(fname, dtype=cfg["dtype"])
+                    patch = limap_features.load_patch(fname, dtype=cfg["dtype"])
                     p_patches.append(patch)
                 else:
                     with open(
@@ -81,7 +81,7 @@ def line_refinement(
                     p_features.append(featuremap.transpose(1, 2, 0))
 
         # refine
-        rf_engine = _optim.solve_line_refinement(
+        rf_engine = optimize.solve_line_refinement(
             cfg,
             track,
             p_cameras,
@@ -91,7 +91,7 @@ def line_refinement(
             p_features=p_features,
             dtype=cfg["dtype"],
         )
-        newtrack = _base.LineTrack(track)
+        newtrack = base.LineTrack(track)
         if rf_engine is None:
             opttracks.append(newtrack)
             continue

@@ -8,11 +8,11 @@ from hloc.utils.parsers import parse_retrieval
 from scipy.io import loadmat
 from tqdm import tqdm
 
-import limap.base as _base
+import limap.base as base
 import limap.util.io as limapio
 
 
-class InLocP3DReader(_base.BaseP3DReader):
+class InLocP3DReader(base.BaseP3DReader):
     def __init__(self, filename):
         super().__init__(filename)
 
@@ -74,9 +74,9 @@ def read_dataset_inloc(
                 "height": height,
                 "params": [focal_length, cx, cy],
             }
-            cam = _base.Camera(cam_dict)
+            cam = base.Camera(cam_dict)
             cameras.append(cam)
-            campose = _base.CameraPose()
+            campose = base.CameraPose()
 
             if name in queries:
                 query_ids.append(img_id)
@@ -88,12 +88,12 @@ def read_dataset_inloc(
                 # Cam2World -> World2Cam
                 R = Tr[:3, :3].T
                 T = -R @ Tr[:3, -1:]
-                campose = _base.CameraPose(R, T)
+                campose = base.CameraPose(R, T)
             camimages.append(
-                _base.CameraImage(cam, campose, str(dataset_dir / name))
+                base.CameraImage(cam, campose, str(dataset_dir / name))
             )
 
-        imagecols = _base.ImageCollection(cameras, camimages)
+        imagecols = base.ImageCollection(cameras, camimages)
         with open(os.path.join(output_dir, metainfos_filename), "wb") as f:
             np.savez(
                 f,
@@ -111,7 +111,7 @@ def read_dataset_inloc(
                 data["query_ids"],
                 data["scales"].item(),
             )
-            imagecols = _base.ImageCollection(imagecols_np)
+            imagecols = base.ImageCollection(imagecols_np)
     return imagecols, train_ids, query_ids, names, scales
 
 
@@ -201,7 +201,7 @@ def run_hloc_inloc(
             data = data.split()
             name = data[0]
             q, t = np.split(np.array(data[1:], float), [4])
-            poses[name] = _base.CameraPose(q, t)
+            poses[name] = base.CameraPose(q, t)
     logger.info(f"Coarse pose read from {results_file}")
     hloc_log_file = f"{results_file}_logs.pkl"
 

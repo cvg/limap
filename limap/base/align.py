@@ -77,7 +77,7 @@ def align_imagecols_colmap(
     import numpy as np
 
     import limap.util.io as limapio
-    from limap.pointsfm import convert_imagecols_to_colmap
+    from limap.pointsfm.model_converter import convert_imagecols_to_colmap
 
     # assertion check
     assert imagecols_src.NumImages() == imagecols_dst.NumImages()

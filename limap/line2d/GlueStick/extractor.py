@@ -6,7 +6,7 @@ from gluestick.models.wireframe import lines_to_wireframe
 from omegaconf import OmegaConf
 
 import limap.util.io as limapio
-from limap.point2d.superpoint.superpoint import SuperPoint, sample_descriptors
+from limap.point2d.superpoint import SuperPoint, sample_descriptors
 
 from ..base_detector import (
     BaseDetector,

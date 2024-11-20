@@ -115,7 +115,7 @@ def run_superpoint(
                         "[SuperPoint] Out of disk space: storing features \
                             on disk can take "
                         "significant space, did you enable the as_half flag?"
-                    )
+                    ) from None
                     del grp, fd[name]
                 raise error
 

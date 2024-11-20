@@ -2,8 +2,6 @@
 This file implements the evaluation metrics.
 """
 
-import logging
-
 import numpy as np
 import torch
 import torch.nn.functional as F

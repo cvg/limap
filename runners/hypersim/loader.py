@@ -9,10 +9,10 @@ from Hypersim import raydepth2depth, read_raydepth
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
-import limap.base as _base
+import limap.base as base
 
 
-class HypersimDepthReader(_base.BaseDepthReader):
+class HypersimDepthReader(base.BaseDepthReader):
     def __init__(self, filename, K, img_hw):
         super().__init__(filename)
         self.K = K
@@ -40,13 +40,13 @@ def read_scene_hypersim(cfg, dataset, scene_id, cam_id=0, load_depth=False):
     img_hw = [dataset.h, dataset.w]
     Ts, Rs = dataset.load_cameras(cam_id=cam_id)
     cameras, camimages = {}, {}
-    cameras[0] = _base.Camera("SIMPLE_PINHOLE", K, cam_id=0, hw=img_hw)
+    cameras[0] = base.Camera("SIMPLE_PINHOLE", K, cam_id=0, hw=img_hw)
     for image_id in index_list:
-        pose = _base.CameraPose(Rs[image_id], Ts[image_id])
+        pose = base.CameraPose(Rs[image_id], Ts[image_id])
         imname = dataset.load_imname(image_id, cam_id=cam_id)
-        camimage = _base.CameraImage(0, pose, image_name=imname)
+        camimage = base.CameraImage(0, pose, image_name=imname)
         camimages[image_id] = camimage
-    imagecols = _base.ImageCollection(cameras, camimages)
+    imagecols = base.ImageCollection(cameras, camimages)
 
     if load_depth:
         # get depths

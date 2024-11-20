@@ -3,6 +3,8 @@ import os
 
 from tqdm import tqdm
 
+import limap.line2d
+import limap.pointsfm as pointsfm
 import limap.util.io as limapio
 
 
@@ -52,7 +54,7 @@ def undistort_images(
         :class:`limap.base.ImageCollection`: \
             New image collection for the undistorted images
     """
-    import limap.base as _base
+    import limap.base as base
 
     loaded_ids = []
     unload_ids = imagecols.get_img_ids()
@@ -64,7 +66,7 @@ def undistort_images(
         fname_in = os.path.join(output_dir, fname)
         if os.path.isfile(fname_in):
             data = limapio.read_npy(fname_in).item()
-            loaded_imagecols = _base.ImageCollection(data)
+            loaded_imagecols = base.ImageCollection(data)
             unload_ids = []
             for id in imagecols.get_img_ids():
                 if id in loaded_imagecols.get_img_ids():
@@ -85,7 +87,7 @@ def undistort_images(
     import imagesize
     import joblib
 
-    import limap.undistortion as _undist
+    import limap.undistortion as undistortion
 
     # limapio.delete_folder(output_dir)
     limapio.check_makedirs(output_dir)
@@ -102,7 +104,7 @@ def undistort_images(
             img = imagecols.read_image(img_id)
             cv2.imwrite(imname_out, img)
             imname_in = imname_out
-        cam_undistorted = _undist.UndistortImageCamera(
+        cam_undistorted = undistortion.undistort_image_camera(
             cam, imname_in, imname_out
         )
         cam_undistorted.set_cam_id(cam_id)
@@ -114,7 +116,7 @@ def undistort_images(
     )
 
     # update new imagecols
-    imagecols_undistorted = _base.ImageCollection(imagecols)
+    imagecols_undistorted = base.ImageCollection(imagecols)
     cam_dict = {}
     for idx, img_id in enumerate(unload_ids):
         imname_out = os.path.join(output_dir, f"image{img_id:08d}.png")
@@ -159,7 +161,6 @@ def compute_sfminfos(cfg, imagecols, fname="metainfos.txt"):
         ranges (pair of :class:`np.array`, each of shape (3,)): \
             robust 3D ranges for the scene computed from the sfm point cloud.
     """
-    import limap.pointsfm as _psfm
 
     if not cfg["load_meta"]:
         # run colmap sfm and compute neighbors, ranges
@@ -167,15 +168,15 @@ def compute_sfminfos(cfg, imagecols, fname="metainfos.txt"):
             cfg["dir_save"], cfg["sfm"]["colmap_output_path"]
         )
         if not cfg["sfm"]["reuse"]:
-            _psfm.run_colmap_sfm_with_known_poses(
+            pointsfm.run_colmap_sfm_with_known_poses(
                 cfg["sfm"],
                 imagecols,
                 output_path=colmap_output_path,
                 skip_exists=cfg["skip_exists"],
             )
-        model = _psfm.SfmModel()
+        model = pointsfm.SfmModel()
         model.ReadFromCOLMAP(colmap_output_path, "sparse", "images")
-        neighbors, ranges = _psfm.compute_metainfos(
+        neighbors, ranges = pointsfm.compute_metainfos(
             cfg["sfm"], model, n_neighbors=cfg["n_neighbors"]
         )
         fname_save = os.path.join(cfg["dir_save"], fname)
@@ -345,7 +346,7 @@ def compute_matches(cfg, descinfo_folder, image_ids, neighbors):
     return matches_folder
 
 
-def compute_exhausive_matches(cfg, descinfo_folder, image_ids):
+def compute_exhaustive_matches(cfg, descinfo_folder, image_ids):
     """
     Match lines for each image with all the other images exhaustively
 
@@ -365,7 +366,6 @@ def compute_exhausive_matches(cfg, descinfo_folder, image_ids):
             len(image_ids),
         )
     )
-    import limap.line2d
 
     basedir = os.path.join(
         "line_matchings",

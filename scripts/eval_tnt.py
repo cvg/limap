@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 
-import limap.base as _base
-import limap.evaluation as _eval
+import limap.base as base
+import limap.evaluation as limap_eval
 import limap.util.config as cfgutils
 import limap.util.io as limapio
 import limap.visualize as limapvis
@@ -85,12 +85,12 @@ def write_ply(fname, points):
 def report_error_to_mesh(mesh_fname, lines):
     # Hypersim
     MPAU = 0.02539999969303608
-    evaluator = _eval.MeshEvaluator(mesh_fname, MPAU)
+    evaluator = limap_eval.MeshEvaluator(mesh_fname, MPAU)
     return report_error_to_GT(evaluator, lines)
 
 
 def report_error_to_point_cloud(points, lines, kdtree_dir=None):
-    evaluator = _eval.PointCloudEvaluator(points)
+    evaluator = limap_eval.PointCloudEvaluator(points)
     if kdtree_dir is None:
         evaluator.Build()
         evaluator.Save("tmp/kdtree.bin")
@@ -231,7 +231,7 @@ def transform_lines(fname, lines):
     for line in lines:
         newstart = trans[:3, :3] @ line.start + trans[:3, 3]
         newend = trans[:3, :3] @ line.end + trans[:3, 3]
-        newline = _base.Line3d(newstart, newend)
+        newline = base.Line3d(newstart, newend)
         new_lines.append(newline)
     return new_lines
 

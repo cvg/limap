@@ -26,14 +26,14 @@ def load_patch(fname, dtype="float16"):
     return patch
 
 
-def get_extractor(cfg, channels):
+def get_line_patch_extractor(cfg, channels):
     lpe_options = _features.LinePatchExtractorOptions(cfg)
     patch_extractor_name = f"LinePatchExtractor_f64_c{channels}"
     extractor = getattr(_features, patch_extractor_name)(lpe_options)
     return extractor
 
 
-def extract_line_patch_oneimage(cfg, track, img_id, camview, feature):
+def extract_line_patch_one_image(cfg, track, img_id, camview, feature):
     """
     Returns:
     _features.PatchInfo_fx
