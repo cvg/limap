@@ -1,0 +1,24 @@
+line-length = 80
+
+[lint]
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+]
+
+[lint.per-file-ignores]
+"limap/line2d/L2D2/RAL_net_cov.py" = ["SIM"]
+"limap/line2d/LineTR/*.py" = ["E501", "F403", "F405", "F841", "SIM"]
+"limap/line2d/SOLD2/model/*.py" = ["E501", "UP031", "SIM"]
+"limap/line2d/SOLD2/misc/*.py" = ["E501", "E741", "UP031", "SIM"]
+"limap/line2d/SOLD2/train.py" = ["E501", "UP031"]

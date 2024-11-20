@@ -3,22 +3,23 @@ Implements the full pipeline from raw images to line matches.
 """
 
 import time
+
 import cv2
 import numpy as np
 import torch
 import torch.nn.functional as F
 from torch.nn.functional import softmax
 
-from .model_util import get_model
+from ..train import convert_junc_predictions
+from .line_detection import LineSegmentDetectionModule
+from .line_detector import line_map_to_segments
+from .line_matching import WunschLineMatcher
 from .loss import get_loss_and_weights
 from .metrics import super_nms
-from .line_detection import LineSegmentDetectionModule
-from .line_matching import WunschLineMatcher
-from ..train import convert_junc_predictions
-from .line_detector import line_map_to_segments
+from .model_util import get_model
 
 
-class LineMatcher(object):
+class LineMatcher:
     """Full line matcher including line detection and matching
     with the Needleman-Wunsch algorithm."""
 
@@ -30,9 +31,11 @@ class LineMatcher(object):
         line_detector_cfg,
         line_matcher_cfg,
         multiscale=False,
-        scales=[1.0, 2.0],
+        scales=None,
     ):
         # Get loss weights if dynamic weighting
+        if scales is None:
+            scales = [1.0, 2.0]
         _, loss_weights = get_loss_and_weights(model_cfg, device)
         self.device = device
 
@@ -57,9 +60,9 @@ class LineMatcher(object):
 
         # Print some debug messages
         # for key, val in line_detector_cfg.items():
-        #     print(f"[Debug] {key}: {val}")
-        # print("[Debug] detect_thresh: %f" % (line_detector_cfg["detect_thresh"]))
-        # print("[Debug] num_samples: %d" % (line_detector_cfg["num_samples"]))
+        #     logging.info(f"[Debug] {key}: {val}")
+        # logging.info("[Debug] detect_thresh: %f" % (line_detector_cfg["detect_thresh"]))
+        # logging.info("[Debug] num_samples: %d" % (line_detector_cfg["num_samples"]))
 
     # Perform line detection and descriptor inference on a single image
     def line_detection(
@@ -161,10 +164,12 @@ class LineMatcher(object):
         valid_mask=None,
         desc_only=False,
         profile=False,
-        scales=[1.0, 2.0],
+        scales=None,
         aggregation="mean",
     ):
         # Restrict input_image to 4D torch tensor
+        if scales is None:
+            scales = [1.0, 2.0]
         if (not len(input_image.shape) == 4) or (
             not isinstance(input_image, torch.Tensor)
         ):
@@ -290,8 +295,10 @@ class LineMatcher(object):
 
         return outputs
 
-    def __call__(self, images, valid_masks=[None, None], profile=False):
+    def __call__(self, images, valid_masks=None, profile=False):
         # Line detection and descriptor inference on both images
+        if valid_masks is None:
+            valid_masks = [None, None]
         if self.multiscale:
             forward_outputs = [
                 self.multiscale_line_detection(

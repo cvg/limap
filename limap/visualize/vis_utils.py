@@ -1,10 +1,11 @@
-import os
-import cv2
-import numpy as np
-import matplotlib
-import matplotlib.pyplot as plt
-import seaborn as sns
 import copy
+import logging
+import os
+
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
 
 
 def random_color():
@@ -70,21 +71,29 @@ def draw_multiscale_segments(
     img = copy.deepcopy(img)
     for s in segs:
         mycolor = random_color() if color is None else color
-        octave, l = s[0]
-        l = l * np.sqrt(2) ** octave
+        octave, line = s[0]
+        line = line * np.sqrt(2) ** octave
         cv2.line(
             img,
-            (int(l[0]), int(l[1])),
-            (int(l[2]), int(l[3])),
+            (int(line[0]), int(line[1])),
+            (int(line[2]), int(line[3])),
             mycolor,
             thickness,
         )
         if endpoints:
             cv2.circle(
-                img, (int(l[0]), int(l[1])), int(thickness * 1.5), mycolor, -1
+                img,
+                (int(line[0]), int(line[1])),
+                int(thickness * 1.5),
+                mycolor,
+                -1,
             )
             cv2.circle(
-                img, (int(l[2]), int(l[3])), int(thickness * 1.5), mycolor, -1
+                img,
+                (int(line[2]), int(line[3])),
+                int(thickness * 1.5),
+                mycolor,
+                -1,
             )
     return img
 
@@ -95,7 +104,8 @@ def draw_multiscale_matches(
     assert img_left.ndim == 2
     h, w = img_left.shape
 
-    # store the matching results of the first and second images into a single image
+    # store the matching results of the first and second images
+    # into a single image
     left_color_img = cv2.cvtColor(img_left, cv2.COLOR_GRAY2BGR)
     right_color_img = cv2.cvtColor(img_right, cv2.COLOR_GRAY2BGR)
     r1, g1, b1 = [], [], []  # the line colors
@@ -107,22 +117,22 @@ def draw_multiscale_matches(
         b1.append(b)
         line_id_l, line_id_r = matches[pair]
 
-        octave, l = segs_left[line_id_l][0]
-        l = l * np.sqrt(2) ** octave
+        octave, line = segs_left[line_id_l][0]
+        line = line * np.sqrt(2) ** octave
         cv2.line(
             left_color_img,
-            (int(l[0]), int(l[1])),
-            (int(l[2]), int(l[3])),
+            (int(line[0]), int(line[1])),
+            (int(line[2]), int(line[3])),
             (r1[pair], g1[pair], b1[pair]),
             3,
         )
 
-        octave, l = segs_right[line_id_r][0]
-        l = l * np.sqrt(2) ** octave
+        octave, line = segs_right[line_id_r][0]
+        line = line * np.sqrt(2) ** octave
         cv2.line(
             right_color_img,
-            (int(l[0]), int(l[1])),
-            (int(l[2]), int(l[3])),
+            (int(line[0]), int(line[1])),
+            (int(line[2]), int(line[3])),
             (r1[pair], g1[pair], b1[pair]),
             3,
         )
@@ -155,42 +165,43 @@ def draw_singlescale_matches(img_left, img_right, matched_segs, mask=None):
     assert img_left.ndim == 2
     h, w = img_left.shape
 
-    # store the matching results of the first and second images into a single image
+    # store the matching results of the first and second images
+    # into a single image
     left_color_img = cv2.cvtColor(img_left, cv2.COLOR_GRAY2BGR)
     right_color_img = cv2.cvtColor(img_right, cv2.COLOR_GRAY2BGR)
     colors = []
     if mask is None:
-        for l, r in matched_segs:
+        for left, right in matched_segs:
             color = random_color()
             colors.append(color)
             cv2.line(
                 left_color_img,
-                (int(l[0]), int(l[1])),
-                (int(l[2]), int(l[3])),
+                (int(left[0]), int(left[1])),
+                (int(left[2]), int(left[3])),
                 color,
                 3,
             )
             cv2.line(
                 right_color_img,
-                (int(r[0]), int(r[1])),
-                (int(r[2]), int(r[3])),
+                (int(right[0]), int(right[1])),
+                (int(right[2]), int(right[3])),
                 color,
                 3,
             )
     else:
-        for correct, (l, r) in zip(mask, matched_segs):
+        for correct, (left, right) in zip(mask, matched_segs):
             color = (0, 255, 0) if correct else (0, 0, 255)
             cv2.line(
                 left_color_img,
-                (int(l[0]), int(l[1])),
-                (int(l[2]), int(l[3])),
+                (int(left[0]), int(left[1])),
+                (int(left[2]), int(left[3])),
                 color,
                 3,
             )
             cv2.line(
                 right_color_img,
-                (int(r[0]), int(r[1])),
-                (int(r[2]), int(r[3])),
+                (int(right[0]), int(right[1])),
+                (int(right[2]), int(right[3])),
                 color,
                 3,
             )
@@ -199,17 +210,17 @@ def draw_singlescale_matches(img_left, img_right, matched_segs, mask=None):
     result_img_tmp = result_img.copy()
     if mask is None:
         for i in range(len(matched_segs)):
-            l, r = matched_segs[i]
-            start_ptn = (int(l[0]), int(l[1]))
-            end_ptn = (int(r[0] + w), int(r[1]))
+            left, right = matched_segs[i]
+            start_ptn = (int(left[0]), int(left[1]))
+            end_ptn = (int(right[0] + w), int(right[1]))
             cv2.line(
                 result_img_tmp, start_ptn, end_ptn, colors[i], 2, cv2.LINE_AA
             )
     else:
-        for correct, (l, r) in zip(mask, matched_segs):
+        for correct, (left, right) in zip(mask, matched_segs):
             color = (0, 255, 0) if correct else (0, 0, 255)
-            start_ptn = (int(l[0]), int(l[1]))
-            end_ptn = (int(r[0] + w), int(r[1]))
+            start_ptn = (int(left[0]), int(left[1]))
+            end_ptn = (int(right[0] + w), int(right[1]))
             cv2.line(result_img_tmp, start_ptn, end_ptn, color, 2, cv2.LINE_AA)
 
     result_img = cv2.addWeighted(result_img, 0.5, result_img_tmp, 0.5, 0.0)
@@ -300,20 +311,18 @@ def make_bigimage(imgs, pad=20):
 
 def test_point_inside_ranges(point, ranges):
     point = np.array(point)
-    if ~np.all(point > ranges[0]) or ~np.all(point < ranges[1]):
-        return False
-    return True
+    return np.all(point > ranges[0]) and np.all(point < ranges[1])
 
 
 def test_line_inside_ranges(line, ranges):
     if not test_point_inside_ranges(line.start, ranges):
         return False
-    if not test_point_inside_ranges(line.end, ranges):
-        return False
-    return True
+    return test_point_inside_ranges(line.end, ranges)
 
 
-def compute_robust_range(arr, range_robust=[0.05, 0.95], k_stretch=2.0):
+def compute_robust_range(arr, range_robust=None, k_stretch=2.0):
+    if range_robust is None:
+        range_robust = [0.05, 0.95]
     N = arr.shape[0]
     start_idx = int(round((N - 1) * range_robust[0]))
     end_idx = int(round((N - 1) * range_robust[1]))
@@ -325,7 +334,9 @@ def compute_robust_range(arr, range_robust=[0.05, 0.95], k_stretch=2.0):
     return start_stretched, end_stretched
 
 
-def compute_robust_range_lines(lines, range_robust=[0.05, 0.95], k_stretch=2.0):
+def compute_robust_range_lines(lines, range_robust=None, k_stretch=2.0):
+    if range_robust is None:
+        range_robust = [0.05, 0.95]
     lines_array = np.array([line.as_array() for line in lines])
     x_array = lines_array.reshape(-1, 3)[:, 0]
     y_array = lines_array.reshape(-1, 3)[:, 1]
@@ -354,30 +365,28 @@ def filter_ranges(lines_np, counts_np, ranges):
 
 
 def report_dist_reprojection(line3d, line2d, camview, prefix=None):
-    import limap.base as _base
+    import limap.base as base
 
     line2d_proj = line3d.projection(camview)
-    angle = _base.compute_distance_2d(
-        line2d, line2d_proj, _base.LineDistType.ANGULAR
+    angle = base.compute_distance_2d(
+        line2d, line2d_proj, base.LineDistType.ANGULAR
     )
-    perp_dist = _base.compute_distance_2d(
-        line2d, line2d_proj, _base.LineDistType.PERPENDICULAR_ONEWAY
+    perp_dist = base.compute_distance_2d(
+        line2d, line2d_proj, base.LineDistType.PERPENDICULAR_ONEWAY
     )
-    overlap = _base.compute_distance_2d(
-        line2d_proj, line2d, _base.LineDistType.OVERLAP
+    overlap = base.compute_distance_2d(
+        line2d_proj, line2d, base.LineDistType.OVERLAP
     )
     sensitivity = line3d.sensitivity(camview)
     if prefix is None:
-        print(
-            "angle = {0:.4f}, perp = {1:.4f}, overlap = {2:.4f}, sensi = {3:.4f}".format(
-                angle, perp_dist, overlap, sensitivity
-            )
+        logging.info(
+            f"angle = {angle:.4f}, perp = {perp_dist:.4f}, \
+              overlap = {overlap:.4f}, sensi = {sensitivity:.4f}"
         )
     else:
-        print(
-            "{4}: angle = {0:.4f}, perp = {1:.4f}, overlap = {2:.4f}, sensi = {3:.4f}".format(
-                angle, perp_dist, overlap, sensitivity, prefix
-            )
+        logging.info(
+            f"{prefix}: angle = {angle:.4f}, perp = {perp_dist:.4f}, \
+              overlap = {overlap:.4f}, sensi = {sensitivity:.4f}"
         )
 
 
@@ -392,10 +401,9 @@ def visualize_2d_line(fname, imagecols, all_lines_2d, img_id, line_id):
 def visualize_line_track(
     imagecols, linetrack, prefix="linetrack", report=False
 ):
-    print(
-        "[VISUALIZE]: line length: {0}, num_supporting_lines: {1}".format(
-            linetrack.line.length(), len(linetrack.image_id_list)
-        )
+    logging.info(
+        f"[VISUALIZE]: line length: {linetrack.line.length()}, \
+          num_supporting_lines: {len(linetrack.image_id_list)}"
     )
     for idx, (img_id, line2d) in enumerate(
         zip(linetrack.image_id_list, linetrack.line2d_list)
@@ -407,9 +415,8 @@ def visualize_line_track(
             linetrack.line,
             line2d,
             imagecols.camview(img_id),
-            prefix="Reprojecting to line {0} (img {1}, line {2})".format(
-                idx, img_id, linetrack.line_id_list[idx]
-            ),
+            prefix=f"Reprojecting to line {idx} (img {img_id}, \
+                     line {linetrack.line_id_list[idx]})",
         )
         line2d_proj = linetrack.line.projection(imagecols.camview(img_id))
         img = draw_segments(
@@ -420,11 +427,7 @@ def visualize_line_track(
         )
         fname = os.path.join(
             "tmp",
-            "{0}.{1}.{2}.png".format(
-                prefix,
-                idx,
-                os.path.basename(imagecols.camimage(img_id).image_name())[:-4],
-            ),
+            f"{prefix}.{idx}.{os.path.basename(imagecols.camimage(img_id).image_name())[:-4]}.png",
         )
         cv2.imwrite(fname, img)
 
@@ -432,7 +435,6 @@ def visualize_line_track(
 def vis_vpresult(
     img, lines, vpres, vp_id=-1, show_original=False, endpoints=False
 ):
-    import seaborn as sns
     import cv2
 
     n_vps = vpres.count_vps()
@@ -442,10 +444,11 @@ def vis_vpresult(
         colors = [[255, 0, 0]]
     for line_id, line in enumerate(lines):
         c = [255, 255, 255]  # default color: white
-        if not vpres.HasVP(line_id):
-            if not show_original:
-                continue
-        elif vp_id >= 0 and vpres.labels[line_id] != vp_id:
+        if (
+            not vpres.HasVP(line_id)
+            or vp_id >= 0
+            and vpres.labels[line_id] != vp_id
+        ):
             if not show_original:
                 continue
         else:

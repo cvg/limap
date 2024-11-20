@@ -1,4 +1,6 @@
-import os, sys
+import os
+import sys
+
 import numpy as np
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -6,14 +8,14 @@ sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
 
-import cv2
-import limap
-import limap.base as _base
-import limap.estimators as _estimators
-import logging
 import argparse
+import logging
 from pathlib import Path
-from hloc.utils.read_write_model import *
+
+import cv2
+
+import limap.base as base
+import limap.estimators as estimators
 
 formatter = logging.Formatter(
     fmt="[%(asctime)s %(name)s %(levelname)s] %(message)s",
@@ -79,7 +81,8 @@ def parse_args():
         "--line_cost_func",
         type=str,
         default="PerpendicularDist",
-        help="Line Cost function for scoring and optimization, default: %(default)s",
+        help="Line Cost function for scoring and optimization, \
+              default: %(default)s",
     )
 
     args, unknown = arg_parser.parse_known_args()
@@ -106,7 +109,7 @@ def main():
     p2ds = data["p2ds"]
     cam = data["camera"]
 
-    final_pose, ransac_stats = _estimators.pl_estimate_absolute_pose(
+    final_pose, ransac_stats = estimators.pl_estimate_absolute_pose(
         cfg, l3ds, l3d_ids, l2ds, p3ds, p2ds, cam, silent=True, logger=logger
     )
 
@@ -124,8 +127,10 @@ def main():
     log += (
         f"Result(P+L) Pose (qvec, tvec): {final_pose.qvec}, {final_pose.tvec}\n"
     )
-    log += f"HLoc(Point) Pose (qvec, tvec): {data['pose_point'].qvec}, {data['pose_point'].tvec}\n"
-    log += f"GT Pose (qvec, tvec): {data['pose_gt'].qvec}, {data['pose_gt'].tvec}\n\n"
+    log += f"HLoc(Point) Pose (qvec, tvec): \
+             {data['pose_point'].qvec}, {data['pose_point'].tvec}\n"
+    log += f"GT Pose (qvec, tvec): \
+             {data['pose_gt'].qvec}, {data['pose_gt'].tvec}\n\n"
 
     R, t = final_pose.R(), final_pose.tvec
     e_t = np.linalg.norm(-R_gt.T @ t_gt + R.T @ t, axis=0)
@@ -147,8 +152,8 @@ def main():
     l2ds = np.array(l2ds)[inlier_indices[1]]
     l3d_ids = np.array(l3d_ids)[inlier_indices[1]]
 
-    camview_point = _base.CameraView(cam, data["pose_point"])
-    camview_line = _base.CameraView(cam, final_pose)
+    camview_point = base.CameraView(cam, data["pose_point"])
+    camview_line = base.CameraView(cam, final_pose)
 
     args.outputs.mkdir(parents=True, exist_ok=True)
 

@@ -1,14 +1,21 @@
+import logging
 import os
-import numpy as np
+
 import cv2
+import numpy as np
 import torch
+
 import limap.util.io as limapio
-from ..base_detector import BaseDetector, BaseDetectorOptions
+
+from ..base_detector import (
+    BaseDetector,
+    DefaultDetectorOptions,
+)
 
 
 class L2D2Extractor(BaseDetector):
-    def __init__(self, options=BaseDetectorOptions(), device=None):
-        super(L2D2Extractor, self).__init__(options)
+    def __init__(self, options=DefaultDetectorOptions, device=None):
+        super().__init__(options)
         self.mini_batch = 20
         self.device = "cuda" if device is None else device
         if self.weight_path is None:
@@ -37,14 +44,14 @@ class L2D2Extractor(BaseDetector):
             os.makedirs(os.path.dirname(path))
         link = "https://github.com/hichem-abdellali/L2D2/blob/main/IN_OUT_DATA/INPUT_NETWEIGHT/checkpoint_line_descriptor.th?raw=true"
         cmd = ["wget", link, "-O", path]
-        print("Downloading L2D2 model...")
+        logging.info("Downloading L2D2 model...")
         subprocess.run(cmd, check=True)
 
     def get_module_name(self):
         return "l2d2"
 
     def get_descinfo_fname(self, descinfo_folder, img_id):
-        fname = os.path.join(descinfo_folder, "descinfo_{0}.npz".format(img_id))
+        fname = os.path.join(descinfo_folder, f"descinfo_{img_id}.npz")
         return fname
 
     def save_descinfo(self, descinfo_folder, img_id, descinfo):
@@ -120,8 +127,8 @@ class L2D2Extractor(BaseDetector):
             return {"line_descriptors": np.empty((0, 128))}
 
         patches, line_desc = [], []
-        for i, l in enumerate(lines):
-            patches.append(self.get_patch(img, l))
+        for i, line in enumerate(lines):
+            patches.append(self.get_patch(img, line))
 
             if (i + 1) % self.mini_batch == 0 or i == len(lines) - 1:
                 # Extract the descriptors

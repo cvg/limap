@@ -1,15 +1,16 @@
-import os, sys
-import shutil
-import numpy as np
-import cv2
 import copy
+import logging
+import os
+import shutil
 import subprocess
+import sys
 from pathlib import Path
-from tqdm import tqdm
+
+import cv2
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-import read_write_model as colmap_utils
-import database
+import hloc.utils.database as database
+import hloc.utils.read_write_model as colmap_utils
 from model_converter import convert_imagecols_to_colmap
 
 
@@ -60,7 +61,7 @@ def write_pairs_from_neighbors(output_path, image_path, neighbors, image_ids):
                 if id2 in m_pairs[id1]:
                     continue
                 m_pairs[id1].append(id2)
-                f.write("{0} {1}\n".format(name1, name2))
+                f.write(f"{name1} {name2}\n")
 
 
 def run_hloc_matches(
@@ -69,7 +70,8 @@ def run_hloc_matches(
     """
     Inputs:
     - neighbors: map<int, std::vector<int>> to avoid exhaustive matches
-    - imagecols: optionally use the id mapping from _base.ImageCollection to do the match
+    - imagecols: optionally use the id mapping from \
+        _base.ImageCollection to do the match
     """
     image_path = Path(image_path)
     from hloc import (
@@ -94,10 +96,11 @@ def run_hloc_matches(
     if keypoints is not None and keypoints != []:
         if cfg["descriptor"][:10] != "superpoint":
             raise ValueError(
-                "Error! Non-superpoint feature extraction is unfortunately not supported in the current implementation."
+                "Error! Non-superpoint feature extraction is unfortunately \
+                 not supported in the current implementation."
             )
         # run superpoint
-        from limap.point2d import run_superpoint
+        from limap.point2d.superpoint import run_superpoint
 
         feature_path = run_superpoint(
             feature_conf, image_path, outputs, keypoints=keypoints
@@ -159,7 +162,7 @@ def run_colmap_sfm(
 
     ### initialize sparse folder
     if skip_exists and os.path.exists(output_path):
-        print("[COLMAP] Skipping mapping")
+        logging.info("[COLMAP] Skipping mapping")
         return
     if os.path.exists(output_path):
         shutil.rmtree(output_path)
@@ -172,11 +175,9 @@ def run_colmap_sfm(
 
     ### copy images to tmp folder
     keypoints_in_order = []
-    for idx, img_id in enumerate(imagecols.get_img_ids()):
+    for img_id in imagecols.get_img_ids():
         img = imagecols.read_image(img_id)
-        fname_to_save = os.path.join(
-            image_path, "image{0:08d}.png".format(img_id)
-        )
+        fname_to_save = os.path.join(image_path, f"image{img_id:08d}.png")
         cv2.imwrite(fname_to_save, img)
         if keypoints is not None:
             keypoints_in_order.append(keypoints[img_id])
@@ -234,7 +235,7 @@ def run_colmap_sfm_with_known_poses(
 
     ### initialize sparse folder
     if skip_exists and os.path.exists(point_triangulation_path):
-        print("[COLMAP] Skipping point triangulation")
+        logging.info("[COLMAP] Skipping point triangulation")
         return Path(point_triangulation_path)
     if os.path.exists(output_path):
         shutil.rmtree(output_path)
@@ -249,17 +250,13 @@ def run_colmap_sfm_with_known_poses(
     ### copy images to tmp folder
     keypoints_in_order = []
     imagecols_tmp = copy.deepcopy(imagecols)
-    for idx, img_id in enumerate(imagecols.get_img_ids()):
+    for img_id in imagecols.get_img_ids():
         img = imagecols.read_image(img_id)
-        fname_to_save = os.path.join(
-            image_path, "image{0:08d}.png".format(img_id)
-        )
+        fname_to_save = os.path.join(image_path, f"image{img_id:08d}.png")
         cv2.imwrite(fname_to_save, img)
         if keypoints is not None:
             keypoints_in_order.append(keypoints[img_id])
-        imagecols_tmp.change_image_name(
-            img_id, "image{0:08d}.png".format(img_id)
-        )
+        imagecols_tmp.change_image_name(img_id, f"image{img_id:08d}.png")
 
     # feature extraction and matching
     run_hloc_matches(

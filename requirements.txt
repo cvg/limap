@@ -27,6 +27,7 @@ einops
 ninja
 yacs
 python-json-logger
+ruff==0.6.7
 
 ./third-party/pytlsd
 ./third-party/hawp

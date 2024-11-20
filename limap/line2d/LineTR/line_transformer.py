@@ -1,10 +1,13 @@
+import logging
 from copy import deepcopy
 from pathlib import Path
+
 import torch
+from einops import repeat
 from torch import nn
-from .line_attention import MultiHeadAttention, FeedForward
+
+from .line_attention import FeedForward, MultiHeadAttention
 from .line_process import *
-from einops import rearrange, repeat
 
 
 def MLP(channels: list, do_bn=True):  # channels [3, 32, 64, 128, 256, 256]
@@ -186,7 +189,7 @@ class KeylineEncoder(nn.Module):
 def attention(query, key, value):
     dim = query.shape[1]
     scores = (
-        torch.einsum("bdhn,bdhm->bhnm", query, key) / dim ** 0.5
+        torch.einsum("bdhn,bdhm->bhnm", query, key) / dim**0.5
     )  # [3, 64, 4, 512] -> [3, 4, 512, 512]
     prob = torch.nn.functional.softmax(scores, dim=-1)
     return torch.einsum("bhnm,bdhm->bdhn", prob, value), prob
@@ -207,12 +210,12 @@ class MultiHeadedAttention(nn.Module):
 
     def forward(self, query, key, value):
         batch_dim = query.size(0)
-        query, key, value = [
-            l(x).view(
+        query, key, value = (
+            layer(x).view(
                 batch_dim, self.dim, self.num_heads, -1
             )  # [3, 64, 4, 512]
-            for l, x in zip(self.proj, (query, key, value))
-        ]
+            for layer, x in zip(self.proj, (query, key, value))
+        )
         x, prob = attention(query, key, value)
         return (
             self.merge(
@@ -255,7 +258,8 @@ class SelfAttentionalLayer(nn.Module):
     def forward(self, kline_desc):
         d_desc_kline = kline_desc.size(2)
 
-        for layer, name in zip(self.layers, self.names):
+        for layer in self.layers:
+            # for layer, name in zip(self.layers, self.names):
             delta, _ = layer(kline_desc, kline_desc)
             kline_desc = kline_desc + delta
 
@@ -325,7 +329,7 @@ class LineTransformer(nn.Module):
             if not path.is_file():
                 self.download_model(path)
             self.load_state_dict(torch.load(str(path)))
-            print("Loaded Line-Transformer model")
+            logging.info("Loaded Line-Transformer model")
 
     def download_model(self, path):
         import subprocess
@@ -334,7 +338,7 @@ class LineTransformer(nn.Module):
             path.parent.mkdir(parents=True, exist_ok=True)
         link = "https://github.com/yosungho/LineTR/blob/main/models/weights/LineTR_weight.pth?raw=true"
         cmd = ["wget", link, "-O", str(path)]
-        print("Downloading LineTR model...")
+        logging.info("Downloading LineTR model...")
         subprocess.run(cmd, check=True)
 
     def forward(self, data):

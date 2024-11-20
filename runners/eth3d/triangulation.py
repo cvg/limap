@@ -1,5 +1,5 @@
-import os, sys
-import numpy as np
+import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from ETH3D import ETH3D
@@ -8,8 +8,8 @@ from loader import read_scene_eth3d
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
-import limap.util.config as cfgutils
 import limap.runners
+import limap.util.config as cfgutils
 
 
 def run_scene_eth3d(cfg, dataset, reso_type, scene_id, cam_id=0):
@@ -64,7 +64,7 @@ def parse_config():
         "precomputed",
         "eth3d",
         cfg["reso_type"],
-        "{0}_cam{1}".format(cfg["scene_id"], cfg["cam_id"]),
+        "{}_cam{}".format(cfg["scene_id"], cfg["cam_id"]),
     )
     return cfg
 

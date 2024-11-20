@@ -1,21 +1,29 @@
-import os
 import copy
+import os
+
 import limap.util.io as limapio
+
+from ..base_detector import (
+    BaseDetector,
+    DefaultDetectorOptions,
+)
+from ..base_matcher import (
+    BaseMatcher,
+    DefaultMatcherOptions,
+)
 from .sold2_wrapper import SOLD2LineDetector
-from ..base_detector import BaseDetector, BaseDetectorOptions
-from ..base_matcher import BaseMatcher, BaseMatcherOptions
 
 
 class SOLD2Detector(BaseDetector):
-    def __init__(self, options=BaseDetectorOptions()):
-        super(SOLD2Detector, self).__init__(options)
+    def __init__(self, options=DefaultDetectorOptions):
+        super().__init__(options)
         self.detector = SOLD2LineDetector(weight_path=self.weight_path)
 
     def get_module_name(self):
         return "sold2"
 
     def get_descinfo_fname(self, descinfo_folder, img_id):
-        fname = os.path.join(descinfo_folder, "descinfo_{0}.npy".format(img_id))
+        fname = os.path.join(descinfo_folder, f"descinfo_{img_id}.npy")
         return fname
 
     def save_descinfo(self, descinfo_folder, img_id, descinfo):
@@ -59,7 +67,7 @@ class SOLD2Detector(BaseDetector):
         return descinfo
 
     def get_heatmap_fname(self, folder, img_id):
-        return os.path.join(folder, "heatmap_{0}.npy".format(img_id))
+        return os.path.join(folder, f"heatmap_{img_id}.npy")
 
     def extract_heatmap(self, camview):
         img = camview.read_image(set_gray=self.set_gray)
@@ -91,8 +99,8 @@ class SOLD2Detector(BaseDetector):
 
 
 class SOLD2Matcher(BaseMatcher):
-    def __init__(self, extractor, options=BaseMatcherOptions()):
-        super(SOLD2Matcher, self).__init__(extractor, options)
+    def __init__(self, extractor, options=DefaultMatcherOptions):
+        super().__init__(extractor, options)
         assert self.extractor.get_module_name() == "sold2"
         self.detector = SOLD2LineDetector(weight_path=self.weight_path)
 

@@ -1,5 +1,4 @@
-import os, sys
-import numpy as np
+import os
 
 import limap.base as _base
 import limap.util.io as limapio
@@ -15,7 +14,8 @@ def parse_args():
         "--input_dir",
         type=str,
         required=True,
-        help="input line file. Format supported now: .obj, .npy, linetrack folder.",
+        help="input line file. Format supported now: \
+              .obj, .npy, linetrack folder.",
     )
     arg_parser.add_argument(
         "-nv",
@@ -112,9 +112,7 @@ def main(args):
         if (not os.path.exists(args.imagecols)) or (
             not args.imagecols.endswith(".npy")
         ):
-            raise ValueError(
-                "Error! Input file {0} is not valid".format(args.imagecols)
-            )
+            raise ValueError(f"Error! Input file {args.imagecols} is not valid")
         imagecols = _base.ImageCollection(
             limapio.read_npy(args.imagecols).item()
         )

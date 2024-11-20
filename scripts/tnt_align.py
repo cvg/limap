@@ -1,6 +1,6 @@
-import os, sys
+import os
+
 import numpy as np
-import pdb
 
 MAX_ERROR = 0.01
 colmap_output_path = os.path.expanduser("~/data/TanksTemples/colmap/training")
@@ -13,24 +13,24 @@ def get_imname_list(scene_id):
     n_images = len(flist)
     imname_list = []
     for idx in range(n_images):
-        fname = "{0:06d}.jpg".format(idx + 1)
+        fname = f"{idx + 1:06d}.jpg"
         # fname = os.path.join(image_path, fname)
         imname_list.append(fname)
     return imname_list
 
 
 def read_positions(log_file):
-    with open(log_file, "r") as f:
+    with open(log_file) as f:
         lines = f.readlines()
     n_images = int(len(lines) / 5)
     positions = []
     counter = 0
-    for img_id in range(n_images):
+    for _ in range(n_images):
         counter += 1
         mat = []
-        for idx in range(4):
-            l = lines[counter].strip("\n").split(" ")
-            mat.append([float(k) for k in l])
+        for _ in range(4):
+            line = lines[counter].strip("\n").split(" ")
+            mat.append([float(k) for k in line])
             counter += 1
         mat = np.array(mat)
         pos = mat[:3, 3]
@@ -39,12 +39,12 @@ def read_positions(log_file):
 
 
 def read_trans(fname):
-    with open(fname, "r") as f:
+    with open(fname) as f:
         lines = f.readlines()
     mat = []
     for idx in range(4):
-        l = lines[idx].strip("\n").split(" ")
-        mat.append([float(k) for k in l])
+        line = lines[idx].strip("\n").split(" ")
+        mat.append([float(k) for k in line])
     mat = np.array(mat)
     assert np.all(mat[3, :] == np.array([0, 0, 0, 1]))
     return mat[:3, :]
@@ -53,7 +53,7 @@ def read_trans(fname):
 def write_geoinfo_txt(fname, imname_list, positions):
     with open(fname, "w") as f:
         for imname, pos in zip(imname_list, positions):
-            f.write("{0} {1} {2} {3}\n".format(imname, pos[0], pos[1], pos[2]))
+            f.write(f"{imname} {pos[0]} {pos[1]} {pos[2]}\n")
 
 
 def main():
@@ -62,11 +62,11 @@ def main():
         # get geo txt
         imname_list = get_imname_list(scene_id)
         log_file = os.path.join(
-            input_meta_path, scene_id, "{0}_COLMAP_SfM.log".format(scene_id)
+            input_meta_path, scene_id, f"{scene_id}_COLMAP_SfM.log"
         )
         positions = read_positions(log_file)
         trans_file = os.path.join(
-            input_meta_path, scene_id, "{0}_trans.txt".format(scene_id)
+            input_meta_path, scene_id, f"{scene_id}_trans.txt"
         )
         trans_mat = read_trans(trans_file)
         new_positions = [
@@ -80,9 +80,14 @@ def main():
         # colmap align
         cmd_list = []
         basepath = os.path.join(colmap_output_path, scene_id, "dense")
-        cmd = "mkdir -p {0}".format(os.path.join(basepath, "aligned"))
+        cmd = "mkdir -p {}".format(os.path.join(basepath, "aligned"))
         cmd_list.append(cmd)
-        cmd = "colmap model_aligner --input_path {0} --output_path {1} --ref_images_path {2} --robust_alignment 1 --robust_alignment_max_error {3} --transform_path {4} --ref_is_gps false".format(
+        cmd = "colmap model_aligner --input_path {} --output_path {} \
+               --ref_images_path {} \
+               --robust_alignment 1 \
+               --robust_alignment_max_error {} \
+               --transform_path {} \
+               --ref_is_gps false".format(
             os.path.join(basepath, "sparse"),
             os.path.join(basepath, "aligned"),
             os.path.join(input_meta_path, scene_id, "geo_positions.txt"),
@@ -90,7 +95,8 @@ def main():
             os.path.join(basepath, "transform.txt"),
         )
         cmd_list.append(cmd)
-        cmd = "colmap model_converter --input_path {0} --output_path {1} --output_type PLY".format(
+        cmd = "colmap model_converter --input_path {} --output_path {} \
+               --output_type PLY".format(
             os.path.join(basepath, "aligned"),
             os.path.join(basepath, "aligned/points.ply"),
         )

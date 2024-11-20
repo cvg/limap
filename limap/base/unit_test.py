@@ -1,3 +1,5 @@
+import logging
+
 import _limap._base as _base
 import numpy as np
 
@@ -26,7 +28,7 @@ def report_error(imagecols_pred, imagecols):
         )
         error = np.abs(error)
         camera_errors.append(error)
-    print("camera_errors", np.array(camera_errors).mean(0))
+    logging.info("camera_errors", np.array(camera_errors).mean(0))
 
     # images
     pose_errors = []
@@ -34,10 +36,10 @@ def report_error(imagecols_pred, imagecols):
         R_error = (
             imagecols_pred.camimage(img_id).R() - imagecols.camimage(img_id).R()
         )
-        R_error = np.sqrt(np.sum(R_error ** 2))
+        R_error = np.sqrt(np.sum(R_error**2))
         T_error = (
             imagecols_pred.camimage(img_id).T() - imagecols.camimage(img_id).T()
         )
-        T_error = np.sqrt(np.sum(T_error ** 2))
+        T_error = np.sqrt(np.sum(T_error**2))
         pose_errors.append(np.array([R_error, T_error]))
-    print("pose_error: (R, T)", np.array(pose_errors).mean(0))
+    logging.info("pose_error: (R, T)", np.array(pose_errors).mean(0))

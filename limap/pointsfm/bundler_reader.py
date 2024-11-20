@@ -1,8 +1,9 @@
-from _limap import _base, _pointsfm
-
+import logging
 import os
-import numpy as np
+
 import imagesize
+import numpy as np
+from _limap import _base, _pointsfm
 from tqdm import tqdm
 
 
@@ -11,8 +12,8 @@ def ReadModelBundler(bundler_path, list_path, model_path):
     # read imname_list
     ################################
     list_path = os.path.join(bundler_path, list_path)
-    print("Loading bundler list file {0}...".format(list_path))
-    with open(list_path, "r") as f:
+    logging.info(f"Loading bundler list file {list_path}...")
+    with open(list_path) as f:
         lines = f.readlines()
     image_names = [line.strip("\n").split(" ")[0] for line in lines]
     imname_list = [
@@ -23,8 +24,8 @@ def ReadModelBundler(bundler_path, list_path, model_path):
     # read sfm model
     ################################
     model_path = os.path.join(bundler_path, model_path)
-    print("Loading bundler model file {0}...".format(model_path))
-    with open(model_path, "r") as f:
+    logging.info(f"Loading bundler model file {model_path}...")
+    with open(model_path) as f:
         lines = f.readlines()
     counter = 1  # start from the second line
     line = lines[counter].strip("\n").split(" ")
@@ -42,10 +43,10 @@ def ReadModelBundler(bundler_path, list_path, model_path):
         counter += 1
         imname = imname_list[img_id]
         if not os.path.exists(imname):
-            raise ValueError("Error! Image not found: {0}".format(imname))
+            raise ValueError(f"Error! Image not found: {imname}")
         width, height = imagesize.get(imname)
         img_hw = [height, width]
-        K = np.zeros((3, 3))
+        # K = np.zeros((3, 3))
         cx = img_hw[1] / 2.0
         cy = img_hw[0] / 2.0
         params = [f, cx, cy, k1, k2]
@@ -64,7 +65,7 @@ def ReadModelBundler(bundler_path, list_path, model_path):
             counter += 1
         R[1, :] = -R[1, :]  # for bundler format
         R[2, :] = -R[2, :]  # for bundler format
-        T = np.zeros((3))
+        T = np.zeros(3)
         line = lines[counter].strip("\n").split(" ")
         T[0], T[1], T[2] = float(line[0]), float(line[1]), float(line[2])
         T[1:] = -T[1:]  # for bundler format
@@ -88,7 +89,7 @@ def ReadModelBundler(bundler_path, list_path, model_path):
     imagecols = _base.ImageCollection(cameras, camimages)
 
     # read points
-    for point_id in tqdm(range(n_points)):
+    for _ in tqdm(range(n_points)):
         line = lines[counter].strip("\n").split(" ")
         x, y, z = float(line[0]), float(line[1]), float(line[2])
         counter += 1
@@ -97,7 +98,7 @@ def ReadModelBundler(bundler_path, list_path, model_path):
         n_views = int(line[0])
         subcounter = 1
         track = []
-        for view_id in range(n_views):
+        for _ in range(n_views):
             track.append(int(line[subcounter]))
             subcounter += 4
         model.addPoint(x, y, z, track)

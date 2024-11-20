@@ -5,7 +5,7 @@ from scipy.sparse.csgraph import connected_components
 
 
 def project_point_to_line(line_segs, points):
-    """Given a list of line segments and a list of points (2D or 3D coordinates),
+    """Given a list of line segments and a list of points (2D / 3D coordinates),
     compute the orthogonal projection of all points on all lines.
     This returns the 1D coordinates of the projection on the line,
     as well as the list of orthogonal distances."""
@@ -104,8 +104,8 @@ def merge_line_cluster(lines):
     if b == 0:
         u = np.array([1, 0]) if a >= c else np.array([0, 1])
     else:
-        m = (c - a + np.sqrt((a - c) ** 2 + 4 * b ** 2)) / (2 * b)
-        u = np.array([1, m]) / np.sqrt(1 + m ** 2)
+        m = (c - a + np.sqrt((a - c) ** 2 + 4 * b**2)) / (2 * b)
+        u = np.array([1, m]) / np.sqrt(1 + m**2)
 
     # Get the center of gravity of all endpoints
     cross = np.mean(points, axis=0)

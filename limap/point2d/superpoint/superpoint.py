@@ -40,8 +40,10 @@
 # --------------------------------------------------------------------*/
 # %BANNER_END%
 
+import logging
 import os
 from pathlib import Path
+
 import torch
 from torch import nn
 
@@ -164,7 +166,7 @@ class SuperPoint(nn.Module):
         if mk == 0 or mk < -1:
             raise ValueError('"max_keypoints" must be positive or "-1"')
 
-        print("Loaded SuperPoint model")
+        logging.info("Loaded SuperPoint model")
 
     def download_model(self, path):
         import subprocess
@@ -173,7 +175,7 @@ class SuperPoint(nn.Module):
             os.makedirs(os.path.dirname(path))
         link = "https://github.com/magicleap/SuperPointPretrainedNetwork/blob/master/superpoint_v1.pth?raw=true"
         cmd = ["wget", link, "-O", path]
-        print("Downloading SuperPoint model...")
+        logging.info("Downloading SuperPoint model...")
         subprocess.run(cmd, check=True)
 
     def compute_dense_descriptor(self, data):

@@ -1,21 +1,25 @@
 import os
-import numpy as np
-from tqdm import tqdm
-import joblib
-import limap.util.io as limapio
-
-import collections
 from typing import NamedTuple
+
+import joblib
+from tqdm import tqdm
+
+import limap.util.io as limapio
 
 
 class BaseMatcherOptions(NamedTuple):
     """
     Base options for the line matcher
 
-    :param topk: number of top matches for each line (if equal to 0, do mutual nearest neighbor matching)
-    :param n_neighbors: number of visual neighbors, only for naming the output folder
-    :param n_jobs: number of jobs at multi-processing (please make sure not to exceed the GPU memory limit with learning methods)
-    :param weight_path: specify path to load weights (at default, weights will be downloaded to ~/.local)
+    :param topk: number of top matches for each line \
+        (if equal to 0, do mutual nearest neighbor matching)
+    :param n_neighbors: number of visual neighbors, \
+        only for naming the output folder
+    :param n_jobs: number of jobs at multi-processing \
+        (please make sure not to exceed the GPU memory limit \
+        with learning methods)
+    :param weight_path: specify path to load weights \
+        (at default, weights will be downloaded to ~/.local)
     """
 
     topk: int = 10
@@ -24,12 +28,15 @@ class BaseMatcherOptions(NamedTuple):
     weight_path: str = None
 
 
+DefaultMatcherOptions = BaseMatcherOptions()
+
+
 class BaseMatcher:
     """
     Virtual class for line matcher
     """
 
-    def __init__(self, extractor, options=BaseMatcherOptions()):
+    def __init__(self, extractor, options=DefaultMatcherOptions):
         self.extractor = extractor
         self.topk = options.topk
         self.n_neighbors = options.n_neighbors
@@ -45,7 +52,8 @@ class BaseMatcher:
 
     def match_pair(self, descinfo1, descinfo2):
         """
-        Virtual method (need to be implemented) - match two set of lines based on the descriptors
+        Virtual method (need to be implemented) - match two set \
+            of lines based on the descriptors
         """
         raise NotImplementedError
 
@@ -60,9 +68,7 @@ class BaseMatcher:
         """
         return os.path.join(
             output_folder,
-            "{0}_n{1}_top{2}".format(
-                self.get_module_name(), self.n_neighbors, self.topk
-            ),
+            f"{self.get_module_name()}_n{self.n_neighbors}_top{self.topk}",
         )
 
     def read_descinfo(self, descinfo_folder, idx):
@@ -76,7 +82,7 @@ class BaseMatcher:
             matches_folder (str): The output matching folder
             idx (int): image id
         """
-        fname = os.path.join(matches_folder, "matches_{0}.npy".format(idx))
+        fname = os.path.join(matches_folder, f"matches_{idx}.npy")
         return fname
 
     def save_match(self, matches_folder, idx, matches):
@@ -86,7 +92,9 @@ class BaseMatcher:
         Args:
             matches_folder (str): The output matching folder
             idx (int): image id
-            matches (dict[int -> :class:`np.array`]): The output matches for each neighboring image, each with shape (N, 2)
+            matches (dict[int -> :class:`np.array`]): \
+                The output matches for each neighboring image, \
+                each with shape (N, 2)
         """
         fname = self.get_match_filename(matches_folder, idx)
         limapio.save_npy(fname, matches)
@@ -99,7 +107,9 @@ class BaseMatcher:
             matches_folder (str): The output matching folder
             idx (int): image id
         Returns:
-            matches (dict[int -> :class:`np.array`]): The output matches for each neighboring image, each with shape (N, 2)
+            matches (dict[int -> :class:`np.array`]): \
+                The output matches for each neighboring image, \
+                each with shape (N, 2)
         """
         fname = self.get_match_filename(matches_folder, idx)
         return limapio.read_npy(fname).item()

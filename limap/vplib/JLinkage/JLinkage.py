@@ -1,11 +1,11 @@
-from ..base_vp_detector import BaseVPDetector, BaseVPDetectorOptions
-
 from _limap import _vplib
+
+from ..base_vp_detector import BaseVPDetector, DefaultVPDetectorOptions
 
 
 class JLinkage(BaseVPDetector):
-    def __init__(self, cfg_jlinkage, options=BaseVPDetectorOptions()):
-        super(JLinkage, self).__init__(options)
+    def __init__(self, cfg_jlinkage, options=DefaultVPDetectorOptions):
+        super().__init__(options)
         self.detector = _vplib.JLinkage(cfg_jlinkage)
 
     def get_module_name(self):

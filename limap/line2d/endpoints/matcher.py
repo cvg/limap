@@ -1,15 +1,17 @@
-import os
 import numpy as np
 import torch
 
-import limap.util.io as limapio
-from limap.point2d.superglue.superglue import SuperGlue
-from ..base_matcher import BaseMatcher, BaseMatcherOptions
+from limap.point2d.superglue import SuperGlue
+
+from ..base_matcher import (
+    BaseMatcher,
+    DefaultMatcherOptions,
+)
 
 
 class NNEndpointsMatcher(BaseMatcher):
-    def __init__(self, extractor, options=BaseMatcherOptions(), device=None):
-        super(NNEndpointsMatcher, self).__init__(extractor, options)
+    def __init__(self, extractor, options=DefaultMatcherOptions, device=None):
+        super().__init__(extractor, options)
         assert self.extractor.get_module_name() == "superpoint_endpoints"
         self.device = "cuda" if device is None else device
         self.sg = (
@@ -113,11 +115,11 @@ class SuperGlueEndpointsMatcher(BaseMatcher):
     def __init__(
         self,
         extractor,
-        options=BaseMatcherOptions(),
+        options=DefaultMatcherOptions,
         weights="outdoor",
         device=None,
     ):
-        super(SuperGlueEndpointsMatcher, self).__init__(extractor, options)
+        super().__init__(extractor, options)
         assert self.extractor.get_module_name() == "superpoint_endpoints"
         self.device = "cuda" if device is None else device
         self.sg = SuperGlue({"weights": weights}).eval().to(self.device)

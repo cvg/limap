@@ -1,5 +1,4 @@
-from _limap import _base, _ceresbase, _optimize
-import numpy as np
+from _limap import _ceresbase, _optimize
 
 
 def solve_line_refinement(
@@ -27,8 +26,7 @@ def solve_line_refinement(
         channels = p_features[0].shape[2]
     else:
         channels = 128
-    rf_engine_name = "RefinementEngine_f{0}_c{1}".format(dtype[-2:], channels)
-    # print("Refinement type: ", rf_engine_name)
+    rf_engine_name = f"RefinementEngine_f{dtype[-2:]}_c{channels}"
     rf_engine = getattr(_optimize, rf_engine_name)(rf_config)
 
     # initialize track and camview

@@ -1,15 +1,16 @@
-from _limap import _base, _undistortion
 import cv2
-import numpy as np
-import copy
+from _limap import _base, _undistortion
 
 
-def UndistortImageCamera(camera, imname_in, imname_out):
+def undistort_image_camera(camera, imname_in, imname_out):
     """
-    Run COLMAP undistortion on one single image with an input camera. The undistortion is only applied if the camera model is neither "SIMPLE_PINHOLE" nor "PINHOLE".
+    Run COLMAP undistortion on one single image with an input camera. \
+    The undistortion is only applied if the camera model is \
+    neither "SIMPLE_PINHOLE" nor "PINHOLE".
 
     Args:
-        camera (:class:`limap.base.Camera`): The camera (type + parameters) for the image.
+        camera (:class:`limap.base.Camera`): \
+            The camera (type + parameters) for the image.
         imname_in (str): filename for the input image
         imname_out (str): filename for the output undistorted image
 
@@ -46,17 +47,21 @@ def UndistortImageCamera(camera, imname_in, imname_out):
     return camera_undistorted
 
 
-def UndistortPoints(points, distorted_camera, undistorted_camera):
+def undistort_points(points, distorted_camera, undistorted_camera):
     """
     Run COLMAP undistortion on the keypoints.
 
     Args:
-        points (list[:class:`np.array`]): List of 2D keypoints on the distorted image
-        distorted_camera (:class:`limap.base.Camera`): The camera before undistortion
-        undistorted_camera (:class:`limap.base.Camera`): The camera after undistortion
+        points (list[:class:`np.array`]): \
+            List of 2D keypoints on the distorted image
+        distorted_camera (:class:`limap.base.Camera`): \
+            The camera before undistortion
+        undistorted_camera (:class:`limap.base.Camera`): \
+            The camera after undistortion
 
     Returns:
-        list[:class:`np.array`]: List of the corresponding 2D keypoints on the undistorted image
+        list[:class:`np.array`]: \
+            List of the corresponding 2D keypoints on the undistorted image
     """
     return _undistortion._UndistortPoints(
         points, distorted_camera, undistorted_camera

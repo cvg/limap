@@ -1,5 +1,5 @@
-import os, sys
-import numpy as np
+import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from Rome16K import Rome16K
@@ -7,12 +7,8 @@ from Rome16K import Rome16K
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
-import limap.base as _base
-import limap.pointsfm as _psfm
-import limap.util.io as limapio
-import limap.util.config as cfgutils
 import limap.runners
-
+import limap.util.config as cfgutils
 from runners.bundler_triangulation import read_scene_bundler
 
 
@@ -36,7 +32,7 @@ def run_rome16k_triangulation(cfg, bundler_path, list_path, model_path):
             if comp_id == cfg["comp_id"]:
                 valid_image_ids.append(img_id)
         print(
-            "[LOG] Get image subset from component {0}: n_images = {1}".format(
+            "[LOG] Get image subset from component {}: n_images = {}".format(
                 cfg["comp_id"], len(valid_image_ids)
             )
         )
@@ -53,7 +49,8 @@ def parse_config():
     import argparse
 
     arg_parser = argparse.ArgumentParser(
-        description="triangulate 3d lines from specific component of Rome16k (bundler format)."
+        description="triangulate 3d lines from specific component \
+                     of Rome16k (bundler format)."
     )
     arg_parser.add_argument(
         "-c",
@@ -113,7 +110,7 @@ def parse_config():
     cfg["list_path"] = args.list_path
     cfg["model_path"] = args.model_path
     cfg["info_path"] = args.info_path
-    if ("max_image_dim" not in cfg.keys()) or args.max_image_dim is not None:
+    if ("max_image_dim" not in cfg) or args.max_image_dim is not None:
         cfg["max_image_dim"] = args.max_image_dim
     # components
     cfg["component_folder"] = args.component_folder

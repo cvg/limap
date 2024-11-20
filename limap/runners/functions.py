@@ -1,7 +1,10 @@
+import logging
 import os
-import numpy as np
-import warnings
+
 from tqdm import tqdm
+
+import limap.line2d
+import limap.pointsfm as pointsfm
 import limap.util.io as limapio
 
 
@@ -17,11 +20,11 @@ def setup(cfg):
         folder_load = folder_save
     cfg["dir_save"] = folder_save
     cfg["dir_load"] = folder_load
-    print("[LOG] Output dir: {0}".format(cfg["dir_save"]))
-    print("[LOG] Loading dir: {0}".format(cfg["dir_load"]))
+    logging.info("[LOG] Output dir: {}".format(cfg["dir_save"]))
+    logging.info("[LOG] Loading dir: {}".format(cfg["dir_load"]))
     if "weight_path" in cfg and cfg["weight_path"] is not None:
         cfg["weight_path"] = os.path.expanduser(cfg["weight_path"])
-        print("[LOG] weight dir: {0}".format(cfg["weight_path"]))
+        logging.info("[LOG] weight dir: {}".format(cfg["weight_path"]))
     return cfg
 
 
@@ -33,30 +36,37 @@ def undistort_images(
     n_jobs=-1,
 ):
     """
-    Run undistortion on the images stored in the :class:`limap.base.ImageCollection` instance `imagecols` (only distorted images are undistorted), and store the undistorted images into `output_dir`. The function will return a corresponding `limap.base.ImageCollection` instance for the undistorted images.
+    Run undistortion on the images stored in the \
+    :class:`limap.base.ImageCollection` instance `imagecols` \
+    (only distorted images are undistorted), and store the undistorted \
+    images into `output_dir`. The function will return a corresponding \
+    `limap.base.ImageCollection` instance for the undistorted images.
 
     Args:
-        imagecols (:class:`limap.base.ImageCollection`): Image collection of the images to be undistorted.
-        output_dir (str): output folder for storing the undistorted images
-        skip_exists (bool): whether to skip already undistorted images in the output folder.
+        imagecols (:class:`limap.base.ImageCollection`): \
+            Image collection of the images to be undistorted.
+        output_dir (str): \
+            output folder for storing the undistorted images
+        skip_exists (bool): \
+            whether to skip already undistorted images in the output folder.
 
     Returns:
-        :class:`limap.base.ImageCollection`: New image collection for the undistorted images
+        :class:`limap.base.ImageCollection`: \
+            New image collection for the undistorted images
     """
-    import limap.base as _base
+    import limap.base as base
 
     loaded_ids = []
     unload_ids = imagecols.get_img_ids()
     if skip_exists:
-        print(
-            "[LOG] Loading undistorted images (n_images = {0})...".format(
-                imagecols.NumImages()
-            )
+        logging.info(
+            f"[LOG] Loading undistorted images \
+             (n_images = {imagecols.NumImages()})..."
         )
         fname_in = os.path.join(output_dir, fname)
         if os.path.isfile(fname_in):
             data = limapio.read_npy(fname_in).item()
-            loaded_imagecols = _base.ImageCollection(data)
+            loaded_imagecols = base.ImageCollection(data)
             unload_ids = []
             for id in imagecols.get_img_ids():
                 if id in loaded_imagecols.get_img_ids():
@@ -70,14 +80,14 @@ def undistort_images(
     # start undistortion
     if n_jobs == -1:
         n_jobs = os.cpu_count()
-    print(
-        "[LOG] Start undistorting images (n_images = {0})...".format(
-            len(unload_ids)
-        )
+    logging.info(
+        f"[LOG] Start undistorting images (n_images = {len(unload_ids)})..."
     )
-    import limap.undistortion as _undist
-    import cv2, imagesize
+    import cv2
+    import imagesize
     import joblib
+
+    import limap.undistortion as undistortion
 
     # limapio.delete_folder(output_dir)
     limapio.check_makedirs(output_dir)
@@ -87,14 +97,14 @@ def undistort_images(
         cam_id = imagecols.camimage(img_id).cam_id
         cam = imagecols.cam(cam_id)
         imname_in = imagecols.camimage(img_id).image_name()
-        imname_out = os.path.join(output_dir, "image{0:08d}.png".format(img_id))
+        imname_out = os.path.join(output_dir, f"image{img_id:08d}.png")
         # save image if resizing is needed
         width, height = imagesize.get(imname_in)
         if height != cam.h() or width != cam.w():
             img = imagecols.read_image(img_id)
             cv2.imwrite(imname_out, img)
             imname_in = imname_out
-        cam_undistorted = _undist.UndistortImageCamera(
+        cam_undistorted = undistortion.undistort_image_camera(
             cam, imname_in, imname_out
         )
         cam_undistorted.camera_id = cam_id
@@ -106,18 +116,18 @@ def undistort_images(
     )
 
     # update new imagecols
-    imagecols_undistorted = _base.ImageCollection(imagecols)
+    imagecols_undistorted = base.ImageCollection(imagecols)
     cam_dict = {}
     for idx, img_id in enumerate(unload_ids):
-        imname_out = os.path.join(output_dir, "image{0:08d}.png".format(img_id))
+        imname_out = os.path.join(output_dir, f"image{img_id:08d}.png")
         cam_undistorted = outputs[idx]
         cam_id = cam_undistorted.camera_id
         if cam_id not in cam_dict:
             cam_dict[cam_id] = cam_undistorted
             imagecols_undistorted.change_camera(cam_id, cam_undistorted)
         imagecols_undistorted.change_image_name(img_id, imname_out)
-    for idx, img_id in enumerate(loaded_ids):
-        imname_out = os.path.join(output_dir, "image{0:08d}.png".format(img_id))
+    for img_id in loaded_ids:
+        imname_out = os.path.join(output_dir, f"image{img_id:08d}.png")
         cam_id = loaded_imagecols.camimage(img_id).cam_id
         cam_undistorted = loaded_imagecols.cam(cam_id)
         if cam_id not in cam_dict:
@@ -136,17 +146,21 @@ def undistort_images(
 
 def compute_sfminfos(cfg, imagecols, fname="metainfos.txt"):
     """
-    Compute visual neighbors and robust 3D ranges from COLMAP point triangulation.
+    Compute visual neighbors and robust 3D ranges from \
+    COLMAP point triangulation.
 
     Args:
-        cfg (dict): Configuration, fields refer to :file:`cfgs/examples/pointsfm.yaml` as a minimal example
-        imagecols (:class:`limap.base.ImageCollection`): image collection for the images of interest, storing intrinsics and triangulated poses
+        cfg (dict): Configuration, \
+            fields refer to :file:`cfgs/examples/pointsfm.yaml`
+        imagecols (:class:`limap.base.ImageCollection`): \
+            image collection for the images of interest, \
+            storing intrinsics and triangulated poses
     Returns:
         colmap_output_path (str): path to store the colmap output
         neighbors (dict[int -> list[int]]): visual neighbors for each image
-        ranges (pair of :class:`np.array`, each of shape (3,)): robust 3D ranges for the scene computed from the sfm point cloud.
+        ranges (pair of :class:`np.array`, each of shape (3,)): \
+            robust 3D ranges for the scene computed from the sfm point cloud.
     """
-    import limap.pointsfm as _psfm
 
     if not cfg["load_meta"]:
         # run colmap sfm and compute neighbors, ranges
@@ -154,15 +168,15 @@ def compute_sfminfos(cfg, imagecols, fname="metainfos.txt"):
             cfg["dir_save"], cfg["sfm"]["colmap_output_path"]
         )
         if not cfg["sfm"]["reuse"]:
-            _psfm.run_colmap_sfm_with_known_poses(
+            pointsfm.run_colmap_sfm_with_known_poses(
                 cfg["sfm"],
                 imagecols,
                 output_path=colmap_output_path,
                 skip_exists=cfg["skip_exists"],
             )
-        model = _psfm.SfmModel()
+        model = pointsfm.SfmModel()
         model.ReadFromCOLMAP(colmap_output_path, "sparse", "images")
-        neighbors, ranges = _psfm.compute_metainfos(
+        neighbors, ranges = pointsfm.compute_metainfos(
             cfg["sfm"], model, n_neighbors=cfg["n_neighbors"]
         )
         fname_save = os.path.join(cfg["dir_save"], fname)
@@ -175,7 +189,7 @@ def compute_sfminfos(cfg, imagecols, fname="metainfos.txt"):
         limapio.check_path(cfg["dir_load"])
         fname_load = os.path.join(cfg["dir_load"], fname)
         neighbors, ranges = limapio.read_txt_metainfos(fname_load)
-        for img_id, neighbor in neighbors.items():
+        for img_id, _ in neighbors.items():
             neighbors[img_id] = neighbors[img_id][: cfg["n_neighbors"]]
     return colmap_output_path, neighbors, ranges
 
@@ -185,32 +199,38 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
     Detect and desribe 2D lines for each image in the image collection
 
     Args:
-        cfg (dict): Configuration, fields refer to :file:`cfgs/examples/line2d_detect.yaml` as a minimal example
-        imagecols (:class:`limap.base.ImageCollection`): image collection for the images of interest
-        compute_descinfo (bool, optional, default=True): whether to extract the line descriptors
+        cfg (dict): Configuration, \
+            fields refer to :file:`cfgs/examples/line2d_detect.yaml`
+        imagecols (:class:`limap.base.ImageCollection`): \
+            image collection for the images of interest
+        compute_descinfo (bool, optional, default=True): \
+            whether to extract the line descriptors
     Returns:
-        all_2d_segs (dict[int -> :class:`np.array`], each with shape (N, 4) or (N, 5)): all the line detections for each image
+        all_2d_segs (dict[int -> :class:`np.array`], each with \
+        shape (N, 4) or (N, 5)): all the line detections for each image
         descinfo_folder (str): folder to store the descriptors
     """
-    weight_path = None if "weight_path" not in cfg else cfg["weight_path"]
+    weight_path = cfg.get("weight_path", None)
     if "extractor" in cfg["line2d"]:
-        print(
-            "[LOG] Start 2D line detection and description (detector = {0}, extractor = {1}, n_images = {2})...".format(
+        logging.info(
+            "[LOG] Start 2D line detection and description \
+             (detector = {}, extractor = {}, n_images = {})...".format(
                 cfg["line2d"]["detector"]["method"],
                 cfg["line2d"]["extractor"]["method"],
                 imagecols.NumImages(),
             )
         )
     else:
-        print(
-            "[LOG] Start 2D line detection and description (detector = {0}, n_images = {1})...".format(
+        logging.info(
+            "[LOG] Start 2D line detection and description \
+             (detector = {}, n_images = {})...".format(
                 cfg["line2d"]["detector"]["method"], imagecols.NumImages()
             )
         )
     import limap.line2d
 
     if not imagecols.IsUndistorted():
-        warnings.warn("The input images are distorted!")
+        logging.warning("The input images are distorted!", stacklevel=2)
     basedir = os.path.join(
         "line_detections", cfg["line2d"]["detector"]["method"]
     )
@@ -276,16 +296,18 @@ def compute_matches(cfg, descinfo_folder, image_ids, neighbors):
     Match lines for each image with its visual neighbors
 
     Args:
-        cfg (dict): Configuration, fields refeer to :file:`cfgs/examples/line2d_match.yaml` as a minimal example
+        cfg (dict): Configuration, \
+            fields refeer to :file:`cfgs/examples/line2d_match.yaml`
         descinfo_folder (str): path to store the descriptors
         image_ids (list[int]): list of image ids
         neighbors (dict[int -> list[int]]): visual neighbors for each image
     Returns:
         matches_folder (str): path to store the computed matches
     """
-    weight_path = None if "weight_path" not in cfg else cfg["weight_path"]
-    print(
-        "[LOG] Start matching 2D lines... (extractor = {0}, matcher = {1}, n_images = {2}, n_neighbors = {3})".format(
+    weight_path = cfg.get("weight_path", None)
+    logging.info(
+        "[LOG] Start matching 2D lines... (extractor = {}, matcher = {}, \
+         n_images = {}, n_neighbors = {})".format(
             cfg["line2d"]["extractor"]["method"],
             cfg["line2d"]["matcher"]["method"],
             len(image_ids),
@@ -297,7 +319,7 @@ def compute_matches(cfg, descinfo_folder, image_ids, neighbors):
     basedir = os.path.join(
         "line_matchings",
         cfg["line2d"]["detector"]["method"],
-        "feats_{0}".format(cfg["line2d"]["extractor"]["method"]),
+        "feats_{}".format(cfg["line2d"]["extractor"]["method"]),
     )
     extractor = limap.line2d.get_extractor(
         cfg["line2d"]["extractor"], weight_path=weight_path
@@ -324,30 +346,31 @@ def compute_matches(cfg, descinfo_folder, image_ids, neighbors):
     return matches_folder
 
 
-def compute_exhausive_matches(cfg, descinfo_folder, image_ids):
+def compute_exhaustive_matches(cfg, descinfo_folder, image_ids):
     """
     Match lines for each image with all the other images exhaustively
 
     Args:
-        cfg (dict): Configuration, fields refeer to :file:`cfgs/examples/line2d_match.yaml` as a minimal example
+        cfg (dict): Configuration, \
+            fields refer to :file:`cfgs/examples/line2d_match.yaml`
         descinfo_folder (str): path to store the descriptors
         image_ids (list[int]): list of image ids
     Returns:
         matches_folder (str): path to store the computed matches
     """
-    print(
-        "[LOG] Start exhausive matching 2D lines... (extractor = {0}, matcher = {1}, n_images = {2})".format(
+    logging.info(
+        "[LOG] Start exhausive matching 2D lines... \
+         (extractor = {}, matcher = {}, n_images = {})".format(
             cfg["line2d"]["extractor"]["method"],
             cfg["line2d"]["matcher"]["method"],
             len(image_ids),
         )
     )
-    import limap.line2d
 
     basedir = os.path.join(
         "line_matchings",
         cfg["line2d"]["detector"]["method"],
-        "feats_{0}".format(cfg["line2d"]["extractor"]["method"]),
+        "feats_{}".format(cfg["line2d"]["extractor"]["method"]),
     )
     extractor = limap.line2d.get_extractor(cfg["line2d"]["extractor"])
     se_match = cfg["skip_exists"] or cfg["line2d"]["matcher"]["skip_exists"]

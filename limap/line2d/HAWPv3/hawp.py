@@ -1,17 +1,21 @@
+import logging
 import os
-from ..base_detector import BaseDetector, BaseDetectorOptions
 
 import cv2
 import numpy as np
 import torch
-
 from hawp.fsl.config import cfg as model_config
 from hawp.ssl.models import MODELS
 
+from ..base_detector import (
+    BaseDetector,
+    DefaultDetectorOptions,
+)
+
 
 class HAWPv3Detector(BaseDetector):
-    def __init__(self, options=BaseDetectorOptions()):
-        super(HAWPv3Detector, self).__init__(options)
+    def __init__(self, options=DefaultDetectorOptions):
+        super().__init__(options)
         # Load the HAWPv3 model
         if self.weight_path is None:
             ckpt = os.path.join(
@@ -42,7 +46,7 @@ class HAWPv3Detector(BaseDetector):
             os.makedirs(os.path.dirname(path))
         link = "https://github.com/cherubicXN/hawp-torchhub/releases/download/HAWPv3/hawpv3-fdc5487a.pth"
         cmd = ["wget", link, "-O", path]
-        print("Downloading HAWPv3 model...")
+        logging.info("Downloading HAWPv3 model...")
         subprocess.run(cmd, check=True)
 
     def get_module_name(self):

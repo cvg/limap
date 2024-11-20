@@ -1,20 +1,20 @@
-import os, sys
-import numpy as np
+import os
+from pathlib import Path
 
 import imagesize
-from tqdm import tqdm
-from pathlib import Path
+import numpy as np
+from hloc import extract_features, localize_inloc, match_features
+from hloc.utils.parsers import parse_retrieval
 from scipy.io import loadmat
-import limap.base as _base
+from tqdm import tqdm
+
+import limap.base as base
 import limap.util.io as limapio
 
-from hloc import extract_features, match_features, localize_inloc
-from hloc.utils.parsers import parse_retrieval
 
-
-class InLocP3DReader(_base.BaseP3DReader):
+class InLocP3DReader(base.BaseP3DReader):
     def __init__(self, filename):
-        super(InLocP3DReader, self).__init__(filename)
+        super().__init__(filename)
 
     def read(self, filename):
         scan = loadmat(str(filename) + ".mat")["XYZcut"]
@@ -50,7 +50,8 @@ def read_dataset_inloc(
         names = names_
     if logger:
         logger.info(
-            f"Found {len(names)} images in {dataset_dir}, excluding CSE scenes: {exclude_CSE}"
+            f"Found {len(names)} images in {dataset_dir}, \
+              excluding CSE scenes: {exclude_CSE}"
         )
 
     if cfg["info_path"] is None:
@@ -73,9 +74,9 @@ def read_dataset_inloc(
                 "height": height,
                 "params": [focal_length, cx, cy],
             }
-            cam = _base.Camera(cam_dict)
+            cam = base.Camera(cam_dict)
             cameras.append(cam)
-            campose = _base.CameraPose()
+            campose = base.CameraPose()
 
             if name in queries:
                 query_ids.append(img_id)
@@ -87,12 +88,12 @@ def read_dataset_inloc(
                 # Cam2World -> World2Cam
                 R = Tr[:3, :3].T
                 T = -R @ Tr[:3, -1:]
-                campose = _base.CameraPose(R, T)
+                campose = base.CameraPose(R, T)
             camimages.append(
-                _base.CameraImage(cam, campose, str(dataset_dir / name))
+                base.CameraImage(cam, campose, str(dataset_dir / name))
             )
 
-        imagecols = _base.ImageCollection(cameras, camimages)
+        imagecols = base.ImageCollection(cameras, camimages)
         with open(os.path.join(output_dir, metainfos_filename), "wb") as f:
             np.savez(
                 f,
@@ -110,14 +111,14 @@ def read_dataset_inloc(
                 data["query_ids"],
                 data["scales"].item(),
             )
-            imagecols = _base.ImageCollection(imagecols_np)
+            imagecols = base.ImageCollection(imagecols_np)
     return imagecols, train_ids, query_ids, names, scales
 
 
 def get_result_filenames(cfg, use_temporal=True):
     ransac_cfg = cfg["ransac"]
     ransac_postfix = ""
-    if ransac_cfg["method"] != None:
+    if ransac_cfg["method"] is not None:
         if ransac_cfg["method"] in ["ransac", "hybrid"]:
             ransac_postfix = "_{}".format(ransac_cfg["method"])
         elif ransac_cfg["method"] == "solver":
@@ -191,17 +192,16 @@ def run_hloc_inloc(
         if logger:
             logger.info(f"Coarse pose saved at {results_file}")
     else:
-        logger.info(f"Point-only localization skipped.")
+        logger.info("Point-only localization skipped.")
 
     # Read coarse poses and inliers
     poses = {}
-    with open(results_file, "r") as f:
-        lines = []
+    with open(results_file) as f:
         for data in f.read().rstrip().split("\n"):
             data = data.split()
             name = data[0]
             q, t = np.split(np.array(data[1:], float), [4])
-            poses[name] = _base.CameraPose(q, t)
+            poses[name] = base.CameraPose(q, t)
     logger.info(f"Coarse pose read from {results_file}")
     hloc_log_file = f"{results_file}_logs.pkl"
 

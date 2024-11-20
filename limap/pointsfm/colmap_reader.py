@@ -1,8 +1,18 @@
-import os, sys
+import logging
+import os
+import sys
+
 from _limap import _base
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from read_write_model import *
+from hloc.utils.read_write_model import (
+    read_cameras_binary,
+    read_cameras_text,
+    read_images_binary,
+    read_images_text,
+    read_points3D_binary,
+    read_points3D_text,
+)
 
 
 def check_exists_colmap_model(model_path):
@@ -12,17 +22,15 @@ def check_exists_colmap_model(model_path):
         and os.path.exists(os.path.join(model_path, "points3D.bin"))
     ):
         return True
-    if (
+    return (
         os.path.exists(os.path.join(model_path, "cameras.txt"))
         and os.path.exists(os.path.join(model_path, "images.txt"))
         and os.path.exists(os.path.join(model_path, "points3D.txt"))
-    ):
-        return True
-    return False
+    )
 
 
 def ReadInfos(colmap_path, model_path="sparse", image_path="images"):
-    print("Start loading COLMAP sparse reconstruction.")
+    logging.info("Start loading COLMAP sparse reconstruction.")
     model_path = os.path.join(colmap_path, model_path)
     image_path = os.path.join(colmap_path, image_path)
     if os.path.exists(os.path.join(model_path, "cameras.bin")):
@@ -37,9 +45,9 @@ def ReadInfos(colmap_path, model_path="sparse", image_path="images"):
         colmap_images = read_images_text(fname_images)
     else:
         raise ValueError(
-            "Error! The model file does not exist at {0}".format(model_path)
+            f"Error! The model file does not exist at {model_path}"
         )
-    print("Reconstruction loaded. (n_images = {0})".format(len(colmap_images)))
+    logging.info(f"Reconstruction loaded. (n_images = {len(colmap_images)})")
 
     # read cameras
     cameras = {}
@@ -52,7 +60,6 @@ def ReadInfos(colmap_path, model_path="sparse", image_path="images"):
         )
 
     # read images
-    n_images = len(colmap_images)
     camimages = {}
     for img_id, colmap_image in colmap_images.items():
         imname = colmap_image.name
@@ -89,7 +96,7 @@ def PyReadCOLMAP(colmap_path, model_path=None):
         colmap_points = read_points3D_text(fname_points)
     else:
         raise ValueError(
-            "Error! The model file does not exist at {0}".format(model_path)
+            f"Error! The model file does not exist at {model_path}"
         )
     reconstruction = {}
     reconstruction["cameras"] = colmap_cameras

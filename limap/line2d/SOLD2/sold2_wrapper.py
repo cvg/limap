@@ -1,10 +1,11 @@
-import os, sys
-import numpy as np
-from torch.nn.functional import softmax
+import logging
+import os
+import subprocess
+
 import cv2
+import numpy as np
 import torch
 from skimage.draw import line
-import subprocess
 
 from .experiment import load_config
 from .model.line_matcher import LineMatcher
@@ -40,7 +41,7 @@ class SOLD2LineDetector:
                 os.makedirs(os.path.dirname(self.ckpt_path))
             link = "https://cvg-data.inf.ethz.ch/SOLD2/sold2_wireframe.tar"
             cmd = ["wget", link, "-O", self.ckpt_path]
-            print("Downloading SOLD2 model...")
+            logging.info("Downloading SOLD2 model...")
             subprocess.run(cmd, check=True)
         self.line_matcher = LineMatcher(
             self.cfg["model_cfg"],

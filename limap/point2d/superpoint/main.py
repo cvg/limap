@@ -1,17 +1,19 @@
-import torch
-import numpy as np
-import h5py
-from tqdm import tqdm
-from pathlib import Path
-from typing import Dict, List, Union, Optional
-import pprint
-
-string_classes = str
 import collections.abc as collections
+import logging
+import pprint
+from pathlib import Path
+from typing import Dict, List, Optional, Union
 
+import h5py
+import numpy as np
+import torch
 from hloc import extract_features
 from hloc.utils.io import list_h5_names
+from tqdm import tqdm
+
 from .superpoint import SuperPoint
+
+string_classes = str
 
 
 # Copy from legacy hloc code
@@ -41,7 +43,7 @@ def run_superpoint(
     overwrite: bool = False,
     keypoints=None,
 ) -> Path:
-    print(
+    logging.info(
         "[SuperPoint] Extracting local features with configuration:"
         f"\n{pprint.pformat(conf)}"
     )
@@ -60,7 +62,7 @@ def run_superpoint(
     )
     dataset.names = [n for n in dataset.names if n not in skip_names]
     if len(dataset.names) == 0:
-        print("[SuperPoint] Skipping the extraction.")
+        logging.info("[SuperPoint] Skipping the extraction.")
         return feature_path
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -110,30 +112,14 @@ def run_superpoint(
             except OSError as error:
                 if "No space left on device" in error.args[0]:
                     raise ValueError(
-                        "[SuperPoint] Out of disk space: storing features on disk can take "
+                        "[SuperPoint] Out of disk space: storing features \
+                            on disk can take "
                         "significant space, did you enable the as_half flag?"
-                    )
+                    ) from None
                     del grp, fd[name]
                 raise error
 
         del pred
 
-    print("[SuperPoint] Finished exporting features.")
+    logging.info("[SuperPoint] Finished exporting features.")
     return feature_path
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--image_dir", type=Path, required=True)
-    parser.add_argument("--export_dir", type=Path, required=True)
-    parser.add_argument(
-        "--conf",
-        type=str,
-        default="superpoint_aachen",
-        choices=list(confs.keys()),
-    )
-    parser.add_argument("--as_half", action="store_true")
-    parser.add_argument("--image_list", type=Path)
-    parser.add_argument("--feature_path", type=Path)
-    args = parser.parse_args()
-    main(confs[args.conf], args.image_dir, args.export_dir, args.as_half)

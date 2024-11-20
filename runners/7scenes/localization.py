@@ -1,29 +1,30 @@
-import os, sys
-import numpy as np
+import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
-import limap.base as _base
-import limap.util.io as limapio
-import limap.util.config as cfgutils
-import limap.runners as _runners
 import argparse
 import logging
 import pickle
-import pycolmap
-import limap.pointsfm.read_write_model as colmap_utils
 from pathlib import Path
 
+import hloc.utils.read_write_model as colmap_utils
+import pycolmap
+from hloc.utils.parsers import parse_retrieval
 from utils import (
     DepthReader,
-    read_scene_7scenes,
+    evaluate,
     get_result_filenames,
+    image_path_to_rendered_depth_path,
+    read_scene_7scenes,
     run_hloc_7scenes,
 )
-from utils import image_path_to_rendered_depth_path, evaluate
-from hloc.utils.parsers import parse_retrieval
+
+import limap.runners as _runners
+import limap.util.config as cfgutils
+import limap.util.io as limapio
 
 formatter = logging.Formatter(
     fmt="[%(asctime)s %(name)s %(levelname)s] %(message)s",
@@ -107,7 +108,7 @@ def parse_config():
 
     # Output path for LIMAP results (tmp)
     if cfg["output_dir"] is None:
-        cfg["output_dir"] = "tmp/7scenes/{}".format(args.scene)
+        cfg["output_dir"] = f"tmp/7scenes/{args.scene}"
     # Output folder for LIMAP linetracks (in tmp)
     if cfg["output_folder"] is None:
         cfg["output_folder"] = "finaltracks"
@@ -248,7 +249,8 @@ def main():
             "inliers": inliers,
         }
 
-    final_poses = _runners.line_localization(
+    # can return final_poses
+    _runners.line_localization(
         cfg,
         imagecols_train,
         imagecols_query,

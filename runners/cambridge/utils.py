@@ -1,25 +1,27 @@
-import os, sys
+import os
+import sys
+
 import numpy as np
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
+from pathlib import Path
+
 import imagesize
 import pycolmap
-from tqdm import tqdm
-from pathlib import Path
-import limap.base as _base
-import limap.pointsfm as _psfm
-import limap.util.io as limapio
-
 from hloc import (
     extract_features,
     localize_sfm,
     match_features,
     pairs_from_retrieval,
 )
-from hloc.utils.parsers import parse_retrieval
+from tqdm import tqdm
+
+import limap.base as base
+import limap.pointsfm as pointsfm
+import limap.util.io as limapio
 
 
 def read_scene_visualsfm(
@@ -33,7 +35,7 @@ def read_scene_visualsfm(
     ):
         cfg["info_path"] = os.path.join(output_dir, metainfos_filename)
     if cfg["info_path"] is None:
-        imagecols, neighbors, ranges = _psfm.read_infos_visualsfm(
+        imagecols, neighbors, ranges = pointsfm.read_infos_visualsfm(
             cfg["sfm"], vsfm_path, nvm_file=nvm_file, n_neighbors=n_neighbors
         )
         with open(os.path.join(output_dir, metainfos_filename), "wb") as f:
@@ -51,14 +53,14 @@ def read_scene_visualsfm(
                 data["neighbors"].item(),
                 data["ranges"],
             )
-            imagecols = _base.ImageCollection(imagecols_np)
+            imagecols = base.ImageCollection(imagecols_np)
     return imagecols, neighbors, ranges
 
 
 def get_scene_info(vsfm_path, imagecols, query_images):
     with open(os.path.join(vsfm_path, "dataset_train.txt")) as f:
         lines = f.readlines()[3:]
-    train_names = [l.split()[0] for l in lines]
+    train_names = [line.split()[0] for line in lines]
 
     query_start_idx = 0
     if query_images is None:
@@ -66,7 +68,7 @@ def get_scene_info(vsfm_path, imagecols, query_images):
         query_start_idx = 3
     with open(query_images) as f:
         lines = f.readlines()[query_start_idx:]
-    query_names = [l.split()[0] for l in lines]
+    query_names = [line.split()[0] for line in lines]
 
     train_ids = []
     query_ids = []
@@ -82,8 +84,9 @@ def get_scene_info(vsfm_path, imagecols, query_images):
 
 
 def undistort_and_resize(cfg, imagecols, logger=None):
-    import limap.runners as _runners
     import cv2
+
+    import limap.runners as _runners
 
     # undistort images
     logger.info("Performing undistortion...")
@@ -150,7 +153,7 @@ def create_query_list(imagecols, out):
 def get_result_filenames(cfg, args):
     ransac_cfg = cfg["ransac"]
     ransac_postfix = ""
-    if ransac_cfg["method"] != None:
+    if ransac_cfg["method"] is not None:
         if ransac_cfg["method"] in ["ransac", "hybrid"]:
             ransac_postfix = "_{}".format(ransac_cfg["method"])
         elif ransac_cfg["method"] == "solver":
@@ -190,12 +193,12 @@ def eval(filename, poses_gt, query_ids, id_to_name, logger):
     errors_t = []
     errors_R = []
     pose_results = {}
-    with open(filename, "r") as f:
+    with open(filename) as f:
         for data in f.read().rstrip().split("\n"):
             data = data.split()
             name = data[0]
             q, t = np.split(np.array(data[1:], float), [4])
-            pose_results[name] = _base.CameraPose(q, t)
+            pose_results[name] = base.CameraPose(q, t)
 
     for qid in query_ids:
         name = id_to_name[qid]
@@ -259,10 +262,10 @@ def run_hloc_cambridge(
     query_list = results_dir / "query_list_with_intrinsics.txt"
     loc_pairs = results_dir / f"pairs-query-netvlad{num_loc}.txt"
     image_list = [
-        "image{0:08d}.png".format(img_id) for img_id in (train_ids + query_ids)
+        f"image{img_id:08d}.png" for img_id in (train_ids + query_ids)
     ]
     img_name_to_id = {
-        "image{0:08d}.png".format(id): id for id in (train_ids + query_ids)
+        f"image{id:08d}.png": id for id in (train_ids + query_ids)
     }
 
     imagecols_train = imagecols.subset_by_image_ids(train_ids)
@@ -286,8 +289,8 @@ def run_hloc_cambridge(
         global_descriptors,
         loc_pairs,
         num_loc,
-        db_list=["image{0:08d}.png".format(img_id) for img_id in train_ids],
-        query_list=["image{0:08d}.png".format(img_id) for img_id in query_ids],
+        db_list=[f"image{img_id:08d}.png" for img_id in train_ids],
+        query_list=[f"image{img_id:08d}.png" for img_id in query_ids],
     )
 
     # feature extraction
@@ -309,7 +312,7 @@ def run_hloc_cambridge(
         logger.info("Running COLMAP for 3D points...")
     neighbors_train = imagecols_train.update_neighbors(neighbors)
 
-    ref_sfm_path = _psfm.run_colmap_sfm_with_known_poses(
+    ref_sfm_path = pointsfm.run_colmap_sfm_with_known_poses(
         cfg["sfm"],
         imagecols_train,
         os.path.join(cfg["output_dir"], "tmp_colmap"),
@@ -336,7 +339,7 @@ def run_hloc_cambridge(
         )
 
         # Read coarse poses
-        with open(results_file, "r") as f:
+        with open(results_file) as f:
             lines = []
             for data in f.read().rstrip().split("\n"):
                 data = data.split()
@@ -361,17 +364,17 @@ def run_hloc_cambridge(
             logger.info(f"Coarse pose saved at {results_file}")
     else:
         if logger:
-            logger.info(f"Point-only localization skipped.")
+            logger.info("Point-only localization skipped.")
 
     # Read coarse poses
     poses = {}
-    with open(results_file, "r") as f:
+    with open(results_file) as f:
         lines = []
         for data in f.read().rstrip().split("\n"):
             data = data.split()
             name = data[0]
             q, t = np.split(np.array(data[1:], float), [4])
-            poses[name] = _base.CameraPose(q, t)
+            poses[name] = base.CameraPose(q, t)
     if logger:
         logger.info(f"Coarse pose read from {results_file}")
     hloc_log_file = f"{results_file}_logs.pkl"

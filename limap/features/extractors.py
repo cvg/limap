@@ -1,17 +1,18 @@
 # [NOTE] modified from the pixel-perfect-sfm project
 
-import os, sys
-import torch
-import numpy as np
-import PIL
-
-from .models.s2dnet import *
-from .models.vggnet import VGGNet
-import torchvision.transforms.functional as tvf
-from torchvision import transforms
+import logging
+import sys
 import time
 
+import numpy as np
+import PIL
+import torch
+import torchvision.transforms.functional as tvf
 from _limap import _features
+from torchvision import transforms
+
+from .models.s2dnet import S2DNet
+from .models.vggnet import VGGNet
 
 RGB_mean = [0.485, 0.456, 0.406]
 RGB_std = [0.229, 0.224, 0.225]
@@ -44,7 +45,7 @@ class Extractor(torch.nn.Module):
     """
 
     def __init__(self, device: str):
-        super(Extractor, self).__init__()
+        super().__init__()
         self.device = device
         self.num_levels = 0
         self.model = None
@@ -63,7 +64,8 @@ class Extractor(torch.nn.Module):
             image_batch: [BxHxWxC] Tensor.
 
         Returns:
-            List of self.num_levels featuremaps as torch.Tensor[HxWxC] on device.
+            List of self.num_levels featuremaps as \
+            torch.Tensor[HxWxC] on device.
         """
         raise NotImplementedError()
 
@@ -87,7 +89,7 @@ class S2DNetExtractor(Extractor):
         self.num_levels = 1
         self.channels = [128]  # ,128] #[128,128]
         self.l2_normalize = True
-        if "output_channels" in kwargs.keys():
+        if "output_channels" in kwargs:
             self.channels = [min(kwargs["output_channels"], self.channels[0])]
 
     def extract_featuremaps(self, image_batch: torch.Tensor) -> list:
@@ -130,14 +132,13 @@ class DSIFTExtractor(Extractor):
             .permute(2, 0, 1)
             .unsqueeze(0)
         )
-        print(res.shape, image_batch.shape)
+        logging.info(res.shape, image_batch.shape)
         return [res]
 
     def adapt_image(self, pil_img: PIL.Image) -> torch.Tensor:
-        print("HELLO")
         t = time.time()
         res = to_grayscale(pil_img).unsqueeze(0)
-        print(time.time() - t)
+        logging.info(time.time() - t)
         return res
 
 
@@ -148,7 +149,7 @@ class VGGNetExtractor(Extractor):
         self.num_levels = 1  # 2
         self.channels = [64]  # [128,128]
         self.l2_normalize = True
-        if "output_channels" in kwargs.keys():
+        if "output_channels" in kwargs:
             self.channels = [min(kwargs["output_channels"], self.channels[0])]
 
     def extract_featuremaps(self, image_batch: torch.Tensor) -> list:
@@ -159,7 +160,6 @@ class VGGNetExtractor(Extractor):
                 maps[i] = maps[i][:, :channels]
         early = maps[0]
         middle = maps[1]
-        # combined = early + nn.Upsample(size = early.shape[2:], mode="bilinear", align_corners=True)(middle)
         return [early, middle]
 
     def adapt_image(self, pil_img: PIL.Image) -> torch.Tensor:
@@ -178,7 +178,6 @@ class ImageExtractor(Extractor):
 
     def adapt_image(self, pil_img: PIL.Image) -> torch.Tensor:
         return tvf.to_tensor(pil_img).unsqueeze(0)
-        # return torch.from_numpy(np.asarray(pil_img) / 255.0).permute(2,0,1).unsqueeze(0)
 
 
 class GrayscaleExtractor(Extractor):

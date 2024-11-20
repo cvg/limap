@@ -1,18 +1,19 @@
-import os
 import numpy as np
-import torch
 
-from ..base_matcher import BaseMatcher, BaseMatcherOptions
-from .line_transformer import LineTransformer
+from ..base_matcher import (
+    BaseMatcher,
+    DefaultMatcherOptions,
+)
 from .line_process import get_dist_matrix
+from .line_transformer import LineTransformer
 from .nn_matcher import nn_matcher_distmat
 
 
 class LineTRMatcher(BaseMatcher):
     def __init__(
-        self, extractor, options=BaseMatcherOptions(), topk=0, device=None
+        self, extractor, options=DefaultMatcherOptions, topk=0, device=None
     ):
-        super(LineTRMatcher, self).__init__(extractor, options)
+        super().__init__(extractor, options)
         self.device = "cuda" if device is None else device
         self.linetr = (
             LineTransformer({"weight_path": self.weight_path})

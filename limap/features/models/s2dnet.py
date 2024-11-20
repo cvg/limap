@@ -1,22 +1,14 @@
+import logging
+import os
+from pathlib import Path
 from typing import List
-import numpy
+
+import numpy as np
 import torch
 import torch.nn as nn
 from torchvision import models
-from pathlib import Path
-import logging
 
-from PIL import Image
 from .base_model import BaseModel
-import os, sys
-from torchvision import transforms
-import numpy as np
-import torch.nn.functional as F
-
-import argparse
-import h5py
-
-from time import time
 
 type_dict = {
     "uint8_t": torch.cuda.ByteTensor,
@@ -66,7 +58,7 @@ def print_gpu_memory():
     a = torch.cuda.memory_allocated(0)
     f = r - a  # free inside reserved
 
-    print(np.array([t, r, a, f]) / 2 ** 30)
+    logging.info(np.array([t, r, a, f]) / 2**30)
 
 
 class AdapLayers(nn.Module):
@@ -78,24 +70,24 @@ class AdapLayers(nn.Module):
             hypercolumn_layers: The list of the hypercolumn layer names.
             output_dim: The output channel dimension.
         """
-        super(AdapLayers, self).__init__()
+        super().__init__()
         self.layers = []
         channel_sizes = [vgg16_layers[name] for name in hypercolumn_layers]
-        print(channel_sizes)
-        for i, l in enumerate(channel_sizes):
+        logging.info(channel_sizes)
+        for i, ll in enumerate(channel_sizes):
             layer = nn.Sequential(
-                nn.Conv2d(l, 64, kernel_size=1, stride=1, padding=0),
+                nn.Conv2d(ll, 64, kernel_size=1, stride=1, padding=0),
                 nn.ReLU(),
                 nn.Conv2d(64, output_dim, kernel_size=5, stride=1, padding=2),
                 nn.BatchNorm2d(output_dim),
             )
             self.layers.append(layer)
-            self.add_module("adap_layer_{}".format(i), layer)
+            self.add_module(f"adap_layer_{i}", layer)
 
     def forward(self, features: List[torch.tensor]):
         """Apply adaptation layers."""
         for i, _ in enumerate(features):
-            features[i] = getattr(self, "adap_layer_{}".format(i))(features[i])
+            features[i] = getattr(self, f"adap_layer_{i}")(features[i])
         return features
 
 
@@ -123,14 +115,14 @@ class S2DNet(BaseModel):
         layers = list(vgg16.features.children())[:num_layers]
 
         self.encoder = nn.ModuleList(layers)
-        print(self.encoder)
+        logging.info(self.encoder)
         self.scales = []
         current_scale = 0
         for i, layer in enumerate(layers):
             if isinstance(layer, torch.nn.MaxPool2d):
                 current_scale += 1
             if i in self.hypercolumn_indices:
-                self.scales.append(2 ** current_scale)
+                self.scales.append(2**current_scale)
 
         self.adaptation_layers = AdapLayers(
             conf.hypercolumn_layers, conf.output_dim
@@ -142,12 +134,12 @@ class S2DNet(BaseModel):
                 self.download_s2dnet_model(path)
             logging.info(f"Loading S2DNet checkpoint at {path}.")
             state_dict = torch.load(path, map_location="cpu")["state_dict"]
-            params = self.state_dict()
             state_dict = {k: v for k, v in state_dict.items()}
             self.load_state_dict(state_dict, strict=False)
 
     def download_s2dnet_model(self, path):
-        # TODO: not supporting global weight_path now. Downloading to current directory.
+        # TODO: not supporting global weight_path now.
+        # Downloading to current directory.
         import subprocess
 
         if not os.path.exists(os.path.dirname(path)):
@@ -156,7 +148,7 @@ class S2DNet(BaseModel):
             "https://www.dropbox.com/s/hnv51iwu4hn82rj/s2dnet_weights.pth?dl=0"
         )
         cmd = ["wget", link, "-O", path]
-        print("Downloading S2DNet model...")
+        logging.info("Downloading S2DNet model...")
         subprocess.run(cmd, check=True)
 
     def _forward(self, data):

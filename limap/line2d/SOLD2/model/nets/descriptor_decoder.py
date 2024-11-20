@@ -6,7 +6,7 @@ class SuperpointDescriptor(nn.Module):
     """Descriptor decoder based on the SuperPoint arcihtecture."""
 
     def __init__(self, input_feat_dim=128):
-        super(SuperpointDescriptor, self).__init__()
+        super().__init__()
         self.relu = torch.nn.ReLU(inplace=True)
         self.convPa = torch.nn.Conv2d(
             input_feat_dim, 256, kernel_size=3, stride=1, padding=1

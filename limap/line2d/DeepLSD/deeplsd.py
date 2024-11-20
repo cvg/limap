@@ -1,13 +1,19 @@
+import logging
 import os
+
 import numpy as np
 import torch
 from deeplsd.models.deeplsd_inference import DeepLSD
-from ..base_detector import BaseDetector, BaseDetectorOptions
+
+from ..base_detector import (
+    BaseDetector,
+    DefaultDetectorOptions,
+)
 
 
 class DeepLSDDetector(BaseDetector):
-    def __init__(self, options=BaseDetectorOptions()):
-        super(DeepLSDDetector, self).__init__(options)
+    def __init__(self, options=DefaultDetectorOptions):
+        super().__init__(options)
 
         conf = {
             "detect_lines": True,
@@ -39,7 +45,7 @@ class DeepLSDDetector(BaseDetector):
             os.makedirs(os.path.dirname(path))
         link = "https://cvg-data.inf.ethz.ch/DeepLSD/deeplsd_md.tar"
         cmd = ["wget", link, "-O", path]
-        print("Downloading DeepLSD model...")
+        logging.info("Downloading DeepLSD model...")
         subprocess.run(cmd, check=True)
 
     def get_module_name(self):

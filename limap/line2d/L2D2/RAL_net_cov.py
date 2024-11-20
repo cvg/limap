@@ -1,12 +1,11 @@
-from __future__ import division, print_function
 import torch
-import torch.nn.init
 import torch.nn as nn
+import torch.nn.init
 
 
 class L2Norm(nn.Module):
     def __init__(self):
-        super(L2Norm, self).__init__()
+        super().__init__()
         self.eps = 1e-10
 
     def forward(self, x):
@@ -17,7 +16,7 @@ class L2Norm(nn.Module):
 
 class L2Net(nn.Module):
     def __init__(self):
-        super(L2Net, self).__init__()
+        super().__init__()
         self.features = nn.Sequential(
             nn.Conv2d(1, 32, kernel_size=3, padding=1, bias=False),
             nn.BatchNorm2d(32, affine=False),
@@ -69,8 +68,7 @@ def weights_init(m):
         nn.init.orthogonal_(m.weight.data, gain=0.6)
         try:
             nn.init.constant_(m.bias.data, 0.01)
-
-        except:
+        except AttributeError:
             pass
     return
 

@@ -1,6 +1,8 @@
-import limap.util.config
+import cv2
+
 import limap.base
 import limap.line2d
+import limap.util.config
 import limap.visualize
 
 # detect and describe lines
@@ -10,7 +12,9 @@ view1 = limap.base.CameraView(
 view2 = limap.base.CameraView(
     limap.base.Camera("SIMPLE_PINHOLE", hw=(800, 800)),
     "runners/tests/data/line2d/frame.0000.color.jpg",
-)  # You can specify the height and width to resize into in the limap.base.Camera instance at initialization.
+)
+# You can specify the height and width to resize into
+# in the limap.base.Camera instance at initialization.
 detector = limap.line2d.get_detector(
     {"method": "deeplsd", "skip_exists": False}
 )  # get a line detector
@@ -23,8 +27,6 @@ segs2 = detector.detect(view2)  # detection
 desc2 = extractor.extract(view2, segs2)  # description
 
 # visualize
-import cv2
-
 img1 = view1.read_image(set_gray=False)
 img1 = limap.visualize.draw_segments(img1, segs1, (0, 255, 0))
 cv2.imshow("detections", img1)

@@ -1,20 +1,20 @@
 import numpy as np
 
-import limap.base as _base
+import limap.base as base
 
 
 def match_line_2to2_epipolarIoU(
     ref_lines, tgt_lines, ref_cam, ref_pose, tgt_cam, tgt_pose, IoU_threshold
 ):
-    from limap.triangulation.triangulation import compute_epipolar_IoU
+    from limap.triangulation import compute_epipolar_IoU
 
     pairs = []
-    if not isinstance(ref_pose, _base.CameraPose):
-        ref_pose = _base.CameraPose(ref_pose[0], ref_pose[1])
-    if not isinstance(tgt_pose, _base.CameraPose):
-        tgt_pose = _base.CameraPose(tgt_pose[0], tgt_pose[1])
-    ref_view = _base.CameraView(ref_cam, ref_pose)
-    tgt_view = _base.CameraView(tgt_cam, tgt_pose)
+    if not isinstance(ref_pose, base.CameraPose):
+        ref_pose = base.CameraPose(ref_pose[0], ref_pose[1])
+    if not isinstance(tgt_pose, base.CameraPose):
+        tgt_pose = base.CameraPose(tgt_pose[0], tgt_pose[1])
+    ref_view = base.CameraView(ref_cam, ref_pose)
+    tgt_view = base.CameraView(tgt_cam, tgt_pose)
     for ref_line_id, ref_line in enumerate(ref_lines):
         for tgt_line_id, tgt_line in enumerate(tgt_lines):
             res = compute_epipolar_IoU(ref_line, ref_view, tgt_line, tgt_view)
@@ -33,14 +33,14 @@ def filter_line_2to2_epipolarIoU(
     tgt_pose,
     IoU_threshold,
 ):
-    from limap.triangulation.triangulation import compute_epipolar_IoU
+    from limap.triangulation import compute_epipolar_IoU
 
-    if not isinstance(ref_pose, _base.CameraPose):
-        ref_pose = _base.CameraPose(ref_pose[0], ref_pose[1])
-    if not isinstance(tgt_pose, _base.CameraPose):
-        tgt_pose = _base.CameraPose(tgt_pose[0], tgt_pose[1])
-    ref_view = _base.CameraView(ref_cam, ref_pose)
-    tgt_view = _base.CameraView(tgt_cam, tgt_pose)
+    if not isinstance(ref_pose, base.CameraPose):
+        ref_pose = base.CameraPose(ref_pose[0], ref_pose[1])
+    if not isinstance(tgt_pose, base.CameraPose):
+        tgt_pose = base.CameraPose(tgt_pose[0], tgt_pose[1])
+    ref_view = base.CameraView(ref_cam, ref_pose)
+    tgt_view = base.CameraView(tgt_cam, tgt_pose)
     filtered = []
     for ref_line_id, tgt_line_id in pairs:
         res = compute_epipolar_IoU(
@@ -106,17 +106,19 @@ def reprojection_filter_matches_2to3(
     matches = []
     for ref_line_id in all_pairs_2to3:
         ref_line = ref_lines[ref_line_id]
-        mp_ref, dir_ref = ref_line.midpoint(), ref_line.direction()
+        # mp_ref = ref_line.midpoint()
+        dir_ref = ref_line.direction()
         track_ids = np.unique(all_pairs_2to3[ref_line_id])
 
         min_loss = np.inf
         best_id = None
         for id in track_ids:
             l3d = linetracks[id].line
-            l2d_start, l2d_end = ref_camview.projection(
-                l3d.start
-            ), ref_camview.projection(l3d.end)
-            l2d = _base.Line2d(l2d_start, l2d_end)
+            l2d_start, l2d_end = (
+                ref_camview.projection(l3d.start),
+                ref_camview.projection(l3d.end),
+            )
+            l2d = base.Line2d(l2d_start, l2d_end)
 
             dist = dist_func(ref_line, l2d)
             loss_val = dist

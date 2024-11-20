@@ -1,14 +1,14 @@
-import os, sys
+import os
+import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 
-import limap.util.io as limapio
+import limap.base as base
+import limap.optimize as optimize
 import limap.util.config as cfgutils
-
-import limap.base as _base
-import limap.vplib as _vplib
-import limap.optimize as _optim
+import limap.util.io as limapio
+import limap.vplib as vplib
 
 
 def one_by_one_refinement(cfg):
@@ -21,12 +21,12 @@ def one_by_one_refinement(cfg):
         imagecols,
         all_2d_segs,
     ) = limapio.read_folder_linetracks_with_info(cfg["input_folder"])
-    all_2d_lines = _base.get_all_lines_2d(all_2d_segs)
+    all_2d_lines = base.get_all_lines_2d(all_2d_segs)
 
     # vp
     vpresults = None
     if cfg["refinement"]["use_vp"]:
-        vpdetector = _vplib.get_vp_detector(
+        vpdetector = vplib.get_vp_detector(
             cfg["refinement"]["vpdet"],
             n_jobs=cfg["refinement"]["vpdet"]["n_jobs"],
         )
@@ -35,7 +35,7 @@ def one_by_one_refinement(cfg):
         )
 
     # one-by-one refinement
-    newtracks = _optim.line_refinement(
+    newtracks = optimize.line_refinement(
         cfg["refinement"],
         linetracks,
         imagecols,
@@ -79,9 +79,9 @@ def joint_refinement(cfg):
     ) = limapio.read_folder_linetracks_with_info(cfg["input_folder"])
 
     # all refinements in a single problem
-    cfg_ba = _optim.HybridBAConfig(cfg["refinement"])
+    cfg_ba = optimize.HybridBAConfig(cfg["refinement"])
     cfg_ba.set_constant_camera()
-    ba_engine = _optim.solve_line_bundle_adjustment(
+    ba_engine = optimize.solve_line_bundle_adjustment(
         cfg["refinement"], imagecols, linetracks, max_num_iterations=200
     )
     newtracks_map = ba_engine.GetOutputLineTracks(

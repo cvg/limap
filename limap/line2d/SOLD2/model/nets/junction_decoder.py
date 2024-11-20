@@ -6,7 +6,7 @@ class SuperpointDecoder(nn.Module):
     """Junction decoder based on the SuperPoint architecture."""
 
     def __init__(self, input_feat_dim=128, backbone_name="lcnn"):
-        super(SuperpointDecoder, self).__init__()
+        super().__init__()
         self.relu = torch.nn.ReLU(inplace=True)
         # Perform strided convolution when using lcnn backbone.
         if backbone_name == "lcnn":

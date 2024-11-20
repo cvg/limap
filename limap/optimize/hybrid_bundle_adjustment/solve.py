@@ -1,12 +1,8 @@
-from _limap import _base, _ceresbase, _optimize
-import numpy as np
+from _limap import _ceresbase, _optimize
 
 
 def _init_bundle_adjustment_engine(cfg, imagecols, max_num_iterations=100):
-    if type(cfg) == dict:
-        ba_config = _optimize.HybridBAConfig(cfg)
-    else:
-        ba_config = cfg
+    ba_config = _optimize.HybridBAConfig(cfg) if isinstance(cfg, dict) else cfg
     ba_config.solver_options.logging_type = _ceresbase.LoggingType.SILENT
     ba_config.solver_options.max_num_iterations = max_num_iterations
     ba_engine = _optimize.HybridBAEngine(ba_config)

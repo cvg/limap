@@ -1,10 +1,8 @@
 from _limap import _triangulation as _tri
-from _limap import _base
-import numpy as np
 
 
-def get_normal_direction(l, view):
-    return _tri.get_normal_direction(l, view)
+def get_normal_direction(line2d, view):
+    return _tri.get_normal_direction(line2d, view)
 
 
 def get_direction_from_VP(vp, view):
@@ -48,7 +46,8 @@ def compute_fundamental_matrix(view1, view2):
 
 def compute_epipolar_IoU(l1, view1, l2, view2):
     """
-    Get the IoU between two lines from different views by intersecting the epipolar lines
+    Get the IoU between two lines from different views by \
+    intersecting the epipolar lines
 
     Args:
         l1 (:class:`limap.base.Line2d`)
@@ -78,7 +77,8 @@ def point_triangulation(p1, view1, p2, view2):
 
 def triangulate_endpoints(l1, view1, l2, view2):
     """
-    Two-view triangulation of lines with point triangulation on both endpoints (assuming correspondences)
+    Two-view triangulation of lines with point triangulation \
+    on both endpoints (assuming correspondences)
 
     Args:
         l1 (:class:`limap.base.Line2d`)
