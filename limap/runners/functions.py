@@ -3,6 +3,7 @@ import warnings
 
 from tqdm import tqdm
 
+import limap.line2d
 import limap.pointsfm as pointsfm
 import limap.util.io as limapio
 
@@ -339,7 +340,6 @@ def compute_exhausive_matches(cfg, descinfo_folder, image_ids):
             len(image_ids),
         )
     )
-    import limap.line2d
 
     basedir = os.path.join(
         "line_matchings",
