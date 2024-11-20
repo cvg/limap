@@ -9,7 +9,7 @@ from tqdm import tqdm
 import limap.base as _base
 import limap.estimators as estimators
 import limap.line2d
-import limap.runners as _runners
+import limap.runners as runners
 import limap.util.io as limapio
 from limap.optimize.line_localization.functions import (
     filter_line_2to2_epipolarIoU,
@@ -176,10 +176,10 @@ def line_localization(
 
     # line detection of query images, fetch detection of
     # db images (generally already be detected during triangulation)
-    all_db_segs, _ = _runners.compute_2d_segs(
+    all_db_segs, _ = runners.compute_2d_segs(
         cfg, imagecols_db, compute_descinfo=False
     )
-    all_query_segs, _ = _runners.compute_2d_segs(
+    all_query_segs, _ = runners.compute_2d_segs(
         cfg, imagecols_query, compute_descinfo=False
     )
     all_db_lines = _base.get_all_lines_2d(all_db_segs)

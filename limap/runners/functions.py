@@ -346,7 +346,7 @@ def compute_matches(cfg, descinfo_folder, image_ids, neighbors):
     return matches_folder
 
 
-def compute_exhausive_matches(cfg, descinfo_folder, image_ids):
+def compute_exhaustive_matches(cfg, descinfo_folder, image_ids):
     """
     Match lines for each image with all the other images exhaustively
 

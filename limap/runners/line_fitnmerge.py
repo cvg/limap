@@ -9,7 +9,7 @@ import limap.base as _base
 import limap.fitting as fitting
 import limap.merging as merging
 import limap.optimize as optimize
-import limap.runners as _runners
+import limap.runners as runners
 import limap.util.io as limapio
 import limap.visualize as limapvis
 
@@ -155,7 +155,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     # assertion check
     assert imagecols.IsUndistorted()
     logging.info(f"[LOG] Number of images: {imagecols.NumImages()}")
-    cfg = _runners.setup(cfg)
+    cfg = runners.setup(cfg)
     detector_name = cfg["line2d"]["detector"]["method"]
     if cfg["fitting"]["var2d"] == -1:
         cfg["fitting"]["var2d"] = cfg["var2d"][detector_name]
@@ -173,7 +173,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     # [A] sfm metainfos (neighbors, ranges)
     ##########################################################
     if neighbors is None:
-        _, neighbors, ranges = _runners.compute_sfminfos(cfg, imagecols)
+        _, neighbors, ranges = runners.compute_sfminfos(cfg, imagecols)
     else:
         neighbors = imagecols.update_neighbors(neighbors)
         for img_id, _ in neighbors.items():
@@ -182,7 +182,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     ##########################################################
     # [B] get 2D line segments for each image
     ##########################################################
-    all_2d_segs, _ = _runners.compute_2d_segs(
+    all_2d_segs, _ = runners.compute_2d_segs(
         cfg, imagecols, compute_descinfo=cfg["line2d"]["compute_descinfo"]
     )
 
@@ -310,7 +310,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     return linetracks
 
 
-def line_fitting_with_3Dpoints(
+def line_fitting_with_points3d(
     cfg, imagecols, p3d_readers, inloc_read_transformations=False
 ):
     """
@@ -338,7 +338,7 @@ def line_fitting_with_3Dpoints(
     # assertion check
     assert imagecols.IsUndistorted()
     logging.info(f"[LOG] Number of images: {imagecols.NumImages()}")
-    cfg = _runners.setup(cfg)
+    cfg = runners.setup(cfg)
     detector_name = cfg["line2d"]["detector"]["method"]
     if cfg["fitting"]["var2d"] == -1:
         cfg["fitting"]["var2d"] = cfg["var2d"][detector_name]
@@ -355,7 +355,7 @@ def line_fitting_with_3Dpoints(
     ##########################################################
     # [A] get 2D line segments for each image
     ##########################################################
-    all_2d_segs, _ = _runners.compute_2d_segs(
+    all_2d_segs, _ = runners.compute_2d_segs(
         cfg, imagecols, compute_descinfo=cfg["line2d"]["compute_descinfo"]
     )
 

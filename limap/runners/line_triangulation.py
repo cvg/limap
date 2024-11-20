@@ -7,7 +7,7 @@ import limap.base as _base
 import limap.merging as merging
 import limap.optimize as optimize
 import limap.pointsfm as pointsfm
-import limap.runners as _runners
+import limap.runners as runners
 import limap.triangulation as triangulation
 import limap.util.io as limapio
 import limap.visualize as limapvis
@@ -33,13 +33,13 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
         list[:class:`limap.base.LineTrack`]: list of output 3D line tracks
     """
     logging.info(f"[LOG] Number of images: {imagecols.NumImages()}")
-    cfg = _runners.setup(cfg)
+    cfg = runners.setup(cfg)
     detector_name = cfg["line2d"]["detector"]["method"]
     if cfg["triangulation"]["var2d"] == -1:
         cfg["triangulation"]["var2d"] = cfg["var2d"][detector_name]
     # undistort images
     if not imagecols.IsUndistorted():
-        imagecols = _runners.undistort_images(
+        imagecols = runners.undistort_images(
             imagecols,
             os.path.join(cfg["dir_save"], cfg["undistortion_output_dir"]),
             skip_exists=cfg["load_undistort"] or cfg["skip_exists"],
@@ -62,7 +62,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     ##########################################################
     sfminfos_colmap_folder = None
     if neighbors is None:
-        sfminfos_colmap_folder, neighbors, ranges = _runners.compute_sfminfos(
+        sfminfos_colmap_folder, neighbors, ranges = runners.compute_sfminfos(
             cfg, imagecols
         )
     else:
@@ -83,7 +83,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     compute_descinfo = (
         compute_descinfo and (not cfg["load_match"]) and (not cfg["load_det"])
     ) or cfg["line2d"]["compute_descinfo"]
-    all_2d_segs, descinfo_folder = _runners.compute_2d_segs(
+    all_2d_segs, descinfo_folder = runners.compute_2d_segs(
         cfg, imagecols, compute_descinfo=compute_descinfo
     )
 
@@ -91,7 +91,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     # [C] get line matches
     ##########################################################
     if not cfg["triangulation"]["use_exhaustive_matcher"]:
-        matches_dir = _runners.compute_matches(
+        matches_dir = runners.compute_matches(
             cfg, descinfo_folder, imagecols.get_img_ids(), neighbors
         )
 
@@ -146,7 +146,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
                 "colmap_folder"
             ]
         reconstruction = pointsfm.PyReadCOLMAP(colmap_model_path)
-        all_bpt2ds, sfm_points = _runners.compute_2d_bipartites_from_colmap(
+        all_bpt2ds, sfm_points = runners.compute_2d_bipartites_from_colmap(
             reconstruction, imagecols, all_2d_lines, cfg["structures"]["bpt2d"]
         )
         Triangulator.SetBipartites2d(all_bpt2ds)
