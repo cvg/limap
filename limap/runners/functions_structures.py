@@ -4,7 +4,7 @@ import numpy as np
 from tqdm import tqdm
 
 import limap.pointsfm as pointsfm
-import limap.structures as _structures
+import limap.structures as structures
 
 
 def compute_2d_feature_points_sp(imagecols, output_path="tmp/featurepoints"):
@@ -56,9 +56,9 @@ def compute_colmap_model_with_junctions(
 ):
     all_keypoints = compute_2d_feature_points_sp(imagecols)
     all_keypoints_updated = {}
-    config_bpt2d = _structures.PL_Bipartite2dConfig(cfg_bpt2d)
+    config_bpt2d = structures.PL_Bipartite2dConfig(cfg_bpt2d)
     for img_id in imagecols.get_img_ids():
-        bpt2d = _structures.PL_Bipartite2d(config_bpt2d)
+        bpt2d = structures.PL_Bipartite2d(config_bpt2d)
         bpt2d.init_lines(all_2d_lines[img_id])
         keypoints = all_keypoints[img_id]
         bpt2d.compute_intersection_with_points(keypoints)
@@ -82,7 +82,7 @@ def compute_2d_bipartites_from_colmap(
     if cfg is None:
         cfg = dict()
     all_bpt2ds = {}
-    cfg_bpt2d = _structures.PL_Bipartite2dConfig(cfg)
+    cfg_bpt2d = structures.PL_Bipartite2dConfig(cfg)
     colmap_cameras, colmap_images, colmap_points = (
         reconstruction["cameras"],
         reconstruction["images"],
@@ -109,7 +109,7 @@ def compute_2d_bipartites_from_colmap(
             xys[:, 1] = xys[:, 1] * new_size[1] / orig_size[1]
 
         # init bpt2d
-        bpt2d = _structures.PL_Bipartite2d(cfg_bpt2d)
+        bpt2d = structures.PL_Bipartite2d(cfg_bpt2d)
         bpt2d.init_lines(all_2d_lines[img_id])
         bpt2d.add_keypoints_with_point3D_ids(
             xys[mask], point3D_ids[mask], indexes[mask]

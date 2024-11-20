@@ -10,7 +10,7 @@ import limap.base as _base
 import limap.optimize as _optim
 import limap.pointsfm as pointsfm
 import limap.runners
-import limap.structures as _structures
+import limap.structures as structures
 import limap.util.config as cfgutils
 import limap.util.io as limapio
 import limap.visualize as limapvis
@@ -81,7 +81,7 @@ def pointline_association(cfg, input_folder, output_folder, colmap_folder):
         vptrack_constructor = vplib.GlobalVPTrackConstructor()
         vptrack_constructor.Init(vpresults)
         vptracks = vptrack_constructor.ClusterLineTracks(linetracks, imagecols)
-        all_bpt2ds_vp = _structures.GetAllBipartites_VPLine2d(
+        all_bpt2ds_vp = structures.GetAllBipartites_VPLine2d(
             all_2d_lines, vpresults, vptracks
         )
 
@@ -120,7 +120,7 @@ def pointline_association(cfg, input_folder, output_folder, colmap_folder):
                 break
 
             # run optimization on the merged vptracks
-            all_bpt2ds_vp_opt = _structures.GetAllBipartites_VPLine2d(
+            all_bpt2ds_vp_opt = structures.GetAllBipartites_VPLine2d(
                 all_2d_lines, vpresults, vptracks_opt_merged
             )
             associator.InitVPTracks(vptracks_opt_merged)
