@@ -3,7 +3,7 @@ import sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import limap.base as _base
-import limap.pointsfm as _psfm
+from limap.pointsfm import model_converter as model_converter
 import limap.util.io as limapio
 
 if __name__ == "__main__":
@@ -25,8 +25,8 @@ if __name__ == "__main__":
         imagecols = limapio.read_npy(args.input_path).item()
         if isinstance(imagecols, dict):
             imagecols = _base.ImageCollection(imagecols)
-        _psfm.convert_imagecols_to_colmap(imagecols, args.output_path)
+        model_converter.convert_imagecols_to_colmap(imagecols, args.output_path)
     elif args.type == "colmap2vsfm":
-        _psfm.convert_colmap_to_visualsfm(args.input_path, args.output_path)
+        model_converter.convert_colmap_to_visualsfm(args.input_path, args.output_path)
     else:
         raise NotImplementedError

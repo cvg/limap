@@ -8,7 +8,7 @@ import numpy as np
 from tqdm import tqdm
 
 import limap.base as _base
-import limap.undistortion as _undist
+import limap.undistortion as undistortion
 
 data_dir = os.path.expanduser("~/data/Localization/Aachen-1.1")
 img_orig_dir = os.path.join(data_dir, "images_upright")
@@ -51,7 +51,7 @@ def process(image_list, cameras):
             path = os.path.dirname(imname_undist)
             if not os.path.exists(path):
                 os.makedirs(path)
-            camera_undistorted = _undist.UndistortImageCamera(
+            camera_undistorted = undistortion.undistort_image_camera(
                 camera, imname_orig, imname_undist
             )
             img = cv2.imread(imname_undist)
