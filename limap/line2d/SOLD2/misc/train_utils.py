@@ -2,6 +2,7 @@
 This file contains some useful functions for train / val.
 """
 
+import logging
 import os
 
 import numpy as np
@@ -59,7 +60,7 @@ def remove_old_checkpoints(checkpoint_root, max_ckpt=15):
         for _ in remove_list:
             full_name = os.path.join(checkpoint_root, _)
             os.remove(full_name)
-            print("[Debug] Remove outdated checkpoint %s" % (full_name))
+            logging.info("[Debug] Remove outdated checkpoint %s" % (full_name))
 
 
 ################

@@ -1,3 +1,4 @@
+import logging
 import os
 
 import numpy as np
@@ -40,7 +41,7 @@ class GlueStickMatcher(BaseMatcher):
             os.makedirs(os.path.dirname(path))
         link = "https://github.com/cvg/GlueStick/releases/download/v0.1_arxiv/checkpoint_GlueStick_MD.tar"
         cmd = ["wget", link, "-O", path]
-        print("Downloading GlueStick model...")
+        logging.info("Downloading GlueStick model...")
         subprocess.run(cmd, check=True)
 
     def get_module_name(self):

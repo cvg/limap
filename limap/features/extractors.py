@@ -1,5 +1,6 @@
 # [NOTE] modified from the pixel-perfect-sfm project
 
+import logging
 import sys
 import time
 
@@ -131,14 +132,13 @@ class DSIFTExtractor(Extractor):
             .permute(2, 0, 1)
             .unsqueeze(0)
         )
-        print(res.shape, image_batch.shape)
+        logging.info(res.shape, image_batch.shape)
         return [res]
 
     def adapt_image(self, pil_img: PIL.Image) -> torch.Tensor:
-        print("HELLO")
         t = time.time()
         res = to_grayscale(pil_img).unsqueeze(0)
-        print(time.time() - t)
+        logging.info(time.time() - t)
         return res
 
 

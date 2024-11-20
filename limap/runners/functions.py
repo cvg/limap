@@ -1,5 +1,5 @@
+import logging
 import os
-import warnings
 
 from tqdm import tqdm
 
@@ -18,11 +18,11 @@ def setup(cfg):
         folder_load = folder_save
     cfg["dir_save"] = folder_save
     cfg["dir_load"] = folder_load
-    print("[LOG] Output dir: {}".format(cfg["dir_save"]))
-    print("[LOG] Loading dir: {}".format(cfg["dir_load"]))
+    logging.info("[LOG] Output dir: {}".format(cfg["dir_save"]))
+    logging.info("[LOG] Loading dir: {}".format(cfg["dir_load"]))
     if "weight_path" in cfg and cfg["weight_path"] is not None:
         cfg["weight_path"] = os.path.expanduser(cfg["weight_path"])
-        print("[LOG] weight dir: {}".format(cfg["weight_path"]))
+        logging.info("[LOG] weight dir: {}".format(cfg["weight_path"]))
     return cfg
 
 
@@ -57,7 +57,7 @@ def undistort_images(
     loaded_ids = []
     unload_ids = imagecols.get_img_ids()
     if skip_exists:
-        print(
+        logging.info(
             f"[LOG] Loading undistorted images \
              (n_images = {imagecols.NumImages()})..."
         )
@@ -78,7 +78,9 @@ def undistort_images(
     # start undistortion
     if n_jobs == -1:
         n_jobs = os.cpu_count()
-    print(f"[LOG] Start undistorting images (n_images = {len(unload_ids)})...")
+    logging.info(
+        f"[LOG] Start undistorting images (n_images = {len(unload_ids)})..."
+    )
     import cv2
     import imagesize
     import joblib
@@ -209,7 +211,7 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
     """
     weight_path = cfg.get("weight_path", None)
     if "extractor" in cfg["line2d"]:
-        print(
+        logging.info(
             "[LOG] Start 2D line detection and description \
              (detector = {}, extractor = {}, n_images = {})...".format(
                 cfg["line2d"]["detector"]["method"],
@@ -218,7 +220,7 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
             )
         )
     else:
-        print(
+        logging.info(
             "[LOG] Start 2D line detection and description \
              (detector = {}, n_images = {})...".format(
                 cfg["line2d"]["detector"]["method"], imagecols.NumImages()
@@ -227,7 +229,7 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
     import limap.line2d
 
     if not imagecols.IsUndistorted():
-        warnings.warn("The input images are distorted!", stacklevel=2)
+        logging.warning("The input images are distorted!", stacklevel=2)
     basedir = os.path.join(
         "line_detections", cfg["line2d"]["detector"]["method"]
     )
@@ -302,7 +304,7 @@ def compute_matches(cfg, descinfo_folder, image_ids, neighbors):
         matches_folder (str): path to store the computed matches
     """
     weight_path = cfg.get("weight_path", None)
-    print(
+    logging.info(
         "[LOG] Start matching 2D lines... (extractor = {}, matcher = {}, \
          n_images = {}, n_neighbors = {})".format(
             cfg["line2d"]["extractor"]["method"],
@@ -355,7 +357,7 @@ def compute_exhausive_matches(cfg, descinfo_folder, image_ids):
     Returns:
         matches_folder (str): path to store the computed matches
     """
-    print(
+    logging.info(
         "[LOG] Start exhausive matching 2D lines... \
          (extractor = {}, matcher = {}, n_images = {})".format(
             cfg["line2d"]["extractor"]["method"],

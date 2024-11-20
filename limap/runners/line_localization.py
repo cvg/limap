@@ -1,3 +1,4 @@
+import logging
 import os
 from collections import defaultdict
 
@@ -245,7 +246,7 @@ def line_localization(
         )
 
     # Localization
-    print("[LOG] Starting localization with points+lines...")
+    logging.info("[LOG] Starting localization with points+lines...")
     final_poses = {}
     pose_dir = results_path.parent / "poses_{}".format(
         cfg["localization"]["2d_matcher"]

@@ -31,6 +31,7 @@
 
 import argparse
 import collections
+import logging
 import os
 import struct
 
@@ -480,7 +481,7 @@ def detect_model_format(path, ext):
         and os.path.isfile(os.path.join(path, "images" + ext))
         and os.path.isfile(os.path.join(path, "points3D" + ext))
     ):
-        print("Detected model format: '" + ext + "'")
+        logging.info("Detected model format: '" + ext + "'")
         return True
 
     return False
@@ -494,7 +495,7 @@ def read_model(path, ext=""):
         elif detect_model_format(path, ".txt"):
             ext = ".txt"
         else:
-            print("Provide model format: '.bin' or '.txt'")
+            logging.info("Provide model format: '.bin' or '.txt'")
             return
 
     if ext == ".txt":
@@ -586,9 +587,9 @@ def main():
         path=args.input_model, ext=args.input_format
     )
 
-    print("num_cameras:", len(cameras))
-    print("num_images:", len(images))
-    print("num_points3D:", len(points3D))
+    logging.info("num_cameras:", len(cameras))
+    logging.info("num_images:", len(images))
+    logging.info("num_points3D:", len(points3D))
 
     if args.output_model is not None:
         write_model(

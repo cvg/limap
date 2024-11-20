@@ -1,4 +1,5 @@
 import copy
+import logging
 import os
 import shutil
 import subprocess
@@ -161,7 +162,7 @@ def run_colmap_sfm(
 
     ### initialize sparse folder
     if skip_exists and os.path.exists(output_path):
-        print("[COLMAP] Skipping mapping")
+        logging.info("[COLMAP] Skipping mapping")
         return
     if os.path.exists(output_path):
         shutil.rmtree(output_path)
@@ -234,7 +235,7 @@ def run_colmap_sfm_with_known_poses(
 
     ### initialize sparse folder
     if skip_exists and os.path.exists(point_triangulation_path):
-        print("[COLMAP] Skipping point triangulation")
+        logging.info("[COLMAP] Skipping point triangulation")
         return Path(point_triangulation_path)
     if os.path.exists(output_path):
         shutil.rmtree(output_path)

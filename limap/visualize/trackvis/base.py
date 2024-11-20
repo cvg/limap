@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 
 from ..vis_utils import test_line_inside_ranges
@@ -23,7 +25,7 @@ class BaseTrackVisualizer:
 
     def report_stats(self):
         counts = np.array(self.counts)
-        print(
+        logging.info(
             f"[Track Report] (N2, N4, N6, N8, N10, N20, N50) = \
               ({counts[counts >= 2].shape[0]}, \
               {counts[counts >= 4].shape[0]}, \
@@ -39,11 +41,11 @@ class BaseTrackVisualizer:
         counts_lines = np.array(self.counts_lines)
         arr = counts[counts >= n_visible_views]
         arr_lines = counts_lines[counts >= n_visible_views]
-        print(
+        logging.info(
             f"average supporting images (>= {n_visible_views}): \
               {arr.sum()} / {arr.shape[0]} = {arr.mean():.2f}"
         )
-        print(
+        logging.info(
             f"average supporting lines (>= {n_visible_views}): \
               {arr_lines.sum()} / {arr_lines.shape[0]} = {arr_lines.mean():.2f}"
         )

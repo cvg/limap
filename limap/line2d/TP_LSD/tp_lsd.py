@@ -1,3 +1,4 @@
+import logging
 import os
 
 import cv2
@@ -39,7 +40,7 @@ class TPLSDDetector(BaseDetector):
             os.makedirs(os.path.dirname(path))
         link = "https://github.com/Siyuada7/TP-LSD/blob/master/pretraineds/Res512.pth?raw=true"
         cmd = ["wget", link, "-O", path]
-        print("Downloading TP_LSD model...")
+        logging.info("Downloading TP_LSD model...")
         subprocess.run(cmd, check=True)
 
     def get_module_name(self):

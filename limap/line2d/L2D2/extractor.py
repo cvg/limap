@@ -1,3 +1,4 @@
+import logging
 import os
 
 import cv2
@@ -43,7 +44,7 @@ class L2D2Extractor(BaseDetector):
             os.makedirs(os.path.dirname(path))
         link = "https://github.com/hichem-abdellali/L2D2/blob/main/IN_OUT_DATA/INPUT_NETWEIGHT/checkpoint_line_descriptor.th?raw=true"
         cmd = ["wget", link, "-O", path]
-        print("Downloading L2D2 model...")
+        logging.info("Downloading L2D2 model...")
         subprocess.run(cmd, check=True)
 
     def get_module_name(self):

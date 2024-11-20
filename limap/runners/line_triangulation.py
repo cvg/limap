@@ -1,3 +1,4 @@
+import logging
 import os
 
 from tqdm import tqdm
@@ -31,7 +32,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     Returns:
         list[:class:`limap.base.LineTrack`]: list of output 3D line tracks
     """
-    print(f"[LOG] Number of images: {imagecols.NumImages()}")
+    logging.info(f"[LOG] Number of images: {imagecols.NumImages()}")
     cfg = _runners.setup(cfg)
     detector_name = cfg["line2d"]["detector"]["method"]
     if cfg["triangulation"]["var2d"] == -1:
@@ -152,7 +153,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
         if cfg["triangulation"]["use_pointsfm"]["use_triangulated_points"]:
             Triangulator.SetSfMPoints(sfm_points)
     # triangulate
-    print("Start multi-view triangulation...")
+    logging.info("Start multi-view triangulation...")
     for img_id in tqdm(imagecols.get_img_ids()):
         if cfg["triangulation"]["use_exhaustive_matcher"]:
             Triangulator.TriangulateImageExhaustiveMatch(

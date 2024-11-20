@@ -58,7 +58,7 @@ def print_gpu_memory():
     a = torch.cuda.memory_allocated(0)
     f = r - a  # free inside reserved
 
-    print(np.array([t, r, a, f]) / 2**30)
+    logging.info(np.array([t, r, a, f]) / 2**30)
 
 
 class AdapLayers(nn.Module):
@@ -73,7 +73,7 @@ class AdapLayers(nn.Module):
         super().__init__()
         self.layers = []
         channel_sizes = [vgg16_layers[name] for name in hypercolumn_layers]
-        print(channel_sizes)
+        logging.info(channel_sizes)
         for i, ll in enumerate(channel_sizes):
             layer = nn.Sequential(
                 nn.Conv2d(ll, 64, kernel_size=1, stride=1, padding=0),
@@ -115,7 +115,7 @@ class S2DNet(BaseModel):
         layers = list(vgg16.features.children())[:num_layers]
 
         self.encoder = nn.ModuleList(layers)
-        print(self.encoder)
+        logging.info(self.encoder)
         self.scales = []
         current_scale = 0
         for i, layer in enumerate(layers):
@@ -148,7 +148,7 @@ class S2DNet(BaseModel):
             "https://www.dropbox.com/s/hnv51iwu4hn82rj/s2dnet_weights.pth?dl=0"
         )
         cmd = ["wget", link, "-O", path]
-        print("Downloading S2DNet model...")
+        logging.info("Downloading S2DNet model...")
         subprocess.run(cmd, check=True)
 
     def _forward(self, data):

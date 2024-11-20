@@ -1,3 +1,4 @@
+import logging
 import os
 
 import numpy as np
@@ -44,7 +45,7 @@ class DeepLSDDetector(BaseDetector):
             os.makedirs(os.path.dirname(path))
         link = "https://cvg-data.inf.ethz.ch/DeepLSD/deeplsd_md.tar"
         cmd = ["wget", link, "-O", path]
-        print("Downloading DeepLSD model...")
+        logging.info("Downloading DeepLSD model...")
         subprocess.run(cmd, check=True)
 
     def get_module_name(self):

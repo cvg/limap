@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 
@@ -79,7 +80,7 @@ def read_ply(fname):
     y = np.asarray(plydata.elements[0].data["y"])
     z = np.asarray(plydata.elements[0].data["z"])
     points = np.stack([x, y, z], axis=1)
-    print(f"number of points: {points.shape[0]}")
+    logging.info(f"number of points: {points.shape[0]}")
     return points
 
 
@@ -252,7 +253,7 @@ def save_l3dpp(folder, imagecols, all_2d_segs):
             for line_id in range(n_segments):
                 line = segs[line_id]
                 f.write(f"{line[0]} {line[1]} {line[2]} {line[3]}\n")
-        print(f"Writing for L3DPP: {fname}")
+        logging.info(f"Writing for L3DPP: {fname}")
 
 
 def save_txt_linetracks(fname, linetracks, n_visible_views=4):
@@ -264,7 +265,7 @@ def save_txt_linetracks(fname, linetracks, n_visible_views=4):
     linetracks = [
         track for track in linetracks if track.count_images() >= n_visible_views
     ]
-    print("Writing all linetracks to a single file...")
+    logging.info("Writing all linetracks to a single file...")
     n_tracks = len(linetracks)
     with open(fname, "w") as f:
         f.write(f"{n_tracks}\n")
@@ -295,7 +296,7 @@ def save_folder_linetracks(folder, linetracks):
     if os.path.exists(folder):
         shutil.rmtree(folder)
     os.makedirs(folder)
-    print(f"Writing linetracks to {folder}...")
+    logging.info(f"Writing linetracks to {folder}...")
     n_tracks = len(linetracks)
     for track_id in tqdm(range(n_tracks)):
         fname = os.path.join(folder, f"track_{track_id}.txt")
@@ -309,7 +310,7 @@ def read_folder_linetracks(folder):
     for fname in flist:
         if fname[-4:] == ".txt" and fname[:5] == "track":
             n_tracks += 1
-    print(f"Read linetracks from {folder}...")
+    logging.info(f"Read linetracks from {folder}...")
     linetracks = []
     for track_id in range(n_tracks):
         fname = os.path.join(folder, f"track_{track_id}.txt")

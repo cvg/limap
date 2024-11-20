@@ -1,3 +1,4 @@
+import logging
 import os
 
 import joblib
@@ -153,7 +154,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     """
     # assertion check
     assert imagecols.IsUndistorted()
-    print(f"[LOG] Number of images: {imagecols.NumImages()}")
+    logging.info(f"[LOG] Number of images: {imagecols.NumImages()}")
     cfg = _runners.setup(cfg)
     detector_name = cfg["line2d"]["detector"]["method"]
     if cfg["fitting"]["var2d"] == -1:
@@ -334,7 +335,7 @@ def line_fitting_with_3Dpoints(
     """
     # assertion check
     assert imagecols.IsUndistorted()
-    print(f"[LOG] Number of images: {imagecols.NumImages()}")
+    logging.info(f"[LOG] Number of images: {imagecols.NumImages()}")
     cfg = _runners.setup(cfg)
     detector_name = cfg["line2d"]["detector"]["method"]
     if cfg["fitting"]["var2d"] == -1:

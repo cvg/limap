@@ -40,6 +40,7 @@
 # --------------------------------------------------------------------*/
 # %BANNER_END%
 
+import logging
 import os
 from copy import deepcopy
 from pathlib import Path
@@ -224,7 +225,7 @@ class SuperGlue(nn.Module):
         if not os.path.isfile(path):
             self.download_model(path)
         self.load_state_dict(torch.load(str(path)))
-        print(
+        logging.info(
             'Loaded SuperGlue model ("{}" weights)'.format(
                 self.config["weights"]
             )
@@ -236,7 +237,7 @@ class SuperGlue(nn.Module):
         if not os.path.exists(os.path.dirname(path)):
             os.makedirs(os.path.dirname(path))
         model_name = os.path.basename(path)
-        print(f"Downloading SuperGlue model {model_name}...")
+        logging.info(f"Downloading SuperGlue model {model_name}...")
         link = f"https://github.com/magicleap/SuperGluePretrainedNetwork/blob/master/models/weights/{model_name}?raw=true"
         cmd = ["wget", link, "-O", path]
         subprocess.run(cmd, check=True)

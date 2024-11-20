@@ -1,4 +1,5 @@
 import copy
+import logging
 import os
 
 import cv2
@@ -378,12 +379,12 @@ def report_dist_reprojection(line3d, line2d, camview, prefix=None):
     )
     sensitivity = line3d.sensitivity(camview)
     if prefix is None:
-        print(
+        logging.info(
             f"angle = {angle:.4f}, perp = {perp_dist:.4f}, \
               overlap = {overlap:.4f}, sensi = {sensitivity:.4f}"
         )
     else:
-        print(
+        logging.info(
             f"{prefix}: angle = {angle:.4f}, perp = {perp_dist:.4f}, \
               overlap = {overlap:.4f}, sensi = {sensitivity:.4f}"
         )
@@ -400,7 +401,7 @@ def visualize_2d_line(fname, imagecols, all_lines_2d, img_id, line_id):
 def visualize_line_track(
     imagecols, linetrack, prefix="linetrack", report=False
 ):
-    print(
+    logging.info(
         f"[VISUALIZE]: line length: {linetrack.line.length()}, \
           num_supporting_lines: {len(linetrack.image_id_list)}"
     )

@@ -1,3 +1,4 @@
+import logging
 import os
 
 import cv2
@@ -45,7 +46,7 @@ class HAWPv3Detector(BaseDetector):
             os.makedirs(os.path.dirname(path))
         link = "https://github.com/cherubicXN/hawp-torchhub/releases/download/HAWPv3/hawpv3-fdc5487a.pth"
         cmd = ["wget", link, "-O", path]
-        print("Downloading HAWPv3 model...")
+        logging.info("Downloading HAWPv3 model...")
         subprocess.run(cmd, check=True)
 
     def get_module_name(self):
