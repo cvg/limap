@@ -8,7 +8,7 @@ import limap.base as _base
 import limap.optimize as _optim
 import limap.util.config as cfgutils
 import limap.util.io as limapio
-import limap.vplib as _vplib
+import limap.vplib as vplib
 
 
 def one_by_one_refinement(cfg):
@@ -26,7 +26,7 @@ def one_by_one_refinement(cfg):
     # vp
     vpresults = None
     if cfg["refinement"]["use_vp"]:
-        vpdetector = _vplib.get_vp_detector(
+        vpdetector = vplib.get_vp_detector(
             cfg["refinement"]["vpdet"],
             n_jobs=cfg["refinement"]["vpdet"]["n_jobs"],
         )

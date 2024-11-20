@@ -10,7 +10,7 @@ import limap.runners as _runners
 import limap.triangulation as _tri
 import limap.util.io as limapio
 import limap.visualize as limapvis
-import limap.vplib as _vplib
+import limap.vplib as vplib
 
 
 def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
@@ -96,7 +96,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     all_2d_lines = _base.get_all_lines_2d(all_2d_segs)
     Triangulator.Init(all_2d_lines, imagecols)
     if cfg["triangulation"]["use_vp"]:
-        vpdetector = _vplib.get_vp_detector(
+        vpdetector = vplib.get_vp_detector(
             cfg["triangulation"]["vpdet_config"],
             n_jobs=cfg["triangulation"]["vpdet_config"]["n_jobs"],
         )

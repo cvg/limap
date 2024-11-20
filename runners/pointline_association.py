@@ -14,7 +14,7 @@ import limap.structures as _structures
 import limap.util.config as cfgutils
 import limap.util.io as limapio
 import limap.visualize as limapvis
-import limap.vplib as _vplib
+import limap.vplib as vplib
 
 
 def report_vp(vpresults, vptracks, print_pairs=False):
@@ -69,7 +69,7 @@ def pointline_association(cfg, input_folder, output_folder, colmap_folder):
     ############################################################
     if cfg["global_pl_association"]["use_vp"]:
         # detect vp
-        vpdetector = _vplib.get_vp_detector(
+        vpdetector = vplib.get_vp_detector(
             cfg["global_pl_association"]["vpdet"],
             n_jobs=cfg["global_pl_association"]["vpdet"]["n_jobs"],
         )
@@ -78,7 +78,7 @@ def pointline_association(cfg, input_folder, output_folder, colmap_folder):
         )
 
         # build vanishing point tracks
-        vptrack_constructor = _vplib.GlobalVPTrackConstructor()
+        vptrack_constructor = vplib.GlobalVPTrackConstructor()
         vptrack_constructor.Init(vpresults)
         vptracks = vptrack_constructor.ClusterLineTracks(linetracks, imagecols)
         all_bpt2ds_vp = _structures.GetAllBipartites_VPLine2d(
@@ -113,7 +113,7 @@ def pointline_association(cfg, input_folder, output_folder, colmap_folder):
             vptracks_opt = [
                 vptrack for (idx, vptrack) in vptracks_opt_map.items()
             ]
-            vptracks_opt_merged = _vplib.MergeVPTracksByDirection(
+            vptracks_opt_merged = vplib.MergeVPTracksByDirection(
                 vptracks_opt, 1.0
             )
             if len(vptracks_opt_merged) == len(vptracks_opt):
