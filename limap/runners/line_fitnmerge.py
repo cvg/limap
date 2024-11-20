@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 import limap.base as _base
 import limap.fitting as fitting
-import limap.merging as _mrg
+import limap.merging as merging
 import limap.optimize as _optim
 import limap.runners as _runners
 import limap.util.io as limapio
@@ -200,7 +200,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     linker = _base.LineLinker(
         cfg["merging"]["linker2d"], cfg["merging"]["linker3d"]
     )
-    graph, linetracks = _mrg.merging(
+    graph, linetracks = merging.merging(
         linker,
         all_2d_segs,
         imagecols,
@@ -208,7 +208,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
         neighbors,
         var2d=cfg["merging"]["var2d"],
     )
-    linetracks = _mrg.filtertracksbyreprojection(
+    linetracks = merging.filter_tracks_by_reprojection(
         linetracks,
         imagecols,
         cfg["filtering2d"]["th_angular_2d"],
@@ -217,8 +217,10 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
     )
     if not cfg["remerging"]["disable"]:
         linker3d_remerge = _base.LineLinker3d(cfg["remerging"]["linker3d"])
-        linetracks = _mrg.remerge(linker3d_remerge, linetracks, num_outliers=0)
-        linetracks = _mrg.filtertracksbyreprojection(
+        linetracks = merging.remerge(
+            linker3d_remerge, linetracks, num_outliers=0
+        )
+        linetracks = merging.filter_tracks_by_reprojection(
             linetracks,
             imagecols,
             cfg["filtering2d"]["th_angular_2d"],

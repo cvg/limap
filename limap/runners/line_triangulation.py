@@ -3,7 +3,7 @@ import os
 from tqdm import tqdm
 
 import limap.base as _base
-import limap.merging as _mrg
+import limap.merging as merging
 import limap.optimize as _optim
 import limap.pointsfm as pointsfm
 import limap.runners as _runners
@@ -160,7 +160,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     linetracks = Triangulator.ComputeLineTracks()
 
     # filtering 2d supports
-    linetracks = _mrg.filtertracksbyreprojection(
+    linetracks = merging.filter_tracks_by_reprojection(
         linetracks,
         imagecols,
         cfg["triangulation"]["filtering2d"]["th_angular_2d"],
@@ -171,20 +171,20 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
         linker3d = _base.LineLinker3d(
             cfg["triangulation"]["remerging"]["linker3d"]
         )
-        linetracks = _mrg.remerge(linker3d, linetracks)
-        linetracks = _mrg.filtertracksbyreprojection(
+        linetracks = merging.remerge(linker3d, linetracks)
+        linetracks = merging.filter_tracks_by_reprojection(
             linetracks,
             imagecols,
             cfg["triangulation"]["filtering2d"]["th_angular_2d"],
             cfg["triangulation"]["filtering2d"]["th_perp_2d"],
         )
-    linetracks = _mrg.filtertracksbysensitivity(
+    linetracks = merging.filter_tracks_by_sensitivity(
         linetracks,
         imagecols,
         cfg["triangulation"]["filtering2d"]["th_sv_angular_3d"],
         cfg["triangulation"]["filtering2d"]["th_sv_num_supports"],
     )
-    linetracks = _mrg.filtertracksbyoverlap(
+    linetracks = merging.filter_tracks_by_overlap(
         linetracks,
         imagecols,
         cfg["triangulation"]["filtering2d"]["th_overlap"],
