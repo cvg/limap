@@ -5,7 +5,7 @@ import numpy as np
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import limap.base as _base
-import limap.pointsfm as _psfm
+import limap.pointsfm as pointsfm
 import limap.runners
 import limap.util.config as cfgutils
 import limap.util.io as limapio
@@ -22,7 +22,7 @@ def read_scene_bundler(
     ):
         cfg["info_path"] = os.path.join(output_dir, metainfos_filename)
     if cfg["info_path"] is None:
-        imagecols, neighbors, ranges = _psfm.read_infos_bundler(
+        imagecols, neighbors, ranges = pointsfm.read_infos_bundler(
             cfg["sfm"],
             bundler_path,
             list_path,

@@ -3,7 +3,7 @@ import os
 import numpy as np
 from tqdm import tqdm
 
-import limap.pointsfm as _psfm
+import limap.pointsfm as pointsfm
 import limap.structures as _structures
 
 
@@ -65,7 +65,7 @@ def compute_colmap_model_with_junctions(
         intersections = [point2d.p for point2d in bpt2d.get_all_points()]
         new_keypoints = np.concatenate([keypoints, np.array(intersections)], 0)
         all_keypoints_updated[img_id] = new_keypoints
-    _psfm.run_colmap_sfm_with_known_poses(
+    pointsfm.run_colmap_sfm_with_known_poses(
         cfg_sfm,
         imagecols,
         output_path=output_model_path,

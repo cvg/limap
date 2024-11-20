@@ -23,7 +23,7 @@ from hloc.utils.read_write_model import read_model, write_model
 from tqdm import tqdm
 
 import limap.base as _base
-import limap.pointsfm as _psfm
+import limap.pointsfm as pointsfm
 import limap.util.io as limapio
 
 ###############################################################################
@@ -208,7 +208,7 @@ def read_scene_7scenes(cfg, root_path, model_path, image_path, n_neighbors=20):
     ):
         cfg["info_path"] = os.path.join(output_dir, metainfos_filename)
     if cfg["info_path"] is None:
-        imagecols, neighbors, ranges = _psfm.read_infos_colmap(
+        imagecols, neighbors, ranges = pointsfm.read_infos_colmap(
             cfg["sfm"],
             root_path,
             model_path,

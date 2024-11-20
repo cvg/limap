@@ -11,7 +11,7 @@ sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
 import limap.optimize
-import limap.pointsfm
+import limap.pointsfm as pointsfm
 import limap.runners
 import limap.util.config as cfgutils
 import limap.util.evaluation as limapeval
@@ -25,16 +25,14 @@ def run_scene_hypersim(cfg, dataset, scene_id, cam_id=0):
     )
 
     # run colmap
-    import limap.pointsfm as _psfm
-
     cfg = limap.runners.setup(cfg)
     global_dir_save = cfg["dir_save"]
     limapio.save_npy(
         os.path.join(global_dir_save, "imagecols_gt.npy"), imagecols_gt
     )
     colmap_path = os.path.join(cfg["dir_save"], "colmap_sfm")
-    # _psfm.run_colmap_sfm(cfg["sfm"], imagecols_gt, output_path=colmap_path, skip_exists=cfg["skip_exists"], map_to_original_image_names=False)
-    imagecols, _, _ = _psfm.read_infos_colmap(
+    # pointsfm.run_colmap_sfm(cfg["sfm"], imagecols_gt, output_path=colmap_path, skip_exists=cfg["skip_exists"], map_to_original_image_names=False)
+    imagecols, _, _ = pointsfm.read_infos_colmap(
         cfg["sfm"], colmap_path, model_path="sparse/0", image_path="images"
     )
     limapio.save_npy(
@@ -54,8 +52,8 @@ def run_scene_hypersim(cfg, dataset, scene_id, cam_id=0):
 
     # run joint ba
     colmap_folder = os.path.join(colmap_path, "sparse/0")
-    reconstruction = limap.pointsfm.PyReadCOLMAP(colmap_folder)
-    pointtracks = limap.pointsfm.ReadPointTracks(reconstruction)
+    reconstruction = pointsfm.PyReadCOLMAP(colmap_folder)
+    pointtracks = pointsfm.ReadPointTracks(reconstruction)
     cfg_ba = limap.optimize.HybridBAConfig()
     ba_engine = limap.optimize.solve_hybrid_bundle_adjustment(
         cfg_ba, imagecols, pointtracks, linetracks

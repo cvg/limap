@@ -20,7 +20,7 @@ from hloc import (
 from tqdm import tqdm
 
 import limap.base as _base
-import limap.pointsfm as _psfm
+import limap.pointsfm as pointsfm
 import limap.util.io as limapio
 
 
@@ -35,7 +35,7 @@ def read_scene_visualsfm(
     ):
         cfg["info_path"] = os.path.join(output_dir, metainfos_filename)
     if cfg["info_path"] is None:
-        imagecols, neighbors, ranges = _psfm.read_infos_visualsfm(
+        imagecols, neighbors, ranges = pointsfm.read_infos_visualsfm(
             cfg["sfm"], vsfm_path, nvm_file=nvm_file, n_neighbors=n_neighbors
         )
         with open(os.path.join(output_dir, metainfos_filename), "wb") as f:
@@ -312,7 +312,7 @@ def run_hloc_cambridge(
         logger.info("Running COLMAP for 3D points...")
     neighbors_train = imagecols_train.update_neighbors(neighbors)
 
-    ref_sfm_path = _psfm.run_colmap_sfm_with_known_poses(
+    ref_sfm_path = pointsfm.run_colmap_sfm_with_known_poses(
         cfg["sfm"],
         imagecols_train,
         os.path.join(cfg["output_dir"], "tmp_colmap"),

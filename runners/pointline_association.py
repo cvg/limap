@@ -8,7 +8,7 @@ import numpy as np
 
 import limap.base as _base
 import limap.optimize as _optim
-import limap.pointsfm as _psfm
+import limap.pointsfm as pointsfm
 import limap.runners
 import limap.structures as _structures
 import limap.util.config as cfgutils
@@ -58,8 +58,8 @@ def pointline_association(cfg, input_folder, output_folder, colmap_folder):
     # Point-line bipartite
     ############################################################
     # initiate point-line bipartites on 2d for each image
-    reconstruction = _psfm.PyReadCOLMAP(colmap_folder)
-    pointtracks = _psfm.ReadPointTracks(reconstruction)
+    reconstruction = pointsfm.PyReadCOLMAP(colmap_folder)
+    pointtracks = pointsfm.ReadPointTracks(reconstruction)
     all_bpt2ds, _ = limap.runners.compute_2d_bipartites_from_colmap(
         reconstruction, imagecols, all_2d_lines
     )

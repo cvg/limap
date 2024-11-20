@@ -5,7 +5,7 @@ from tqdm import tqdm
 import limap.base as _base
 import limap.merging as _mrg
 import limap.optimize as _optim
-import limap.pointsfm as _psfm
+import limap.pointsfm as pointsfm
 import limap.runners as _runners
 import limap.triangulation as _tri
 import limap.util.io as limapio
@@ -116,7 +116,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
                 colmap_model_path = os.path.join(
                     sfminfos_colmap_folder, "sparse"
                 )
-                if not _psfm.check_exists_colmap_model(colmap_model_path):
+                if not pointsfm.check_exists_colmap_model(colmap_model_path):
                     colmap_model_path = None
             # retriangulate
             if colmap_model_path is None:
@@ -126,7 +126,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
                 input_neighbors = None
                 if cfg["triangulation"]["use_pointsfm"]["use_neighbors"]:
                     input_neighbors = neighbors
-                _psfm.run_colmap_sfm_with_known_poses(
+                pointsfm.run_colmap_sfm_with_known_poses(
                     cfg["sfm"],
                     imagecols,
                     output_path=colmap_output_path,
@@ -138,7 +138,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
             colmap_model_path = cfg["triangulation"]["use_pointsfm"][
                 "colmap_folder"
             ]
-        reconstruction = _psfm.PyReadCOLMAP(colmap_model_path)
+        reconstruction = pointsfm.PyReadCOLMAP(colmap_model_path)
         all_bpt2ds, sfm_points = _runners.compute_2d_bipartites_from_colmap(
             reconstruction, imagecols, all_2d_lines, cfg["structures"]["bpt2d"]
         )

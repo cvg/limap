@@ -3,6 +3,7 @@ import warnings
 
 from tqdm import tqdm
 
+import limap.pointsfm as pointsfm
 import limap.util.io as limapio
 
 
@@ -143,7 +144,6 @@ def compute_sfminfos(cfg, imagecols, fname="metainfos.txt"):
         neighbors (dict[int -> list[int]]): visual neighbors for each image
         ranges (pair of :class:`np.array`, each of shape (3,)): robust 3D ranges for the scene computed from the sfm point cloud.
     """
-    import limap.pointsfm as _psfm
 
     if not cfg["load_meta"]:
         # run colmap sfm and compute neighbors, ranges
@@ -151,15 +151,15 @@ def compute_sfminfos(cfg, imagecols, fname="metainfos.txt"):
             cfg["dir_save"], cfg["sfm"]["colmap_output_path"]
         )
         if not cfg["sfm"]["reuse"]:
-            _psfm.run_colmap_sfm_with_known_poses(
+            pointsfm.run_colmap_sfm_with_known_poses(
                 cfg["sfm"],
                 imagecols,
                 output_path=colmap_output_path,
                 skip_exists=cfg["skip_exists"],
             )
-        model = _psfm.SfmModel()
+        model = pointsfm.SfmModel()
         model.ReadFromCOLMAP(colmap_output_path, "sparse", "images")
-        neighbors, ranges = _psfm.compute_metainfos(
+        neighbors, ranges = pointsfm.compute_metainfos(
             cfg["sfm"], model, n_neighbors=cfg["n_neighbors"]
         )
         fname_save = os.path.join(cfg["dir_save"], fname)
