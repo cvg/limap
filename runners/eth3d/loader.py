@@ -7,11 +7,11 @@ import numpy as np
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
-import limap.base as _base
+import limap.base as base
 import limap.pointsfm as pointsfm
 
 
-class ETH3DDepthReader(_base.BaseDepthReader):
+class ETH3DDepthReader(base.BaseDepthReader):
     def __init__(self, filename):
         super().__init__(filename)
 
@@ -52,7 +52,7 @@ def read_scene_eth3d(
                 data["neighbors"].item(),
                 data["ranges"],
             )
-            imagecols = _base.ImageCollection(imagecols_np)
+            imagecols = base.ImageCollection(imagecols_np)
 
     # filter by camera ids for eth3d
     if dataset.cam_id != -1:

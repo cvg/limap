@@ -365,17 +365,17 @@ def filter_ranges(lines_np, counts_np, ranges):
 
 
 def report_dist_reprojection(line3d, line2d, camview, prefix=None):
-    import limap.base as _base
+    import limap.base as base
 
     line2d_proj = line3d.projection(camview)
-    angle = _base.compute_distance_2d(
-        line2d, line2d_proj, _base.LineDistType.ANGULAR
+    angle = base.compute_distance_2d(
+        line2d, line2d_proj, base.LineDistType.ANGULAR
     )
-    perp_dist = _base.compute_distance_2d(
-        line2d, line2d_proj, _base.LineDistType.PERPENDICULAR_ONEWAY
+    perp_dist = base.compute_distance_2d(
+        line2d, line2d_proj, base.LineDistType.PERPENDICULAR_ONEWAY
     )
-    overlap = _base.compute_distance_2d(
-        line2d_proj, line2d, _base.LineDistType.OVERLAP
+    overlap = base.compute_distance_2d(
+        line2d_proj, line2d, base.LineDistType.OVERLAP
     )
     sensitivity = line3d.sensitivity(camview)
     if prefix is None:

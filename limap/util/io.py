@@ -5,7 +5,7 @@ import shutil
 import numpy as np
 from tqdm import tqdm
 
-import limap.base as _base
+import limap.base as base
 
 
 def check_directory(fname):
@@ -314,7 +314,7 @@ def read_folder_linetracks(folder):
     linetracks = []
     for track_id in range(n_tracks):
         fname = os.path.join(folder, f"track_{track_id}.txt")
-        track = _base.LineTrack()
+        track = base.LineTrack()
         track.Read(fname)
         linetracks.append(track)
     return linetracks
@@ -338,7 +338,7 @@ def read_folder_linetracks_with_info(folder):
     if os.path.isfile(os.path.join(folder, "config.npy")):
         cfg = read_npy(os.path.join(folder, "config.npy"))
     if os.path.isfile(os.path.join(folder, "imagecols.npy")):
-        imagecols = _base.ImageCollection(
+        imagecols = base.ImageCollection(
             read_npy(os.path.join(folder, "imagecols.npy")).item()
         )
     if os.path.isfile(os.path.join(folder, "all_2d_segs.npy")):
@@ -363,7 +363,7 @@ def read_txt_Line3Dpp(fname):
         line3d_list = []
         for _ in range(n_lines):
             infos = [float(k) for k in txt_line[counter : (counter + 6)]]
-            line3d = _base.Line3d(infos[:3], infos[3:])
+            line3d = base.Line3d(infos[:3], infos[3:])
             counter += 6
             line3d_list.append(line3d)
         line3d = line3d_list[0]
@@ -377,12 +377,12 @@ def read_txt_Line3Dpp(fname):
             line_id = int(txt_line[counter])
             counter += 1
             infos = [float(k) for k in txt_line[counter : (counter + 4)]]
-            line2d = _base.Line2d(infos[:2], infos[2:])
+            line2d = base.Line2d(infos[:2], infos[2:])
             counter += 4
             img_id_list.append(img_id)
             line_id_list.append(line_id)
             line2d_list.append(line2d)
-        track = _base.LineTrack(line3d, img_id_list, line_id_list, line2d_list)
+        track = base.LineTrack(line3d, img_id_list, line_id_list, line2d_list)
         linetracks.append(track)
         for _ in range(n_lines):
             line_counts.append(track.count_images())
@@ -411,13 +411,13 @@ def read_lines_from_input(input_file):
     # npy file
     if input_file.endswith(".npy"):
         lines_np = read_npy(input_file)
-        lines = [_base.Line3d(arr) for arr in lines_np.tolist()]
+        lines = [base.Line3d(arr) for arr in lines_np.tolist()]
         return lines, None
 
     # obj file
     if input_file.endswith(".obj"):
         lines_np = load_obj(input_file)
-        lines = [_base.Line3d(arr) for arr in lines_np.tolist()]
+        lines = [base.Line3d(arr) for arr in lines_np.tolist()]
         return lines, None
 
     # line3dpp format

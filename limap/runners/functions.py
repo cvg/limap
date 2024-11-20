@@ -54,7 +54,7 @@ def undistort_images(
         :class:`limap.base.ImageCollection`: \
             New image collection for the undistorted images
     """
-    import limap.base as _base
+    import limap.base as base
 
     loaded_ids = []
     unload_ids = imagecols.get_img_ids()
@@ -66,7 +66,7 @@ def undistort_images(
         fname_in = os.path.join(output_dir, fname)
         if os.path.isfile(fname_in):
             data = limapio.read_npy(fname_in).item()
-            loaded_imagecols = _base.ImageCollection(data)
+            loaded_imagecols = base.ImageCollection(data)
             unload_ids = []
             for id in imagecols.get_img_ids():
                 if id in loaded_imagecols.get_img_ids():
@@ -116,7 +116,7 @@ def undistort_images(
     )
 
     # update new imagecols
-    imagecols_undistorted = _base.ImageCollection(imagecols)
+    imagecols_undistorted = base.ImageCollection(imagecols)
     cam_dict = {}
     for idx, img_id in enumerate(unload_ids):
         imname_out = os.path.join(output_dir, f"image{img_id:08d}.png")

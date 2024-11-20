@@ -1,7 +1,7 @@
 import numpy as np
 from _limap import _ceresbase
 
-import limap.base as _base
+import limap.base as base
 import limap.estimators as _estimators
 import limap.optimize as optimize
 
@@ -81,7 +81,7 @@ def _pl_estimate_absolute_pose(
         )
         final_t = jointloc.GetFinalT().copy()
         final_q = jointloc.GetFinalQ().copy()
-        return _base.CameraPose(final_q, final_t), None
+        return base.CameraPose(final_q, final_t), None
 
     options = (
         _estimators.HybridPoseEstimatorOptions()

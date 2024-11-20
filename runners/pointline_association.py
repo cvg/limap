@@ -6,7 +6,7 @@ import math
 
 import numpy as np
 
-import limap.base as _base
+import limap.base as base
 import limap.optimize as optimize
 import limap.pointsfm as pointsfm
 import limap.runners
@@ -55,7 +55,7 @@ def pointline_association(cfg, input_folder, output_folder, colmap_folder):
         imagecols,
         all_2d_segs,
     ) = limapio.read_folder_linetracks_with_info(input_folder)
-    all_2d_lines = _base.get_all_lines_2d(all_2d_segs)
+    all_2d_lines = base.get_all_lines_2d(all_2d_segs)
 
     ############################################################
     # Point-line bipartite

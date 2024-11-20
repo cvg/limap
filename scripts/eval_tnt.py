@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 
-import limap.base as _base
+import limap.base as base
 import limap.evaluation as limap_eval
 import limap.util.config as cfgutils
 import limap.util.io as limapio
@@ -231,7 +231,7 @@ def transform_lines(fname, lines):
     for line in lines:
         newstart = trans[:3, :3] @ line.start + trans[:3, 3]
         newend = trans[:3, :3] @ line.end + trans[:3, 3]
-        newline = _base.Line3d(newstart, newend)
+        newline = base.Line3d(newstart, newend)
         new_lines.append(newline)
     return new_lines
 

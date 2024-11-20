@@ -15,7 +15,7 @@ from pathlib import Path
 import cv2
 from hloc.utils.read_write_model import *
 
-import limap.base as _base
+import limap.base as base
 import limap.estimators as estimators
 
 formatter = logging.Formatter(
@@ -153,8 +153,8 @@ def main():
     l2ds = np.array(l2ds)[inlier_indices[1]]
     l3d_ids = np.array(l3d_ids)[inlier_indices[1]]
 
-    camview_point = _base.CameraView(cam, data["pose_point"])
-    camview_line = _base.CameraView(cam, final_pose)
+    camview_point = base.CameraView(cam, data["pose_point"])
+    camview_line = base.CameraView(cam, final_pose)
 
     args.outputs.mkdir(parents=True, exist_ok=True)
 

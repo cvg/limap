@@ -4,7 +4,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import numpy as np
 
-import limap.base as _base
+import limap.base as base
 import limap.optimize as optimize
 import limap.util.config as cfgutils
 import limap.util.io as limapio
@@ -21,7 +21,7 @@ def one_by_one_refinement(cfg):
         imagecols,
         all_2d_segs,
     ) = limapio.read_folder_linetracks_with_info(cfg["input_folder"])
-    all_2d_lines = _base.get_all_lines_2d(all_2d_segs)
+    all_2d_lines = base.get_all_lines_2d(all_2d_segs)
 
     # vp
     vpresults = None

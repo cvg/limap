@@ -22,7 +22,7 @@ from hloc.utils.parsers import *
 from hloc.utils.read_write_model import read_model, write_model
 from tqdm import tqdm
 
-import limap.base as _base
+import limap.base as base
 import limap.pointsfm as pointsfm
 import limap.util.io as limapio
 
@@ -186,7 +186,7 @@ def correct_sfm_with_gt_depth(sfm_path, depth_folder_path, output_path):
 ###############################################################################
 
 
-class DepthReader(_base.BaseDepthReader):
+class DepthReader(base.BaseDepthReader):
     def __init__(self, filename, depth_folder):
         super().__init__(filename)
         self.depth_folder = depth_folder
@@ -230,7 +230,7 @@ def read_scene_7scenes(cfg, root_path, model_path, image_path, n_neighbors=20):
                 data["neighbors"].item(),
                 data["ranges"],
             )
-            imagecols = _base.ImageCollection(imagecols_np)
+            imagecols = base.ImageCollection(imagecols_np)
     return imagecols, neighbors, ranges
 
 
@@ -400,7 +400,7 @@ def run_hloc_7scenes(
             data = data.split()
             name = data[0]
             q, t = np.split(np.array(data[1:], float), [4])
-            poses[name] = _base.CameraPose(q, t)
+            poses[name] = base.CameraPose(q, t)
     if logger:
         logger.info(f"Coarse pose read from {results_file}")
     hloc_log_file = f"{results_file}_logs.pkl"

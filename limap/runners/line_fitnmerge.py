@@ -5,7 +5,7 @@ import joblib
 import numpy as np
 from tqdm import tqdm
 
-import limap.base as _base
+import limap.base as base
 import limap.fitting as fitting
 import limap.merging as merging
 import limap.optimize as optimize
@@ -212,18 +212,18 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
         for img_id in all_2d_segs:
             for line_id, seg2d in enumerate(all_2d_segs[img_id]):
                 seg3d = seg3d_list[img_id][line_id]
-                l3d = _base.Line3d(seg3d[0], seg3d[1])
-                l2d = _base.Line2d(seg2d[0:2], seg2d[2:4])
+                l3d = base.Line3d(seg3d[0], seg3d[1])
+                l2d = base.Line2d(seg2d[0:2], seg2d[2:4])
                 if l3d.length() == 0:
                     continue
-                track = _base.LineTrack(l3d, [img_id], [line_id], [l2d])
+                track = base.LineTrack(l3d, [img_id], [line_id], [l2d])
                 linetracks.append(track)
         return linetracks
 
     ##########################################################
     # [D] merge 3d segments
     ##########################################################
-    linker = _base.LineLinker(
+    linker = base.LineLinker(
         cfg["merging"]["linker2d"], cfg["merging"]["linker3d"]
     )
     graph, linetracks = merging.merging(
@@ -242,7 +242,7 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
         num_outliers=0,
     )
     if not cfg["remerging"]["disable"]:
-        linker3d_remerge = _base.LineLinker3d(cfg["remerging"]["linker3d"])
+        linker3d_remerge = base.LineLinker3d(cfg["remerging"]["linker3d"])
         linetracks = merging.remerge(
             linker3d_remerge, linetracks, num_outliers=0
         )
@@ -390,10 +390,10 @@ def line_fitting_with_points3d(
     for img_id in all_2d_segs:
         for line_id, seg2d in enumerate(all_2d_segs[img_id]):
             seg3d = seg3d_list[img_id][line_id]
-            l3d = _base.Line3d(seg3d[0], seg3d[1])
-            l2d = _base.Line2d(seg2d[0:2], seg2d[2:4])
+            l3d = base.Line3d(seg3d[0], seg3d[1])
+            l2d = base.Line2d(seg2d[0:2], seg2d[2:4])
             if l3d.length() == 0:
                 continue
-            track = _base.LineTrack(l3d, [img_id], [line_id], [l2d])
+            track = base.LineTrack(l3d, [img_id], [line_id], [l2d])
             linetracks.append(track)
     return linetracks

@@ -19,7 +19,7 @@ from hloc import (
 )
 from tqdm import tqdm
 
-import limap.base as _base
+import limap.base as base
 import limap.pointsfm as pointsfm
 import limap.util.io as limapio
 
@@ -53,7 +53,7 @@ def read_scene_visualsfm(
                 data["neighbors"].item(),
                 data["ranges"],
             )
-            imagecols = _base.ImageCollection(imagecols_np)
+            imagecols = base.ImageCollection(imagecols_np)
     return imagecols, neighbors, ranges
 
 
@@ -198,7 +198,7 @@ def eval(filename, poses_gt, query_ids, id_to_name, logger):
             data = data.split()
             name = data[0]
             q, t = np.split(np.array(data[1:], float), [4])
-            pose_results[name] = _base.CameraPose(q, t)
+            pose_results[name] = base.CameraPose(q, t)
 
     for qid in query_ids:
         name = id_to_name[qid]
@@ -374,7 +374,7 @@ def run_hloc_cambridge(
             data = data.split()
             name = data[0]
             q, t = np.split(np.array(data[1:], float), [4])
-            poses[name] = _base.CameraPose(q, t)
+            poses[name] = base.CameraPose(q, t)
     if logger:
         logger.info(f"Coarse pose read from {results_file}")
     hloc_log_file = f"{results_file}_logs.pkl"

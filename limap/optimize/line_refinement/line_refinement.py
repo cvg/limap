@@ -4,7 +4,7 @@ import os
 import numpy as np
 from tqdm import tqdm
 
-import limap.base as _base
+import limap.base as base
 import limap.evaluation as limap_eval
 import limap.features as limap_features
 import limap.optimize as optimize
@@ -91,7 +91,7 @@ def line_refinement(
             p_features=p_features,
             dtype=cfg["dtype"],
         )
-        newtrack = _base.LineTrack(track)
+        newtrack = base.LineTrack(track)
         if rf_engine is None:
             opttracks.append(newtrack)
             continue

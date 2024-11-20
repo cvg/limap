@@ -6,7 +6,7 @@ import numpy as np
 from hloc.utils.io import get_keypoints, get_matches
 from tqdm import tqdm
 
-import limap.base as _base
+import limap.base as base
 import limap.estimators as estimators
 import limap.line2d
 import limap.runners as runners
@@ -182,11 +182,9 @@ def line_localization(
     all_query_segs, _ = runners.compute_2d_segs(
         cfg, imagecols_query, compute_descinfo=False
     )
-    all_db_lines = _base.get_all_lines_2d(all_db_segs)
-    all_query_lines = _base.get_all_lines_2d(all_query_segs)
-    line2track = _base.get_invert_idmap_from_linetracks(
-        all_db_lines, linemap_db
-    )
+    all_db_lines = base.get_all_lines_2d(all_db_segs)
+    all_query_lines = base.get_all_lines_2d(all_query_segs)
+    line2track = base.get_invert_idmap_from_linetracks(all_db_lines, linemap_db)
 
     # Do matches for query images and retrieved neighbors
     # for superglue endpoints matcher
@@ -258,7 +256,7 @@ def line_localization(
                 with open(os.path.join(pose_dir, f"{qid}.txt")) as f:
                     data = f.read().rstrip().split("\n")[0].split()
                     q, t = np.split(np.array(data[1:], float), [4])
-                    final_poses[qid] = _base.CameraPose(q, t)
+                    final_poses[qid] = base.CameraPose(q, t)
                     continue
         if logger:
             logger.info(f"Query Image ID: {qid}")
@@ -267,7 +265,7 @@ def line_localization(
         qname = id_to_name[qid]
         query_pose = imagecols_query.get_camera_pose(qid)
         query_cam = imagecols_query.cam(imagecols_query.camimage(qid).cam_id)
-        query_camview = _base.CameraView(query_cam, query_pose)
+        query_camview = base.CameraView(query_cam, query_pose)
         targets = retrieval[qname]
 
         if cfg["localization"]["2d_matcher"] != "epipolar":

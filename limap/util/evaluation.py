@@ -3,7 +3,7 @@ import logging
 import cv2
 import numpy as np
 
-import limap.base as _base
+import limap.base as base
 
 
 def compute_rot_err(R1, R2):
@@ -17,8 +17,8 @@ def compute_rot_err(R1, R2):
 def compute_pose_err(pose, pose_gt):
     """
     Inputs:
-    - pose:     _base.CameraPose
-    - pose_gt:  _base.CameraPose
+    - pose:     base.CameraPose
+    - pose_gt:  base.CameraPose
     """
     trans_err = np.linalg.norm(pose.center() - pose_gt.center())
     rot_err = compute_rot_err(pose.R(), pose_gt.R())
@@ -35,7 +35,7 @@ def eval_imagecols(
         logging.info(
             f"[LOG EVAL] imagecols_gt.NumImages() = {imagecols_gt.NumImages()}"
         )
-    _, imagecols_aligned = _base.align_imagecols(
+    _, imagecols_aligned = base.align_imagecols(
         imagecols,
         imagecols_gt.subset_by_image_ids(imagecols.get_img_ids()),
         max_error=max_error,
@@ -79,13 +79,13 @@ def eval_imagecols_relpose(
         if imagecols.exist_image(img_ids[i]):
             pose1 = imagecols.camimage(img_ids[i]).pose
         else:
-            pose1 = _base.CameraPose()
+            pose1 = base.CameraPose()
         pose1_gt = imagecols_gt.camimage(img_ids[i]).pose
         for j in range(i + 1, num_images):
             if imagecols.exist_image(img_ids[j]):
                 pose2 = imagecols.camimage(img_ids[j]).pose
             else:
-                pose2 = _base.CameraPose()
+                pose2 = base.CameraPose()
             pose2_gt = imagecols_gt.camimage(img_ids[j]).pose
 
             relR = pose1.R() @ pose2.R().T

@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 
-import limap.base as _base
+import limap.base as base
 import limap.undistortion as undistortion
 
 data_dir = os.path.expanduser("~/data/Localization/Aachen-1.1")
@@ -33,7 +33,7 @@ def load_list_file(fname):
         cx, cy = float(k[5]), float(k[6])
         k1 = float(k[7])
         K = np.array([[f, 0, cx], [0, f, cy], [0, 0, 1.0]])
-        camera = _base.Camera(
+        camera = base.Camera(
             K, np.eye(3), np.zeros(3), np.array([k1, 0, 0, 0, 0])
         )
         imname_list.append(imname)

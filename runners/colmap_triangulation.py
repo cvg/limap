@@ -4,7 +4,7 @@ import sys
 import numpy as np
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import limap.base as _base
+import limap.base as base
 import limap.pointsfm as pointsfm
 import limap.runners
 import limap.util.config as cfgutils
@@ -44,7 +44,7 @@ def read_scene_colmap(
                 data["neighbors"].item(),
                 data["ranges"],
             )
-            imagecols = _base.ImageCollection(imagecols_np)
+            imagecols = base.ImageCollection(imagecols_np)
     return imagecols, neighbors, ranges
 
 

@@ -3,7 +3,7 @@ import os
 
 from tqdm import tqdm
 
-import limap.base as _base
+import limap.base as base
 import limap.merging as merging
 import limap.optimize as optimize
 import limap.pointsfm as pointsfm
@@ -100,7 +100,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     ##########################################################
     Triangulator = triangulation.GlobalLineTriangulator(cfg["triangulation"])
     Triangulator.SetRanges(ranges)
-    all_2d_lines = _base.get_all_lines_2d(all_2d_segs)
+    all_2d_lines = base.get_all_lines_2d(all_2d_segs)
     Triangulator.Init(all_2d_lines, imagecols)
     if cfg["triangulation"]["use_vp"]:
         vpdetector = vplib.get_vp_detector(
@@ -175,7 +175,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     )
     if not cfg["triangulation"]["remerging"]["disable"]:
         # remerging
-        linker3d = _base.LineLinker3d(
+        linker3d = base.LineLinker3d(
             cfg["triangulation"]["remerging"]["linker3d"]
         )
         linetracks = merging.remerge(linker3d, linetracks)
