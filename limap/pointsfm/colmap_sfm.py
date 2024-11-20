@@ -8,8 +8,8 @@ from pathlib import Path
 import cv2
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-import hloc.utils.read_write_model as colmap_utils
 import hloc.utils.database as database
+import hloc.utils.read_write_model as colmap_utils
 from model_converter import convert_imagecols_to_colmap
 
 

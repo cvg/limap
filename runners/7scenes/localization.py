@@ -10,6 +10,7 @@ import logging
 import pickle
 from pathlib import Path
 
+import hloc.utils.read_write_model as colmap_utils
 import pycolmap
 from hloc.utils.parsers import parse_retrieval
 from utils import (
@@ -21,7 +22,6 @@ from utils import (
     run_hloc_7scenes,
 )
 
-import hloc.utils.read_write_model as colmap_utils
 import limap.runners as _runners
 import limap.util.config as cfgutils
 import limap.util.io as limapio
