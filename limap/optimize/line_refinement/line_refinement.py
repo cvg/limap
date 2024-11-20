@@ -7,7 +7,7 @@ from tqdm import tqdm
 import limap.base as _base
 import limap.evaluation as limap_eval
 import limap.features as limap_features
-import limap.optimize as _optim
+import limap.optimize as optimize
 import limap.util.io as limapio
 import limap.visualize as limapvis
 
@@ -81,7 +81,7 @@ def line_refinement(
                     p_features.append(featuremap.transpose(1, 2, 0))
 
         # refine
-        rf_engine = _optim.solve_line_refinement(
+        rf_engine = optimize.solve_line_refinement(
             cfg,
             track,
             p_cameras,

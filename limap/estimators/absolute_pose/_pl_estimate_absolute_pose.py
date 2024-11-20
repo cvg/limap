@@ -3,7 +3,7 @@ from _limap import _ceresbase
 
 import limap.base as _base
 import limap.estimators as _estimators
-import limap.optimize as _optimize
+import limap.optimize as optimize
 
 
 def _pl_estimate_absolute_pose(
@@ -66,7 +66,7 @@ def _pl_estimate_absolute_pose(
                       {original_len} line matches"
                 )
 
-        jointloc = _optimize.solve_jointloc(
+        jointloc = optimize.solve_jointloc(
             cfg["line_cost_func"],
             jointloc_cfg,
             l3ds,
@@ -88,7 +88,7 @@ def _pl_estimate_absolute_pose(
         if ransac_cfg["method"] == "hybrid"
         else _estimators.JointPoseEstimatorOptions()
     )
-    options.lineloc_config = _optimize.LineLocConfig(jointloc_cfg)
+    options.lineloc_config = optimize.LineLocConfig(jointloc_cfg)
     if (
         "solver_options" not in jointloc_cfg
         or "minimizer_progress_to_stdout" not in jointloc_cfg["solver_options"]
@@ -104,7 +104,7 @@ def _pl_estimate_absolute_pose(
         options.lineloc_config.solver_options.logging_type = (
             _ceresbase.LoggingType.SILENT
         )
-    func = _optimize.get_lineloc_cost_func(cfg["line_cost_func"])
+    func = optimize.get_lineloc_cost_func(cfg["line_cost_func"])
     options.lineloc_config.cost_function = func
 
     if ransac_cfg["method"] == "hybrid":

@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 import limap.base as _base
 import limap.merging as merging
-import limap.optimize as _optim
+import limap.optimize as optimize
 import limap.pointsfm as pointsfm
 import limap.runners as _runners
 import limap.triangulation as triangulation
@@ -207,9 +207,9 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     # [E] geometric refinement
     ##########################################################
     if not cfg["refinement"]["disable"]:
-        cfg_ba = _optim.HybridBAConfig(cfg["refinement"])
+        cfg_ba = optimize.HybridBAConfig(cfg["refinement"])
         cfg_ba.set_constant_camera()
-        ba_engine = _optim.solve_line_bundle_adjustment(
+        ba_engine = optimize.solve_line_bundle_adjustment(
             cfg["refinement"], imagecols, linetracks, max_num_iterations=200
         )
         linetracks_map = ba_engine.GetOutputLineTracks(
