@@ -4,7 +4,7 @@
 #include "ceresbase/line_projection.h"
 #include "ceresbase/point_projection.h"
 #include "estimators/absolute_pose/pl_absolute_pose_ransac.h"
-#include "optimize/line_localization/cost_functions.h"
+#include "optimize/hybrid_localization/cost_functions.h"
 
 #include <PoseLib/camera_pose.h>
 #include <PoseLib/solvers/p1p2ll.h>
@@ -18,7 +18,7 @@ namespace estimators {
 
 namespace absolute_pose {
 
-namespace lineloc = optimize::line_localization;
+namespace hybridloc = optimize::hybrid_localization;
 
 std::pair<CameraPose, ransac_lib::RansacStatistics>
 EstimateAbsolutePose_PointLine(const std::vector<Line3d> &l3ds,
@@ -60,7 +60,7 @@ JointPoseEstimator::JointPoseEstimator(
     const std::vector<Line3d> &l3ds, const std::vector<int> &l3d_ids,
     const std::vector<Line2d> &l2ds, const std::vector<V3D> &p3ds,
     const std::vector<V2D> &p2ds, const Camera &cam,
-    const lineloc::LineLocConfig &cfg, const double cheirality_min_depth,
+    const hybridloc::LineLocConfig &cfg, const double cheirality_min_depth,
     const double cheirality_overlap_pixels)
     : loc_config_(cfg), cheirality_min_depth_(cheirality_min_depth),
       cheirality_overlap_pixels_(cheirality_overlap_pixels) {
@@ -182,8 +182,8 @@ double JointPoseEstimator::EvaluateModelOnPoint(const CameraPose &pose,
     bool cheirality = cheirality_test_point(p3ds_->at(i), pose);
     if (!cheirality)
       return std::numeric_limits<double>::max();
-    lineloc::ReprojectionPointFunctor(p3ds_->at(i), p2ds_->at(i),
-                                      loc_config_.points_3d_dist)(
+    hybridloc::ReprojectionPointFunctor(p3ds_->at(i), p2ds_->at(i),
+                                        loc_config_.points_3d_dist)(
         cam_.Params().data(), pose.qvec.data(), pose.tvec.data(), res);
     return V2D(res[0], res[1]).squaredNorm();
   } else {
@@ -193,8 +193,8 @@ double JointPoseEstimator::EvaluateModelOnPoint(const CameraPose &pose,
     bool cheirality = cheirality_test_line(l2ds_->at(i), l3d, pose);
     if (!cheirality)
       return std::numeric_limits<double>::max();
-    lineloc::ReprojectionLineFunctor(loc_config_.cost_function, ENoneWeight,
-                                     l3d, l2ds_->at(i))(
+    hybridloc::ReprojectionLineFunctor(loc_config_.cost_function, ENoneWeight,
+                                       l3d, l2ds_->at(i))(
         cam_.Params().data(), pose.qvec.data(), pose.tvec.data(), res);
     if (getResidualNum(loc_config_.cost_function) == 2) {
       return V2D(res[0], res[1]).squaredNorm();

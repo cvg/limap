@@ -7,7 +7,7 @@ from .hybrid_bundle_adjustment import (
     solve_line_bundle_adjustment,
     solve_point_bundle_adjustment,
 )
-from .line_localization import (
+from .hybrid_localization import (
     get_lineloc_cost_func,
     get_lineloc_weight_func,
     solve_jointloc,

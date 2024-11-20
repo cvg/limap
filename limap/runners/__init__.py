@@ -13,10 +13,10 @@ from .line_fitnmerge import (
     line_fitnmerge,
     line_fitting_with_points3d,
 )
-from .line_localization import (
+from .hybrid_localization import (
     get_hloc_keypoints,
     get_hloc_keypoints_from_log,
-    line_localization,
+    hybrid_localization,
 )
 from .line_triangulation import line_triangulation
 
@@ -34,6 +34,6 @@ __all__ = [
     "line_fitting_with_points3d",
     "get_hloc_keypoints",
     "get_hloc_keypoints_from_log",
-    "line_localization",
+    "hybrid_localization",
     "line_triangulation",
 ]
