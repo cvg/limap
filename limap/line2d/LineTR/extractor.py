@@ -5,7 +5,7 @@ import numpy as np
 import torch
 
 import limap.util.io as limapio
-from limap.point2d.superpoint.superpoint import SuperPoint
+from limap.point2d.superpoint import SuperPoint
 
 from ..base_detector import BaseDetector, BaseDetectorOptions
 from .line_transformer import LineTransformer

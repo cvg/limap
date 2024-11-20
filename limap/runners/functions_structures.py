@@ -31,7 +31,7 @@ def compute_2d_feature_points_sp(imagecols, output_path="tmp/featurepoints"):
 
     outputs = Path(os.path.join(image_path, "hloc_outputs"))
     feature_conf = extract_features.confs["superpoint_aachen"]
-    from limap.point2d import run_superpoint
+    from limap.point2d.superpoint import run_superpoint
 
     feature_path = run_superpoint(feature_conf, image_path, outputs)
 

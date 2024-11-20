@@ -97,7 +97,7 @@ def run_hloc_matches(
                 "Error! Non-superpoint feature extraction is unfortunately not supported in the current implementation."
             )
         # run superpoint
-        from limap.point2d import run_superpoint
+        from limap.point2d.superpoint import run_superpoint
 
         feature_path = run_superpoint(
             feature_conf, image_path, outputs, keypoints=keypoints
