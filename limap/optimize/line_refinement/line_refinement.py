@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 import limap.base as _base
 import limap.evaluation as _eval
-import limap.features as _features
+import limap.features as limap_features
 import limap.optimize as _optim
 import limap.util.io as limapio
 import limap.visualize as limapvis
@@ -67,7 +67,7 @@ def line_refinement(
                         f"track{track_id}",
                         f"track{track_id}_img{img_id}.npy",
                     )
-                    patch = _features.load_patch(fname, dtype=cfg["dtype"])
+                    patch = limap_features.load_patch(fname, dtype=cfg["dtype"])
                     p_patches.append(patch)
                 else:
                     with open(

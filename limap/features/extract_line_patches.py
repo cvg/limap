@@ -26,7 +26,7 @@ def load_patch(fname, dtype="float16"):
     return patch
 
 
-def get_extractor(cfg, channels):
+def get_line_patch_extractor(cfg, channels):
     lpe_options = _features.LinePatchExtractorOptions(cfg)
     patch_extractor_name = f"LinePatchExtractor_f64_c{channels}"
     extractor = getattr(_features, patch_extractor_name)(lpe_options)
