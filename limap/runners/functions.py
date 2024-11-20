@@ -75,7 +75,7 @@ def undistort_images(
     import imagesize
     import joblib
 
-    import limap.undistortion as _undist
+    import limap.undistortion as undistortion
 
     # limapio.delete_folder(output_dir)
     limapio.check_makedirs(output_dir)
@@ -92,7 +92,7 @@ def undistort_images(
             img = imagecols.read_image(img_id)
             cv2.imwrite(imname_out, img)
             imname_in = imname_out
-        cam_undistorted = _undist.UndistortImageCamera(
+        cam_undistorted = undistortion.undistort_image_camera(
             cam, imname_in, imname_out
         )
         cam_undistorted.set_cam_id(cam_id)

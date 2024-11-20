@@ -2,7 +2,7 @@ import cv2
 from _limap import _base, _undistortion
 
 
-def UndistortImageCamera(camera, imname_in, imname_out):
+def undistort_image_camera(camera, imname_in, imname_out):
     """
     Run COLMAP undistortion on one single image with an input camera. The undistortion is only applied if the camera model is neither "SIMPLE_PINHOLE" nor "PINHOLE".
 
@@ -44,7 +44,7 @@ def UndistortImageCamera(camera, imname_in, imname_out):
     return camera_undistorted
 
 
-def UndistortPoints(points, distorted_camera, undistorted_camera):
+def undistort_points(points, distorted_camera, undistorted_camera):
     """
     Run COLMAP undistortion on the keypoints.
 
