@@ -7,11 +7,11 @@ from .triangulation import (
     compute_fundamental_matrix,
     get_direction_from_VP,
     get_normal_direction,
-    triangulate_point,
     triangulate_line,
     triangulate_line_by_endpoints,
     triangulate_line_with_direction,
     triangulate_line_with_one_point,
+    triangulate_point,
 )
 
 __all__ = [n for n in _triangulation.__dict__ if not n.startswith("_")] + [

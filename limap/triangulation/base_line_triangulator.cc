@@ -184,7 +184,7 @@ void BaseLineTriangulator::triangulateOneNode(const int img_id,
       for (auto it = points_info.begin(); it != points_info.end(); ++it) {
         if (sfm_points_.empty()) {
           auto res = triangulate_point(it->second.first, view1,
-                                         it->second.second, view2);
+                                       it->second.second, view2);
           if (res.second)
             points.push_back(res.first);
         } else
@@ -221,7 +221,8 @@ void BaseLineTriangulator::triangulateOneNode(const int img_id,
       // Step 1.2 one point triangulation
       if (!config_.disable_one_point_triangulation && !points.empty()) {
         for (const V3D &p : points) {
-          Line3d line = triangulate_line_with_one_point(l1, view1, l2, view2, p);
+          Line3d line =
+              triangulate_line_with_one_point(l1, view1, l2, view2, p);
           if (line.score > 0) {
             double u1 = line.computeUncertainty(view1, config_.var2d);
             double u2 = line.computeUncertainty(view2, config_.var2d);
@@ -239,7 +240,8 @@ void BaseLineTriangulator::triangulateOneNode(const int img_id,
       if (vpresults_[img_id].HasVP(line_id)) {
         V3D direc =
             getDirectionFromVP(vpresults_[img_id].GetVP(line_id), view1);
-        Line3d line = triangulate_line_with_direction(l1, view1, l2, view2, direc);
+        Line3d line =
+            triangulate_line_with_direction(l1, view1, l2, view2, direc);
         if (line.score > 0) {
           double u1 = line.computeUncertainty(view1, config_.var2d);
           double u2 = line.computeUncertainty(view2, config_.var2d);
@@ -252,7 +254,8 @@ void BaseLineTriangulator::triangulateOneNode(const int img_id,
       if (vpresults_[ng_img_id].HasVP(ng_line_id)) {
         V3D direc =
             getDirectionFromVP(vpresults_[ng_img_id].GetVP(ng_line_id), view1);
-        Line3d line = triangulate_line_with_direction(l1, view1, l2, view2, direc);
+        Line3d line =
+            triangulate_line_with_direction(l1, view1, l2, view2, direc);
         if (line.score > 0) {
           double u1 = line.computeUncertainty(view1, config_.var2d);
           double u2 = line.computeUncertainty(view2, config_.var2d);

@@ -98,8 +98,7 @@ double compute_epipolar_IoU(const Line2d &l1, const CameraView &view1,
 }
 
 std::pair<V3D, bool> triangulate_point(const V2D &p1, const CameraView &view1,
-                                         const V2D &p2,
-                                         const CameraView &view2) {
+                                       const V2D &p2, const CameraView &view2) {
   V3D C1 = view1.pose.center();
   V3D C2 = view2.pose.center();
   V3D n1e = view1.ray_direction(p1);
@@ -171,7 +170,8 @@ M3D point_triangulation_covariance(const V2D &p1, const CameraView &view1,
 
 // Triangulating endpoints for triangulation
 Line3d triangulate_line_by_endpoints(const Line2d &l1, const CameraView &view1,
-                             const Line2d &l2, const CameraView &view2) {
+                                     const Line2d &l2,
+                                     const CameraView &view2) {
   // start point
   auto res_start = triangulate_point(l1.start, view1, l2.start, view2);
   if (!res_start.second)
@@ -292,8 +292,8 @@ M6D line_triangulation_covariance(const Line2d &l1, const CameraView &view1,
 }
 
 // Algebraic line triangulation
-Line3d triangulate_line(const Line2d &l1, const CameraView &view1, const Line2d &l2,
-                   const CameraView &view2) {
+Line3d triangulate_line(const Line2d &l1, const CameraView &view1,
+                        const Line2d &l2, const CameraView &view2) {
   // triangulate line
   auto res = line_triangulation(l1, view1, l2, view2);
   if (!res.second)
@@ -303,8 +303,9 @@ Line3d triangulate_line(const Line2d &l1, const CameraView &view1, const Line2d 
 }
 
 // unproject endpoints with known infinite line
-Line3d triangulate_line_with_infinite_line(const Line2d &l1, const CameraView &view1,
-                                      const InfiniteLine3d &inf_line) {
+Line3d triangulate_line_with_infinite_line(const Line2d &l1,
+                                           const CameraView &view1,
+                                           const InfiniteLine3d &inf_line) {
   InfiniteLine3d ray1_start =
       InfiniteLine3d(view1.pose.center(), view1.ray_direction(l1.start));
   V3D pstart = inf_line.project_to_infinite_line(ray1_start);
@@ -321,9 +322,11 @@ Line3d triangulate_line_with_infinite_line(const Line2d &l1, const CameraView &v
 
 // Asymmetric perspective to (view1, l1)
 // Triangulation with a known point
-Line3d triangulate_line_with_one_point(const Line2d &l1, const CameraView &view1,
-                                  const Line2d &l2, const CameraView &view2,
-                                  const V3D &point) {
+Line3d triangulate_line_with_one_point(const Line2d &l1,
+                                       const CameraView &view1,
+                                       const Line2d &l2,
+                                       const CameraView &view2,
+                                       const V3D &point) {
   // project point onto plane 1
   V3D n1 = getNormalDirection(l1, view1);
   V3D C1 = view1.pose.center();
@@ -383,9 +386,11 @@ Line3d triangulate_line_with_one_point(const Line2d &l1, const CameraView &view1
 
 // Asymmetric perspective to (view1, l1)
 // Triangulation with known direction
-Line3d triangulate_line_with_direction(const Line2d &l1, const CameraView &view1,
-                                  const Line2d &l2, const CameraView &view2,
-                                  const V3D &direction) {
+Line3d triangulate_line_with_direction(const Line2d &l1,
+                                       const CameraView &view1,
+                                       const Line2d &l2,
+                                       const CameraView &view2,
+                                       const V3D &direction) {
   // Step 1: project direction onto plane 1
   V3D n1 = getNormalDirection(l1, view1);
   V3D direc = direction - (n1.dot(direction)) * n1;
