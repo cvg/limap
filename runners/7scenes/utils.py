@@ -18,7 +18,6 @@ from hloc.pipelines.Cambridge.utils import (
     create_query_list_with_intrinsics,
     evaluate,
 )
-from hloc.utils.parsers import *
 from hloc.utils.read_write_model import read_model, write_model
 from tqdm import tqdm
 

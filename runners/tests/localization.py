@@ -13,7 +13,6 @@ import logging
 from pathlib import Path
 
 import cv2
-from hloc.utils.read_write_model import *
 
 import limap.base as base
 import limap.estimators as estimators
