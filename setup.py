@@ -61,6 +61,10 @@ class CMakeBuild(build_ext):
             cwd=self.build_temp,
         )
 
+    def copy_extensions_to_source(self):
+        # Skip copying
+        pass
+
 
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in
