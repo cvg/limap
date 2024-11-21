@@ -86,12 +86,12 @@ def get_scene_info(vsfm_path, imagecols, query_images):
 def undistort_and_resize(cfg, imagecols, logger=None):
     import cv2
 
-    import limap.runners as _runners
+    import limap.runners as runners
 
     # undistort images
     logger.info("Performing undistortion...")
     if not imagecols.IsUndistorted():
-        imagecols = _runners.undistort_images(
+        imagecols = runners.undistort_images(
             imagecols,
             os.path.join(cfg["output_dir"], cfg["undistortion_output_dir"]),
             skip_exists=cfg["load_undistort"] or cfg["skip_exists"],

@@ -22,7 +22,7 @@ from utils import (
     run_hloc_7scenes,
 )
 
-import limap.runners as _runners
+import limap.runners as runners
 import limap.util.config as cfgutils
 import limap.util.io as limapio
 
@@ -120,7 +120,7 @@ def parse_config():
 
 def main():
     cfg, args = parse_config()
-    cfg = _runners.setup(cfg)
+    cfg = runners.setup(cfg)
 
     # outputs is for localization-related results
     outputs = Path(cfg["output_dir"]) / "localization"
@@ -183,7 +183,7 @@ def main():
         finaltracks_dir = os.path.join(cfg["output_dir"], cfg["output_folder"])
         if not cfg["skip_exists"] or not os.path.exists(finaltracks_dir):
             logger.info("Running LIMAP triangulation...")
-            linetracks_db = _runners.line_triangulation(
+            linetracks_db = runners.line_triangulation(
                 cfg, imagecols_train, neighbors=neighbors, ranges=ranges
             )
         else:
@@ -206,7 +206,7 @@ def main():
                 )
                 for id in train_ids
             }
-            linetracks_db = _runners.line_fitnmerge(
+            linetracks_db = runners.line_fitnmerge(
                 cfg, imagecols_train, depths, neighbors, ranges
             )
         else:
@@ -240,7 +240,7 @@ def main():
         hloc_logs = pickle.load(f)
     point_correspondences = {}
     for qid in query_ids:
-        p2ds, p3ds, inliers = _runners.get_hloc_keypoints_from_log(
+        p2ds, p3ds, inliers = runners.get_hloc_keypoints_from_log(
             hloc_logs, img_id_to_name[qid], ref_sfm
         )
         point_correspondences[qid] = {
@@ -250,7 +250,7 @@ def main():
         }
 
     # can return final_poses
-    _runners.line_localization(
+    runners.hybrid_localization(
         cfg,
         imagecols_train,
         imagecols_query,

@@ -24,11 +24,11 @@ void bind_functions(py::module &m) {
   m.def("compute_essential_matrix", &compute_essential_matrix);
   m.def("compute_fundamental_matrix", &compute_fundamental_matrix);
   m.def("compute_epipolar_IoU", &compute_epipolar_IoU);
-  m.def("point_triangulation", &point_triangulation);
-  m.def("triangulate_endpoints", &triangulate_endpoints);
-  m.def("triangulate", &triangulate);
-  m.def("triangulate_with_one_point", &triangulate_with_one_point);
-  m.def("triangulate_with_direction", &triangulate_with_direction);
+  m.def("triangulate_point", &triangulate_point);
+  m.def("triangulate_line_by_endpoints", &triangulate_line_by_endpoints);
+  m.def("triangulate_line", &triangulate_line);
+  m.def("triangulate_line_with_one_point", &triangulate_line_with_one_point);
+  m.def("triangulate_line_with_direction", &triangulate_line_with_direction);
 }
 
 void bind_triangulator(py::module &m) {

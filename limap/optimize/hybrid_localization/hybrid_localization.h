@@ -1,5 +1,5 @@
-#ifndef LIMAP_OPTIMIZE_LINE_LOCALIZATION_LINELOC_H_
-#define LIMAP_OPTIMIZE_LINE_LOCALIZATION_LINELOC_H_
+#ifndef LIMAP_OPTIMIZE_HYBRID_LOCALIZATION_HYBRID_LOCALIZATION_H_
+#define LIMAP_OPTIMIZE_HYBRID_LOCALIZATION_HYBRID_LOCALIZATION_H_
 
 #include "_limap/helpers.h"
 #include <pybind11/numpy.h>
@@ -8,7 +8,7 @@
 #include "util/types.h"
 
 #include "base/linebase.h"
-#include "optimize/line_localization/lineloc_config.h"
+#include "optimize/hybrid_localization/hybrid_localization_config.h"
 #include <ceres/ceres.h>
 
 namespace py = pybind11;
@@ -17,7 +17,7 @@ namespace limap {
 
 namespace optimize {
 
-namespace line_localization {
+namespace hybrid_localization {
 
 class LineLocEngine {
 protected:
@@ -126,7 +126,7 @@ public:
   }
 };
 
-} // namespace line_localization
+} // namespace hybrid_localization
 
 } // namespace optimize
 

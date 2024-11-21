@@ -28,9 +28,8 @@ double compute_epipolar_IoU(const Line2d &l1, const CameraView &view1,
                             const Line2d &l2, const CameraView &view2);
 
 // point triangulation
-std::pair<V3D, bool> point_triangulation(const V2D &p1, const CameraView &view1,
-                                         const V2D &p2,
-                                         const CameraView &view2);
+std::pair<V3D, bool> triangulate_point(const V2D &p1, const CameraView &view1,
+                                       const V2D &p2, const CameraView &view2);
 
 Eigen::Matrix3d
 point_triangulation_covariance(const V2D &p1, const CameraView &view1,
@@ -38,8 +37,8 @@ point_triangulation_covariance(const V2D &p1, const CameraView &view1,
                                const Eigen::Matrix4d &covariance);
 
 // Triangulating endpoints for triangulation
-Line3d triangulate_endpoints(const Line2d &l1, const CameraView &view1,
-                             const Line2d &l2, const CameraView &view2);
+Line3d triangulate_line_by_endpoints(const Line2d &l1, const CameraView &view1,
+                                     const Line2d &l2, const CameraView &view2);
 
 // Asymmetric perspective to (view1, l1)
 // Triangulation by plane intersection
@@ -54,24 +53,29 @@ M6D line_triangulation_covariance(const Line2d &l1, const CameraView &view1,
 
 // Asymmetric perspective to (view1, l1)
 // Algebraic line triangulation
-Line3d triangulate(const Line2d &l1, const CameraView &view1, const Line2d &l2,
-                   const CameraView &view2);
+Line3d triangulate_line(const Line2d &l1, const CameraView &view1,
+                        const Line2d &l2, const CameraView &view2);
 
 // unproject endpoints with known infinite line
-Line3d triangulate_with_infinite_line(const Line2d &l1, const CameraView &view1,
-                                      const InfiniteLine3d &inf_line);
+Line3d triangulate_line_with_infinite_line(const Line2d &l1,
+                                           const CameraView &view1,
+                                           const InfiniteLine3d &inf_line);
 
 // Asymmetric perspective to (view1, l1)
 // Triangulation with a known point
-Line3d triangulate_with_one_point(const Line2d &l1, const CameraView &view1,
-                                  const Line2d &l2, const CameraView &view2,
-                                  const V3D &point);
+Line3d triangulate_line_with_one_point(const Line2d &l1,
+                                       const CameraView &view1,
+                                       const Line2d &l2,
+                                       const CameraView &view2,
+                                       const V3D &point);
 
 // Asymmetric perspective to (view1, l1)
 // Triangulation with known direction
-Line3d triangulate_with_direction(const Line2d &l1, const CameraView &view1,
-                                  const Line2d &l2, const CameraView &view2,
-                                  const V3D &direction);
+Line3d triangulate_line_with_direction(const Line2d &l1,
+                                       const CameraView &view1,
+                                       const Line2d &l2,
+                                       const CameraView &view2,
+                                       const V3D &direction);
 
 } // namespace triangulation
 

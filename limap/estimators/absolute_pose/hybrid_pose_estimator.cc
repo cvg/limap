@@ -1,7 +1,7 @@
 #include "estimators/absolute_pose/hybrid_pose_estimator.h"
 #include "estimators/absolute_pose/pl_absolute_pose_hybrid_ransac.h"
 #include "estimators/absolute_pose/pl_absolute_pose_ransac.h"
-#include "optimize/line_localization/cost_functions.h"
+#include "optimize/hybrid_localization/cost_functions.h"
 
 namespace limap {
 
@@ -9,7 +9,7 @@ namespace estimators {
 
 namespace absolute_pose {
 
-namespace lineloc = optimize::line_localization;
+namespace hybridloc = optimize::hybrid_localization;
 
 std::pair<CameraPose, ransac_lib::HybridRansacStatistics>
 EstimateAbsolutePose_PointLine_Hybrid(
