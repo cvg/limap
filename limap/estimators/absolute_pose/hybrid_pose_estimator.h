@@ -6,14 +6,14 @@
 #include "base/linetrack.h"
 #include "estimators/absolute_pose/joint_pose_estimator.h"
 #include "estimators/extended_hybrid_ransac.h"
-#include "optimize/line_localization/lineloc.h"
+#include "optimize/hybrid_localization/hybrid_localization.h"
 #include "util/types.h"
 
 #include <RansacLib/ransac.h>
 
 namespace limap {
 
-using namespace optimize::line_localization;
+using namespace optimize::hybrid_localization;
 
 namespace estimators {
 

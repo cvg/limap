@@ -198,7 +198,7 @@ def main():
             "inliers": inliers,
         }
 
-    final_poses = runners.line_localization(
+    final_poses = runners.hybrid_localization(
         cfg,
         imagecols_train,
         imagecols_query,

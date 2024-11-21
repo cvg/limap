@@ -11,7 +11,7 @@ import limap.estimators as estimators
 import limap.line2d
 import limap.runners as runners
 import limap.util.io as limapio
-from limap.optimize.line_localization.functions import (
+from limap.optimize.hybrid_localization.functions import (
     filter_line_2to2_epipolarIoU,
     get_reprojection_dist_func,
     match_line_2to2_epipolarIoU,
@@ -91,7 +91,7 @@ def get_hloc_keypoints_from_log(
     return p2ds, p3ds, inliers
 
 
-def line_localization(
+def hybrid_localization(
     cfg,
     imagecols_db,
     imagecols_query,

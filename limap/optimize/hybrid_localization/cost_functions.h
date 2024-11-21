@@ -1,5 +1,5 @@
-#ifndef LIMAP_OPTIMIZE_LINE_LOCALIZATION_COST_FUNCTIONS_H_
-#define LIMAP_OPTIMIZE_LINE_LOCALIZATION_COST_FUNCTIONS_H_
+#ifndef LIMAP_OPTIMIZE_HYBRID_LOCALIZATION_COST_FUNCTIONS_H_
+#define LIMAP_OPTIMIZE_HYBRID_LOCALIZATION_COST_FUNCTIONS_H_
 
 #include "_limap/helpers.h"
 #include <pybind11/numpy.h>
@@ -14,7 +14,7 @@
 #include "ceresbase/point_projection.h"
 #include <ceres/ceres.h>
 
-#include "optimize/line_localization/lineloc_config.h"
+#include "optimize/hybrid_localization/hybrid_localization_config.h"
 
 namespace py = pybind11;
 
@@ -22,7 +22,7 @@ namespace limap {
 
 namespace optimize {
 
-namespace line_localization {
+namespace hybrid_localization {
 
 ////////////////////////////////////////////////////////////
 // 2D Weights and Line Dists
@@ -347,7 +347,7 @@ protected:
   bool use_3d_dist_;
 };
 
-} // namespace line_localization
+} // namespace hybrid_localization
 
 } // namespace optimize
 

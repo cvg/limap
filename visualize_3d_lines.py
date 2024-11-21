@@ -1,6 +1,6 @@
 import os
 
-import limap.base as _base
+import limap.base as base
 import limap.util.io as limapio
 import limap.visualize as limapvis
 
@@ -113,7 +113,7 @@ def main(args):
             not args.imagecols.endswith(".npy")
         ):
             raise ValueError(f"Error! Input file {args.imagecols} is not valid")
-        imagecols = _base.ImageCollection(
+        imagecols = base.ImageCollection(
             limapio.read_npy(args.imagecols).item()
         )
         vis_reconstruction(
