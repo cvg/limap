@@ -184,7 +184,7 @@ double JointPoseEstimator::EvaluateModelOnPoint(const CameraPose &pose,
       return std::numeric_limits<double>::max();
     hybridloc::ReprojectionPointFunctor(p3ds_->at(i), p2ds_->at(i),
                                         loc_config_.points_3d_dist)(
-        cam_.Params().data(), pose.qvec.data(), pose.tvec.data(), res);
+        cam_.params.data(), pose.qvec.data(), pose.tvec.data(), res);
     return V2D(res[0], res[1]).squaredNorm();
   } else {
     // we sampled a line correspondence
@@ -195,7 +195,7 @@ double JointPoseEstimator::EvaluateModelOnPoint(const CameraPose &pose,
       return std::numeric_limits<double>::max();
     hybridloc::ReprojectionLineFunctor(loc_config_.cost_function, ENoneWeight,
                                        l3d, l2ds_->at(i))(
-        cam_.Params().data(), pose.qvec.data(), pose.tvec.data(), res);
+        cam_.params.data(), pose.qvec.data(), pose.tvec.data(), res);
     if (getResidualNum(loc_config_.cost_function) == 2) {
       return V2D(res[0], res[1]).squaredNorm();
     } else if (getResidualNum(loc_config_.cost_function) == 4)
