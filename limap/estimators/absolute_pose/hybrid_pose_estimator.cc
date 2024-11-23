@@ -81,6 +81,8 @@ double HybridPoseEstimator::EvaluateModelOnPoint(const CameraPose &pose, int t,
   else if (t == 1)
     return JointPoseEstimator::EvaluateModelOnPoint(pose,
                                                     i + num_data_points());
+  else
+    throw std::runtime_error("Error! Not supported!");
 }
 
 } // namespace absolute_pose

@@ -200,6 +200,8 @@ double JointPoseEstimator::EvaluateModelOnPoint(const CameraPose &pose,
       return V2D(res[0], res[1]).squaredNorm();
     } else if (getResidualNum(loc_config_.cost_function) == 4)
       return V4D(res[0], res[1], res[2], res[3]).squaredNorm();
+    else
+      throw std::runtime_error("Error! Not supported!");
   }
 }
 
