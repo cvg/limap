@@ -2,6 +2,30 @@
 # Find packages
 ################################################################################
 find_package(Eigen3 3.4 REQUIRED)
+find_package(FreeImage REQUIRED)
+find_package(Glog REQUIRED)
+if(DEFINED glog_VERSION_MAJOR)
+  # Older versions of glog don't export version variables.
+  add_definitions("-DGLOG_VERSION_MAJOR=${glog_VERSION_MAJOR}")
+  add_definitions("-DGLOG_VERSION_MINOR=${glog_VERSION_MINOR}")
+endif()
+find_package(Boost ${COLMAP_FIND_TYPE} COMPONENTS
+             graph
+             program_options
+             system)
+
+# Ceres
+find_package(Ceres REQUIRED COMPONENTS SuiteSparse)
+if(${CERES_VERSION} VERSION_LESS "2.2.0")
+    # ceres 2.2.0 changes the interface of local parameterization
+    add_definitions("-DCERES_PARAMETERIZATION_ENABLED")
+endif()
+if(INTERPOLATION_ENABLED)
+    message(STATUS "Enabling pixelwise optimization with ceres interpolation. This should be disabled for clang.")
+    add_definitions("-DINTERPOLATION_ENABLED")
+else()
+    message(STATUS "Disabling pixelwise optimization with ceres interpolation.")
+endif()
 
 # OpenMP
 if(OPENMP_ENABLED)
@@ -30,17 +54,16 @@ endif()
 message(STATUS "Configuring PoseLib... done")
 
 # COLMAP
-find_package(COLMAP REQUIRED)
-
-# Ceres
-if(${CERES_VERSION} VERSION_LESS "2.2.0")
-    # ceres 2.2.0 changes the interface of local parameterization
-    add_definitions("-DCERES_PARAMETERIZATION_ENABLED")
-endif()
-if(INTERPOLATION_ENABLED)
-    message(STATUS "Enabling pixelwise optimization with ceres interpolation. This should be disabled for clang.")
-    add_definitions("-DINTERPOLATION_ENABLED")
+FetchContent_Declare(COLMAP
+    GIT_REPOSITORY    https://github.com/colmap/colmap.git
+    GIT_TAG           63b2cc000de32dc697f45ef1576dec7e67abddbc 
+    EXCLUDE_FROM_ALL
+)
+message(STATUS "Configuring COLMAP...")
+if (FETCH_COLMAP) 
+    FetchContent_MakeAvailable(COLMAP)
 else()
-    message(STATUS "Disabling pixelwise optimization with ceres interpolation.")
+    find_package(COLMAP REQUIRED)
 endif()
+message(STATUS "Configuring COLMAP... done")
 

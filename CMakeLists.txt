@@ -24,52 +24,29 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CMakeHelper.cmake NO_POLICY_SCOPE)
 option(OPENMP_ENABLED "Whether to enable OpenMP parallelization" ON)
 option(INTERPOLATION_ENABLED "Whether to enable interpolation-based pixel-perfect optimization" OFF)
 option(FETCH_POSELIB "Whether to use PoseLib with FetchContent or with self-installed software" ON)
+option(FETCH_COLMAP "Whether to use COLMAP with FetchContent or with self-installed software" ON)
 
 include(cmake/FindDependencies.cmake)
+include(cmake/InitVariables.cmake)
 
-################################################################################
-# Add sources
-################################################################################
-set(LIMAP_INCLUDE_DIRS
-  ${HDF5_INCLUDE_DIRS}
-  ${EIGEN3_INCLUDE_DIR}
-  ${PROJECT_SOURCE_DIR}
-  ${FREEIMAGE_INCLUDE_DIRS}
-  ${COLMAP_INCLUDE_DIRS}
-)
-set(LIMAP_LINK_DIRS
-  ${COLMAP_LINK_DIRS}
-)
-set(LIMAP_EXTERNAL_LIBRARIES
-  ${CERES_LIBRARIES}
-  ${FREEIMAGE_LIBRARIES}
-  ${COLMAP_LIBRARIES}
-  ${HDF5_C_LIBRARIES}
-  ${Boost_LIBRARIES}
-  PoseLib::PoseLib
-)
-if(OPENMP_FOUND)
-    list(APPEND LIMAP_EXTERNAL_LIBRARIES ${OpenMP_libomp_LIBRARY})
-endif()
-
-set(LIMAP_INTERNAL_LIBRARIES
-  HighFive
-  pybind11::module
-  JLinkage
-  igl::core
-)
-
+# include directories
 include_directories(
     third-party
     limap
     ${LIMAP_INCLUDE_DIRS}
 )
-link_directories(${LIMAP_LINK_DIRS})
 
+# Add sources
 add_subdirectory(third-party)
 include_directories(${JLINKAGE_INCLUDE_DIRS})
 include_directories(${RANSACLIB_INCLUDE_DIRS})
 add_subdirectory(limap)
+
+# Install find_package scripts for dependencies.
+install(
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cmake
+    DESTINATION share/colmap
+    FILES_MATCHING PATTERN "Find*.cmake")
 
 ################################################################################
 # Generate source groups for Visual Studio, XCode, etc.
