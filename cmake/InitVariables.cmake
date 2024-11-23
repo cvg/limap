@@ -33,11 +33,14 @@ set(LIMAP_INTERNAL_LIBRARIES
   igl::core
 )
 
-# Directories to include from dependencies
+# Init variables for directories
 set(LIMAP_INCLUDE_DIRS
   ${HDF5_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIR}
   ${FREEIMAGE_INCLUDE_DIRS}
   ${COLMAP_INCLUDE_DIRS}
-  ${PROJECT_SOURCE_DIR}
+)
+
+set(LIMAP_LINK_DIRS
+  ${Boost_LIBRARY_DIRS}
 )

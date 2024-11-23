@@ -33,8 +33,10 @@ include(cmake/InitVariables.cmake)
 include_directories(
     third-party
     limap
+    ${PROJECT_SOURCE_DIR}
     ${LIMAP_INCLUDE_DIRS}
 )
+link_directories(${LIMAP_LINK_DIRS})
 
 # Add sources
 add_subdirectory(third-party)
