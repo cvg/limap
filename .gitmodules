@@ -20,10 +20,6 @@
 [submodule "third-party/pytlsd"]
 	path = third-party/pytlsd
 	url = https://github.com/iago-suarez/pytlsd.git
-[submodule "third-party/hawp"]
-	path = third-party/hawp
-	url = https://github.com/cherubicXN/hawp.git
-	ignore = dirty
 [submodule "third-party/DeepLSD"]
 	path = third-party/DeepLSD
 	url = https://github.com/cvg/DeepLSD.git
