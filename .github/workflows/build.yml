@@ -35,11 +35,6 @@ jobs:
           restore-keys: limap-v${{ env.COMPILER_CACHE_VERSION }}-${{ matrix.config.os }}-${{ matrix.config.arch }}
           path: ${{ env.COMPILER_CACHE_DIR }}
 
-      - name: Select Python
-        if: github.event_name == 'pull_request'
-        run: |
-          echo "CIBW_BUILD=${PULL_REQUEST_CIBW_BUILD}" >> "$GITHUB_ENV"
-
       - name: Set env (Linux)
         if: runner.os == 'Linux'
         run: |
