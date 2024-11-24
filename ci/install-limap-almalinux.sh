@@ -26,7 +26,6 @@ git clone https://github.com/microsoft/vcpkg ${VCPKG_INSTALLATION_ROOT}
 cd ${VCPKG_INSTALLATION_ROOT}
 git checkout ${VCPKG_COMMIT_ID}
 ./bootstrap-vcpkg.sh
-./vcpkg integrate install
 
 # install dependencies
 ./vcpkg install cmake ninja
@@ -43,4 +42,5 @@ git checkout ${VCPKG_COMMIT_ID}
 ./vcpkg install qt5-base qt5-opengl
 ./vcpkg install cgal
 ./vcpkg install libunwind
+./vcpkg integrate install
 
