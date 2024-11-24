@@ -9,7 +9,7 @@ if(DEFINED glog_VERSION_MAJOR)
   add_definitions("-DGLOG_VERSION_MAJOR=${glog_VERSION_MAJOR}")
   add_definitions("-DGLOG_VERSION_MINOR=${glog_VERSION_MINOR}")
 endif()
-find_package(Boost ${COLMAP_FIND_TYPE} COMPONENTS
+find_package(Boost REQUIRED COMPONENTS
              graph
              program_options
              system)
