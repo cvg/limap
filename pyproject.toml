@@ -1,3 +1,7 @@
+[build-system]
+requires = ["scikit-build-core>=0.3.3", "pybind11==2.11.1"]
+build-backend = "scikit_build_core.build"
+
 [project]
 name = "limap"
 # WARNING: This version must follow the MAJOR.MINOR.PATCH format. If only
