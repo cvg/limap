@@ -4,11 +4,11 @@ import numpy as np
 
 import limap.util.io as limapio
 
-from ..base_detector import BaseDetector, BaseDetectorOptions
+from ..base_detector import BaseDetector, DefaultDetectorOptions
 
 
 class DenseNaiveExtractor(BaseDetector):
-    def __init__(self, options=BaseDetectorOptions(), device=None):
+    def __init__(self, options=DefaultDetectorOptions, device=None):
         super().__init__(options)
 
     def get_module_name(self):

@@ -4,7 +4,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from ..base_matcher import BaseMatcher, BaseMatcherOptions
+from ..base_matcher import BaseMatcher, DefaultMatcherOptions
 from .dense_matcher import BaseDenseMatcher
 
 
@@ -16,13 +16,16 @@ class BaseDenseLineMatcherOptions(NamedTuple):
     one_to_many: bool = False
 
 
+DefaultDenseLineMatcherOptions = BaseDenseLineMatcherOptions()
+
+
 class BaseDenseLineMatcher(BaseMatcher):
     def __init__(
         self,
         extractor,
         dense_matcher,
-        dense_options=BaseDenseLineMatcherOptions(),
-        options=BaseMatcherOptions(),
+        dense_options=DefaultDenseLineMatcherOptions,
+        options=DefaultMatcherOptions,
     ):
         super().__init__(extractor, options)
         assert self.extractor.get_module_name() == "dense_naive"
@@ -169,7 +172,8 @@ class BaseDenseLineMatcher(BaseMatcher):
         dists = torch.where(
             overlap_1to2 > overlap_2to1.T, dists_1to2, dists_2to1.T
         )
-        # Both warps must have a minimum overlap and close distance (= equivalent of mutual nearest neighbor)
+        # Both warps must have a minimum overlap and close distance
+        # (= equivalent of mutual nearest neighbor)
         overlap = torch.minimum(overlap_1to2, overlap_2to1.T)
         dists[overlap < self.dense_options.segment_percentage_th] = 10000
         dists[
@@ -213,7 +217,8 @@ class BaseDenseLineMatcher(BaseMatcher):
         dists = torch.where(
             overlap_1to2 > overlap_2to1.T, dists_1to2, dists_2to1.T
         )
-        # Both warps must have a minimum overlap and close distance (= equivalent of mutual nearest neighbor)
+        # Both warps must have a minimum overlap and close distance
+        # (= equivalent of mutual nearest neighbor)
         overlap = torch.minimum(overlap_1to2, overlap_2to1.T)
         dists[overlap < self.dense_options.segment_percentage_th] = 10000
         dists[
@@ -238,8 +243,8 @@ class RoMaLineMatcher(BaseDenseLineMatcher):
         self,
         extractor,
         mode="outdoor",
-        dense_options=BaseDenseLineMatcherOptions(),
-        options=BaseMatcherOptions(),
+        dense_options=DefaultDenseLineMatcherOptions,
+        options=DefaultMatcherOptions,
     ):
         from .dense_matcher import RoMa
 
