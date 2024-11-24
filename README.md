@@ -20,6 +20,31 @@ In this project, we provide interfaces for various geometric operations on 2D/3D
 
 **Install the dependencies as follows:**
 * CMake >= 3.17
+* All dependencies for third-party: COLMAP (will be installed with FetchContent). From [[official guide](https://colmap.github.io/install.html)]
+```bash
+sudo apt-get install \
+    git \
+    cmake \
+    ninja-build \
+    build-essential \
+    libboost-program-options-dev \
+    libboost-filesystem-dev \
+    libboost-graph-dev \
+    libboost-system-dev \
+    libeigen3-dev \
+    libflann-dev \
+    libfreeimage-dev \
+    libmetis-dev \
+    libgoogle-glog-dev \
+    libgtest-dev \
+    libgmock-dev \
+    libsqlite3-dev \
+    libglew-dev \
+    qtbase5-dev \
+    libqt5opengl5-dev \
+    libcgal-dev \
+    libceres-dev
+```
 * HDF5
 ```bash
 sudo apt-get install libhdf5-dev
