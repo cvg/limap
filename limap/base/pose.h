@@ -3,8 +3,6 @@
 
 #include <colmap/geometry/pose.h>
 
-#include "base/camera.h"
-
 // Functions copied from COLMAP 3.8
 // TODO: Update all the qvec to Eigen Quaternion as in the new COLMAP
 

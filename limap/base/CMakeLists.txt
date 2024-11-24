@@ -7,6 +7,7 @@ LIMAP_ADD_SOURCES(
     transforms.h transforms.cc
     camera_view.h camera_view.cc
     image_collection.h image_collection.cc
+    pose.h pose.cc
 
     pointtrack.h pointtrack.cc
     linebase.h linebase.cc
