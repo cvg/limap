@@ -35,4 +35,4 @@
 	url = https://github.com/cvg/GlueStick.git
 [submodule "third-party/libigl"]
 	path = third-party/libigl
-	url = git@github.com:libigl/libigl.git
+	url = https://github.com/libigl/libigl.git
