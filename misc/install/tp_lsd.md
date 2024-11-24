@@ -1,6 +1,7 @@
 ## TP-LSD installation
 
 ```bash
+git clone --recursive https://github.com/rpautrat/TP-LSD.git ./third-party/TP-LSD
 python -m pip install -e ./third-party/TP-LSD/tp_lsd/modeling/DCNv2
 python -m pip install -e ./third-party/TP-LSD
 ```
