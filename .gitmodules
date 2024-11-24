@@ -20,9 +20,6 @@
 [submodule "third-party/pytlsd"]
 	path = third-party/pytlsd
 	url = https://github.com/iago-suarez/pytlsd.git
-[submodule "third-party/pytlbd"]
-	path = third-party/pytlbd
-	url = https://github.com/iago-suarez/pytlbd.git
 [submodule "third-party/hawp"]
 	path = third-party/hawp
 	url = https://github.com/cherubicXN/hawp.git
