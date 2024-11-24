@@ -55,7 +55,7 @@ dependencies = [
 find = { include = ["limap"] }
 
 [tool.cibuildwheel]
-build = "cp3{8,9,10,11,12}-{manylinux}*"
+build = "cp3{8,9,10,11,12}-manylinux*"
 archs = ["auto64"]
 test-command = "python -c \"import limap; print(limap.__version__)\""
 
