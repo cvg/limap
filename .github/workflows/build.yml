@@ -71,6 +71,7 @@ jobs:
 
       - name: Build
         run: |
+          python -m pip install setuptools
           python -m pip install .
 
       - name: Run Python tests
