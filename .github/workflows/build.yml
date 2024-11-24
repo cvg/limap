@@ -38,6 +38,49 @@ jobs:
       - name: Set env (Linux)
         if: runner.os == 'Linux'
         run: |
+          sudo apt-get update && sudo apt-get install -y \
+            build-essential \
+            cmake \
+            ninja-build \
+            libboost-program-options-dev \
+            libboost-graph-dev \
+            libboost-system-dev \
+            libeigen3-dev \
+            libceres-dev \
+            libflann-dev \
+            libfreeimage-dev \
+            libmetis-dev \
+            libgoogle-glog-dev \
+            libgtest-dev \
+            libgmock-dev \
+            libsqlite3-dev \
+            libglew-dev \
+            qtbase5-dev \
+            libqt5opengl5-dev \
+            libcgal-dev \
+            libcgal-qt5-dev \
+            libgl1-mesa-dri \
+            libunwind-dev \
+            xvfb
+
+          if [ "${{ matrix.config.cudaEnabled }}" == "true" ]; then
+            if [ "${{ matrix.config.os }}" == "ubuntu-20.04" ]; then
+              sudo apt-get install -y \
+                nvidia-cuda-toolkit \
+                nvidia-cuda-toolkit-gcc
+              echo "CC=/usr/bin/cuda-gcc" >> $GITHUB_ENV
+              echo "CXX=/usr/bin/cuda-g++" >> $GITHUB_ENV
+            elif [ "${{ matrix.config.os }}" == "ubuntu-22.04" ]; then
+              sudo apt-get install -y \
+                nvidia-cuda-toolkit \
+                nvidia-cuda-toolkit-gcc \
+                gcc-10 g++-10
+              echo "CC=/usr/bin/gcc-10" >> $GITHUB_ENV
+              echo "CXX=/usr/bin/g++-10" >> $GITHUB_ENV
+              echo "CUDAHOSTCXX=/usr/bin/g++-10" >> $GITHUB_ENV
+            fi
+          fi
+
           VCPKG_TARGET_TRIPLET="x64-linux-release"
           echo "VCPKG_TARGET_TRIPLET=${VCPKG_TARGET_TRIPLET}" >> "$GITHUB_ENV"
 
