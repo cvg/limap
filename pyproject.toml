@@ -1,0 +1,64 @@
+[project]
+name = "limap"
+# WARNING: This version must follow the MAJOR.MINOR.PATCH format. If only
+# MAJOR.MINOR is used, cibuildwheel will add a .dev0 patch version, which
+# results in releasing a pre-release version on PyPI.
+version = "1.0.0.dev0"
+description = "LIMAP: A toolbox for localization and mapping with line features"
+readme = "README.md"
+authors = [
+  { name = "Shaohui Liu", email = "b1ueber2y@gmail.com" },
+  { name = "Yifan Yu", email = "TBD" },
+  { name = "Rémi Pautrat", email = "pautratrmi@microsoft.com" },
+  { name = "Viktor Larsson", email = "viktor.larsson@math.lth.se" },
+]
+license = {text = "BSD-3-Clause"}
+urls = {Repository = "https://github.com/cvg/limap"}
+requires-python = ">=3.8"
+
+dependencies = [
+    "scikit-build-core>=0.3.3",
+    "pybind11==2.13.0",
+    "pyyaml",
+    "tqdm",
+    "attrdict",
+    "h5py",
+    "numpy",
+    "scipy",
+    "matplotlib",
+    "seaborn",
+    "tensorboardX",
+    "opencv-python",
+    "opencv-contrib-python",
+    "scikit-learn",
+    "scikit-image",
+    "bresenham",
+    "pyvista",
+    "omegaconf",
+    "plyfile",
+    "pathlib",
+    "open3d==0.16.0",
+    "imagesize",
+    "einops",
+    "ninja",
+    "yacs",
+    "python-json-logger",
+    "ruff==0.6.7",
+    "clang-format==19.1.0",
+    ./third-party/pytlsd",
+    ./third-party/hawp",
+    ./third-party/Hierarchical-Localization",
+    ./third-party/DeepLSD",
+    ./third-party/GlueStick",
+]
+
+[tool.cibuildwheel]
+build = "cp3{8,9,10,11,12}-{manylinux}*"
+archs = ["auto64"]
+test-command = "python -c \"import limap; print(limap.__version__)\"
+
+[tool.cibuildwheel.environment]
+VCPKG_COMMIT_ID = "10b7a178346f3f0abef60cecd5130e295afd8da4"
+
+[tool.cibuildwheel.linux]
+before-all = "{package}/ci/install-limap-almalinux.sh"
