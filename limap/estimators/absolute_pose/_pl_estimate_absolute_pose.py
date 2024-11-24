@@ -1,9 +1,9 @@
 import numpy as np
 from _limap import _ceresbase
 
-import limap.base as _base
+import limap.base as base
 import limap.estimators as _estimators
-import limap.optimize as _optimize
+import limap.optimize as optimize
 
 
 def _pl_estimate_absolute_pose(
@@ -52,7 +52,8 @@ def _pl_estimate_absolute_pose(
             p3ds = np.array(p3ds)[inliers_point]
             if logger:
                 logger.info(
-                    f"{len(p2ds)} inliers reserved from {original_len} point matches"
+                    f"{len(p2ds)} inliers reserved from \
+                      {original_len} point matches"
                 )
 
         if inliers_line is not None:
@@ -61,10 +62,11 @@ def _pl_estimate_absolute_pose(
             l2ds = np.array(l2ds)[inliers_line]
             if logger:
                 logger.info(
-                    f"{len(l3d_ids)} inliers reserved from {original_len} line matches"
+                    f"{len(l3d_ids)} inliers reserved from \
+                      {original_len} line matches"
                 )
 
-        jointloc = _optimize.solve_jointloc(
+        jointloc = optimize.solve_jointloc(
             cfg["line_cost_func"],
             jointloc_cfg,
             l3ds,
@@ -79,14 +81,14 @@ def _pl_estimate_absolute_pose(
         )
         final_t = jointloc.GetFinalT().copy()
         final_q = jointloc.GetFinalQ().copy()
-        return _base.CameraPose(final_q, final_t), None
+        return base.CameraPose(final_q, final_t), None
 
     options = (
         _estimators.HybridPoseEstimatorOptions()
         if ransac_cfg["method"] == "hybrid"
         else _estimators.JointPoseEstimatorOptions()
     )
-    options.lineloc_config = _optimize.LineLocConfig(jointloc_cfg)
+    options.lineloc_config = optimize.LineLocConfig(jointloc_cfg)
     if (
         "solver_options" not in jointloc_cfg
         or "minimizer_progress_to_stdout" not in jointloc_cfg["solver_options"]
@@ -102,7 +104,7 @@ def _pl_estimate_absolute_pose(
         options.lineloc_config.solver_options.logging_type = (
             _ceresbase.LoggingType.SILENT
         )
-    func = _optimize.get_lineloc_cost_func(cfg["line_cost_func"])
+    func = optimize.get_lineloc_cost_func(cfg["line_cost_func"])
     options.lineloc_config.cost_function = func
 
     if ransac_cfg["method"] == "hybrid":

@@ -1,3 +1,5 @@
+import logging
+
 from _limap import _pointsfm
 
 
@@ -16,7 +18,7 @@ def filter_by_cam_id(cam_id, prev_imagecols, prev_neighbors):
     return imagecols, neighbors
 
 
-def ComputeNeighbors(
+def compute_neighbors(
     model, n_neighbors, min_triangulation_angle=1.0, neighbor_type="iou"
 ):
     """
@@ -39,8 +41,8 @@ def ComputeNeighbors(
 
 def compute_metainfos(cfg, model, n_neighbors=20):
     # get neighbors
-    print(f"Computing visual neighbors... (n_neighbors = {n_neighbors})")
-    neighbors = ComputeNeighbors(
+    logging.info(f"Computing visual neighbors... (n_neighbors = {n_neighbors})")
+    neighbors = compute_neighbors(
         model,
         n_neighbors,
         min_triangulation_angle=cfg["min_triangulation_angle"],

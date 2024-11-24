@@ -1,5 +1,5 @@
-#ifndef LIMAP_OPTIMIZE_LINE_LOCALIZATION_LINELOC_CONFIG_H_
-#define LIMAP_OPTIMIZE_LINE_LOCALIZATION_LINELOC_CONFIG_H_
+#ifndef LIMAP_OPTIMIZE_HYBRID_LOCALIZATION_HYBRID_LOCALIZATION_CONFIG_H_
+#define LIMAP_OPTIMIZE_HYBRID_LOCALIZATION_HYBRID_LOCALIZATION_CONFIG_H_
 
 #include "_limap/helpers.h"
 #include <pybind11/numpy.h>
@@ -14,7 +14,7 @@ namespace limap {
 
 namespace optimize {
 
-namespace line_localization {
+namespace hybrid_localization {
 
 enum LineLocCostFunction {
   E2DMidpointDist2,
@@ -78,7 +78,7 @@ public:
   std::shared_ptr<ceres::LossFunction> loss_function;
 };
 
-} // namespace line_localization
+} // namespace hybrid_localization
 
 } // namespace optimize
 

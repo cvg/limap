@@ -80,9 +80,14 @@ def main():
         # colmap align
         cmd_list = []
         basepath = os.path.join(colmap_output_path, scene_id, "dense")
-        cmd = "mkdir -p {0}".format(os.path.join(basepath, "aligned"))
+        cmd = "mkdir -p {}".format(os.path.join(basepath, "aligned"))
         cmd_list.append(cmd)
-        cmd = "colmap model_aligner --input_path {0} --output_path {1} --ref_images_path {2} --robust_alignment 1 --robust_alignment_max_error {3} --transform_path {4} --ref_is_gps false".format(
+        cmd = "colmap model_aligner --input_path {} --output_path {} \
+               --ref_images_path {} \
+               --robust_alignment 1 \
+               --robust_alignment_max_error {} \
+               --transform_path {} \
+               --ref_is_gps false".format(
             os.path.join(basepath, "sparse"),
             os.path.join(basepath, "aligned"),
             os.path.join(input_meta_path, scene_id, "geo_positions.txt"),
@@ -90,7 +95,8 @@ def main():
             os.path.join(basepath, "transform.txt"),
         )
         cmd_list.append(cmd)
-        cmd = "colmap model_converter --input_path {0} --output_path {1} --output_type PLY".format(
+        cmd = "colmap model_converter --input_path {} --output_path {} \
+               --output_type PLY".format(
             os.path.join(basepath, "aligned"),
             os.path.join(basepath, "aligned/points.ply"),
         )

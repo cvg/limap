@@ -19,8 +19,8 @@ from hloc import (
 )
 from tqdm import tqdm
 
-import limap.base as _base
-import limap.pointsfm as _psfm
+import limap.base as base
+import limap.pointsfm as pointsfm
 import limap.util.io as limapio
 
 
@@ -35,7 +35,7 @@ def read_scene_visualsfm(
     ):
         cfg["info_path"] = os.path.join(output_dir, metainfos_filename)
     if cfg["info_path"] is None:
-        imagecols, neighbors, ranges = _psfm.read_infos_visualsfm(
+        imagecols, neighbors, ranges = pointsfm.read_infos_visualsfm(
             cfg["sfm"], vsfm_path, nvm_file=nvm_file, n_neighbors=n_neighbors
         )
         with open(os.path.join(output_dir, metainfos_filename), "wb") as f:
@@ -53,7 +53,7 @@ def read_scene_visualsfm(
                 data["neighbors"].item(),
                 data["ranges"],
             )
-            imagecols = _base.ImageCollection(imagecols_np)
+            imagecols = base.ImageCollection(imagecols_np)
     return imagecols, neighbors, ranges
 
 
@@ -86,12 +86,12 @@ def get_scene_info(vsfm_path, imagecols, query_images):
 def undistort_and_resize(cfg, imagecols, logger=None):
     import cv2
 
-    import limap.runners as _runners
+    import limap.runners as runners
 
     # undistort images
     logger.info("Performing undistortion...")
     if not imagecols.IsUndistorted():
-        imagecols = _runners.undistort_images(
+        imagecols = runners.undistort_images(
             imagecols,
             os.path.join(cfg["output_dir"], cfg["undistortion_output_dir"]),
             skip_exists=cfg["load_undistort"] or cfg["skip_exists"],
@@ -198,7 +198,7 @@ def eval(filename, poses_gt, query_ids, id_to_name, logger):
             data = data.split()
             name = data[0]
             q, t = np.split(np.array(data[1:], float), [4])
-            pose_results[name] = _base.CameraPose(q, t)
+            pose_results[name] = base.CameraPose(q, t)
 
     for qid in query_ids:
         name = id_to_name[qid]
@@ -312,7 +312,7 @@ def run_hloc_cambridge(
         logger.info("Running COLMAP for 3D points...")
     neighbors_train = imagecols_train.update_neighbors(neighbors)
 
-    ref_sfm_path = _psfm.run_colmap_sfm_with_known_poses(
+    ref_sfm_path = pointsfm.run_colmap_sfm_with_known_poses(
         cfg["sfm"],
         imagecols_train,
         os.path.join(cfg["output_dir"], "tmp_colmap"),
@@ -374,7 +374,7 @@ def run_hloc_cambridge(
             data = data.split()
             name = data[0]
             q, t = np.split(np.array(data[1:], float), [4])
-            poses[name] = _base.CameraPose(q, t)
+            poses[name] = base.CameraPose(q, t)
     if logger:
         logger.info(f"Coarse pose read from {results_file}")
     hloc_log_file = f"{results_file}_logs.pkl"

@@ -1,3 +1,5 @@
+import logging
+
 import torch.nn as nn
 import torch.nn.init as init
 
@@ -15,7 +17,7 @@ def get_model(model_cfg=None, loss_weights=None, mode="train", printing=False):
 
     # List the supported options here
     if printing:
-        print("\n\n\t--------Initializing model----------")
+        logging.info("\n\n\t--------Initializing model----------")
     supported_arch = ["simple"]
     if model_cfg["model_architecture"] not in supported_arch:
         raise ValueError(
@@ -35,7 +37,7 @@ def get_model(model_cfg=None, loss_weights=None, mode="train", printing=False):
             for param_name, param in loss_weights.items():
                 if isinstance(param, nn.Parameter):
                     if printing:
-                        print(
+                        logging.info(
                             "\t [Debug] Adding %s with value %f to model"
                             % (param_name, param.item())
                         )
@@ -47,11 +49,13 @@ def get_model(model_cfg=None, loss_weights=None, mode="train", printing=False):
 
     # Display some summary info.
     if printing:
-        print("\tModel architecture: %s" % model_cfg["model_architecture"])
-        print("\tBackbone: %s" % model_cfg["backbone"])
-        print("\tJunction decoder: %s" % model_cfg["junction_decoder"])
-        print("\tHeatmap decoder: %s" % model_cfg["heatmap_decoder"])
-        print("\t-------------------------------------")
+        logging.info(
+            "\tModel architecture: %s" % model_cfg["model_architecture"]
+        )
+        logging.info("\tBackbone: %s" % model_cfg["backbone"])
+        logging.info("\tJunction decoder: %s" % model_cfg["junction_decoder"])
+        logging.info("\tHeatmap decoder: %s" % model_cfg["heatmap_decoder"])
+        logging.info("\t-------------------------------------")
 
     return model
 

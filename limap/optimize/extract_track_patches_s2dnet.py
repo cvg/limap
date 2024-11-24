@@ -4,7 +4,7 @@ import time
 import numpy as np
 from tqdm import tqdm
 
-import limap.features as _features
+import limap.features as limap_features
 import limap.util.io as limapio
 
 
@@ -28,8 +28,10 @@ def extract_track_patches_s2dnet(
     """
     Extract line patches (S2DNet) for each track
     """
-    feature_extractor = _features.S2DNetExtractor("cuda")
-    extractor = _features.get_extractor(cfg["patch"], cfg["channels"])
+    feature_extractor = limap_features.load_extractor("s2dnet", "cuda")
+    extractor = limap_features.get_line_patch_extractor(
+        cfg["patch"], cfg["channels"]
+    )
     if not skip_exists:
         limapio.delete_folder(output_dir)
     limapio.check_makedirs(output_dir)
@@ -66,7 +68,7 @@ def extract_track_patches_s2dnet(
             )
             if skip_exists and os.path.exists(fname):
                 continue
-            _features.write_patch(fname, patch, dtype=cfg["dtype"])
+            limap_features.write_patch(fname, patch, dtype=cfg["dtype"])
             time.sleep(0.001)
 
 

@@ -1,10 +1,11 @@
+import logging
 import os
 import sys
 
 from _limap import _base
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from read_write_model import (
+from hloc.utils.read_write_model import (
     read_cameras_binary,
     read_cameras_text,
     read_images_binary,
@@ -29,7 +30,7 @@ def check_exists_colmap_model(model_path):
 
 
 def ReadInfos(colmap_path, model_path="sparse", image_path="images"):
-    print("Start loading COLMAP sparse reconstruction.")
+    logging.info("Start loading COLMAP sparse reconstruction.")
     model_path = os.path.join(colmap_path, model_path)
     image_path = os.path.join(colmap_path, image_path)
     if os.path.exists(os.path.join(model_path, "cameras.bin")):
@@ -46,7 +47,7 @@ def ReadInfos(colmap_path, model_path="sparse", image_path="images"):
         raise ValueError(
             f"Error! The model file does not exist at {model_path}"
         )
-    print(f"Reconstruction loaded. (n_images = {len(colmap_images)})")
+    logging.info(f"Reconstruction loaded. (n_images = {len(colmap_images)})")
 
     # read cameras
     cameras = {}

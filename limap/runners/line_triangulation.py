@@ -1,16 +1,17 @@
+import logging
 import os
 
 from tqdm import tqdm
 
-import limap.base as _base
-import limap.merging as _mrg
-import limap.optimize as _optim
-import limap.pointsfm as _psfm
-import limap.runners as _runners
-import limap.triangulation as _tri
+import limap.base as base
+import limap.merging as merging
+import limap.optimize as optimize
+import limap.pointsfm as pointsfm
+import limap.runners as runners
+import limap.triangulation as triangulation
 import limap.util.io as limapio
 import limap.visualize as limapvis
-import limap.vplib as _vplib
+import limap.vplib as vplib
 
 
 def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
@@ -18,21 +19,27 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     Main interface of line triangulation over multi-view images.
 
     Args:
-        cfg (dict): Configuration. Fields refer to :file:`cfgs/triangulation/default.yaml` as an example
-        imagecols (:class:`limap.base.ImageCollection`): The image collection corresponding to all the images of interest
-        neighbors (dict[int -> list[int]], optional): visual neighbors for each image. By default we compute neighbor information from the covisibility of COLMAP triangulation.
-        ranges (pair of :class:`np.array` each of shape (3,), optional): robust 3D ranges for the scene. By default we compute range information from the COLMAP triangulation.
+        cfg (dict): Configuration. \
+            Refer to :file:`cfgs/triangulation/default.yaml` as an example
+        imagecols (:class:`limap.base.ImageCollection`): \
+            The image collection corresponding to all the images of interest
+        neighbors (dict[int -> list[int]], optional): \
+            visual neighbors for each image. By default we compute \
+            neighbor information from the covisibility of COLMAP triangulation.
+        ranges (pair of :class:`np.array` each of shape (3,), optional): \
+            robust 3D ranges for the scene. By default we compute \
+            range information from the COLMAP triangulation.
     Returns:
         list[:class:`limap.base.LineTrack`]: list of output 3D line tracks
     """
-    print(f"[LOG] Number of images: {imagecols.NumImages()}")
-    cfg = _runners.setup(cfg)
+    logging.info(f"[LOG] Number of images: {imagecols.NumImages()}")
+    cfg = runners.setup(cfg)
     detector_name = cfg["line2d"]["detector"]["method"]
     if cfg["triangulation"]["var2d"] == -1:
         cfg["triangulation"]["var2d"] = cfg["var2d"][detector_name]
     # undistort images
     if not imagecols.IsUndistorted():
-        imagecols = _runners.undistort_images(
+        imagecols = runners.undistort_images(
             imagecols,
             os.path.join(cfg["dir_save"], cfg["undistortion_output_dir"]),
             skip_exists=cfg["load_undistort"] or cfg["skip_exists"],
@@ -55,7 +62,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     ##########################################################
     sfminfos_colmap_folder = None
     if neighbors is None:
-        sfminfos_colmap_folder, neighbors, ranges = _runners.compute_sfminfos(
+        sfminfos_colmap_folder, neighbors, ranges = runners.compute_sfminfos(
             cfg, imagecols
         )
     else:
@@ -76,7 +83,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     compute_descinfo = (
         compute_descinfo and (not cfg["load_match"]) and (not cfg["load_det"])
     ) or cfg["line2d"]["compute_descinfo"]
-    all_2d_segs, descinfo_folder = _runners.compute_2d_segs(
+    all_2d_segs, descinfo_folder = runners.compute_2d_segs(
         cfg, imagecols, compute_descinfo=compute_descinfo
     )
 
@@ -84,19 +91,19 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     # [C] get line matches
     ##########################################################
     if not cfg["triangulation"]["use_exhaustive_matcher"]:
-        matches_dir = _runners.compute_matches(
+        matches_dir = runners.compute_matches(
             cfg, descinfo_folder, imagecols.get_img_ids(), neighbors
         )
 
     ##########################################################
     # [D] multi-view triangulation
     ##########################################################
-    Triangulator = _tri.GlobalLineTriangulator(cfg["triangulation"])
+    Triangulator = triangulation.GlobalLineTriangulator(cfg["triangulation"])
     Triangulator.SetRanges(ranges)
-    all_2d_lines = _base.get_all_lines_2d(all_2d_segs)
+    all_2d_lines = base.get_all_lines_2d(all_2d_segs)
     Triangulator.Init(all_2d_lines, imagecols)
     if cfg["triangulation"]["use_vp"]:
-        vpdetector = _vplib.get_vp_detector(
+        vpdetector = vplib.get_vp_detector(
             cfg["triangulation"]["vpdet_config"],
             n_jobs=cfg["triangulation"]["vpdet_config"]["n_jobs"],
         )
@@ -116,7 +123,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
                 colmap_model_path = os.path.join(
                     sfminfos_colmap_folder, "sparse"
                 )
-                if not _psfm.check_exists_colmap_model(colmap_model_path):
+                if not pointsfm.check_exists_colmap_model(colmap_model_path):
                     colmap_model_path = None
             # retriangulate
             if colmap_model_path is None:
@@ -126,7 +133,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
                 input_neighbors = None
                 if cfg["triangulation"]["use_pointsfm"]["use_neighbors"]:
                     input_neighbors = neighbors
-                _psfm.run_colmap_sfm_with_known_poses(
+                pointsfm.run_colmap_sfm_with_known_poses(
                     cfg["sfm"],
                     imagecols,
                     output_path=colmap_output_path,
@@ -138,15 +145,15 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
             colmap_model_path = cfg["triangulation"]["use_pointsfm"][
                 "colmap_folder"
             ]
-        reconstruction = _psfm.PyReadCOLMAP(colmap_model_path)
-        all_bpt2ds, sfm_points = _runners.compute_2d_bipartites_from_colmap(
+        reconstruction = pointsfm.PyReadCOLMAP(colmap_model_path)
+        all_bpt2ds, sfm_points = runners.compute_2d_bipartites_from_colmap(
             reconstruction, imagecols, all_2d_lines, cfg["structures"]["bpt2d"]
         )
         Triangulator.SetBipartites2d(all_bpt2ds)
         if cfg["triangulation"]["use_pointsfm"]["use_triangulated_points"]:
             Triangulator.SetSfMPoints(sfm_points)
     # triangulate
-    print("Start multi-view triangulation...")
+    logging.info("Start multi-view triangulation...")
     for img_id in tqdm(imagecols.get_img_ids()):
         if cfg["triangulation"]["use_exhaustive_matcher"]:
             Triangulator.TriangulateImageExhaustiveMatch(
@@ -160,7 +167,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     linetracks = Triangulator.ComputeLineTracks()
 
     # filtering 2d supports
-    linetracks = _mrg.filtertracksbyreprojection(
+    linetracks = merging.filter_tracks_by_reprojection(
         linetracks,
         imagecols,
         cfg["triangulation"]["filtering2d"]["th_angular_2d"],
@@ -168,23 +175,23 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     )
     if not cfg["triangulation"]["remerging"]["disable"]:
         # remerging
-        linker3d = _base.LineLinker3d(
+        linker3d = base.LineLinker3d(
             cfg["triangulation"]["remerging"]["linker3d"]
         )
-        linetracks = _mrg.remerge(linker3d, linetracks)
-        linetracks = _mrg.filtertracksbyreprojection(
+        linetracks = merging.remerge(linker3d, linetracks)
+        linetracks = merging.filter_tracks_by_reprojection(
             linetracks,
             imagecols,
             cfg["triangulation"]["filtering2d"]["th_angular_2d"],
             cfg["triangulation"]["filtering2d"]["th_perp_2d"],
         )
-    linetracks = _mrg.filtertracksbysensitivity(
+    linetracks = merging.filter_tracks_by_sensitivity(
         linetracks,
         imagecols,
         cfg["triangulation"]["filtering2d"]["th_sv_angular_3d"],
         cfg["triangulation"]["filtering2d"]["th_sv_num_supports"],
     )
-    linetracks = _mrg.filtertracksbyoverlap(
+    linetracks = merging.filter_tracks_by_overlap(
         linetracks,
         imagecols,
         cfg["triangulation"]["filtering2d"]["th_overlap"],
@@ -200,9 +207,9 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     # [E] geometric refinement
     ##########################################################
     if not cfg["refinement"]["disable"]:
-        cfg_ba = _optim.HybridBAConfig(cfg["refinement"])
+        cfg_ba = optimize.HybridBAConfig(cfg["refinement"])
         cfg_ba.set_constant_camera()
-        ba_engine = _optim.solve_line_bundle_adjustment(
+        ba_engine = optimize.solve_line_bundle_adjustment(
             cfg["refinement"], imagecols, linetracks, max_num_iterations=200
         )
         linetracks_map = ba_engine.GetOutputLineTracks(
@@ -231,7 +238,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
     limapio.save_obj(
         os.path.join(
             cfg["dir_save"],
-            "triangulated_lines_nv{0}.obj".format(cfg["n_visible_views"]),
+            "triangulated_lines_nv{}.obj".format(cfg["n_visible_views"]),
         ),
         VisTrack.get_lines_np(n_visible_views=cfg["n_visible_views"]),
     )
@@ -255,7 +262,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
 
         pdb.set_trace()
         VisTrack.vis_reconstruction(
-            imagecols, n_visible_views=cfg["n_visible_views"], width=2
+            imagecols, n_visible_views=cfg["n_visible_views"]
         )
         pdb.set_trace()
     return linetracks

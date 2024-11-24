@@ -45,7 +45,13 @@ void bind_features(py::module &);
 namespace limap {
 
 PYBIND11_MODULE(_limap, m) {
-  m.doc() = "Multi-view Line Triangulation and Refinement";
+  m.doc() = "A toolbox for mapping and localization with line features";
+#ifdef VERSION_INFO
+  m.attr("__version__") = py::str(VERSION_INFO);
+#else
+  m.attr("__version__") = py::str("dev");
+#endif
+  m.attr("__ceres_version__") = py::str(CERES_VERSION_STRING);
 
   py::add_ostream_redirect(m, "ostream_redirect");
 

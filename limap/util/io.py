@@ -1,10 +1,11 @@
+import logging
 import os
 import shutil
 
 import numpy as np
 from tqdm import tqdm
 
-import limap.base as _base
+import limap.base as base
 
 
 def check_directory(fname):
@@ -79,7 +80,7 @@ def read_ply(fname):
     y = np.asarray(plydata.elements[0].data["y"])
     z = np.asarray(plydata.elements[0].data["z"])
     points = np.stack([x, y, z], axis=1)
-    print(f"number of points: {points.shape[0]}")
+    logging.info(f"number of points: {points.shape[0]}")
     return points
 
 
@@ -223,11 +224,12 @@ def save_l3dpp(folder, imagecols, all_2d_segs):
     assert imagecols.NumImages() == len(all_2d_segs)
     image_names = imagecols.get_image_name_list()
 
-    # TODO make this function general for different input resolution within the set
+    # TODO make this function general for different input resolution
     first_cam = imagecols.cam(imagecols.get_cam_ids()[0])
     height, width = first_cam.h(), first_cam.w()
 
-    # TODO now it is hard-coded here (need to deal with the weird id mapping of Line3D++)
+    # TODO now it is hard-coded here
+    # (need to deal with the weird id mapping of Line3D++)
     mode = "default"
     if os.path.basename(image_names[0])[0] == "0":  # tnt
         mode = "tnt"
@@ -251,7 +253,7 @@ def save_l3dpp(folder, imagecols, all_2d_segs):
             for line_id in range(n_segments):
                 line = segs[line_id]
                 f.write(f"{line[0]} {line[1]} {line[2]} {line[3]}\n")
-        print(f"Writing for L3DPP: {fname}")
+        logging.info(f"Writing for L3DPP: {fname}")
 
 
 def save_txt_linetracks(fname, linetracks, n_visible_views=4):
@@ -263,7 +265,7 @@ def save_txt_linetracks(fname, linetracks, n_visible_views=4):
     linetracks = [
         track for track in linetracks if track.count_images() >= n_visible_views
     ]
-    print("Writing all linetracks to a single file...")
+    logging.info("Writing all linetracks to a single file...")
     n_tracks = len(linetracks)
     with open(fname, "w") as f:
         f.write(f"{n_tracks}\n")
@@ -273,10 +275,14 @@ def save_txt_linetracks(fname, linetracks, n_visible_views=4):
                 f"{track_id} {track.count_lines()} {track.count_images()}\n"
             )
             f.write(
-                f"{track.line.start[0]:.10f} {track.line.start[1]:.10f} {track.line.start[2]:.10f}\n"
+                f"{track.line.start[0]:.10f} \
+                  {track.line.start[1]:.10f} \
+                  {track.line.start[2]:.10f}\n"
             )
             f.write(
-                f"{track.line.end[0]:.10f} {track.line.end[1]:.10f} {track.line.end[2]:.10f}\n"
+                f"{track.line.end[0]:.10f} \
+                  {track.line.end[1]:.10f} \
+                  {track.line.end[2]:.10f}\n"
             )
             for idx in range(track.count_lines()):
                 f.write(f"{track.image_id_list[idx]} ")
@@ -290,7 +296,7 @@ def save_folder_linetracks(folder, linetracks):
     if os.path.exists(folder):
         shutil.rmtree(folder)
     os.makedirs(folder)
-    print(f"Writing linetracks to {folder}...")
+    logging.info(f"Writing linetracks to {folder}...")
     n_tracks = len(linetracks)
     for track_id in tqdm(range(n_tracks)):
         fname = os.path.join(folder, f"track_{track_id}.txt")
@@ -304,11 +310,11 @@ def read_folder_linetracks(folder):
     for fname in flist:
         if fname[-4:] == ".txt" and fname[:5] == "track":
             n_tracks += 1
-    print(f"Read linetracks from {folder}...")
+    logging.info(f"Read linetracks from {folder}...")
     linetracks = []
     for track_id in range(n_tracks):
         fname = os.path.join(folder, f"track_{track_id}.txt")
-        track = _base.LineTrack()
+        track = base.LineTrack()
         track.Read(fname)
         linetracks.append(track)
     return linetracks
@@ -332,7 +338,7 @@ def read_folder_linetracks_with_info(folder):
     if os.path.isfile(os.path.join(folder, "config.npy")):
         cfg = read_npy(os.path.join(folder, "config.npy"))
     if os.path.isfile(os.path.join(folder, "imagecols.npy")):
-        imagecols = _base.ImageCollection(
+        imagecols = base.ImageCollection(
             read_npy(os.path.join(folder, "imagecols.npy")).item()
         )
     if os.path.isfile(os.path.join(folder, "all_2d_segs.npy")):
@@ -357,7 +363,7 @@ def read_txt_Line3Dpp(fname):
         line3d_list = []
         for _ in range(n_lines):
             infos = [float(k) for k in txt_line[counter : (counter + 6)]]
-            line3d = _base.Line3d(infos[:3], infos[3:])
+            line3d = base.Line3d(infos[:3], infos[3:])
             counter += 6
             line3d_list.append(line3d)
         line3d = line3d_list[0]
@@ -371,12 +377,12 @@ def read_txt_Line3Dpp(fname):
             line_id = int(txt_line[counter])
             counter += 1
             infos = [float(k) for k in txt_line[counter : (counter + 4)]]
-            line2d = _base.Line2d(infos[:2], infos[2:])
+            line2d = base.Line2d(infos[:2], infos[2:])
             counter += 4
             img_id_list.append(img_id)
             line_id_list.append(line_id)
             line2d_list.append(line2d)
-        track = _base.LineTrack(line3d, img_id_list, line_id_list, line2d_list)
+        track = base.LineTrack(line3d, img_id_list, line_id_list, line2d_list)
         linetracks.append(track)
         for _ in range(n_lines):
             line_counts.append(track.count_images())
@@ -405,13 +411,13 @@ def read_lines_from_input(input_file):
     # npy file
     if input_file.endswith(".npy"):
         lines_np = read_npy(input_file)
-        lines = [_base.Line3d(arr) for arr in lines_np.tolist()]
+        lines = [base.Line3d(arr) for arr in lines_np.tolist()]
         return lines, None
 
     # obj file
     if input_file.endswith(".obj"):
         lines_np = load_obj(input_file)
-        lines = [_base.Line3d(arr) for arr in lines_np.tolist()]
+        lines = [base.Line3d(arr) for arr in lines_np.tolist()]
         return lines, None
 
     # line3dpp format
@@ -422,7 +428,8 @@ def read_lines_from_input(input_file):
 
     # exception
     raise ValueError(
-        f"Error! File {input_file} not supported. should be txt, obj, or folder to the linetracks."
+        f"Error! File {input_file} not supported. \
+          should be txt, obj, or folder to the linetracks."
     )
 
 

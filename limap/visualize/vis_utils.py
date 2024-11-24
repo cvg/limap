@@ -1,4 +1,5 @@
 import copy
+import logging
 import os
 
 import cv2
@@ -103,7 +104,8 @@ def draw_multiscale_matches(
     assert img_left.ndim == 2
     h, w = img_left.shape
 
-    # store the matching results of the first and second images into a single image
+    # store the matching results of the first and second images
+    # into a single image
     left_color_img = cv2.cvtColor(img_left, cv2.COLOR_GRAY2BGR)
     right_color_img = cv2.cvtColor(img_right, cv2.COLOR_GRAY2BGR)
     r1, g1, b1 = [], [], []  # the line colors
@@ -163,7 +165,8 @@ def draw_singlescale_matches(img_left, img_right, matched_segs, mask=None):
     assert img_left.ndim == 2
     h, w = img_left.shape
 
-    # store the matching results of the first and second images into a single image
+    # store the matching results of the first and second images
+    # into a single image
     left_color_img = cv2.cvtColor(img_left, cv2.COLOR_GRAY2BGR)
     right_color_img = cv2.cvtColor(img_right, cv2.COLOR_GRAY2BGR)
     colors = []
@@ -317,7 +320,9 @@ def test_line_inside_ranges(line, ranges):
     return test_point_inside_ranges(line.end, ranges)
 
 
-def compute_robust_range(arr, range_robust=[0.05, 0.95], k_stretch=2.0):
+def compute_robust_range(arr, range_robust=None, k_stretch=2.0):
+    if range_robust is None:
+        range_robust = [0.05, 0.95]
     N = arr.shape[0]
     start_idx = int(round((N - 1) * range_robust[0]))
     end_idx = int(round((N - 1) * range_robust[1]))
@@ -329,7 +334,9 @@ def compute_robust_range(arr, range_robust=[0.05, 0.95], k_stretch=2.0):
     return start_stretched, end_stretched
 
 
-def compute_robust_range_lines(lines, range_robust=[0.05, 0.95], k_stretch=2.0):
+def compute_robust_range_lines(lines, range_robust=None, k_stretch=2.0):
+    if range_robust is None:
+        range_robust = [0.05, 0.95]
     lines_array = np.array([line.as_array() for line in lines])
     x_array = lines_array.reshape(-1, 3)[:, 0]
     y_array = lines_array.reshape(-1, 3)[:, 1]
@@ -358,26 +365,28 @@ def filter_ranges(lines_np, counts_np, ranges):
 
 
 def report_dist_reprojection(line3d, line2d, camview, prefix=None):
-    import limap.base as _base
+    import limap.base as base
 
     line2d_proj = line3d.projection(camview)
-    angle = _base.compute_distance_2d(
-        line2d, line2d_proj, _base.LineDistType.ANGULAR
+    angle = base.compute_distance_2d(
+        line2d, line2d_proj, base.LineDistType.ANGULAR
     )
-    perp_dist = _base.compute_distance_2d(
-        line2d, line2d_proj, _base.LineDistType.PERPENDICULAR_ONEWAY
+    perp_dist = base.compute_distance_2d(
+        line2d, line2d_proj, base.LineDistType.PERPENDICULAR_ONEWAY
     )
-    overlap = _base.compute_distance_2d(
-        line2d_proj, line2d, _base.LineDistType.OVERLAP
+    overlap = base.compute_distance_2d(
+        line2d_proj, line2d, base.LineDistType.OVERLAP
     )
     sensitivity = line3d.sensitivity(camview)
     if prefix is None:
-        print(
-            f"angle = {angle:.4f}, perp = {perp_dist:.4f}, overlap = {overlap:.4f}, sensi = {sensitivity:.4f}"
+        logging.info(
+            f"angle = {angle:.4f}, perp = {perp_dist:.4f}, \
+              overlap = {overlap:.4f}, sensi = {sensitivity:.4f}"
         )
     else:
-        print(
-            f"{prefix}: angle = {angle:.4f}, perp = {perp_dist:.4f}, overlap = {overlap:.4f}, sensi = {sensitivity:.4f}"
+        logging.info(
+            f"{prefix}: angle = {angle:.4f}, perp = {perp_dist:.4f}, \
+              overlap = {overlap:.4f}, sensi = {sensitivity:.4f}"
         )
 
 
@@ -392,8 +401,9 @@ def visualize_2d_line(fname, imagecols, all_lines_2d, img_id, line_id):
 def visualize_line_track(
     imagecols, linetrack, prefix="linetrack", report=False
 ):
-    print(
-        f"[VISUALIZE]: line length: {linetrack.line.length()}, num_supporting_lines: {len(linetrack.image_id_list)}"
+    logging.info(
+        f"[VISUALIZE]: line length: {linetrack.line.length()}, \
+          num_supporting_lines: {len(linetrack.image_id_list)}"
     )
     for idx, (img_id, line2d) in enumerate(
         zip(linetrack.image_id_list, linetrack.line2d_list)
@@ -405,7 +415,8 @@ def visualize_line_track(
             linetrack.line,
             line2d,
             imagecols.camview(img_id),
-            prefix=f"Reprojecting to line {idx} (img {img_id}, line {linetrack.line_id_list[idx]})",
+            prefix=f"Reprojecting to line {idx} (img {img_id}, \
+                     line {linetrack.line_id_list[idx]})",
         )
         line2d_proj = linetrack.line.projection(imagecols.camview(img_id))
         img = draw_segments(

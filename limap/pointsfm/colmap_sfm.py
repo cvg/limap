@@ -1,4 +1,5 @@
 import copy
+import logging
 import os
 import shutil
 import subprocess
@@ -8,8 +9,8 @@ from pathlib import Path
 import cv2
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-import database
-import read_write_model as colmap_utils
+import hloc.utils.database as database
+import hloc.utils.read_write_model as colmap_utils
 from model_converter import convert_imagecols_to_colmap
 
 
@@ -69,7 +70,8 @@ def run_hloc_matches(
     """
     Inputs:
     - neighbors: map<int, std::vector<int>> to avoid exhaustive matches
-    - imagecols: optionally use the id mapping from _base.ImageCollection to do the match
+    - imagecols: optionally use the id mapping from \
+        _base.ImageCollection to do the match
     """
     image_path = Path(image_path)
     from hloc import (
@@ -94,10 +96,11 @@ def run_hloc_matches(
     if keypoints is not None and keypoints != []:
         if cfg["descriptor"][:10] != "superpoint":
             raise ValueError(
-                "Error! Non-superpoint feature extraction is unfortunately not supported in the current implementation."
+                "Error! Non-superpoint feature extraction is unfortunately \
+                 not supported in the current implementation."
             )
         # run superpoint
-        from limap.point2d import run_superpoint
+        from limap.point2d.superpoint import run_superpoint
 
         feature_path = run_superpoint(
             feature_conf, image_path, outputs, keypoints=keypoints
@@ -159,7 +162,7 @@ def run_colmap_sfm(
 
     ### initialize sparse folder
     if skip_exists and os.path.exists(output_path):
-        print("[COLMAP] Skipping mapping")
+        logging.info("[COLMAP] Skipping mapping")
         return
     if os.path.exists(output_path):
         shutil.rmtree(output_path)
@@ -232,7 +235,7 @@ def run_colmap_sfm_with_known_poses(
 
     ### initialize sparse folder
     if skip_exists and os.path.exists(point_triangulation_path):
-        print("[COLMAP] Skipping point triangulation")
+        logging.info("[COLMAP] Skipping point triangulation")
         return Path(point_triangulation_path)
     if os.path.exists(output_path):
         shutil.rmtree(output_path)

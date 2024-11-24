@@ -7,15 +7,15 @@
 #include <Eigen/Core>
 #include <vector>
 
-#include "optimize/line_localization/lineloc.h"
-#include "optimize/line_localization/lineloc_config.h"
+#include "optimize/hybrid_localization/hybrid_localization.h"
+#include "optimize/hybrid_localization/hybrid_localization_config.h"
 
 namespace py = pybind11;
 
 namespace limap {
 
 void bind_lineloc_engine(py::module &m) {
-  using namespace optimize::line_localization;
+  using namespace optimize::hybrid_localization;
 
   using LocEngine = LineLocEngine;
   using JointEngine = JointLocEngine;
@@ -63,8 +63,8 @@ void bind_lineloc_engine(py::module &m) {
       .def("GetFinalCost", &JointEngine::GetFinalCost);
 }
 
-void bind_line_localization(py::module &m) {
-  using namespace optimize::line_localization;
+void bind_hybrid_localization(py::module &m) {
+  using namespace optimize::hybrid_localization;
 
   py::enum_<LineLocCostFunction>(m, "LineLocCostFunction")
       .value("E2DMidpointDist2", LineLocCostFunction::E2DMidpointDist2)

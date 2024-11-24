@@ -1,13 +1,16 @@
 import numpy as np
 import torch
 
-from limap.point2d.superglue.superglue import SuperGlue
+from limap.point2d.superglue import SuperGlue
 
-from ..base_matcher import BaseMatcher, BaseMatcherOptions
+from ..base_matcher import (
+    BaseMatcher,
+    DefaultMatcherOptions,
+)
 
 
 class NNEndpointsMatcher(BaseMatcher):
-    def __init__(self, extractor, options=BaseMatcherOptions(), device=None):
+    def __init__(self, extractor, options=DefaultMatcherOptions, device=None):
         super().__init__(extractor, options)
         assert self.extractor.get_module_name() == "superpoint_endpoints"
         self.device = "cuda" if device is None else device
@@ -112,7 +115,7 @@ class SuperGlueEndpointsMatcher(BaseMatcher):
     def __init__(
         self,
         extractor,
-        options=BaseMatcherOptions(),
+        options=DefaultMatcherOptions,
         weights="outdoor",
         device=None,
     ):

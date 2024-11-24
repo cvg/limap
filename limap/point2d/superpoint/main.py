@@ -1,4 +1,5 @@
 import collections.abc as collections
+import logging
 import pprint
 from pathlib import Path
 from typing import Dict, List, Optional, Union
@@ -42,7 +43,7 @@ def run_superpoint(
     overwrite: bool = False,
     keypoints=None,
 ) -> Path:
-    print(
+    logging.info(
         "[SuperPoint] Extracting local features with configuration:"
         f"\n{pprint.pformat(conf)}"
     )
@@ -61,7 +62,7 @@ def run_superpoint(
     )
     dataset.names = [n for n in dataset.names if n not in skip_names]
     if len(dataset.names) == 0:
-        print("[SuperPoint] Skipping the extraction.")
+        logging.info("[SuperPoint] Skipping the extraction.")
         return feature_path
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -111,13 +112,14 @@ def run_superpoint(
             except OSError as error:
                 if "No space left on device" in error.args[0]:
                     raise ValueError(
-                        "[SuperPoint] Out of disk space: storing features on disk can take "
+                        "[SuperPoint] Out of disk space: storing features \
+                            on disk can take "
                         "significant space, did you enable the as_half flag?"
-                    )
+                    ) from None
                     del grp, fd[name]
                 raise error
 
         del pred
 
-    print("[SuperPoint] Finished exporting features.")
+    logging.info("[SuperPoint] Finished exporting features.")
     return feature_path

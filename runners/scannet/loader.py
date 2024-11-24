@@ -7,10 +7,10 @@ import numpy as np
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
-import limap.base as _base
+import limap.base as base
 
 
-class ScanNetDepthReader(_base.BaseDepthReader):
+class ScanNetDepthReader(base.BaseDepthReader):
     def __init__(self, filename):
         super().__init__(filename)
 
@@ -34,14 +34,14 @@ def read_scene_scannet(cfg, dataset, scene_id, load_depth=False):
     K = dataset.load_intrinsics()
     img_hw = dataset.get_img_hw()
     Ts, Rs = dataset.load_cameras()
-    cameras = [_base.Camera("PINHOLE", K, cam_id=0, hw=img_hw)]
+    cameras = [base.Camera("PINHOLE", K, cam_id=0, hw=img_hw)]
     camimages = [
-        _base.CameraImage(
-            0, _base.CameraPose(Rs[idx], Ts[idx]), image_name=imname_list[idx]
+        base.CameraImage(
+            0, base.CameraPose(Rs[idx], Ts[idx]), image_name=imname_list[idx]
         )
         for idx in range(len(imname_list))
     ]
-    imagecols = _base.ImageCollection(cameras, camimages)
+    imagecols = base.ImageCollection(cameras, camimages)
 
     # TODO: advanced implementation with the original ids
     # trivial neighbors

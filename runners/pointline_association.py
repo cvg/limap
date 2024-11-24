@@ -6,15 +6,15 @@ import math
 
 import numpy as np
 
-import limap.base as _base
-import limap.optimize as _optim
-import limap.pointsfm as _psfm
+import limap.base as base
+import limap.optimize as optimize
+import limap.pointsfm as pointsfm
 import limap.runners
-import limap.structures as _structures
+import limap.structures as structures
 import limap.util.config as cfgutils
 import limap.util.io as limapio
 import limap.visualize as limapvis
-import limap.vplib as _vplib
+import limap.vplib as vplib
 
 
 def report_vp(vpresults, vptracks, print_pairs=False):
@@ -27,18 +27,21 @@ def report_vp(vpresults, vptracks, print_pairs=False):
                 n_pairs_parallel += 1
                 if print_pairs:
                     print(
-                        f"[LOG] Parallel pair detected: {i} / {j}, angle = {angle:.2f}"
+                        f"[LOG] Parallel pair detected: {i} / {j}, \
+                          angle = {angle:.2f}"
                     )
             if angle >= 87.0:
                 n_pairs_orthogonal += 1
                 if print_pairs:
                     print(
-                        f"[LOG] Orthogonal pair detected: {i} / {j}, angle = {angle:.2f}"
+                        f"[LOG] Orthogonal pair detected: {i} / {j}, \
+                          angle = {angle:.2f}"
                     )
     print(f"[LOG] number of VP tracks: {len(vptracks)}")
     print("[LOG]", [track.length() for track in vptracks])
     print(
-        f"[LOG] parallel pairs: {n_pairs_parallel}, orthogonal pairs: {n_pairs_orthogonal}"
+        f"[LOG] parallel pairs: {n_pairs_parallel}, \
+          orthogonal pairs: {n_pairs_orthogonal}"
     )
 
 
@@ -52,14 +55,14 @@ def pointline_association(cfg, input_folder, output_folder, colmap_folder):
         imagecols,
         all_2d_segs,
     ) = limapio.read_folder_linetracks_with_info(input_folder)
-    all_2d_lines = _base.get_all_lines_2d(all_2d_segs)
+    all_2d_lines = base.get_all_lines_2d(all_2d_segs)
 
     ############################################################
     # Point-line bipartite
     ############################################################
     # initiate point-line bipartites on 2d for each image
-    reconstruction = _psfm.PyReadCOLMAP(colmap_folder)
-    pointtracks = _psfm.ReadPointTracks(reconstruction)
+    reconstruction = pointsfm.PyReadCOLMAP(colmap_folder)
+    pointtracks = pointsfm.ReadPointTracks(reconstruction)
     all_bpt2ds, _ = limap.runners.compute_2d_bipartites_from_colmap(
         reconstruction, imagecols, all_2d_lines
     )
@@ -69,7 +72,7 @@ def pointline_association(cfg, input_folder, output_folder, colmap_folder):
     ############################################################
     if cfg["global_pl_association"]["use_vp"]:
         # detect vp
-        vpdetector = _vplib.get_vp_detector(
+        vpdetector = vplib.get_vp_detector(
             cfg["global_pl_association"]["vpdet"],
             n_jobs=cfg["global_pl_association"]["vpdet"]["n_jobs"],
         )
@@ -78,10 +81,10 @@ def pointline_association(cfg, input_folder, output_folder, colmap_folder):
         )
 
         # build vanishing point tracks
-        vptrack_constructor = _vplib.GlobalVPTrackConstructor()
+        vptrack_constructor = vplib.GlobalVPTrackConstructor()
         vptrack_constructor.Init(vpresults)
         vptracks = vptrack_constructor.ClusterLineTracks(linetracks, imagecols)
-        all_bpt2ds_vp = _structures.GetAllBipartites_VPLine2d(
+        all_bpt2ds_vp = structures.GetAllBipartites_VPLine2d(
             all_2d_lines, vpresults, vptracks
         )
 
@@ -89,9 +92,10 @@ def pointline_association(cfg, input_folder, output_folder, colmap_folder):
     # Optimization
     ############################################################
     # optimize association # 1
-    cfg_associator = _optim.GlobalAssociatorConfig(cfg["global_pl_association"])
-    # cfg_associator.solver_options.logging_type = _ceresbase.LoggingType.STDOUT
-    associator = _optim.GlobalAssociator(cfg_associator)
+    cfg_associator = optimize.GlobalAssociatorConfig(
+        cfg["global_pl_association"]
+    )
+    associator = optimize.GlobalAssociator(cfg_associator)
     associator.InitImagecols(imagecols)
     associator.InitPointTracks(pointtracks)
     associator.InitLineTracks(linetracks)
@@ -113,14 +117,14 @@ def pointline_association(cfg, input_folder, output_folder, colmap_folder):
             vptracks_opt = [
                 vptrack for (idx, vptrack) in vptracks_opt_map.items()
             ]
-            vptracks_opt_merged = _vplib.MergeVPTracksByDirection(
+            vptracks_opt_merged = vplib.MergeVPTracksByDirection(
                 vptracks_opt, 1.0
             )
             if len(vptracks_opt_merged) == len(vptracks_opt):
                 break
 
             # run optimization on the merged vptracks
-            all_bpt2ds_vp_opt = _structures.GetAllBipartites_VPLine2d(
+            all_bpt2ds_vp_opt = structures.GetAllBipartites_VPLine2d(
                 all_2d_lines, vpresults, vptracks_opt_merged
             )
             associator.InitVPTracks(vptracks_opt_merged)

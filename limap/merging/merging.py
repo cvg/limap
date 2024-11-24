@@ -1,3 +1,5 @@
+import logging
+
 from _limap import _base
 from _limap import _merging as _mrg
 
@@ -34,18 +36,19 @@ def remerge(linker3d, linetracks, num_outliers=2):
         if num_tracks == num_tracks_new:
             break
         num_tracks = num_tracks_new
-    print(
-        f"[LOG] tracks after iterative remerging: {len(new_linetracks)} / {len(linetracks)}"
+    logging.info(
+        f"[LOG] tracks after iterative remerging: \
+          {len(new_linetracks)} / {len(linetracks)}"
     )
     return new_linetracks
 
 
-def checktrackbyreprojection(track, imagecols, th_angular2d, th_perp2d):
+def check_track_by_reprojection(track, imagecols, th_angular2d, th_perp2d):
     results = _mrg._CheckReprojection(track, imagecols, th_angular2d, th_perp2d)
     return results
 
 
-def filtertracksbyreprojection(
+def filter_tracks_by_reprojection(
     linetracks, imagecols, th_angular2d, th_perp2d, num_outliers=2
 ):
     new_linetracks = _mrg._FilterSupportLines(
@@ -58,12 +61,12 @@ def filtertracksbyreprojection(
     return new_linetracks
 
 
-def checksensitivity(linetracks, imagecols, th_angular3d):
+def check_sensitivity(linetracks, imagecols, th_angular3d):
     results = _mrg._CheckSensitivity(linetracks, imagecols, th_angular3d)
     return results
 
 
-def filtertracksbysensitivity(
+def filter_tracks_by_sensitivity(
     linetracks, imagecols, th_angular3d, min_num_supports
 ):
     new_linetracks = _mrg._FilterTracksBySensitivity(
@@ -72,7 +75,9 @@ def filtertracksbysensitivity(
     return new_linetracks
 
 
-def filtertracksbyoverlap(linetracks, imagecols, th_overlap, min_num_supports):
+def filter_tracks_by_overlap(
+    linetracks, imagecols, th_overlap, min_num_supports
+):
     new_linetracks = _mrg._FilterTracksByOverlap(
         linetracks, imagecols, th_overlap, min_num_supports
     )

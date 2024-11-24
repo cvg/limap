@@ -18,7 +18,7 @@ from utils import (
     run_hloc_inloc,
 )
 
-import limap.runners as _runners
+import limap.runners as runners
 import limap.util.config as cfgutils
 import limap.util.io as limapio
 
@@ -108,7 +108,7 @@ def parse_config():
 
 def main():
     cfg, args = parse_config()
-    cfg = _runners.setup(cfg)
+    cfg = runners.setup(cfg)
 
     # outputs is for localization-related results
     outputs = Path(cfg["output_dir"]) / "localization"
@@ -157,7 +157,7 @@ def main():
         points_readers = {
             id: InLocP3DReader(imagecols.image_name(id)) for id in train_ids
         }
-        linetracks_db = _runners.line_fitting_with_3Dpoints(
+        linetracks_db = runners.line_fitting_with_points3d(
             cfg,
             imagecols_train,
             points_readers,
@@ -189,7 +189,7 @@ def main():
         hloc_logs = pickle.load(f)
     point_correspondences = {}
     for qid in query_ids:
-        p2ds, p3ds, inliers = _runners.get_hloc_keypoints_from_log(
+        p2ds, p3ds, inliers = runners.get_hloc_keypoints_from_log(
             hloc_logs, img_id_to_name[qid], resize_scales=scales
         )
         point_correspondences[qid] = {
@@ -198,7 +198,7 @@ def main():
             "inliers": inliers,
         }
 
-    final_poses = _runners.line_localization(
+    final_poses = runners.hybrid_localization(
         cfg,
         imagecols_train,
         imagecols_query,

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
 
-import limap.evaluation as _eval
+import limap.evaluation as limap_eval
 import limap.util.config as cfgutils
 import limap.util.io as limapio
 import limap.visualize as limapvis
@@ -61,7 +61,8 @@ def report_error_to_GT(evaluator, lines, vis_err_th=None):
     print("R: recall, P: precision")
     for idx, threshold in enumerate(thresholds):
         print(
-            f"R / P at {int(threshold * 1000)}mm: {list_recall[idx]:.2f} / {list_precision[idx]:.2f}"
+            f"R / P at {int(threshold * 1000)}mm: \
+              {list_recall[idx]:.2f} / {list_precision[idx]:.2f}"
         )
     return evaluator
 
@@ -91,14 +92,14 @@ def write_ply(fname, points):
 
 
 def report_error_to_mesh(mesh_fname, lines, vis_err_th=None):
-    evaluator = _eval.MeshEvaluator(mesh_fname, MPAU)
+    evaluator = limap_eval.MeshEvaluator(mesh_fname, MPAU)
     return report_error_to_GT(evaluator, lines, vis_err_th=vis_err_th)
 
 
 def report_error_to_point_cloud(
     points, lines, kdtree_dir=None, vis_err_th=None
 ):
-    evaluator = _eval.PointCloudEvaluator(points, vis_err_th=vis_err_th)
+    evaluator = limap_eval.PointCloudEvaluator(points, vis_err_th=vis_err_th)
     if kdtree_dir is None:
         evaluator.Build()
         evaluator.Save("tmp/kdtree.bin")
@@ -282,7 +283,8 @@ def main():
             [track.count_lines() for track in linetracks]
         )
         print(
-            f"supporting images / lines: ({sup_image_counts.mean():.2f} / {sup_line_counts.mean():.2f})"
+            f"supporting images / lines: ({sup_image_counts.mean():.2f} \
+              / {sup_line_counts.mean():.2f})"
         )
 
 
