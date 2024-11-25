@@ -71,15 +71,13 @@ jobs:
           python -m pip install setuptools
 
       - name: Build
-        run: |
-          python -m pip install -v .
+        run:  python -m pip install -v .
 
       - name: Run Python tests
-        run: |
-          python -c "import limap; print(limap.__version__)"
+        run:  python -c "import limap; print(limap.__version__)"
 
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.21.3
+        run:  python setup.py bdist_wheel
         env:
           CIBW_ARCHS_MACOS: ${{ matrix.config.arch }}
 
