@@ -1,9 +1,6 @@
 [submodule "third-party/pybind11"]
 	path = third-party/pybind11
 	url = https://github.com/pybind/pybind11.git
-[submodule "third-party/Hierarchical-Localization"]
-	path = third-party/Hierarchical-Localization
-	url = https://github.com/cvg/Hierarchical-Localization.git
 [submodule "third-party/JLinkage"]
 	path = third-party/JLinkage
 	url = https://github.com/B1ueber2y/JLinkage
@@ -14,15 +11,6 @@
 [submodule "third-party/HighFive"]
 	path = third-party/HighFive
 	url = https://github.com/B1ueber2y/HighFive.git
-[submodule "third-party/pytlsd"]
-	path = third-party/pytlsd
-	url = https://github.com/iago-suarez/pytlsd.git
-[submodule "third-party/DeepLSD"]
-	path = third-party/DeepLSD
-	url = https://github.com/cvg/DeepLSD.git
-[submodule "third-party/GlueStick"]
-	path = third-party/GlueStick
-	url = https://github.com/cvg/GlueStick.git
 [submodule "third-party/libigl"]
 	path = third-party/libigl
 	url = https://github.com/libigl/libigl.git
