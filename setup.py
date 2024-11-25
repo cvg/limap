@@ -2,7 +2,7 @@ import os
 import subprocess
 import sys
 
-from setuptools import Extension, setup
+from setuptools import Extension, find_packages, setup
 from setuptools.command.build_ext import build_ext
 
 # Cores used for building the project
@@ -62,13 +62,37 @@ class CMakeBuild(build_ext):
         )
 
 
+# Read requirements from requirements.txt
+def parse_requirements_for_limap(filename):
+    requirements = []
+    with open(filename) as f:
+        requirements = [
+            line.strip()
+            for line in f
+            if line.strip()
+            and not line.startswith("#")
+            and not line.startswith(".")
+        ]
+    requirements.extend(
+        [
+            "pytlsd @ git+https://github.com/iago-suarez/pytlsd.git@21381ca4c5c8da297ef44ce07dda115075c5a648#egg=pytlsd",
+            "hloc @ git+https://github.com/cvg/Hierarchical-Localization.git@abb252080282e31147db6291206ca102c43353f7#egg=hloc",
+            "deeplsd @ git+https://github.com/cvg/DeepLSD.git@59006b264d05e97856556d3f16ded45bd4dbc286#egg=deeplsd",
+            "gluestick @ git+https://github.com/cvg/GlueStick.git@40d71d5f4adc7f4fccae4cd7675a49daee3e873e#egg=gluestick",
+        ]
+    )
+    return requirements
+
+
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in
 # one file.
 setup(
     name="limap",
     version="1.0.0",
-    author="B1ueber2y",
+    packages=find_packages(),
+    install_requires=parse_requirements_for_limap("requirements.txt"),
+    author="Shaohui Liu",
     author_email="b1ueber2y@gmail.com",
     description="A toolbox for mapping and localization with line features",
     long_description="",
