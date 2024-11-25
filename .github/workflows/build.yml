@@ -81,6 +81,12 @@ jobs:
         env:
           CIBW_ARCHS_MACOS: ${{ matrix.config.arch }}
 
+      - name: Upload wheel files as artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: wheel-files
+          path: dist/*.whl
+
   pypi-publish:
     name: Publish wheels to PyPI
     needs: build
