@@ -61,8 +61,6 @@ FetchContent_Declare(COLMAP
 )
 message(STATUS "Configuring COLMAP...")
 if (FETCH_COLMAP) 
-    # Set the CUDA_ENABLED option to OFF before including COLMAP content
-    set(CUDA_ENABLED OFF CACHE BOOL "Build COLMAP without CUDA support" FORCE)
     FetchContent_MakeAvailable(COLMAP)
 else()
     find_package(COLMAP REQUIRED)
