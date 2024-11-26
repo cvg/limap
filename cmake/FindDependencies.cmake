@@ -67,3 +67,5 @@ else()
 endif()
 message(STATUS "Configuring COLMAP... done")
 
+# JLinkage
+find_package(JLinkage REQUIRED)

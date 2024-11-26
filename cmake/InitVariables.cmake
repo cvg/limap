@@ -29,7 +29,7 @@ endif()
 set(LIMAP_INTERNAL_LIBRARIES
   HighFive
   pybind11::module
-  JLinkage
+  JLinkage::JLinkage
   igl::core
 )
 
