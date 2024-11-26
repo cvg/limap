@@ -24,8 +24,6 @@ jobs:
       COMPILER_CACHE_DIR: ${{ github.workspace }}/compiler-cache
       CCACHE_DIR: ${{ github.workspace }}/compiler-cache/ccache
       CCACHE_BASEDIR: ${{ github.workspace }}
-      # For faster builds in PRs, skip all but the latest Python versions.
-      PULL_REQUEST_CIBW_BUILD: cp39-{manylinux}*
     steps:
       - uses: actions/checkout@v4
       - uses: actions/cache@v4
