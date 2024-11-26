@@ -61,6 +61,11 @@ jobs:
             libunwind-dev \
             xvfb
 
+      - name: Set up Python ${{ matrix.python-version  }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version  }}
+
       - name: Install Python dependencies
         run: |
           git submodule update --init --recursive
