@@ -100,7 +100,7 @@ setup(
     ext_modules=[CMakeExtension("_limap")],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
-    classifiers = [
+    classifiers=[
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
