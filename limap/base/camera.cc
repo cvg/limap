@@ -37,7 +37,7 @@ bool Camera::IsInitialized() const {
   return true;
 }
 
-Camera::Camera(const colmap::Camera& cam) {
+Camera::Camera(const colmap::Camera &cam) {
   camera_id = cam.camera_id;
   model_id = cam.model_id;
   params = cam.params;
@@ -185,7 +185,7 @@ Camera::Camera(const Camera &cam) {
   initialized = cam.initialized;
 }
 
-Camera& Camera::operator=(const Camera& cam) {
+Camera &Camera::operator=(const Camera &cam) {
   if (this != &cam) {
     camera_id = cam.camera_id;
     model_id = cam.model_id;
