@@ -91,7 +91,7 @@ setup(
     name="limap",
     version="1.0.0",
     packages=find_packages("limap"),
-    package_data = {"limap": ["third-party/JLinkage/lib/libJLinkage.so"]}
+    package_data={"limap": ["third-party/JLinkage/lib/libJLinkage.so"]},
     python_requires=">=3.8, < 3.13",
     install_requires=parse_requirements_for_limap("requirements.txt"),
     author="Shaohui Liu",
