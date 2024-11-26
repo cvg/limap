@@ -829,6 +829,9 @@ void bind_camera(py::module &m) {
             Constructor from a Python dict
         )",
            py::arg("dict"))
+      .def("__copy__", [](const CameraPose &self) { return CameraPose(self); })
+      .def("__deepcopy__", [](const CameraPose &self,
+                              const py::dict &) { return CameraPose(self); })
       .def(py::pickle(
           [](const CameraPose &input) { // dump
             return input.as_dict();
@@ -884,6 +887,10 @@ void bind_camera(py::module &m) {
            py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
       .def(py::init<py::dict>(), py::arg("dict"))
       .def(py::init<const CameraImage &>(), py::arg("camimage"))
+      .def("__copy__",
+           [](const CameraImage &self) { return CameraImage(self); })
+      .def("__deepcopy__", [](const CameraImage &self,
+                              const py::dict &) { return CameraImage(self); })
       .def(py::pickle(
           [](const CameraImage &input) { // dump
             return input.as_dict();
@@ -938,6 +945,9 @@ void bind_camera(py::module &m) {
            py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
       .def(py::init<py::dict>(), py::arg("dict"))
       .def(py::init<const CameraView &>(), py::arg("camview"))
+      .def("__copy__", [](const CameraView &self) { return CameraView(self); })
+      .def("__deepcopy__", [](const CameraView &self,
+                              const py::dict &) { return CameraView(self); })
       .def(py::pickle(
           [](const CameraView &input) { // dump
             return input.as_dict();
