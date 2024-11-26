@@ -61,8 +61,8 @@ def report_error_to_GT(evaluator, lines, vis_err_th=None):
     print("R: recall, P: precision")
     for idx, threshold in enumerate(thresholds):
         print(
-            f"R / P at {int(threshold * 1000)}mm: \
-              {list_recall[idx]:.2f} / {list_precision[idx]:.2f}"
+            f"R / P at {int(threshold * 1000)}mm: " \
+            f"{list_recall[idx]:.2f} / {list_precision[idx]:.2f}"
         )
     return evaluator
 
@@ -283,8 +283,8 @@ def main():
             [track.count_lines() for track in linetracks]
         )
         print(
-            f"supporting images / lines: ({sup_image_counts.mean():.2f} \
-              / {sup_line_counts.mean():.2f})"
+            f"supporting images / lines: ({sup_image_counts.mean():.2f} " \
+            f"/ {sup_line_counts.mean():.2f})"
         )
 
 

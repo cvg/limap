@@ -32,8 +32,8 @@ def report_error_to_GT(evaluator, lines):
         list_precision.append(precision)
     for idx, threshold in enumerate(thresholds):
         print(
-            f"R / P at {int(threshold * 1000)}mm: \
-              {list_recall[idx]:.2f} / {list_precision[idx]:.2f}"
+            f"R / P at {int(threshold * 1000)}mm: " \
+            f"{list_recall[idx]:.2f} / {list_precision[idx]:.2f}"
         )
     return evaluator
 
@@ -52,8 +52,8 @@ def report_pc_recall_for_GT(evaluator, lines):
         num_inliers = (point_dists < threshold).sum()
         point_recall = 100 * num_inliers / n_points
         print(
-            f"{int(threshold * 1000):.0f}mm, inliers = {num_inliers}, \
-              point recall = {point_recall:.2f}"
+            f"{int(threshold * 1000):.0f}mm, inliers = {num_inliers}, " \
+            f"point recall = {point_recall:.2f}"
         )
     return evaluator
 
@@ -279,8 +279,8 @@ def main():
             [track.count_lines() for track in linetracks]
         )
         print(
-            f"supporting images / lines: ({sup_image_counts.mean():.2f} \
-              / {sup_line_counts.mean():.2f})"
+            f"supporting images / lines: ({sup_image_counts.mean():.2f} " \
+            f"/ {sup_line_counts.mean():.2f})"
         )
 
 
