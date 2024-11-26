@@ -91,6 +91,7 @@ setup(
     name="limap",
     version="1.0.0",
     packages=find_packages(),
+    python_requires=">=3.8, < 3.13",
     install_requires=parse_requirements_for_limap("requirements.txt"),
     author="Shaohui Liu",
     author_email="b1ueber2y@gmail.com",
@@ -99,4 +100,12 @@ setup(
     ext_modules=[CMakeExtension("_limap")],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
+    classifiers = [
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Operating System :: OS Independent",
+    ],
 )
