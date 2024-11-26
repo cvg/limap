@@ -1,6 +1,5 @@
 # [NOTE] modified from the pixel-perfect-sfm project
 
-import logging
 import sys
 import time
 
@@ -9,6 +8,7 @@ import PIL
 import torch
 import torchvision.transforms.functional as tvf
 from _limap import _features
+from pycolmap import logging
 from torchvision import transforms
 
 from .models.s2dnet import S2DNet

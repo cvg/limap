@@ -4,6 +4,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import matplotlib.pyplot as plt
 import numpy as np
+from pycolmap import logging
 from tqdm import tqdm
 
 import limap.evaluation as limap_eval
@@ -58,11 +59,11 @@ def report_error_to_GT(evaluator, lines, vis_err_th=None):
         list_recall.append(length_recall)
         precision = 100 * (ratios > 0).astype(int).sum() / ratios.shape[0]
         list_precision.append(precision)
-    print("R: recall, P: precision")
+    logging.info("R: recall, P: precision")
     for idx, threshold in enumerate(thresholds):
-        print(
-            f"R / P at {int(threshold * 1000)}mm: \
-              {list_recall[idx]:.2f} / {list_precision[idx]:.2f}"
+        logging.info(
+            f"R / P at {int(threshold * 1000)}mm: "
+            f"{list_recall[idx]:.2f} / {list_precision[idx]:.2f}"
         )
     return evaluator
 
@@ -75,7 +76,7 @@ def read_ply(fname):
     y = np.asarray(plydata.elements[0].data["y"])
     z = np.asarray(plydata.elements[0].data["z"])
     points = np.stack([x, y, z], axis=1)
-    print(f"number of points: {points.shape[0]}")
+    logging.info(f"number of points: {points.shape[0]}")
     return points
 
 
@@ -282,9 +283,9 @@ def main():
         sup_line_counts = np.array(
             [track.count_lines() for track in linetracks]
         )
-        print(
-            f"supporting images / lines: ({sup_image_counts.mean():.2f} \
-              / {sup_line_counts.mean():.2f})"
+        logging.info(
+            f"supporting images / lines: ({sup_image_counts.mean():.2f} "
+            f"/ {sup_line_counts.mean():.2f})"
         )
 
 

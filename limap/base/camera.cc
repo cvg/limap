@@ -185,6 +185,18 @@ Camera::Camera(const Camera &cam) {
   initialized = cam.initialized;
 }
 
+Camera &Camera::operator=(const Camera &cam) {
+  if (this != &cam) {
+    camera_id = cam.camera_id;
+    model_id = cam.model_id;
+    params = cam.params;
+    height = cam.height;
+    width = cam.width;
+    initialized = cam.initialized;
+  }
+  return *this;
+}
+
 bool Camera::operator==(const Camera &cam) {
   if (camera_id != cam.camera_id)
     return false;

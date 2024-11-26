@@ -734,6 +734,9 @@ void bind_camera(py::module &m) {
       .def(py::init<const std::string &, int, std::pair<int, int>>(),
            py::arg("model_name"), py::arg("cam_id") = -1,
            py::arg("hw") = std::make_pair<int, int>(-1, -1)) // empty camera
+      .def("__copy__", [](const Camera &self) { return Camera(self); })
+      .def("__deepcopy__",
+           [](const Camera &self, const py::dict &) { return Camera(self); })
       .def(py::pickle(
           [](const Camera &input) { // dump
             return input.as_dict();
@@ -746,6 +749,7 @@ void bind_camera(py::module &m) {
       .def_readwrite("model", &Camera::model_id, "Camera model.")
       .def_readwrite("width", &Camera::width, "Width of camera sensor.")
       .def_readwrite("height", &Camera::height, "Height of camera sensor.")
+      .def_readwrite("params", &Camera::params, "Camera parameters.")
       .def("as_dict", &Camera::as_dict, R"(
             Returns:
                 dict: Python dict representation of this :class:`~limap.base.Camera`
@@ -1052,6 +1056,12 @@ void bind_camera(py::module &m) {
       .def(py::init<const std::vector<CameraView> &>(), py::arg("camviews"))
       .def(py::init<py::dict>(), py::arg("dict"))
       .def(py::init<const ImageCollection &>(), py::arg("imagecols"))
+      .def("__copy__",
+           [](const ImageCollection &self) { return ImageCollection(self); })
+      .def("__deepcopy__",
+           [](const ImageCollection &self, const py::dict &) {
+             return ImageCollection(self);
+           })
       .def(py::pickle(
           [](const ImageCollection &input) { // dump
             return input.as_dict();

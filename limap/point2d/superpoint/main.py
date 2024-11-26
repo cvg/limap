@@ -1,5 +1,4 @@
 import collections.abc as collections
-import logging
 import pprint
 from pathlib import Path
 from typing import Dict, List, Optional, Union
@@ -9,6 +8,7 @@ import numpy as np
 import torch
 from hloc import extract_features
 from hloc.utils.io import list_h5_names
+from pycolmap import logging
 from tqdm import tqdm
 
 from .superpoint import SuperPoint

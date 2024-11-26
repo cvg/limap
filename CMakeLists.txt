@@ -25,6 +25,7 @@ option(OPENMP_ENABLED "Whether to enable OpenMP parallelization" ON)
 option(INTERPOLATION_ENABLED "Whether to enable interpolation-based pixel-perfect optimization" OFF)
 option(FETCH_POSELIB "Whether to use PoseLib with FetchContent or with self-installed software" ON)
 option(FETCH_COLMAP "Whether to use COLMAP with FetchContent or with self-installed software" ON)
+option(CUDA_ENABLED "Whether to use CUDA (only for the third-party COLMAP)" OFF)
 
 include(cmake/FindDependencies.cmake)
 include(cmake/InitVariables.cmake)
