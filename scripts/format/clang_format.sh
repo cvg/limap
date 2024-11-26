@@ -24,7 +24,7 @@ echo "Found clang-format: $(which  ${clang_format})"
 
 # Check version
 version_string=$($clang_format --version | sed -E 's/^.*(\d+\.\d+\.\d+-.*).*$/\1/')
-expected_version_string='14.0.0'
+expected_version_string='19.1.0'
 if [[ "$version_string" =~ "$expected_version_string" ]]; then
     echo "clang-format version '$version_string' matches '$expected_version_string'"
 else

@@ -1,7 +1,6 @@
-import logging
-
 from _limap import _base
 from _limap import _merging as _mrg
+from pycolmap import logging
 
 
 def merging(linker, all_2d_segs, imagecols, seg3d_list, neighbors, var2d=5.0):
@@ -37,8 +36,8 @@ def remerge(linker3d, linetracks, num_outliers=2):
             break
         num_tracks = num_tracks_new
     logging.info(
-        f"[LOG] tracks after iterative remerging: \
-          {len(new_linetracks)} / {len(linetracks)}"
+        f"[LOG] tracks after iterative remerging:"
+        f" {len(new_linetracks)} / {len(linetracks)}"
     )
     return new_linetracks
 

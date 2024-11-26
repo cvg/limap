@@ -1,9 +1,9 @@
-import logging
 import os
 from collections import defaultdict
 
 import numpy as np
 from hloc.utils.io import get_keypoints, get_matches
+from pycolmap import logging
 from tqdm import tqdm
 
 import limap.base as base

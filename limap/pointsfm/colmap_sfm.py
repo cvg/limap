@@ -1,5 +1,4 @@
 import copy
-import logging
 import os
 import shutil
 import subprocess
@@ -7,6 +6,7 @@ import sys
 from pathlib import Path
 
 import cv2
+from pycolmap import logging
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import hloc.utils.database as database

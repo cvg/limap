@@ -1,7 +1,6 @@
-import logging
-
 import _limap._base as _base
 import numpy as np
+from pycolmap import logging
 
 
 def unit_test_add_noise(imagecols):

@@ -1,11 +1,11 @@
 import copy
-import logging
 import os
 
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
+from pycolmap import logging
 
 
 def random_color():

@@ -56,6 +56,7 @@ public:
          std::pair<int, int> hw = std::make_pair<int, int>(-1, -1));
   Camera(py::dict dict);
   Camera(const Camera &cam);
+  Camera &operator=(const Camera &cam);
   Camera(int model, int cam_id = -1,
          std::pair<int, int> hw = std::make_pair<int, int>(-1,
                                                            -1)); // empty camera

@@ -14,7 +14,7 @@ class RefLineEvaluator {
 public:
   RefLineEvaluator() {}
   RefLineEvaluator(const std::vector<Line3d> &ref_lines)
-      : ref_lines_(ref_lines){};
+      : ref_lines_(ref_lines) {};
 
   double SumLength() const;
   double ComputeRecallRef(const std::vector<Line3d> &lines,

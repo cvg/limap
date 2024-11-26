@@ -1,9 +1,9 @@
-import logging
 import os
 
 import cv2
 import numpy as np
 import torch
+from pycolmap import logging
 
 import limap.util.io as limapio
 

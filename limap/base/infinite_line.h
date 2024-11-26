@@ -68,7 +68,7 @@ class MinimalInfiniteLine3d {
 public:
   MinimalInfiniteLine3d() {}
   MinimalInfiniteLine3d(const Line3d &line)
-      : MinimalInfiniteLine3d(InfiniteLine3d(line)){};
+      : MinimalInfiniteLine3d(InfiniteLine3d(line)) {};
   MinimalInfiniteLine3d(const InfiniteLine3d &inf_line);
   MinimalInfiniteLine3d(const std::vector<double> &values);
   InfiniteLine3d GetInfiniteLine() const;
