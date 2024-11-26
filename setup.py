@@ -75,10 +75,10 @@ def parse_requirements_for_limap(filename):
         ]
     requirements.extend(
         [
-            "pytlsd @ git+https://github.com/iago-suarez/pytlsd.git@37ac583341cbca74c2bbb1e07b82e1447f7cdf5f#egg=pytlsd",
-            "hloc @ git+https://github.com/cvg/Hierarchical-Localization.git@abb252080282e31147db6291206ca102c43353f7#egg=hloc",
-            "deeplsd @ git+https://github.com/cvg/DeepLSD.git@17c764595b17f619e6f78c5f9fc18f1f970ea579#egg=deeplsd",
-            "gluestick @ git+https://github.com/cvg/GlueStick.git@0f28efd33ed6e43ab63760decd62750cdede5721#egg=gluestick",
+            "pytlsd @ git+https://github.com/iago-suarez/pytlsd.git@37ac583",
+            "hloc @ git+https://github.com/cvg/Hierarchical-Localization.git@abb2520",
+            "deeplsd @ git+https://github.com/cvg/DeepLSD.git@17c7645",
+            "gluestick @ git+https://github.com/cvg/GlueStick.git@0f28efd",
         ]
     )
     return requirements
