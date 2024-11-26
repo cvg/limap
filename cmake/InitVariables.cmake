@@ -25,11 +25,17 @@ else()
     list(APPEND LIMAP_EXTERNAL_LIBRARIES PoseLib)
 endif()
 
+# JLinkage
+if(NOT FETCH_JLINKAGE)
+    list(APPEND LIMAP_EXTERNAL_LIBRARIES JLinkage::JLinkage)
+else()
+    list(APPEND LIMAP_EXTERNAL_LIBRARIES JLinkage)
+endif()
+
 # Internal libraries
 set(LIMAP_INTERNAL_LIBRARIES
   HighFive
   pybind11::module
-  JLinkage::JLinkage
   igl::core
 )
 
