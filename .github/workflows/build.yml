@@ -16,8 +16,13 @@ jobs:
     runs-on: ${{ matrix.config.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        config: [
+          {os: ubuntu-latest, python-version: 3.8},
+          {os: ubuntu-latest, python-version: 3.9},
+          {os: ubuntu-latest, python-version: 3.10},
+          {os: ubuntu-latest, python-version: 3.11},
+          {os: ubuntu-latest, python-version: 3.12},
+        ]
     env:
       COMPILER_CACHE_VERSION: 1
       COMPILER_CACHE_DIR: ${{ github.workspace }}/compiler-cache
