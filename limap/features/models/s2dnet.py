@@ -1,4 +1,3 @@
-from pycolmap import logging
 import os
 from pathlib import Path
 from typing import List
@@ -6,6 +5,7 @@ from typing import List
 import numpy as np
 import torch
 import torch.nn as nn
+from pycolmap import logging
 from torchvision import models
 
 from .base_model import BaseModel

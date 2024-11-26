@@ -1,6 +1,6 @@
-from pycolmap import logging
 import os
 
+from pycolmap import logging
 from tqdm import tqdm
 
 import limap.base as base

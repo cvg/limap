@@ -2,11 +2,11 @@
 This file contains some useful functions for train / val.
 """
 
-from pycolmap import logging
 import os
 
 import numpy as np
 import torch
+from pycolmap import logging
 
 
 #################

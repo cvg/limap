@@ -1,6 +1,5 @@
-from pycolmap import logging
-
 from _limap import _pointsfm
+from pycolmap import logging
 
 
 def filter_by_cam_id(cam_id, prev_imagecols, prev_neighbors):

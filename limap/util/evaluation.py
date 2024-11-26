@@ -1,7 +1,6 @@
-from pycolmap import logging
-
 import cv2
 import numpy as np
+from pycolmap import logging
 
 import limap.base as base
 

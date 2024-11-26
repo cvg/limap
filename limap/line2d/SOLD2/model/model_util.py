@@ -1,7 +1,6 @@
-from pycolmap import logging
-
 import torch.nn as nn
 import torch.nn.init as init
+from pycolmap import logging
 
 from .nets.backbone import HourglassBackbone, SuperpointBackbone
 from .nets.descriptor_decoder import SuperpointDescriptor

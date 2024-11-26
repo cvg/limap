@@ -1,9 +1,9 @@
-from pycolmap import logging
 import os
 
 import numpy as np
 import torch
 from gluestick.models.gluestick import GlueStick
+from pycolmap import logging
 
 from ..base_matcher import (
     BaseMatcher,

@@ -40,13 +40,13 @@
 # --------------------------------------------------------------------*/
 # %BANNER_END%
 
-from pycolmap import logging
 import os
 from copy import deepcopy
 from pathlib import Path
 from typing import List, Tuple
 
 import torch
+from pycolmap import logging
 from torch import nn
 
 
