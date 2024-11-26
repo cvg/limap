@@ -1,5 +1,5 @@
 import collections.abc as collections
-import logging
+from pycolmap import logging
 import pprint
 from pathlib import Path
 from typing import Dict, List, Optional, Union

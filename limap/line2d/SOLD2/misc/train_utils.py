@@ -2,7 +2,7 @@
 This file contains some useful functions for train / val.
 """
 
-import logging
+from pycolmap import logging
 import os
 
 import numpy as np

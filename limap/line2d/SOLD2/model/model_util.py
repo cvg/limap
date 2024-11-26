@@ -1,4 +1,4 @@
-import logging
+from pycolmap import logging
 
 import torch.nn as nn
 import torch.nn.init as init

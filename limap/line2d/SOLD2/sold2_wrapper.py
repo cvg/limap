@@ -1,4 +1,4 @@
-import logging
+from pycolmap import logging
 import os
 import subprocess
 

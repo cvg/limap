@@ -1,6 +1,6 @@
 # [NOTE] modified from the pixel-perfect-sfm project
 
-import logging
+from pycolmap import logging
 import sys
 import time
 

@@ -2,7 +2,7 @@
 This file implements the training process and all the summaries
 """
 
-import logging
+from pycolmap import logging
 
 import cv2
 import numpy as np

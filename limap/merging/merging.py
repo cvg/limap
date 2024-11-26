@@ -1,4 +1,4 @@
-import logging
+from pycolmap import logging
 
 from _limap import _base
 from _limap import _merging as _mrg

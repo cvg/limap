@@ -1,5 +1,5 @@
 import copy
-import logging
+from pycolmap import logging
 import os
 
 import cv2
