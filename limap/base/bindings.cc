@@ -746,6 +746,7 @@ void bind_camera(py::module &m) {
       .def_readwrite("model", &Camera::model_id, "Camera model.")
       .def_readwrite("width", &Camera::width, "Width of camera sensor.")
       .def_readwrite("height", &Camera::height, "Height of camera sensor.")
+      .def_readwrite("params", &Camera::params, "Camera parameters.")
       .def("as_dict", &Camera::as_dict, R"(
             Returns:
                 dict: Python dict representation of this :class:`~limap.base.Camera`
