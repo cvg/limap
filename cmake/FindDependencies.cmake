@@ -67,3 +67,16 @@ else()
 endif()
 message(STATUS "Configuring COLMAP... done")
 
+# JLinkage
+FetchContent_Declare(JLinkage
+    GIT_REPOSITORY    https://github.com/B1ueber2y/JLinkage.git
+    GIT_TAG           452d67eda005db01a02071a5af8f0eced0a02079
+    EXCLUDE_FROM_ALL
+)
+message(STATUS "Configuring JLinkage...")
+if (FETCH_JLINKAGE)
+    FetchContent_MakeAvailable(JLinkage)
+else()
+    find_package(JLinkage REQUIRED)
+endif()
+message(STATUS "Configuring JLinkage... done")

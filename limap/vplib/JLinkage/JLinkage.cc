@@ -1,7 +1,7 @@
 #include "vplib/JLinkage/JLinkage.h"
 
-#include <VPCluster.h>
-#include <VPSample.h>
+#include <JLinkage/include/VPCluster.h>
+#include <JLinkage/include/VPSample.h>
 #include <third-party/progressbar.hpp>
 
 namespace limap {

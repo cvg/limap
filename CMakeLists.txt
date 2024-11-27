@@ -26,6 +26,7 @@ option(INTERPOLATION_ENABLED "Whether to enable interpolation-based pixel-perfec
 option(FETCH_POSELIB "Whether to use PoseLib with FetchContent or with self-installed software" ON)
 option(FETCH_COLMAP "Whether to use COLMAP with FetchContent or with self-installed software" ON)
 option(CUDA_ENABLED "Whether to use CUDA (only for the third-party COLMAP)" OFF)
+option(FETCH_JLINKAGE "Whether to use JLinkage with FetchContent or with self-installed software" ON)
 
 include(cmake/FindDependencies.cmake)
 include(cmake/InitVariables.cmake)
@@ -41,7 +42,6 @@ link_directories(${LIMAP_LINK_DIRS})
 
 # Add sources
 add_subdirectory(third-party)
-include_directories(${JLINKAGE_INCLUDE_DIRS})
 include_directories(${RANSACLIB_INCLUDE_DIRS})
 add_subdirectory(limap)
 
