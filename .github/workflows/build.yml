@@ -66,10 +66,10 @@ jobs:
             libunwind-dev \
             xvfb
 
-      - name: Set up Python ${{ matrix.python-version  }}
+      - name: Set up Python ${{ matrix.config.python-version  }}
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python-version  }}
+          python-version: ${{ matrix.config.python-version  }}
 
       - name: Install Python dependencies
         run: |
