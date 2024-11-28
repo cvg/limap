@@ -1,8 +1,9 @@
 #include "pointsfm/sfm_model.h"
-#include "util/log_exceptions.h"
 
-#include <colmap/base/reconstruction.h>
-#include <colmap/util/math.h>
+#include <colmap/math/math.h>
+#include <colmap/scene/reconstruction.h>
+#include <colmap/util/file.h>
+#include <colmap/util/logging.h>
 #include <colmap/util/misc.h>
 
 namespace limap {
@@ -39,8 +40,8 @@ void SfmModel::ReadFromCOLMAP(const std::string &path,
   // store image ids
   colmap::Reconstruction reconstruction;
   reconstruction.Read(colmap::JoinPaths(path, sparse_path));
-  for (size_t i = 0; i < reconstruction.NumRegImages(); ++i) {
-    reg_image_ids.push_back(reconstruction.RegImageIds()[i]);
+  for (auto &image_id : reconstruction.RegImageIds()) {
+    reg_image_ids.push_back(static_cast<int>(image_id));
   }
 }
 

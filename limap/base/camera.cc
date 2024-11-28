@@ -1,28 +1,31 @@
 #include "base/camera.h"
+#include <colmap/util/logging.h>
 
 namespace limap {
 
-void Camera::SetModelId(const int model_id) {
-  colmap::Camera::SetModelId(model_id);
-  initialized.resize(NumParams());
+void Camera::SetModelId(int model) {
+  model_id = static_cast<colmap::CameraModelId>(model);
+  initialized.resize(params.size());
   std::fill(initialized.begin(), initialized.end(), false);
 }
 
 void Camera::SetModelIdFromName(const std::string &model_name) {
-  colmap::Camera::SetModelIdFromName(model_name);
-  initialized.resize(NumParams());
+  model_id = colmap::CameraModelNameToId(model_name);
+  initialized.resize(params.size());
   std::fill(initialized.begin(), initialized.end(), false);
 }
 
-void Camera::SetParams(const std::vector<double> &params) {
-  THROW_CHECK_EQ(params.size(), NumParams());
-  colmap::Camera::SetParams(params);
+void Camera::SetParams(const std::vector<double> &params_input) {
+  THROW_CHECK_EQ(params.size(), params_input.size());
+  params = params_input;
   std::fill(initialized.begin(), initialized.end(), true);
 }
 
-void Camera::InitializeParams(const double focal_length, const int width,
-                              const int height) {
-  InitializeWithId(ModelId(), focal_length, width, height);
+void Camera::InitializeParams(double focal_length, int width, int height) {
+  width = width;
+  height = height;
+  params = colmap::CameraModelInitializeParams(model_id, focal_length, width,
+                                               height);
   std::fill(initialized.begin(), initialized.end(), true);
 }
 
@@ -35,51 +38,52 @@ bool Camera::IsInitialized() const {
 }
 
 Camera::Camera(const colmap::Camera &cam) {
-  SetCameraId(cam.CameraId());
-  SetModelId(cam.ModelId());
-  SetParams(cam.Params());
-  SetHeight(cam.Height());
-  SetWidth(cam.Width());
+  camera_id = cam.camera_id;
+  model_id = cam.model_id;
+  params = cam.params;
+  height = cam.height;
+  width = cam.width;
 }
 
 // empty camera
-Camera::Camera(int model_id, int cam_id, std::pair<int, int> hw) {
-  SetModelId(model_id);
-  SetCameraId(cam_id);
-  SetHeight(hw.first);
-  SetWidth(hw.second);
+Camera::Camera(int model, int cam_id, std::pair<int, int> hw) {
+  model_id = static_cast<colmap::CameraModelId>(model);
+  camera_id = cam_id;
+  height = hw.first;
+  width = hw.second;
 }
 
 // empty camera
 Camera::Camera(const std::string &model_name, int cam_id,
                std::pair<int, int> hw) {
-  SetModelIdFromName(model_name);
-  SetCameraId(cam_id);
-  SetHeight(hw.first);
-  SetWidth(hw.second);
+  model_id = colmap::CameraModelNameToId(model_name);
+  camera_id = cam_id;
+  height = hw.first;
+  width = hw.second;
 }
 
-Camera::Camera(int model_id, const std::vector<double> &params, int cam_id,
+Camera::Camera(int model, const std::vector<double> &params_input, int cam_id,
                std::pair<int, int> hw) {
-  SetModelId(model_id);
-  SetParams(params);
+  model_id = static_cast<colmap::CameraModelId>(model);
+  params = params_input;
   if (cam_id != -1)
-    SetCameraId(cam_id);
+    camera_id = cam_id;
   if (hw.first != -1 && hw.second != -1) {
-    SetHeight(hw.first);
-    SetWidth(hw.second);
+    height = hw.first;
+    width = hw.second;
   }
 }
 
-Camera::Camera(const std::string &model_name, const std::vector<double> &params,
-               int cam_id, std::pair<int, int> hw) {
-  SetModelIdFromName(model_name);
-  SetParams(params);
+Camera::Camera(const std::string &model_name,
+               const std::vector<double> &params_input, int cam_id,
+               std::pair<int, int> hw) {
+  model_id = colmap::CameraModelNameToId(model_name);
+  params = params_input;
   if (cam_id != -1)
-    SetCameraId(cam_id);
+    camera_id = cam_id;
   if (hw.first != -1 && hw.second != -1) {
-    SetHeight(hw.first);
-    SetWidth(hw.second);
+    height = hw.first;
+    width = hw.second;
   }
 }
 
@@ -88,44 +92,43 @@ Camera::Camera(M3D K, int cam_id, std::pair<int, int> hw) {
   THROW_CHECK_EQ(K(1, 0), 0);
   THROW_CHECK_EQ(K(2, 0), 0);
   THROW_CHECK_EQ(K(2, 1), 0);
-  std::vector<double> params;
+  params.clear();
   if (K(0, 0) == K(1, 1)) {
-    SetModelIdFromName("SIMPLE_PINHOLE");
+    model_id = colmap::CameraModelNameToId("SIMPLE_PINHOLE");
     params.push_back(K(0, 0));
     params.push_back(K(0, 2));
     params.push_back(K(1, 2));
   } else {
-    SetModelIdFromName("PINHOLE");
+    model_id = colmap::CameraModelNameToId("PINHOLE");
     params.push_back(K(0, 0));
     params.push_back(K(1, 1));
     params.push_back(K(0, 2));
     params.push_back(K(1, 2));
   }
-  SetParams(params);
   if (cam_id != -1)
-    SetCameraId(cam_id);
+    camera_id = cam_id;
   if (hw.first != -1 && hw.second != -1) {
-    SetHeight(hw.first);
-    SetWidth(hw.second);
+    height = hw.first;
+    width = hw.second;
   }
 }
 
-Camera::Camera(int model_id, M3D K, int cam_id, std::pair<int, int> hw) {
+Camera::Camera(int model, M3D K, int cam_id, std::pair<int, int> hw) {
   THROW_CHECK_EQ(K(0, 1), 0);
   THROW_CHECK_EQ(K(1, 0), 0);
   THROW_CHECK_EQ(K(2, 0), 0);
   THROW_CHECK_EQ(K(2, 1), 0);
-  std::vector<double> params;
-  if (model_id == 0) {
+  params.clear();
+  if (model == 0) {
     // SIMPLE_PINHOLE
     THROW_CHECK_EQ(K(0, 0), K(1, 1));
-    SetModelIdFromName("SIMPLE_PINHOLE");
+    model_id = colmap::CameraModelNameToId("SIMPLE_PINHOLE");
     params.push_back(K(0, 0));
     params.push_back(K(0, 2));
     params.push_back(K(1, 2));
-  } else if (model_id == 1) {
+  } else if (model == 1) {
     // PINHOLE
-    SetModelIdFromName("PINHOLE");
+    model_id = colmap::CameraModelNameToId("PINHOLE");
     params.push_back(K(0, 0));
     params.push_back(K(1, 1));
     params.push_back(K(0, 2));
@@ -133,12 +136,11 @@ Camera::Camera(int model_id, M3D K, int cam_id, std::pair<int, int> hw) {
   } else
     throw std::runtime_error(
         "model initialized with K should be either SIMPLE_PINHOLE or PINHOLE");
-  SetParams(params);
   if (cam_id != -1)
-    SetCameraId(cam_id);
+    camera_id = cam_id;
   if (hw.first != -1 && hw.second != -1) {
-    SetHeight(hw.first);
-    SetWidth(hw.second);
+    height = hw.first;
+    width = hw.second;
   }
 }
 
@@ -148,17 +150,17 @@ Camera::Camera(const std::string &model_name, M3D K, int cam_id,
   THROW_CHECK_EQ(K(1, 0), 0);
   THROW_CHECK_EQ(K(2, 0), 0);
   THROW_CHECK_EQ(K(2, 1), 0);
-  std::vector<double> params;
+  params.clear();
   if (model_name == "SIMPLE_PINHOLE") {
     // SIMPLE_PINHOLE
     THROW_CHECK_EQ(K(0, 0), K(1, 1));
-    SetModelIdFromName("SIMPLE_PINHOLE");
+    model_id = colmap::CameraModelNameToId("SIMPLE_PINHOLE");
     params.push_back(K(0, 0));
     params.push_back(K(0, 2));
     params.push_back(K(1, 2));
   } else if (model_name == "PINHOLE") {
     // PINHOLE
-    SetModelIdFromName("PINHOLE");
+    model_id = colmap::CameraModelNameToId("PINHOLE");
     params.push_back(K(0, 0));
     params.push_back(K(1, 1));
     params.push_back(K(0, 2));
@@ -166,37 +168,46 @@ Camera::Camera(const std::string &model_name, M3D K, int cam_id,
   } else
     throw std::runtime_error("Error! The model initialized with K should be "
                              "either SIMPLE_PINHOLE (id=0) or PINHOLE (id=1).");
-  SetParams(params);
   if (cam_id != -1)
-    SetCameraId(cam_id);
+    camera_id = cam_id;
   if (hw.first != -1 && hw.second != -1) {
-    SetHeight(hw.first);
-    SetWidth(hw.second);
+    height = hw.first;
+    width = hw.second;
   }
 }
 
 Camera::Camera(const Camera &cam) {
-  SetCameraId(cam.CameraId());
-  SetModelId(cam.ModelId());
-  SetParams(cam.Params());
-  SetHeight(cam.Height());
-  SetWidth(cam.Width());
+  camera_id = cam.camera_id;
+  model_id = cam.model_id;
+  params = cam.params;
+  height = cam.height;
+  width = cam.width;
   initialized = cam.initialized;
 }
 
+Camera &Camera::operator=(const Camera &cam) {
+  if (this != &cam) {
+    camera_id = cam.camera_id;
+    model_id = cam.model_id;
+    params = cam.params;
+    height = cam.height;
+    width = cam.width;
+    initialized = cam.initialized;
+  }
+  return *this;
+}
+
 bool Camera::operator==(const Camera &cam) {
-  if (CameraId() != cam.CameraId())
+  if (camera_id != cam.camera_id)
     return false;
-  if (ModelId() != cam.ModelId())
+  if (model_id != cam.model_id)
     return false;
   if (h() != cam.h())
     return false;
   if (w() != cam.w())
     return false;
-  std::vector<double> params = Params();
-  std::vector<double> params_cam = cam.Params();
   for (int i = 0; i < params.size(); ++i) {
-    if (params[i] != params_cam[i])
+    if (params[i] != cam.params[i])
       return false;
   }
   return true;
@@ -204,10 +215,8 @@ bool Camera::operator==(const Camera &cam) {
 
 void Camera::set_max_image_dim(const int &val) {
   THROW_CHECK_EQ(IsUndistorted(), true);
-  THROW_CHECK_GT(val, 0)
+  THROW_CHECK_GT(val, 0);
 
-  double height = Height();
-  double width = Width();
   double ratio = double(val) / double(std::max(height, width));
   if (ratio < 1.0) {
     int new_width = int(round(ratio * width));
@@ -218,7 +227,7 @@ void Camera::set_max_image_dim(const int &val) {
 
 double Camera::uncertainty(double depth, double var2d) const {
   double f = -1.0;
-  const std::vector<size_t> &idxs = FocalLengthIdxs();
+  auto idxs = FocalLengthIdxs();
   if (idxs.size() == 1)
     f = FocalLength();
   else if (idxs.size() == 2) {
@@ -233,34 +242,29 @@ double Camera::uncertainty(double depth, double var2d) const {
 }
 
 Camera::Camera(py::dict dict) {
-  // load data
-  int model_id;
-  ASSIGN_PYDICT_ITEM(dict, model_id, int);
-  std::vector<double> params;
-  ASSIGN_PYDICT_ITEM(dict, params, std::vector<double>);
-  int cam_id;
-  ASSIGN_PYDICT_ITEM(dict, cam_id, int);
-  int height, width;
+  // model id
+  int model_id_loaded;
+  ASSIGN_PYDICT_ITEM(dict, model_id_loaded, int);
+  model_id = static_cast<colmap::CameraModelId>(model_id_loaded);
+
+  // params
+  std::vector<double> params_loaded;
+  ASSIGN_PYDICT_ITEM(dict, params_loaded, std::vector<double>);
+  THROW_CHECK_EQ(params_loaded.size(), params.size());
+  params = params_loaded;
+
+  // other fields
+  ASSIGN_PYDICT_ITEM(dict, camera_id, int);
   ASSIGN_PYDICT_ITEM(dict, height, int);
   ASSIGN_PYDICT_ITEM(dict, width, int);
-
-  // set camera
-  SetModelId(model_id);
-  THROW_CHECK_EQ(params.size(), NumParams());
-  SetParams(params);
-  SetCameraId(cam_id);
-  SetHeight(height);
-  SetWidth(width);
-
-  // set initialized
   ASSIGN_PYDICT_ITEM(dict, initialized, std::vector<bool>);
 }
 
 py::dict Camera::as_dict() const {
   py::dict output;
-  output["model_id"] = ModelId();
-  output["params"] = params();
-  output["cam_id"] = int(CameraId());
+  output["model_id"] = int(model_id);
+  output["params"] = params;
+  output["cam_id"] = int(camera_id);
   output["height"] = h();
   output["width"] = w();
   output["initialized"] = initialized;

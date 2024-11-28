@@ -1,10 +1,10 @@
-import logging
 import os
 import subprocess
 
 import cv2
 import numpy as np
 import torch
+from pycolmap import logging
 from skimage.draw import line
 
 from .experiment import load_config

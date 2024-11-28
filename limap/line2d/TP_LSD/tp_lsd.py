@@ -1,9 +1,9 @@
-import logging
 import os
 
 import cv2
 import numpy as np
 import torch
+from pycolmap import logging
 from tp_lsd.modeling.TP_Net import Res320
 from tp_lsd.utils.reconstruct import TPS_line
 from tp_lsd.utils.utils import load_model

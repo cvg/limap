@@ -1,8 +1,8 @@
-import logging
 import os
 import shutil
 
 import numpy as np
+from pycolmap import logging
 from tqdm import tqdm
 
 import limap.base as base

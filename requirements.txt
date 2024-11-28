@@ -26,8 +26,9 @@ imagesize
 einops
 ninja
 yacs
-python-json-logger
+pycolmap
 ruff==0.6.7
+clang-format==19.1.0
 
 ./third-party/pytlsd
 ./third-party/hawp

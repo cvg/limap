@@ -686,6 +686,13 @@ void bind_line_linker(py::module &m) {
 }
 
 void bind_camera(py::module &m) {
+  // TODO: use pycolmap
+  py::enum_<colmap::CameraModelId> PyCameraModelId(m, "CameraModelId");
+  PyCameraModelId.value("INVALID", colmap::CameraModelId::kInvalid);
+  PyCameraModelId.value("SIMPLE_PINHOLE",
+                        colmap::CameraModelId::kSimplePinhole);
+  PyCameraModelId.value("PINHOLE", colmap::CameraModelId::kPinhole);
+
   py::class_<Camera>(m, "Camera", R"(
             | Camera model, inherits `COLMAP's camera model <https://colmap.github.io/cameras.html>`_.
             | COLMAP camera models:
@@ -727,6 +734,9 @@ void bind_camera(py::module &m) {
       .def(py::init<const std::string &, int, std::pair<int, int>>(),
            py::arg("model_name"), py::arg("cam_id") = -1,
            py::arg("hw") = std::make_pair<int, int>(-1, -1)) // empty camera
+      .def("__copy__", [](const Camera &self) { return Camera(self); })
+      .def("__deepcopy__",
+           [](const Camera &self, const py::dict &) { return Camera(self); })
       .def(py::pickle(
           [](const Camera &input) { // dump
             return input.as_dict();
@@ -734,6 +744,12 @@ void bind_camera(py::module &m) {
           [](const py::dict &dict) { // load
             return Camera(dict);
           }))
+      .def_readwrite("camera_id", &Camera::camera_id,
+                     "Unique identifier of the camera.")
+      .def_readwrite("model", &Camera::model_id, "Camera model.")
+      .def_readwrite("width", &Camera::width, "Width of camera sensor.")
+      .def_readwrite("height", &Camera::height, "Height of camera sensor.")
+      .def_readwrite("params", &Camera::params, "Camera parameters.")
       .def("as_dict", &Camera::as_dict, R"(
             Returns:
                 dict: Python dict representation of this :class:`~limap.base.Camera`
@@ -754,22 +770,6 @@ void bind_camera(py::module &m) {
             Returns:
                 :class:`np.array` of shape (3, 3): Inverse of the intrinsic matrix
         )")
-      .def("cam_id", &Camera::CameraId, R"(
-            Returns:
-                int: Camera ID
-        )")
-      .def("model_id", &Camera::ModelId, R"(
-            Returns:
-                int: COLMAP camera model ID
-        )")
-      .def("params", &Camera::params, R"(
-            Returns:
-                list (float): Minimal representation of intrinsic paramters, length varies according to camera model
-        )")
-      .def("num_params", &Camera::NumParams, R"(
-            Returns:
-                int: Number of the paramters for minimal representation of intrinsic 
-        )")
       .def("resize", &Camera::resize, R"(
             Resize camera's width and height.
 
@@ -785,10 +785,6 @@ void bind_camera(py::module &m) {
                 val (int)
         )",
            py::arg("val"))
-      .def("set_cam_id", &Camera::SetCameraId, R"(
-            Set the camera ID.
-        )",
-           py::arg("camera_id"))
       .def("InitializeParams", &Camera::InitializeParams, R"(
             Initialize the intrinsics using focal length, width, and height
 
@@ -798,8 +794,8 @@ void bind_camera(py::module &m) {
                 height (int)
         )",
            py::arg("focal_length"), py::arg("width"), py::arg("height"))
-      .def("ImageToWorld", &Camera::ImageToWorld)
-      .def("WorldToImage", &Camera::WorldToImage)
+      .def("CamFromImg", &Camera::CamFromImg)
+      .def("ImgFromCam", &Camera::ImgFromCam)
       .def("IsInitialized", &Camera::IsInitialized, R"(
             Returns:
                 bool: True if the camera parameters are initialized
@@ -833,6 +829,9 @@ void bind_camera(py::module &m) {
             Constructor from a Python dict
         )",
            py::arg("dict"))
+      .def("__copy__", [](const CameraPose &self) { return CameraPose(self); })
+      .def("__deepcopy__", [](const CameraPose &self,
+                              const py::dict &) { return CameraPose(self); })
       .def(py::pickle(
           [](const CameraPose &input) { // dump
             return input.as_dict();
@@ -888,6 +887,10 @@ void bind_camera(py::module &m) {
            py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
       .def(py::init<py::dict>(), py::arg("dict"))
       .def(py::init<const CameraImage &>(), py::arg("camimage"))
+      .def("__copy__",
+           [](const CameraImage &self) { return CameraImage(self); })
+      .def("__deepcopy__", [](const CameraImage &self,
+                              const py::dict &) { return CameraImage(self); })
       .def(py::pickle(
           [](const CameraImage &input) { // dump
             return input.as_dict();
@@ -942,6 +945,9 @@ void bind_camera(py::module &m) {
            py::arg("camera"), py::arg("pose"), py::arg("image_name") = "none")
       .def(py::init<py::dict>(), py::arg("dict"))
       .def(py::init<const CameraView &>(), py::arg("camview"))
+      .def("__copy__", [](const CameraView &self) { return CameraView(self); })
+      .def("__deepcopy__", [](const CameraView &self,
+                              const py::dict &) { return CameraView(self); })
       .def(py::pickle(
           [](const CameraView &input) { // dump
             return input.as_dict();
@@ -1060,6 +1066,12 @@ void bind_camera(py::module &m) {
       .def(py::init<const std::vector<CameraView> &>(), py::arg("camviews"))
       .def(py::init<py::dict>(), py::arg("dict"))
       .def(py::init<const ImageCollection &>(), py::arg("imagecols"))
+      .def("__copy__",
+           [](const ImageCollection &self) { return ImageCollection(self); })
+      .def("__deepcopy__",
+           [](const ImageCollection &self, const py::dict &) {
+             return ImageCollection(self);
+           })
       .def(py::pickle(
           [](const ImageCollection &input) { // dump
             return input.as_dict();

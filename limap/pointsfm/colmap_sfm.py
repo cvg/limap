@@ -1,5 +1,4 @@
 import copy
-import logging
 import os
 import shutil
 import subprocess
@@ -7,6 +6,7 @@ import sys
 from pathlib import Path
 
 import cv2
+from pycolmap import logging
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import hloc.utils.database as database
@@ -26,7 +26,7 @@ def import_images_with_known_cameras(image_dir, database_path, imagecols):
     for cam_id in imagecols.get_cam_ids():
         cam = imagecols.cam(cam_id)
         db.add_camera(
-            cam.model_id(), cam.w(), cam.h(), cam.params(), camera_id=cam_id
+            int(cam.model), cam.w(), cam.h(), cam.params, camera_id=cam_id
         )
     # add image
     for img_name, img_id in zip(image_name_list, image_ids):

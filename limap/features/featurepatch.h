@@ -6,8 +6,9 @@
 #include <pybind11/pybind11.h>
 
 #include "features/featuremap.h"
-#include "util/log_exceptions.h"
 #include "util/types.h"
+
+#include <colmap/util/logging.h>
 
 namespace py = pybind11;
 

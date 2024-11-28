@@ -2,7 +2,7 @@
 #include "ceresbase/parameterization.h"
 #include "optimize/hybrid_localization/cost_functions.h"
 
-#include <colmap/optim/bundle_adjustment.h>
+#include <colmap/estimators/bundle_adjustment.h>
 #include <colmap/util/logging.h>
 #include <colmap/util/misc.h>
 #include <colmap/util/threading.h>
@@ -14,7 +14,7 @@ namespace optimize {
 namespace hybrid_localization {
 
 void LineLocEngine::ParameterizeCamera() {
-  double *kvec_data = cam.Params().data();
+  double *kvec_data = cam.params.data();
   double *qvec_data = campose.qvec.data();
   double *tvec_data = campose.tvec.data();
 
@@ -45,7 +45,7 @@ void LineLocEngine::AddResiduals() {
       ceres::LossFunction *scaled_loss_function = new ceres::ScaledLoss(
           loss_function, weight, ceres::DO_NOT_TAKE_OWNERSHIP);
       ceres::ResidualBlockId block_id = problem_->AddResidualBlock(
-          cost_function, scaled_loss_function, cam.Params().data(),
+          cost_function, scaled_loss_function, cam.params.data(),
           campose.qvec.data(), campose.tvec.data());
     }
   }
@@ -83,15 +83,14 @@ bool LineLocEngine::Solve() {
   }
 
   if (config_.print_summary) {
-    colmap::PrintHeading2("Optimization report");
-    colmap::PrintSolverSummary(
-        summary_); // We need to replace this with our own Printer!!!
+    colmap::PrintSolverSummary(summary_, "Optimization report");
   }
   return true;
 }
 
 void JointLocEngine::AddResiduals() {
-  CHECK_EQ(this->cam.ModelId(), colmap::PinholeCameraModel::model_id);
+  CHECK_EQ(static_cast<int>(this->cam.model_id),
+           static_cast<int>(colmap::PinholeCameraModel::model_id));
 
   // ceres::LossFunction* loss_function = new ceres::CauchyLoss(0.1);
   ceres::LossFunction *loss_function = this->config_.loss_function.get();
@@ -118,7 +117,7 @@ void JointLocEngine::AddResiduals() {
       ceres::LossFunction *scaled_loss_function = new ceres::ScaledLoss(
           loss_function, weight, ceres::DO_NOT_TAKE_OWNERSHIP);
       ceres::ResidualBlockId block_id = this->problem_->AddResidualBlock(
-          cost_function, scaled_loss_function, this->cam.Params().data(),
+          cost_function, scaled_loss_function, this->cam.params.data(),
           this->campose.qvec.data(), this->campose.tvec.data());
     }
   }
@@ -129,7 +128,7 @@ void JointLocEngine::AddResiduals() {
     ceres::CostFunction *cost_function = ReprojectionPointFunctor::Create(
         this->p3ds[i], this->p2ds[i], this->config_.points_3d_dist);
     ceres::ResidualBlockId block_id = this->problem_->AddResidualBlock(
-        cost_function, weighted_loss_function, this->cam.Params().data(),
+        cost_function, weighted_loss_function, this->cam.params.data(),
         this->campose.qvec.data(), this->campose.tvec.data());
   }
 }

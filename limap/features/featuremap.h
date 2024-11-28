@@ -10,8 +10,8 @@
 #include <ceres/ceres.h>
 #include <ceres/cubic_interpolation.h>
 
-#include "util/log_exceptions.h"
 #include "util/types.h"
+#include <colmap/util/logging.h>
 
 namespace py = pybind11;
 

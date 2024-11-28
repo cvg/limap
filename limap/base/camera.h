@@ -11,11 +11,11 @@
 namespace py = pybind11;
 
 #include "_limap/helpers.h"
+#include "base/pose.h"
 #include "util/types.h"
 
-#include <colmap/base/camera.h>
-#include <colmap/base/camera_models.h>
-#include <colmap/base/pose.h>
+#include <colmap/scene/camera.h>
+#include <colmap/sensor/models.h>
 
 namespace limap {
 
@@ -35,13 +35,14 @@ namespace limap {
 class Camera : public colmap::Camera {
 public:
   Camera() {
-    SetCameraId(-1);
-    SetModelId(0);
-    SetHeight(-1);
-    SetWidth(-1);
+    camera_id = -1;
+    model_id = colmap::CameraModelId::kPinhole;
+    height = -1;
+    width = -1;
   } // default
+
   Camera(const colmap::Camera &cam);
-  Camera(int model_id, const std::vector<double> &params, int cam_id = -1,
+  Camera(int model, const std::vector<double> &params, int cam_id = -1,
          std::pair<int, int> hw = std::make_pair<int, int>(-1, -1));
   Camera(const std::string &model_name, const std::vector<double> &params,
          int cam_id = -1,
@@ -49,13 +50,14 @@ public:
   // initialize with intrinsics
   Camera(M3D K, int cam_id = -1,
          std::pair<int, int> hw = std::make_pair<int, int>(-1, -1));
-  Camera(int model_id, M3D K, int cam_id = -1,
+  Camera(int model, M3D K, int cam_id = -1,
          std::pair<int, int> hw = std::make_pair<int, int>(-1, -1));
   Camera(const std::string &model_name, M3D K, int cam_id = -1,
          std::pair<int, int> hw = std::make_pair<int, int>(-1, -1));
   Camera(py::dict dict);
   Camera(const Camera &cam);
-  Camera(int model_id, int cam_id = -1,
+  Camera &operator=(const Camera &cam);
+  Camera(int model, int cam_id = -1,
          std::pair<int, int> hw = std::make_pair<int, int>(-1,
                                                            -1)); // empty camera
   Camera(const std::string &model_name, int cam_id = -1,
@@ -70,18 +72,16 @@ public:
   void set_max_image_dim(const int &val);
   M3D K() const { return CalibrationMatrix(); }
   M3D K_inv() const { return K().inverse(); }
-  int h() const { return Height(); }
-  int w() const { return Width(); }
-  std::vector<double> params() const { return Params(); }
+  int h() const { return height; }
+  int w() const { return width; }
 
   double uncertainty(double depth, double var2d = 5.0) const;
 
   // initialized
-  void SetModelId(const int model_id);                    // override
-  void SetModelIdFromName(const std::string &model_name); // override
-  void SetParams(const std::vector<double> &params);      // override
-  void InitializeParams(const double focal_length, const int width,
-                        const int height);
+  void SetModelId(int model);
+  void SetModelIdFromName(const std::string &model_name);
+  void SetParams(const std::vector<double> &params);
+  void InitializeParams(double focal_length, int width, int height);
   std::vector<bool> initialized;
   bool IsInitialized() const;
 };
@@ -93,7 +93,7 @@ public:
       : qvec(qvec.normalized()), tvec(tvec), initialized(initialized) {}
   CameraPose(M3D R, V3D T, bool initiallized = true)
       : tvec(T), initialized(initialized) {
-    qvec = colmap::RotationMatrixToQuaternion(R);
+    qvec = RotationMatrixToQuaternion(R);
   }
   CameraPose(py::dict dict);
   CameraPose(const CameraPose &campose)
@@ -105,7 +105,7 @@ public:
   bool initialized = false;
 
   py::dict as_dict() const;
-  M3D R() const { return colmap::QuaternionToRotationMatrix(qvec); }
+  M3D R() const { return QuaternionToRotationMatrix(qvec); }
   V3D T() const { return tvec; }
 
   V3D center() const { return -R().transpose() * T(); }

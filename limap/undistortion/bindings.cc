@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "undistortion/undistort.h"
-#include <colmap/util/bitmap.h>
+#include <colmap/sensor/bitmap.h>
 
 namespace py = pybind11;
 
@@ -21,7 +21,8 @@ void bind_undistortion(py::module &m) {
       .def(py::init<>())
       .def("Read", &colmap::Bitmap::Read, py::arg("imname"),
            py::arg("as_rgb") = true)
-      .def("Write", &colmap::Bitmap::Write)
+      .def("Write", &colmap::Bitmap::Write, py::arg("path"),
+           py::arg("flag") = 0)
       .def("Width", &colmap::Bitmap::Width)
       .def("Height", &colmap::Bitmap::Height)
       .def("Channels", &colmap::Bitmap::Channels);

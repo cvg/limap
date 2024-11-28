@@ -46,7 +46,7 @@ public:
     CHECK_EQ(l3ds.size(), l2ds.size());
     this->l3ds = l3ds;
     this->l2ds = l2ds;
-    this->cam = Camera(colmap::PinholeCameraModel::model_id, K);
+    this->cam = Camera(K);
     this->campose = CameraPose(R, T);
   }
   void Initialize(const std::vector<Line3d> &l3ds,
@@ -60,7 +60,7 @@ public:
     K(1, 1) = kvec(1);
     K(0, 2) = kvec(2);
     K(1, 2) = kvec(3);
-    this->cam = Camera(colmap::PinholeCameraModel::model_id, K);
+    this->cam = Camera(K);
     this->campose = CameraPose(qvec, tvec);
   }
   void SetUp();
@@ -103,7 +103,7 @@ public:
     this->p2ds = p2ds;
     this->l3ds = l3ds;
     this->l2ds = l2ds;
-    this->cam = Camera(colmap::PinholeCameraModel::model_id, K);
+    this->cam = Camera(K);
     this->campose = CameraPose(R, T);
   }
   void Initialize(const std::vector<Line3d> &l3ds,
@@ -121,7 +121,7 @@ public:
     K(1, 1) = kvec(1);
     K(0, 2) = kvec(2);
     K(1, 2) = kvec(3);
-    this->cam = Camera(colmap::PinholeCameraModel::model_id, K);
+    this->cam = Camera(K);
     this->campose = CameraPose(qvec, tvec);
   }
 };

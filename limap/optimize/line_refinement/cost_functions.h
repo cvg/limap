@@ -6,7 +6,7 @@
 #include <pybind11/pybind11.h>
 
 #include <ceres/ceres.h>
-#include <colmap/base/camera_models.h>
+#include <colmap/sensor/models.h>
 
 #include "base/camera_models.h"
 #include "base/infinite_line.h"
@@ -43,7 +43,7 @@ public:
                                      const double *qvec = NULL) {
     if (!params && !qvec)
       return new ceres::AutoDiffCostFunction<VPConstraintsFunctor, 1, 4, 2,
-                                             CameraModel::kNumParams, 4>(
+                                             CameraModel::num_params, 4>(
           new VPConstraintsFunctor(VP, NULL, NULL));
     else
       return new ceres::AutoDiffCostFunction<VPConstraintsFunctor, 1, 4, 2>(
@@ -56,7 +56,7 @@ public:
     CHECK_NOTNULL(params_);
     CHECK_NOTNULL(qvec_);
 
-    const int num_params = CameraModel::kNumParams;
+    const int num_params = CameraModel::num_params;
     T params[num_params];
     for (size_t i = 0; i < num_params; ++i) {
       params[i] = T(params_[i]);
@@ -143,7 +143,7 @@ public:
                                      const double alpha = 10.0) {
     if (!params && !qvec && !tvec)
       return new ceres::AutoDiffCostFunction<GeometricRefinementFunctor, 2, 4,
-                                             2, CameraModel::kNumParams, 4, 3>(
+                                             2, CameraModel::num_params, 4, 3>(
           new GeometricRefinementFunctor(line2d, NULL, NULL, NULL, alpha));
     else
       return new ceres::AutoDiffCostFunction<GeometricRefinementFunctor, 2, 4,
@@ -158,7 +158,7 @@ public:
     CHECK_NOTNULL(qvec_);
     CHECK_NOTNULL(tvec_);
 
-    const int num_params = CameraModel::kNumParams;
+    const int num_params = CameraModel::num_params;
     T params[num_params];
     for (size_t i = 0; i < num_params; ++i) {
       params[i] = T(params_[i]);

@@ -142,7 +142,7 @@ def create_query_list(imagecols, out):
     for img_id in imagecols.get_img_ids():
         cam_id = imagecols.camimage(img_id).cam_id
         camera = imagecols.cam(cam_id)
-        w, h, params = camera.w(), camera.h(), camera.params()
+        w, h, params = camera.w(), camera.h(), camera.params
         name = imagecols.camimage(img_id).image_name().split("/")[-1]
         p = [name, model_dict[camera.as_dict()["model_id"]], w, h] + params
         data.append(" ".join(map(str, p)))
