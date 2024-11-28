@@ -1,0 +1,81 @@
+name: limap
+
+on:
+  push:
+    branches:
+      - main
+      - release/*
+  pull_request:
+    types: [ assigned, opened, synchronize, reopened ]
+  release:
+    types: [ published, edited ]
+
+jobs:
+  build:
+    name: ${{ matrix.config.os }} ${{ matrix.config.arch }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      matrix:
+        config: [
+              {os: ubuntu-latest},
+        ]
+    env:
+      COMPILER_CACHE_VERSION: 1
+      COMPILER_CACHE_DIR: ${{ github.workspace }}/compiler-cache
+      CCACHE_DIR: ${{ github.workspace }}/compiler-cache/ccache
+      CCACHE_BASEDIR: ${{ github.workspace }}
+      # For faster builds in PRs, skip all but the latest Python versions.
+      PULL_REQUEST_CIBW_BUILD: cp39-{manylinux}*
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        id: cache-builds
+        with:
+          key: limap-v${{ env.COMPILER_CACHE_VERSION }}-${{ matrix.config.os }}-${{ matrix.config.arch }}-${{ github.run_id }}-${{ github.run_number }}
+          restore-keys: limap-v${{ env.COMPILER_CACHE_VERSION }}-${{ matrix.config.os }}-${{ matrix.config.arch }}
+          path: ${{ env.COMPILER_CACHE_DIR }}
+
+      - name: Set env (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update && sudo apt-get install -y \
+            git \
+            build-essential \
+            cmake \
+            ninja-build \
+            libboost-program-options-dev \
+            libboost-graph-dev \
+            libboost-system-dev \
+            libeigen3-dev \
+            libceres-dev \
+            libflann-dev \
+            libfreeimage-dev \
+            libmetis-dev \
+            libgoogle-glog-dev \
+            libgtest-dev \
+            libgmock-dev \
+            libsqlite3-dev \
+            libglew-dev \
+            qtbase5-dev \
+            libqt5opengl5-dev \
+            libcgal-dev \
+            libcgal-qt5-dev \
+            libgl1-mesa-dri \
+            libunwind-dev \
+            xvfb
+
+      - name: Install Python dependencies
+        run: |
+          git submodule update --init --recursive
+          python -m pip install --upgrade pip
+          python -m pip install setuptools
+          python -m pip install -r requirements.txt  # If you have a requirements file
+
+      - name: Build
+        run: |
+          python -m pip install -v .
+
+      - name: Run Python tests
+        run: |
+          python -c "import limap; print(limap.__version__)"
+
