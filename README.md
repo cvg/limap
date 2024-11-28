@@ -118,7 +118,7 @@ If you wish to use the methods with **separate installation needed** you need to
 **The following line detectors are currently supported:**
 - [LSD](https://github.com/iago-suarez/pytlsd)
 - [SOLD2](https://github.com/cvg/SOLD2)
-- [HAWPv3](https://github.com/cherubicXN/hawp)
+- [HAWP](https://github.com/cherubicXN/hawp) (separate installation needed [[Guide](misc/install/hawpv3.md)])
 - [TP-LSD](https://github.com/Siyuada7/TP-LSD) (separate installation needed [[Guide](misc/install/tp_lsd.md)]) 
 - [DeepLSD](https://github.com/cvg/DeepLSD)
 
