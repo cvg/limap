@@ -7,9 +7,6 @@
 [submodule "third-party/JLinkage"]
 	path = third-party/JLinkage
 	url = https://github.com/B1ueber2y/JLinkage
-[submodule "third-party/libigl"]
-	path = third-party/libigl
-	url = https://github.com/B1ueber2y/libigl.git
 [submodule "third-party/RansacLib"]
 	path = third-party/RansacLib
 	url = https://github.com/B1ueber2y/RansacLib.git
@@ -26,3 +23,6 @@
 [submodule "third-party/GlueStick"]
 	path = third-party/GlueStick
 	url = https://github.com/cvg/GlueStick.git
+[submodule "third-party/libigl"]
+	path = third-party/libigl
+	url = https://github.com/libigl/libigl.git

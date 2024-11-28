@@ -13,8 +13,8 @@
 #include <unistd.h>
 #include <vector>
 
-#include "util/log_exceptions.h"
 #include "util/simple_logger.h"
+#include <colmap/util/logging.h>
 
 // Copyright (c) 2020, ETH Zurich, CVG, Mihai Dusmanu
 // (mihai.dusmanu@inf.ethz.ch) Adapted by Philipp Lindenberger for the

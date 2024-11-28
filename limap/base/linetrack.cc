@@ -1,6 +1,7 @@
 #include "base/linetrack.h"
 #include "base/line_dists.h"
 
+#include <colmap/util/logging.h>
 #include <fstream>
 #include <iomanip>
 #include <iterator>

@@ -1,5 +1,6 @@
 #include "base/linebase.h"
 #include <cmath>
+#include <colmap/util/logging.h>
 
 namespace limap {
 

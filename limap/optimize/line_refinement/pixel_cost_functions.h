@@ -6,7 +6,7 @@
 #include <pybind11/pybind11.h>
 
 #include <ceres/ceres.h>
-#include <colmap/base/camera_models.h>
+#include <colmap/sensor/models.h>
 
 #include "base/camera_models.h"
 #include "base/infinite_line.h"
@@ -48,7 +48,7 @@ public:
          const double *tvec = NULL) {
     if (!params && !qvec && !tvec)
       return new ceres::AutoDiffCostFunction<MaxHeatmapFunctor, ceres::DYNAMIC,
-                                             4, 2, CameraModel::kNumParams, 4,
+                                             4, 2, CameraModel::num_params, 4,
                                              3>(
           new MaxHeatmapFunctor(interpolator, samples, NULL, NULL, NULL),
           samples.size());
@@ -66,7 +66,7 @@ public:
     CHECK_NOTNULL(qvec_);
     CHECK_NOTNULL(tvec_);
 
-    const int num_params = CameraModel::kNumParams;
+    const int num_params = CameraModel::num_params;
     T params[num_params];
     for (size_t i = 0; i < num_params; ++i) {
       params[i] = T(params_[i]);
@@ -130,7 +130,7 @@ public:
     if (!params && !qvec && !tvec)
       return new ceres::AutoDiffCostFunction<FeatureConsisSrcFunctor,
                                              ceres::DYNAMIC, 4, 2,
-                                             CameraModel::kNumParams, 4, 3>(
+                                             CameraModel::num_params, 4, 3>(
           new FeatureConsisSrcFunctor(interpolator, sample, ref_descriptor,
                                       NULL, NULL, NULL),
           CHANNELS);
@@ -149,7 +149,7 @@ public:
     CHECK_NOTNULL(qvec_);
     CHECK_NOTNULL(tvec_);
 
-    const int num_params = CameraModel::kNumParams;
+    const int num_params = CameraModel::num_params;
     T params[num_params];
     for (size_t i = 0; i < num_params; ++i) {
       params[i] = T(params_[i]);
@@ -223,7 +223,7 @@ public:
         !tvec_tgt)
       return new ceres::AutoDiffCostFunction<
           FeatureConsisTgtFunctor, ceres::DYNAMIC, 4, 2,
-          CameraModelRef::kNumParams, 4, 3, CameraModelTgt::kNumParams, 4, 3>(
+          CameraModelRef::num_params, 4, 3, CameraModelTgt::num_params, 4, 3>(
           new FeatureConsisTgtFunctor(interpolator_ref, interpolator_tgt,
                                       sample, ref_descriptor, NULL, NULL, NULL,
                                       NULL, NULL, NULL),
@@ -242,7 +242,7 @@ public:
   bool intersect(const T *const uvec, const T *const wvec,
                  T *intersection) const {
     // get kvec_ref
-    const int num_params_ref = CameraModelRef::kNumParams;
+    const int num_params_ref = CameraModelRef::num_params;
     T params_ref[num_params_ref];
     for (size_t i = 0; i < num_params_ref; ++i) {
       params_ref[i] = T(params_ref_[i]);
@@ -274,14 +274,14 @@ public:
     CHECK_NOTNULL(tvec_tgt_);
 
     // get kvec_ref and kvec_tgt
-    const int num_params_ref = CameraModelRef::kNumParams;
+    const int num_params_ref = CameraModelRef::num_params;
     T params_ref[num_params_ref];
     for (size_t i = 0; i < num_params_ref; ++i) {
       params_ref[i] = T(params_ref_[i]);
     }
     T kvec_ref[4];
     ParamsToKvec(CameraModelRef::model_id, params_ref, kvec_ref);
-    const int num_params_tgt = CameraModelTgt::kNumParams;
+    const int num_params_tgt = CameraModelTgt::num_params;
     T params_tgt[num_params_tgt];
     for (size_t i = 0; i < num_params_tgt; ++i) {
       params_tgt[i] = T(params_tgt_[i]);
@@ -315,14 +315,14 @@ public:
     CHECK_NOTNULL(tvec_tgt_);
 
     // get kvec_ref and kvec_tgt
-    const int num_params_ref = CameraModelRef::kNumParams;
+    const int num_params_ref = CameraModelRef::num_params;
     T params_ref[num_params_ref];
     for (size_t i = 0; i < num_params_ref; ++i) {
       params_ref[i] = T(params_ref_[i]);
     }
     T kvec_ref[4];
     ParamsToKvec(CameraModelRef::model_id, params_ref, kvec_ref);
-    const int num_params_tgt = CameraModelTgt::kNumParams;
+    const int num_params_tgt = CameraModelTgt::num_params;
     T params_tgt[num_params_tgt];
     for (size_t i = 0; i < num_params_tgt; ++i) {
       params_tgt[i] = T(params_tgt_[i]);

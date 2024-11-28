@@ -82,7 +82,7 @@ def convert_imagecols_to_colmap(imagecols, colmap_output_path):
     colmap_cameras = {}
     for cam_id in imagecols.get_cam_ids():
         cam = imagecols.cam(cam_id)
-        model_id = cam.model_id()
+        model_id = int(cam.model)
         model_name = None
         if model_id == 0:
             model_name = "SIMPLE_PINHOLE"
@@ -105,7 +105,7 @@ def convert_imagecols_to_colmap(imagecols, colmap_output_path):
             model=model_name,
             width=cam.w(),
             height=cam.h(),
-            params=cam.params(),
+            params=cam.params,
         )
     fname = os.path.join(colmap_output_path, "cameras.txt")
     colmap_utils.write_cameras_text(colmap_cameras, fname)

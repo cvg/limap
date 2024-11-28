@@ -18,8 +18,8 @@ namespace py = pybind11;
 
 #include <chrono>
 
-#include "util/log_exceptions.h"
 #include "util/simple_logger.h"
+#include <colmap/util/logging.h>
 
 namespace limap {
 

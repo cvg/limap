@@ -1,6 +1,6 @@
-import logging
 import os
 
+from pycolmap import logging
 from tqdm import tqdm
 
 import limap.line2d
@@ -60,8 +60,8 @@ def undistort_images(
     unload_ids = imagecols.get_img_ids()
     if skip_exists:
         logging.info(
-            f"[LOG] Loading undistorted images \
-             (n_images = {imagecols.NumImages()})..."
+            f"[LOG] Loading undistorted images "
+            f"(n_images = {imagecols.NumImages()})..."
         )
         fname_in = os.path.join(output_dir, fname)
         if os.path.isfile(fname_in):
@@ -107,7 +107,7 @@ def undistort_images(
         cam_undistorted = undistortion.undistort_image_camera(
             cam, imname_in, imname_out
         )
-        cam_undistorted.set_cam_id(cam_id)
+        cam_undistorted.camera_id = cam_id
         return cam_undistorted
 
     outputs = joblib.Parallel(n_jobs=n_jobs)(
@@ -121,7 +121,7 @@ def undistort_images(
     for idx, img_id in enumerate(unload_ids):
         imname_out = os.path.join(output_dir, f"image{img_id:08d}.png")
         cam_undistorted = outputs[idx]
-        cam_id = cam_undistorted.cam_id()
+        cam_id = cam_undistorted.camera_id
         if cam_id not in cam_dict:
             cam_dict[cam_id] = cam_undistorted
             imagecols_undistorted.change_camera(cam_id, cam_undistorted)
@@ -213,8 +213,8 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
     weight_path = cfg.get("weight_path", None)
     if "extractor" in cfg["line2d"]:
         logging.info(
-            "[LOG] Start 2D line detection and description \
-             (detector = {}, extractor = {}, n_images = {})...".format(
+            "[LOG] Start 2D line detection and description "
+            "(detector = {}, extractor = {}, n_images = {})...".format(
                 cfg["line2d"]["detector"]["method"],
                 cfg["line2d"]["extractor"]["method"],
                 imagecols.NumImages(),
@@ -222,8 +222,8 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
         )
     else:
         logging.info(
-            "[LOG] Start 2D line detection and description \
-             (detector = {}, n_images = {})...".format(
+            "[LOG] Start 2D line detection and description "
+            "(detector = {}, n_images = {})...".format(
                 cfg["line2d"]["detector"]["method"], imagecols.NumImages()
             )
         )
@@ -306,8 +306,8 @@ def compute_matches(cfg, descinfo_folder, image_ids, neighbors):
     """
     weight_path = cfg.get("weight_path", None)
     logging.info(
-        "[LOG] Start matching 2D lines... (extractor = {}, matcher = {}, \
-         n_images = {}, n_neighbors = {})".format(
+        "[LOG] Start matching 2D lines... (extractor = {}, matcher = {},"
+        "n_images = {}, n_neighbors = {})".format(
             cfg["line2d"]["extractor"]["method"],
             cfg["line2d"]["matcher"]["method"],
             len(image_ids),
@@ -359,8 +359,8 @@ def compute_exhaustive_matches(cfg, descinfo_folder, image_ids):
         matches_folder (str): path to store the computed matches
     """
     logging.info(
-        "[LOG] Start exhausive matching 2D lines... \
-         (extractor = {}, matcher = {}, n_images = {})".format(
+        "[LOG] Start exhausive matching 2D lines..."
+        "(extractor = {}, matcher = {}, n_images = {})".format(
             cfg["line2d"]["extractor"]["method"],
             cfg["line2d"]["matcher"]["method"],
             len(image_ids),

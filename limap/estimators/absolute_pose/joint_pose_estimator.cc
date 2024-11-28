@@ -69,7 +69,7 @@ JointPoseEstimator::JointPoseEstimator(
   l2ds_ = &l2ds;
   p3ds_ = &p3ds;
   p2ds_ = &p2ds;
-  cam_ = Camera(colmap::PinholeCameraModel::model_id, cam.K());
+  cam_ = Camera(cam.K());
   num_data_ = p3ds.size() + l3d_ids.size();
 
   if (loc_config_.cost_function == E3DLineLineDist2 ||
@@ -161,7 +161,7 @@ int JointPoseEstimator::NonMinimalSolver(const std::vector<int> &sample,
   config.weight_line = config.weight_point = 1.0;
   config.loss_function.reset(new ceres::TrivialLoss());
   JointLocEngine loc_engine(config);
-  V4D kvec = V4D(cam_.Params().data());
+  V4D kvec = V4D(cam_.params.data());
   loc_engine.Initialize(opt_l3ds, opt_l2ds, opt_p3ds, opt_p2ds, kvec,
                         pose->qvec, pose->tvec);
   loc_engine.SetUp();
@@ -184,7 +184,7 @@ double JointPoseEstimator::EvaluateModelOnPoint(const CameraPose &pose,
       return std::numeric_limits<double>::max();
     hybridloc::ReprojectionPointFunctor(p3ds_->at(i), p2ds_->at(i),
                                         loc_config_.points_3d_dist)(
-        cam_.Params().data(), pose.qvec.data(), pose.tvec.data(), res);
+        cam_.params.data(), pose.qvec.data(), pose.tvec.data(), res);
     return V2D(res[0], res[1]).squaredNorm();
   } else {
     // we sampled a line correspondence
@@ -195,11 +195,13 @@ double JointPoseEstimator::EvaluateModelOnPoint(const CameraPose &pose,
       return std::numeric_limits<double>::max();
     hybridloc::ReprojectionLineFunctor(loc_config_.cost_function, ENoneWeight,
                                        l3d, l2ds_->at(i))(
-        cam_.Params().data(), pose.qvec.data(), pose.tvec.data(), res);
+        cam_.params.data(), pose.qvec.data(), pose.tvec.data(), res);
     if (getResidualNum(loc_config_.cost_function) == 2) {
       return V2D(res[0], res[1]).squaredNorm();
     } else if (getResidualNum(loc_config_.cost_function) == 4)
       return V4D(res[0], res[1], res[2], res[3]).squaredNorm();
+    else
+      throw std::runtime_error("Error! Not supported!");
   }
 }
 
@@ -277,7 +279,7 @@ void JointPoseEstimator::LeastSquares(const std::vector<int> &sample,
 
   // Here the passed in config is used for LSQ
   JointLocEngine loc_engine(loc_config_);
-  V4D kvec = V4D(cam_.Params().data());
+  V4D kvec = V4D(cam_.params.data());
   loc_engine.Initialize(opt_l3ds, opt_l2ds, opt_p3ds, opt_p2ds, kvec,
                         pose->qvec, pose->tvec);
   loc_engine.SetUp();

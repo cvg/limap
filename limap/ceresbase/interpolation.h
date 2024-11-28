@@ -23,8 +23,8 @@ namespace py = pybind11;
 #include <utility>
 #include <vector>
 
-#include "util/log_exceptions.h"
 #include "util/types.h"
+#include <colmap/util/logging.h>
 
 namespace limap {
 

@@ -2,6 +2,7 @@
 #include "triangulation/functions.h"
 
 #include <algorithm>
+#include <colmap/util/logging.h>
 #include <iostream>
 #include <third-party/progressbar.hpp>
 

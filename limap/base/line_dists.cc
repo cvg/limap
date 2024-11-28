@@ -90,6 +90,7 @@ double infinite_dist_perpendicular(const Line3d &l1, const Line3d &l2) {
     q = (A11 * B2 - A21 * B1) / det;
   }
   double dist = (C0 + Cp * p + Cq * q).norm();
+  return dist;
 }
 
 double infinite_perpendicular_scaleinv_line3dpp(const Line3d &l1,
@@ -119,6 +120,7 @@ double infinite_perpendicular_scaleinv_line3dpp(const Line3d &l1,
   double distsquared =
       (Ck * k + Cz).squaredNorm() - pow((Ck * k + Cz).dot(v), 2);
   double dist = sqrt(distsquared);
+  return dist;
 }
 
 double infinite_dist_perpendicular_scaleinv_line3dpp(const Line3d &l1,
@@ -217,6 +219,7 @@ double compute_distance<Line2d>(const Line2d &l1, const Line2d &l2,
     throw std::runtime_error(
         "Type error. Scale invariance distance is not supported for Line2d.");
   }
+  return -1.0;
 }
 
 template <>
@@ -258,6 +261,7 @@ double compute_distance<Line3d>(const Line3d &l1, const Line3d &l2,
   case LineDistType::ENDPOINTS_SCALEINV:
     return dist_endpoints_scaleinv(l1, l2);
   }
+  return -1.0;
 }
 
 } // namespace limap

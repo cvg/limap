@@ -1,7 +1,8 @@
 #include "base/infinite_line.h"
+#include "base/pose.h"
 
 #include <cmath>
-#include <colmap/base/pose.h>
+#include <colmap/util/logging.h>
 
 namespace limap {
 
@@ -218,12 +219,12 @@ MinimalInfiniteLine3d::MinimalInfiniteLine3d(const InfiniteLine3d &inf_line) {
     V3D axb = a.cross(bprime);
     Q.col(2) = axb / axb.norm();
   }
-  uvec = colmap::RotationMatrixToQuaternion(Q);
+  uvec = RotationMatrixToQuaternion(Q);
 }
 
 InfiniteLine3d MinimalInfiniteLine3d::GetInfiniteLine() const {
   // get plucker coordinate
-  M3D Q = colmap::QuaternionToRotationMatrix(uvec);
+  M3D Q = QuaternionToRotationMatrix(uvec);
   V3D d = Q.col(0);
   V3D m = std::abs(wvec(1)) / std::abs(wvec(0)) * Q.col(1);
   return InfiniteLine3d(d, m, false);
