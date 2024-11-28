@@ -20,7 +20,7 @@ In this project, we provide interfaces for various geometric operations on 2D/3D
 
 **Install the dependencies as follows:**
 * CMake >= 3.17
-* All dependencies for third-party: COLMAP (will be installed with FetchContent). From [[official guide](https://colmap.github.io/install.html)]
+* All dependencies for third-party: COLMAP (will be installed with FetchContent). From [[official guide](https://colmap.github.io/install.html)]:
 ```bash
 sudo apt-get install \
     git \
@@ -50,16 +50,10 @@ sudo apt-get install \
 sudo apt-get install libhdf5-dev
 ```
 * Python >= 3.9 + required packages
-```bash
-git submodule update --init --recursive
-
-# Refer to https://pytorch.org/get-started/previous-versions/ to install pytorch compatible with your CUDA
-python -m pip install torch==1.12.0 torchvision==0.13.0 
-python -m pip install -r requirements.txt
-```
 
 To install the LIMAP Python package:
 ```
+git submodule update --init --recursive
 python -m pip install -Ive . 
 ```
 To double check if the package is successfully installed:
