@@ -42,10 +42,6 @@ link_directories(${LIMAP_LINK_DIRS})
 
 # Add sources
 add_subdirectory(third-party)
-<<<<<<< HEAD
-=======
-include_directories(${JLINKAGE_INCLUDE_DIRS})
->>>>>>> main
 include_directories(${RANSACLIB_INCLUDE_DIRS})
 add_subdirectory(limap)
 
