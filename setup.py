@@ -77,7 +77,7 @@ def parse_requirements_for_limap(filename):
         [
             "pytlsd @ git+https://github.com/iago-suarez/pytlsd.git@37ac583",
             "hloc @ git+https://github.com/cvg/Hierarchical-Localization.git@abb2520",
-            "deeplsd @ git+https://github.com/cvg/DeepLSD.git@17c7645",
+            "deeplsd @ git+https://github.com/cvg/DeepLSD.git@88c589d",
             "gluestick @ git+https://github.com/cvg/GlueStick.git@0f28efd",
         ]
     )
