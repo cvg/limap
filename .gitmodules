@@ -4,9 +4,6 @@
 [submodule "third-party/Hierarchical-Localization"]
 	path = third-party/Hierarchical-Localization
 	url = https://github.com/cvg/Hierarchical-Localization.git
-[submodule "third-party/JLinkage"]
-	path = third-party/JLinkage
-	url = https://github.com/B1ueber2y/JLinkage
 [submodule "third-party/RansacLib"]
 	path = third-party/RansacLib
 	url = https://github.com/B1ueber2y/RansacLib.git
