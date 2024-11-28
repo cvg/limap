@@ -19,8 +19,9 @@ In this project, we provide interfaces for various geometric operations on 2D/3D
 ## Installation
 
 **Install the dependencies as follows:**
+* Python >= 3.8
 * CMake >= 3.17
-* All dependencies for third-party: COLMAP (will be installed with FetchContent). From [[official guide](https://colmap.github.io/install.html)]:
+* The following dependencies (many of which are for the third-party COLMAP from its [[official guide](https://colmap.github.io/install.html)]):
 ```bash
 sudo apt-get install \
     git \
@@ -43,13 +44,9 @@ sudo apt-get install \
     qtbase5-dev \
     libqt5opengl5-dev \
     libcgal-dev \
-    libceres-dev
+    libceres-dev \
+    libhdf5-dev
 ```
-* HDF5
-```bash
-sudo apt-get install libhdf5-dev
-```
-* Python >= 3.9 + required packages
 
 To install the LIMAP Python package:
 ```
