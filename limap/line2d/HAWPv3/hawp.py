@@ -1,4 +1,3 @@
-import logging
 import os
 
 import cv2
@@ -6,6 +5,7 @@ import numpy as np
 import torch
 from hawp.fsl.config import cfg as model_config
 from hawp.ssl.models import MODELS
+from pycolmap import logging
 
 from ..base_detector import (
     BaseDetector,

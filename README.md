@@ -18,17 +18,38 @@ In this project, we provide interfaces for various geometric operations on 2D/3D
 
 ## Installation
 
-**Note**: COLMAP has been under active development since summer 2023, so we currently only support COLMAP 3.8.
-
 **Install the dependencies as follows:**
 * CMake >= 3.17
-* COLMAP 3.8 [[the official guide](https://colmap.github.io/install.html)] _make sure to use the tag 3.8_
-* PoseLib [[Guide](misc/install/poselib.md)]
+* All dependencies for third-party: COLMAP (will be installed with FetchContent). From [[official guide](https://colmap.github.io/install.html)]
+```bash
+sudo apt-get install \
+    git \
+    cmake \
+    ninja-build \
+    build-essential \
+    libboost-program-options-dev \
+    libboost-filesystem-dev \
+    libboost-graph-dev \
+    libboost-system-dev \
+    libeigen3-dev \
+    libflann-dev \
+    libfreeimage-dev \
+    libmetis-dev \
+    libgoogle-glog-dev \
+    libgtest-dev \
+    libgmock-dev \
+    libsqlite3-dev \
+    libglew-dev \
+    qtbase5-dev \
+    libqt5opengl5-dev \
+    libcgal-dev \
+    libceres-dev
+```
 * HDF5
 ```bash
 sudo apt-get install libhdf5-dev
 ```
-* Python 3.9 + required packages
+* Python >= 3.9 + required packages
 ```bash
 git submodule update --init --recursive
 
@@ -97,7 +118,7 @@ If you wish to use the methods with **separate installation needed** you need to
 **The following line detectors are currently supported:**
 - [LSD](https://github.com/iago-suarez/pytlsd)
 - [SOLD2](https://github.com/cvg/SOLD2)
-- [HAWPv3](https://github.com/cherubicXN/hawp)
+- [HAWP](https://github.com/cherubicXN/hawp) (separate installation needed [[Guide](misc/install/hawpv3.md)])
 - [TP-LSD](https://github.com/Siyuada7/TP-LSD) (separate installation needed [[Guide](misc/install/tp_lsd.md)]) 
 - [DeepLSD](https://github.com/cvg/DeepLSD)
 

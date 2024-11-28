@@ -4,6 +4,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import matplotlib.pyplot as plt
 import numpy as np
+from pycolmap import logging
 from tqdm import tqdm
 
 import limap.base as base
@@ -31,9 +32,9 @@ def report_error_to_GT(evaluator, lines):
         precision = 100 * (ratios > 0).astype(int).sum() / ratios.shape[0]
         list_precision.append(precision)
     for idx, threshold in enumerate(thresholds):
-        print(
-            f"R / P at {int(threshold * 1000)}mm: \
-              {list_recall[idx]:.2f} / {list_precision[idx]:.2f}"
+        logging.info(
+            f"R / P at {int(threshold * 1000)}mm: "
+            f"{list_recall[idx]:.2f} / {list_precision[idx]:.2f}"
         )
     return evaluator
 
@@ -47,13 +48,13 @@ def report_pc_recall_for_GT(evaluator, lines):
     # point_dists = evaluator.ComputeDistsforEachPoint_KDTree(lines)
     point_dists = np.array(point_dists)
     n_points = point_dists.shape[0]
-    print("Compute point recall metrics.")
+    logging.info("Compute point recall metrics.")
     for threshold in thresholds.tolist():
         num_inliers = (point_dists < threshold).sum()
         point_recall = 100 * num_inliers / n_points
-        print(
-            f"{int(threshold * 1000):.0f}mm, inliers = {num_inliers}, \
-              point recall = {point_recall:.2f}"
+        logging.info(
+            f"{int(threshold * 1000):.0f}mm, inliers = {num_inliers}, "
+            f"point recall = {point_recall:.2f}"
         )
     return evaluator
 
@@ -66,7 +67,7 @@ def read_ply(fname):
     y = np.asarray(plydata.elements[0].data["y"])
     z = np.asarray(plydata.elements[0].data["z"])
     points = np.stack([x, y, z], axis=1)
-    print(f"number of points: {points.shape[0]}")
+    logging.info(f"number of points: {points.shape[0]}")
     return points
 
 
@@ -118,7 +119,7 @@ def eval_tnt(cfg, lines, ref_lines=None):
                 for line in lines
                 if limapvis.test_line_inside_ranges(line, ranges)
             ]
-            print(f"Filtering by range: {len(lines)} / {n_lines}")
+            logging.info(f"Filtering by range: {len(lines)} / {n_lines}")
         evaluator = report_error_to_point_cloud(
             points, lines, kdtree_dir=cfg["kdtree_dir"]
         )
@@ -215,7 +216,6 @@ def parse_config():
     cfg["noeval"] = args.noeval
     cfg["transform_txt"] = args.transform_txt
     cfg["use_ranges"] = args.use_ranges
-    # print(cfg)
     return cfg
 
 
@@ -278,9 +278,9 @@ def main():
         sup_line_counts = np.array(
             [track.count_lines() for track in linetracks]
         )
-        print(
-            f"supporting images / lines: ({sup_image_counts.mean():.2f} \
-              / {sup_line_counts.mean():.2f})"
+        logging.info(
+            f"supporting images / lines: ({sup_image_counts.mean():.2f} "
+            f"/ {sup_line_counts.mean():.2f})"
         )
 
 

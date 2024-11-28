@@ -24,15 +24,15 @@ public:
       : cam_id(input_cam_id), pose(CameraPose(false)), image_name_(image_name) {
   } // empty image
   CameraImage(const Camera &input_cam, const std::string &image_name = "none")
-      : cam_id(input_cam.CameraId()), pose(CameraPose(false)),
+      : cam_id(input_cam.camera_id), pose(CameraPose(false)),
         image_name_(image_name) {} // empty image
   CameraImage(const int &input_cam_id, const CameraPose &input_pose,
               const std::string &image_name = "none")
       : cam_id(input_cam_id), pose(input_pose), image_name_(image_name) {}
   CameraImage(const Camera &input_cam, const CameraPose &input_pose,
               const std::string &image_name = "none")
-      : cam_id(input_cam.CameraId()), pose(input_pose),
-        image_name_(image_name) {}
+      : cam_id(input_cam.camera_id), pose(input_pose), image_name_(image_name) {
+  }
   CameraImage(py::dict dict);
   CameraImage(const CameraImage &camimage)
       : cam_id(camimage.cam_id), pose(camimage.pose) {

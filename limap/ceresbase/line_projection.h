@@ -13,7 +13,7 @@ namespace limap {
 
 // line projection (camera frame) in plucker coordinate
 template <typename T>
-void Line_WorldToImage(const T *kvec, const T *mvec, T *coor) {
+void Line_ImgFromCam(const T *kvec, const T *mvec, T *coor) {
   // K * [m]x * K.transpose()
   Eigen::Matrix<T, 3, 3> mskew;
   mskew(0, 0) = T(0.0);
@@ -77,22 +77,22 @@ void Line_WorldToPixel(const T *kvec, const T *qvec, const T *tvec,
   mvec_transformed[0] = mskew_transformed(2, 1);
   mvec_transformed[1] = mskew_transformed(0, 2);
   mvec_transformed[2] = mskew_transformed(1, 0);
-  Line_WorldToImage<T>(kvec, mvec_transformed, coor);
+  Line_ImgFromCam<T>(kvec, mvec_transformed, coor);
 }
 
 // line projection (camera frame) in normal coordinate
 template <typename T>
-void Line_WorldToImage_Regular(const T *kvec, const T *p3d, const T *dir3d,
-                               T *p2d, T *dir2d) {
+void Line_ImgFromCam_Regular(const T *kvec, const T *p3d, const T *dir3d,
+                             T *p2d, T *dir2d) {
   T u = p3d[0] / p3d[2];
   T v = p3d[1] / p3d[2];
-  WorldToImage<T>(kvec, u, v, &p2d[0], &p2d[1]);
+  ImgFromCam<T>(kvec, u, v, &p2d[0], &p2d[1]);
 
   // compute vanishing point
   T u_vp = dir3d[0] / dir3d[2];
   T v_vp = dir3d[1] / dir3d[2];
   T xy_vp[2];
-  WorldToImage<T>(kvec, u_vp, v_vp, &xy_vp[0], &xy_vp[1]);
+  ImgFromCam<T>(kvec, u_vp, v_vp, &xy_vp[0], &xy_vp[1]);
 
   // compute 2d direction
   dir2d[0] = xy_vp[0] - p2d[0];
@@ -118,7 +118,7 @@ void Line_WorldToPixel_Regular(const T *kvec, const T *qvec, const T *tvec,
   ceres::QuaternionRotatePoint(qvec, dir3d, dir_projection);
 
   // world to image
-  Line_WorldToImage_Regular<T>(kvec, p_projection, dir_projection, p2d, dir2d);
+  Line_ImgFromCam_Regular<T>(kvec, p_projection, dir_projection, p2d, dir2d);
 }
 
 // get direction from vp

@@ -1,8 +1,8 @@
 #include "undistortion/undistort.h"
 
-#include <colmap/base/camera.h>
-#include <colmap/base/undistortion.h>
-#include <colmap/util/bitmap.h>
+#include <colmap/image/undistortion.h>
+#include <colmap/scene/camera.h>
+#include <colmap/sensor/bitmap.h>
 #include <iostream>
 
 namespace limap {
@@ -16,8 +16,8 @@ Camera UndistortCamera(const std::string &imname_in, const Camera &camera,
   colmap::Camera cam = camera;
 
   bool exif_autorotate = false;
-  if (cam.Height() != img.Height() || cam.Width() != img.Width()) {
-    if (cam.Width() != img.Height() || cam.Height() != img.Width())
+  if (cam.height != img.Height() || cam.width != img.Width()) {
+    if (cam.width != img.Height() || cam.height != img.Width())
       throw std::runtime_error("Error! The height and width of the given "
                                "camera do not match the input image.");
     // std::cout<<"[WARNING] Auto rotating image (EXIF):
@@ -47,7 +47,7 @@ CameraView UndistortCameraView(const std::string &imname_in,
 
 V2D UndistortPoint(const V2D &point, const Camera &distorted_camera,
                    const Camera &undistorted_camera) {
-  return undistorted_camera.WorldToImage(distorted_camera.ImageToWorld(point));
+  return undistorted_camera.ImgFromCam(distorted_camera.CamFromImg(point));
 }
 
 std::vector<V2D> UndistortPoints(const std::vector<V2D> &points,

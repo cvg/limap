@@ -1,4 +1,5 @@
 #include "merging/aggregator.h"
+#include <colmap/util/logging.h>
 
 namespace limap {
 

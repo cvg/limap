@@ -1,7 +1,6 @@
-import logging
-
 import _limap._base as _base
 import numpy as np
+from pycolmap import logging
 
 
 def unit_test_add_noise(imagecols):
@@ -23,8 +22,8 @@ def report_error(imagecols_pred, imagecols):
     # cameras
     camera_errors = []
     for cam_id in imagecols.get_cam_ids():
-        error = np.array(imagecols_pred.cam(cam_id).params()) - np.array(
-            imagecols.cam(cam_id).params()
+        error = np.array(imagecols_pred.cam(cam_id).params) - np.array(
+            imagecols.cam(cam_id).params
         )
         error = np.abs(error)
         camera_errors.append(error)

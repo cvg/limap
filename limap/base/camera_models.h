@@ -1,7 +1,7 @@
 #ifndef LIMAP_BASE_CAMERA_MODELS_H_
 #define LIMAP_BASE_CAMERA_MODELS_H_
 
-#include <colmap/base/camera_models.h>
+#include <colmap/sensor/models.h>
 
 namespace limap {
 
@@ -27,13 +27,14 @@ namespace limap {
 // Get the 4-dimensional kvec [fx, fy, cx, cy] from the following colmap camera
 // model colmap camera models: (0, SIMPLE_PINHOLE) (1, PINHOLE)
 template <typename T>
-void ParamsToKvec(const int model_id, const T *params, T *kvec) {
-  if (model_id == 0) { // SIMPLE_PINHOLE
+void ParamsToKvec(const colmap::CameraModelId model_id, const T *params,
+                  T *kvec) {
+  if (model_id == colmap::CameraModelId::kSimplePinhole) { // SIMPLE_PINHOLE
     kvec[0] = params[0];
     kvec[1] = params[0];
     kvec[2] = params[1];
     kvec[3] = params[2];
-  } else if (model_id == 1) { // PINHOLE
+  } else if (model_id == colmap::CameraModelId::kPinhole) { // PINHOLE
     kvec[0] = params[0];
     kvec[1] = params[1];
     kvec[2] = params[2];

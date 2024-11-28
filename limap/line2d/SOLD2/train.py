@@ -2,12 +2,11 @@
 This file implements the training process and all the summaries
 """
 
-import logging
-
 import cv2
 import numpy as np
 import torch
 import torch.utils.data.dataloader as torch_loader
+from pycolmap import logging
 from torch.nn.functional import pixel_shuffle, softmax
 
 # from model.lr_scheduler import get_lr_scheduler

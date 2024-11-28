@@ -8,12 +8,11 @@ project(LIMAP)
 # Include CMake dependencies
 ################################################################################
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1)
     message(FATAL_ERROR "GCC version needs to be at least 9.1")
 endif()
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w -std=c++17 -std=gnu++17") # brute-force approach to make sure we are using C++17
 
 # Include helper macros and commands, and allow the included file to override
 # the CMake policies in this file
@@ -24,88 +23,33 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CMakeHelper.cmake NO_POLICY_SCOPE)
 ################################################################################
 option(OPENMP_ENABLED "Whether to enable OpenMP parallelization" ON)
 option(INTERPOLATION_ENABLED "Whether to enable interpolation-based pixel-perfect optimization" OFF)
+option(FETCH_POSELIB "Whether to use PoseLib with FetchContent or with self-installed software" ON)
+option(FETCH_COLMAP "Whether to use COLMAP with FetchContent or with self-installed software" ON)
+option(CUDA_ENABLED "Whether to use CUDA (only for the third-party COLMAP)" OFF)
+option(FETCH_JLINKAGE "Whether to use JLinkage with FetchContent or with self-installed software" ON)
 
-################################################################################
-# Compiler specific configuration
-################################################################################
+include(cmake/FindDependencies.cmake)
+include(cmake/InitVariables.cmake)
 
-if(OPENMP_ENABLED)
-  find_package(OpenMP)
-  if(OPENMP_FOUND)
-    message(STATUS "Enabling OpenMP support")
-    add_definitions("-DOPENMP_ENABLED")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-  endif()
-endif()
-
-if(INTERPOLATION_ENABLED)
-    message(STATUS "Enabling pixelwise optimization with ceres interpolation. This should be disabled for clang.")
-    add_definitions("-DINTERPOLATION_ENABLED")
-else()
-    message(STATUS "Disabling pixelwise optimization with ceres interpolation.")
-endif()
-
-################################################################################
-# Find packages
-################################################################################
-find_package(Eigen3 3.3 REQUIRED)
-find_package(COLMAP REQUIRED)
-if(${CERES_VERSION} VERSION_LESS "2.2.0")
-    # ceres 2.2.0 changes the interface of local parameterization
-    add_definitions("-DCERES_PARAMETERIZATION_ENABLED")
-endif()
-find_package(PoseLib REQUIRED)
-
-################################################################################
-# Add sources
-################################################################################
-
-set(LIMAP_INCLUDE_DIRS
-  ${HDF5_INCLUDE_DIRS}
-  ${EIGEN3_INCLUDE_DIR}
-  ${PROJECT_SOURCE_DIR}
-  ${FREEIMAGE_INCLUDE_DIRS}
-  ${COLMAP_INCLUDE_DIRS}
-)
-
-set(LIMAP_LINK_DIRS
-  ${COLMAP_LINK_DIRS}
-)
-
-set(LIMAP_EXTERNAL_LIBRARIES
-  ${CERES_LIBRARIES}
-  ${FREEIMAGE_LIBRARIES}
-  ${COLMAP_LIBRARIES}
-  ${HDF5_C_LIBRARIES}
-  ${Boost_LIBRARIES}
-  PoseLib::PoseLib
-)
-
-if(OPENMP_FOUND)
-    list(APPEND LIMAP_EXTERNAL_LIBRARIES ${OpenMP_libomp_LIBRARY})
-endif()
-
-set(LIMAP_INTERNAL_LIBRARIES
-  HighFive
-  pybind11::module
-  JLinkage
-  igl::core
-)
-
+# include directories
 include_directories(
     third-party
     limap
+    ${PROJECT_SOURCE_DIR}
     ${LIMAP_INCLUDE_DIRS}
 )
-
 link_directories(${LIMAP_LINK_DIRS})
 
+# Add sources
 add_subdirectory(third-party)
-include_directories(${JLINKAGE_INCLUDE_DIRS})
-include_directories(${POSELIB_INCLUDE_DIRS})
 include_directories(${RANSACLIB_INCLUDE_DIRS})
 add_subdirectory(limap)
+
+# Install find_package scripts for dependencies.
+install(
+    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cmake
+    DESTINATION share/colmap
+    FILES_MATCHING PATTERN "Find*.cmake")
 
 ################################################################################
 # Generate source groups for Visual Studio, XCode, etc.

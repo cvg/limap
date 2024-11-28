@@ -1,4 +1,5 @@
 #include "base/image_collection.h"
+#include <colmap/util/logging.h>
 
 namespace limap {
 
@@ -44,11 +45,11 @@ ImageCollection::ImageCollection(const std::vector<CameraView> &camviews) {
   for (size_t img_id = 0; img_id < n_images; ++img_id) {
     auto camview = camviews[img_id];
     images.insert(std::make_pair(img_id, CameraImage(camview)));
-    int cam_id = camview.cam.CameraId();
+    int cam_id = camview.cam.camera_id;
     if (exist_cam(cam_id)) {
       CHECK_EQ(cameras.at(cam_id) == camview.cam, true);
     } else {
-      cameras.insert(std::make_pair(camview.cam.CameraId(), camview.cam));
+      cameras.insert(std::make_pair(camview.cam.camera_id, camview.cam));
     }
   }
 }
@@ -63,7 +64,7 @@ ImageCollection::ImageCollection(py::dict dict) {
   for (auto it = dictvec_cameras.begin(); it != dictvec_cameras.end(); ++it) {
     int cam_id = it->first;
     Camera cam = Camera(it->second);
-    assert(cam_id == cam.CameraId());
+    assert(cam_id == cam.camera_id);
     cameras.insert(std::make_pair(cam_id, cam));
   }
   // load images
@@ -446,7 +447,7 @@ bool ImageCollection::IsUndistorted() const {
 double *ImageCollection::params_data(const int img_id) {
   THROW_CHECK_EQ(exist_image(img_id), true);
   int cam_id = camimage(img_id).cam_id;
-  return cameras.at(cam_id).Params().data();
+  return cameras.at(cam_id).params.data();
 }
 
 double *ImageCollection::qvec_data(const int img_id) {
@@ -485,10 +486,7 @@ void ImageCollection::init_uninitialized_cameras() {
     CameraView view = camview(img_id);
     auto res = view.get_initial_focal_length();
     it->second.InitializeParams(res.first, view.w(), view.h());
-    if (res.second)
-      it->second.SetPriorFocalLength(true);
-    else
-      it->second.SetPriorFocalLength(false);
+    it->second.has_prior_focal_length = res.second;
   }
 }
 
@@ -498,10 +496,7 @@ void ImageCollection::uninitialize_intrinsics() {
     CameraView view = camview(img_id);
     auto res = view.get_initial_focal_length();
     it->second.InitializeParams(res.first, view.w(), view.h());
-    if (res.second)
-      it->second.SetPriorFocalLength(true);
-    else
-      it->second.SetPriorFocalLength(false);
+    it->second.has_prior_focal_length = res.second;
   }
 }
 
@@ -514,7 +509,8 @@ void ImageCollection::uninitialize_poses() {
 
 bool ImageCollection::IsUndistortedCameraModel() const {
   for (auto it = cameras.begin(); it != cameras.end(); ++it) {
-    if (it->second.ModelId() != 0 and it->second.ModelId() != 1)
+    if (it->second.model_id != colmap::CameraModelId::kSimplePinhole and
+        it->second.model_id != colmap::CameraModelId::kPinhole)
       return false;
   }
   return true;
