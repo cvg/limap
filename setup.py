@@ -73,14 +73,6 @@ def parse_requirements_for_limap(filename):
             and not line.startswith("#")
             and not line.startswith(".")
         ]
-    requirements.extend(
-        [
-            "pytlsd @ git+https://github.com/iago-suarez/pytlsd.git@37ac583",
-            "hloc @ git+https://github.com/cvg/Hierarchical-Localization.git@abb2520",
-            "deeplsd @ git+https://github.com/cvg/DeepLSD.git@88c589d",
-            "gluestick @ git+https://github.com/cvg/GlueStick.git@0f28efd",
-        ]
-    )
     return requirements
 
 
@@ -91,7 +83,7 @@ setup(
     name="limap",
     version="1.0.0",
     packages=find_packages(),
-    python_requires=">=3.8, < 3.13",
+    python_requires=">=3.8, < 3.11",
     install_requires=parse_requirements_for_limap("requirements.txt"),
     author="Shaohui Liu",
     author_email="b1ueber2y@gmail.com",
@@ -104,8 +96,6 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
-        "Programming Language :: Python :: 3.11",
-        "Programming Language :: Python :: 3.12",
         "Operating System :: OS Independent",
     ],
 )

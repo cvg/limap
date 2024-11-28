@@ -19,7 +19,7 @@ In this project, we provide interfaces for various geometric operations on 2D/3D
 ## Installation
 
 **Install the dependencies as follows:**
-* Python >= 3.8
+* Python 3.8/9/10
 * CMake >= 3.17
 * The following dependencies (many of which are for the third-party COLMAP from its [[official guide](https://colmap.github.io/install.html)]):
 ```bash
