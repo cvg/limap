@@ -15,8 +15,8 @@ jobs:
     name: ${{ matrix.config.os }} ${{ matrix.config.arch }} with Python ${{ matrix.config.python-version }}
     runs-on: ${{ matrix.config.os }}
     strategy:
+      fail-fast: false
       matrix:
-        fail-fast: false
         config: [
           {os: ubuntu-latest, python-version: "3.8"},
           {os: ubuntu-latest, python-version: "3.9"},
