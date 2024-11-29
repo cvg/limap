@@ -82,6 +82,14 @@ jobs:
       - name: Run Python tests
         run:  python -c "import limap; print(limap.__version__)"
 
+      - name: Run E2E tests
+        run: |
+          bash scripts/quickstart.sh
+          python runners/hypersim/fitnmerge.py --default_config_file cfgs/fitnmerge/default_cpu.yaml \
+              --output_dir outputs/quickstart_fitnmerge --visualize 0
+          python runners/hypersim/triangulation.py --default_config_file cfgs/triangulation/default_cpu.yaml \
+              --output_dir outputs/quickstart_triangulation --visualize 0
+
       - name: Build wheels
         run: |
           python -m pip install wheel
