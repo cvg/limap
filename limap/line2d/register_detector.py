@@ -83,5 +83,9 @@ def get_extractor(cfg_extractor, weight_path=None):
         from .GlueStick import WireframeExtractor
 
         return WireframeExtractor(options)
+    elif method == "dense_naive":
+        from .dense import DenseNaiveExtractor
+
+        return DenseNaiveExtractor(options)
     else:
         raise NotImplementedError
