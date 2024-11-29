@@ -25,7 +25,7 @@ pycolmap
 ruff==0.6.7
 clang-format==19.1.0
 
-./third-party/pytlsd
-./third-party/DeepLSD
-./third-party/GlueStick
--e ./third-party/Hierarchical-Localization
+pytlsd@git+https://github.com/iago-suarez/pytlsd.git@37ac583
+deeplsd@git+https://github.com/cvg/DeepLSD.git@88c589d
+gluestick@git+https://github.com/cvg/GlueStick.git@0f28efd
+-e git+https://github.com/cvg/Hierarchical-Localization.git@abb2520#egg=hloc

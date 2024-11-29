@@ -12,20 +12,21 @@ on:
 
 jobs:
   build:
-    name: ${{ matrix.config.os }} ${{ matrix.config.arch }}
+    name: ${{ matrix.config.os }} ${{ matrix.config.arch }} with Python ${{ matrix.config.python-version }}
     runs-on: ${{ matrix.config.os }}
     strategy:
+      fail-fast: false
       matrix:
         config: [
-              {os: ubuntu-latest},
+          {os: ubuntu-latest, python-version: "3.8"},
+          {os: ubuntu-latest, python-version: "3.9"},
+          {os: ubuntu-latest, python-version: "3.10"},
         ]
     env:
       COMPILER_CACHE_VERSION: 1
       COMPILER_CACHE_DIR: ${{ github.workspace }}/compiler-cache
       CCACHE_DIR: ${{ github.workspace }}/compiler-cache/ccache
       CCACHE_BASEDIR: ${{ github.workspace }}
-      # For faster builds in PRs, skip all but the latest Python versions.
-      PULL_REQUEST_CIBW_BUILD: cp39-{manylinux}*
     steps:
       - uses: actions/checkout@v4
       - uses: actions/cache@v4
@@ -64,18 +65,29 @@ jobs:
             libunwind-dev \
             xvfb
 
+      - name: Set up Python ${{ matrix.config.python-version  }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.config.python-version  }}
+
       - name: Install Python dependencies
         run: |
           git submodule update --init --recursive
           python -m pip install --upgrade pip
           python -m pip install setuptools
-          python -m pip install -r requirements.txt  # If you have a requirements file
+          python -m pip install -r requirements.txt
 
       - name: Build
-        run: |
-          python -m pip install -v .
+        run:  python -m pip install -v .
 
       - name: Run Python tests
+        run:  python -c "import limap; print(limap.__version__)"
+
+      - name: Run E2E tests
         run: |
-          python -c "import limap; print(limap.__version__)"
+          bash scripts/quickstart.sh
+          python runners/hypersim/fitnmerge.py --default_config_file cfgs/fitnmerge/default_cpu.yaml \
+              --output_dir outputs/quickstart_test --visualize 0
+          python runners/hypersim/triangulation.py --default_config_file cfgs/triangulation/default_fast.yaml \
+              --output_dir outputs/quickstart_test --triangulation.use_exhaustive_matcher --skip_exists --visualize 0
 
