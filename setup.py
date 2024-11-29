@@ -62,20 +62,6 @@ class CMakeBuild(build_ext):
         )
 
 
-# Read requirements from requirements.txt
-def parse_requirements_for_limap(filename):
-    requirements = []
-    with open(filename) as f:
-        requirements = [
-            line.strip()
-            for line in f
-            if line.strip()
-            and not line.startswith("#")
-            and not line.startswith(".")
-        ]
-    return requirements
-
-
 # The information here can also be placed in setup.cfg - better separation of
 # logic and declaration, and simpler if you include description/version in
 # one file.
@@ -84,7 +70,6 @@ setup(
     version="1.0.0",
     packages=find_packages(),
     python_requires=">=3.8, < 3.11",
-    install_requires=parse_requirements_for_limap("requirements.txt"),
     author="Shaohui Liu",
     author_email="b1ueber2y@gmail.com",
     description="A toolbox for mapping and localization with line features",
