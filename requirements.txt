@@ -26,6 +26,6 @@ ruff==0.6.7
 clang-format==19.1.0
 
 ./third-party/pytlsd
-./third-party/Hierarchical-Localization
 ./third-party/DeepLSD
 ./third-party/GlueStick
+-e ./third-party/Hierarchical-Localization
