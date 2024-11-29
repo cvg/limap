@@ -19,47 +19,15 @@ In this project, we provide interfaces for various geometric operations on 2D/3D
 ## Installation
 
 **Install the dependencies as follows:**
+* Python 3.8/9/10
 * CMake >= 3.17
-* All dependencies for third-party: COLMAP (will be installed with FetchContent). From [[official guide](https://colmap.github.io/install.html)]
-```bash
-sudo apt-get install \
-    git \
-    cmake \
-    ninja-build \
-    build-essential \
-    libboost-program-options-dev \
-    libboost-filesystem-dev \
-    libboost-graph-dev \
-    libboost-system-dev \
-    libeigen3-dev \
-    libflann-dev \
-    libfreeimage-dev \
-    libmetis-dev \
-    libgoogle-glog-dev \
-    libgtest-dev \
-    libgmock-dev \
-    libsqlite3-dev \
-    libglew-dev \
-    qtbase5-dev \
-    libqt5opengl5-dev \
-    libcgal-dev \
-    libceres-dev
-```
-* HDF5
-```bash
-sudo apt-get install libhdf5-dev
-```
-* Python >= 3.9 + required packages
-```bash
-git submodule update --init --recursive
-
-# Refer to https://pytorch.org/get-started/previous-versions/ to install pytorch compatible with your CUDA
-python -m pip install torch==1.12.0 torchvision==0.13.0 
-python -m pip install -r requirements.txt
-```
+* CUDA (for deep learning based detectors/matchers)
+* System dependencies [[Command line](./misc/install/dependencies.md)]
 
 To install the LIMAP Python package:
 ```
+git submodule update --init --recursive
+python -m pip install -r requirements.txt
 python -m pip install -Ive . 
 ```
 To double check if the package is successfully installed:

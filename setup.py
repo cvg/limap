@@ -2,7 +2,7 @@ import os
 import subprocess
 import sys
 
-from setuptools import Extension, setup
+from setuptools import Extension, find_packages, setup
 from setuptools.command.build_ext import build_ext
 
 # Cores used for building the project
@@ -68,11 +68,19 @@ class CMakeBuild(build_ext):
 setup(
     name="limap",
     version="1.0.0",
-    author="B1ueber2y",
+    packages=find_packages(),
+    python_requires=">=3.8, < 3.11",
+    author="Shaohui Liu",
     author_email="b1ueber2y@gmail.com",
     description="A toolbox for mapping and localization with line features",
     long_description="",
     ext_modules=[CMakeExtension("_limap")],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
+    classifiers=[
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Operating System :: OS Independent",
+    ],
 )

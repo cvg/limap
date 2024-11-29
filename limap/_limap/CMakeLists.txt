@@ -10,4 +10,4 @@ LIMAP_ADD_PYMODULE(_limap
 target_compile_definitions(_limap PRIVATE VERSION_INFO="${VERSION_INFO}")
 target_link_libraries(_limap PRIVATE
  ${LIMAP_INTERNAL_LIBRARIES} ${LIMAP_EXTERNAL_LIBRARIES})
-
+install(TARGETS _limap LIBRARY DESTINATION limap)
