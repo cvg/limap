@@ -244,14 +244,12 @@ double Camera::uncertainty(double depth, double var2d) const {
 Camera::Camera(py::dict dict) {
   // model id
   int model_id_loaded;
-  ASSIGN_PYDICT_ITEM(dict, model_id_loaded, int);
+  ASSIGN_PYDICT_ITEM_TKEY(dict, model_id, model_id_loaded, int);
   model_id = static_cast<colmap::CameraModelId>(model_id_loaded);
 
   // params
-  std::vector<double> params_loaded;
-  ASSIGN_PYDICT_ITEM(dict, params_loaded, std::vector<double>);
-  THROW_CHECK_EQ(params_loaded.size(), params.size());
-  params = params_loaded;
+  ASSIGN_PYDICT_ITEM(dict, params, std::vector<double>);
+  THROW_CHECK(VerifyParams());
 
   // other fields
   ASSIGN_PYDICT_ITEM(dict, camera_id, int);
