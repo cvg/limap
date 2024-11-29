@@ -89,5 +89,5 @@ jobs:
           python runners/hypersim/fitnmerge.py --default_config_file cfgs/fitnmerge/default_cpu.yaml \
               --output_dir outputs/quickstart_test --visualize 0
           python runners/hypersim/triangulation.py --default_config_file cfgs/triangulation/default_fast.yaml \
-              --output_dir outputs/quickstart_test --skip_exists --visualize 0
+              --output_dir outputs/quickstart_test --triangulation.use_exhaustive_matcher --skip_exists --visualize 0
 
