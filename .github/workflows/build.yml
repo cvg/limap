@@ -80,7 +80,7 @@ jobs:
         run:  python -m pip install -v .
 
       - name: Run Python tests
-        run:  python -c "import limap; print(limap.__version__)"
+        run:  python -c "import limap; import limap.util.io as limapio; print(limap.__version__)"
 
       - name: Run E2E tests
         run: |
