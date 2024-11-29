@@ -1,11 +1,11 @@
 import copy
 import os
 import shutil
-import subprocess
 import sys
 from pathlib import Path
 
 import cv2
+import pycolmap
 from pycolmap import logging
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -193,17 +193,7 @@ def run_colmap_sfm(
     )
 
     ### [COLMAP] mapper
-    cmd = [
-        "colmap",
-        "mapper",
-        "--database_path",
-        db_path,
-        "--image_path",
-        image_path,
-        "--output_path",
-        model_path,
-    ]
-    subprocess.run(cmd, check=True)
+    pycolmap.incremental_mapping(db_path, image_path, model_path)
 
     # map to original image names
     if map_to_original_image_names:
@@ -273,19 +263,10 @@ def run_colmap_sfm_with_known_poses(
 
     ### [COLMAP] point triangulation
     # point triangulation
-    cmd = [
-        "colmap",
-        "point_triangulator",
-        "--database_path",
-        db_path,
-        "--image_path",
-        image_path,
-        "--input_path",
-        model_path,
-        "--output_path",
-        point_triangulation_path,
-    ]
-    subprocess.run(cmd, check=True)
+    input_reconstruction = pycolmap.Reconstruction(model_path)
+    pycolmap.triangulate_points(
+        input_reconstruction, db_path, image_path, point_triangulation_path
+    )
 
     # map to original image names
     if map_to_original_image_names:

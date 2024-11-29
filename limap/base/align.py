@@ -101,6 +101,7 @@ def align_imagecols_colmap(
             f.write(f"{imname} {pos[0]} {pos[1]} {pos[2]}\n")
 
     # call comlap model aligner
+    # TODO: use pycolmap
     transform_path = os.path.join(tmp_folder, "transform.txt")
     cmd = [
         "colmap",
