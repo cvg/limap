@@ -81,7 +81,7 @@ def get_hloc_keypoints_from_log(
         p2ds = logs["loc"][query_img_name]["keypoints_query"]
         p3d_ids = logs["loc"][query_img_name]["points3D_ids"]
         p3ds = [ref_sfm.points3D[j].xyz for j in p3d_ids]
-    inliers = logs["loc"][query_img_name]["PnP_ret"]["inliers"]
+    inliers = logs["loc"][query_img_name]["PnP_ret"]["inlier_mask"]
 
     p2ds, p3ds = np.array(p2ds), np.array(p3ds)
     if resize_scales is not None and query_img_name in resize_scales:
