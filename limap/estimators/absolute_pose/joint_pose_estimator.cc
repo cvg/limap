@@ -69,7 +69,7 @@ JointPoseEstimator::JointPoseEstimator(
   l2ds_ = &l2ds;
   p3ds_ = &p3ds;
   p2ds_ = &p2ds;
-  cam_ = Camera(cam.K());
+  cam_ = Camera("PINHOLE", cam.K());
   num_data_ = p3ds.size() + l3d_ids.size();
 
   if (loc_config_.cost_function == E3DLineLineDist2 ||
