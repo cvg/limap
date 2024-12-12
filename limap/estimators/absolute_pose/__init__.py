@@ -37,10 +37,10 @@ def pl_estimate_absolute_pose(
         campose (:class:`limap.base.CameraPose`, optional): \
             Initial camera pose, only useful for pose refinement \
             (when ``cfg["ransac"]["method"]`` is :py:obj:`None`)
-        inliers_line (list[int], optional): \
-            Indices of line inliers, only useful for pose refinement
-        inliers_point (list[int], optional): \
-            Indices of point inliers, only useful for pose refinement
+        inliers_line (:class:`np.array`, optional): \
+            Boolean mask of line inliers, only useful for pose refinement
+        inliers_point (:class:`np.array`, optional): \
+            Boolean mask of point inliers, only useful for pose refinement
         jointloc_cfg (dict, optional): Config for joint optimization, \
             fields refer to :class:`limap.optimize.LineLocConfig`, \
             pass :py:obj:`None` for default
