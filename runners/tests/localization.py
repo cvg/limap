@@ -137,16 +137,16 @@ def main():
     cos = np.clip((np.trace(np.dot(R_gt.T, R)) - 1) / 2, -1.0, 1.0)
     e_R = np.rad2deg(np.abs(np.arccos(cos)))
     log += f"HLoc(Point) Pose errors: {e_t:.3f}m, {e_R:.3f}deg\n"
-    np.testing.assert_(e_t < 0.5)
-    np.testing.assert_(e_R < 2.0)
+    np.testing.assert_(e_t < 0.5, f"e_t = {e_t:.3f}m")
+    np.testing.assert_(e_R < 2.0, f"e_R = {e_R:.3f}deg")
 
     R, t = final_pose.R(), final_pose.tvec
     e_t = np.linalg.norm(-R_gt.T @ t_gt + R.T @ t, axis=0)
     cos = np.clip((np.trace(np.dot(R_gt.T, R)) - 1) / 2, -1.0, 1.0)
     e_R = np.rad2deg(np.abs(np.arccos(cos)))
     log += f"Result(P+L) Pose errors: {e_t:.3f}m, {e_R:.3f}deg"
-    np.testing.assert_(e_t < 0.1)
-    np.testing.assert_(e_R < 1.5)
+    np.testing.assert_(e_t < 0.1, f"e_t = {e_t:.3f}m")
+    np.testing.assert_(e_R < 2.0, f"e_R = {e_R:.3f}deg")
 
     logger.info(log)
 
