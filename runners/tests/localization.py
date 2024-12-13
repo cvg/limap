@@ -132,17 +132,21 @@ def main():
     log += f"GT Pose (qvec, tvec): \
              {data['pose_gt'].qvec}, {data['pose_gt'].tvec}\n\n"
 
-    R, t = final_pose.R(), final_pose.tvec
-    e_t = np.linalg.norm(-R_gt.T @ t_gt + R.T @ t, axis=0)
-    cos = np.clip((np.trace(np.dot(R_gt.T, R)) - 1) / 2, -1.0, 1.0)
-    e_R = np.rad2deg(np.abs(np.arccos(cos)))
-    log += f"Result(P+L) Pose errors: {e_t:.3f}m, {e_R:.3f}deg\n"
-
     R, t = data["pose_point"].R(), data["pose_point"].tvec
     e_t = np.linalg.norm(-R_gt.T @ t_gt + R.T @ t, axis=0)
     cos = np.clip((np.trace(np.dot(R_gt.T, R)) - 1) / 2, -1.0, 1.0)
     e_R = np.rad2deg(np.abs(np.arccos(cos)))
-    log += f"HLoc(Point) Pose errors: {e_t:.3f}m, {e_R:.3f}deg"
+    log += f"HLoc(Point) Pose errors: {e_t:.3f}m, {e_R:.3f}deg\n"
+    np.testing.assert_(e_t < 0.5)
+    np.testing.assert_(e_R < 2.0)
+
+    R, t = final_pose.R(), final_pose.tvec
+    e_t = np.linalg.norm(-R_gt.T @ t_gt + R.T @ t, axis=0)
+    cos = np.clip((np.trace(np.dot(R_gt.T, R)) - 1) / 2, -1.0, 1.0)
+    e_R = np.rad2deg(np.abs(np.arccos(cos)))
+    log += f"Result(P+L) Pose errors: {e_t:.3f}m, {e_R:.3f}deg"
+    np.testing.assert_(e_t < 0.1)
+    np.testing.assert_(e_R < 1.5)
 
     logger.info(log)
 
