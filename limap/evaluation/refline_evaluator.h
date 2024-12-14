@@ -1,5 +1,4 @@
-#ifndef LIMAP_EVALUATION_REFLINE_EVALUATOR_H_
-#define LIMAP_EVALUATION_REFLINE_EVALUATOR_H_
+#pragma once
 
 #include "base/linebase.h"
 #include "util/types.h"
@@ -39,5 +38,3 @@ private:
 } // namespace evaluation
 
 } // namespace limap
-
-#endif

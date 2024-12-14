@@ -1,5 +1,4 @@
-#ifndef LIMAP_EVALUATION_MESH_EVALUATOR_H_
-#define LIMAP_EVALUATION_MESH_EVALUATOR_H_
+#pragma once
 
 #include "base/linebase.h"
 #include "evaluation/base_evaluator.h"
@@ -30,5 +29,3 @@ private:
 } // namespace evaluation
 
 } // namespace limap
-
-#endif

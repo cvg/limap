@@ -1,5 +1,4 @@
-#ifndef LIMAP_CERESBASE_LINE_PROJECTION_H
-#define LIMAP_CERESBASE_LINE_PROJECTION_H
+#pragma once
 
 #include "ceresbase/line_transforms.h"
 #include "ceresbase/point_projection.h"
@@ -214,5 +213,3 @@ bool Ceres_GetIntersection2dFromInfiniteLine3d(
 }
 
 } // namespace limap
-
-#endif

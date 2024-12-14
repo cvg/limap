@@ -1,5 +1,4 @@
-#ifndef LIMAP_TRIANGULATION_BASE_LINE_TRIANGULATOR_H_
-#define LIMAP_TRIANGULATION_BASE_LINE_TRIANGULATOR_H_
+#pragma once
 
 #include "base/image_collection.h"
 #include "base/linebase.h"
@@ -147,5 +146,3 @@ protected:
 } // namespace triangulation
 
 } // namespace limap
-
-#endif

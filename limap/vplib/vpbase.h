@@ -1,5 +1,4 @@
-#ifndef LIMAP_VPLIB_VPBASE_H_
-#define LIMAP_VPLIB_VPBASE_H_
+#pragma once
 
 #include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
@@ -48,5 +47,3 @@ public:
 } // namespace vplib
 
 } // namespace limap
-
-#endif

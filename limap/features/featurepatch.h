@@ -1,5 +1,4 @@
-#ifndef LIMAP_FEATURES_FEATUREPATCH_H_
-#define LIMAP_FEATURES_FEATUREPATCH_H_
+#pragma once
 
 #include "_limap/helpers.h"
 #include <pybind11/numpy.h>
@@ -140,5 +139,3 @@ bool PatchInterpolator<DTYPE, CHANNELS>::CheckBounds(const T *xy) const {
 } // namespace features
 
 } // namespace limap
-
-#endif

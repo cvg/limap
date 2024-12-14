@@ -1,5 +1,4 @@
-#ifndef LIMAP_PL_TRIANGULATION_COST_FUNCTIONS_H_
-#define LIMAP_PL_TRIANGULATION_COST_FUNCTIONS_H_
+#pragma once
 
 #include "_limap/helpers.h"
 #include <ceres/ceres.h>
@@ -204,5 +203,3 @@ public:
 } // namespace optimize
 
 } // namespace limap
-
-#endif

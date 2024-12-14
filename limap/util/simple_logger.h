@@ -1,5 +1,4 @@
-#ifndef LIMAP_UTIL_SIMPLE_LOGGER_H_
-#define LIMAP_UTIL_SIMPLE_LOGGER_H_
+#pragma once
 
 /*
  * File:   Log.h
@@ -200,5 +199,3 @@ private:
 };
 
 } // namespace limap
-
-#endif
