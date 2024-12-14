@@ -1,8 +1,8 @@
 #ifndef LIMAP_BASE_TRANSFORMS_H_
 #define LIMAP_BASE_TRANSFORMS_H_
 
-#include "base/camera.h"
-#include "base/pose.h"
+#include "limap/base/camera.h"
+#include "limap/base/pose.h"
 
 namespace limap {
 

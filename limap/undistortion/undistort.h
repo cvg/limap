@@ -1,13 +1,13 @@
 #ifndef LIMAP_UNDISTORTION_UNDISTORT_H_
 #define LIMAP_UNDISTORTION_UNDISTORT_H_
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
-#include "base/camera.h"
-#include "base/camera_view.h"
-#include "util/types.h"
+#include "limap/base/camera.h"
+#include "limap/base/camera_view.h"
+#include "limap/util/types.h"
 
 namespace py = pybind11;
 

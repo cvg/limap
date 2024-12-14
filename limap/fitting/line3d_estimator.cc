@@ -1,4 +1,4 @@
-#include "fitting/line3d_estimator.h"
+#include "limap/fitting/line3d_estimator.h"
 
 namespace limap {
 

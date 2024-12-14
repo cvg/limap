@@ -1,8 +1,8 @@
 #ifndef LIMAP_EVALUATION_BASE_EVALUATOR_H_
 #define LIMAP_EVALUATION_BASE_EVALUATOR_H_
 
-#include "base/linebase.h"
-#include "util/types.h"
+#include "limap/base/linebase.h"
+#include "limap/util/types.h"
 
 #include <string>
 #include <tuple>

@@ -1,10 +1,10 @@
-#include "structures/pl_bipartite_base.h"
+#include "limap/structures/pl_bipartite_base.h"
 
-#include "base/linebase.h"
-#include "base/linetrack.h"
-#include "base/pointtrack.h"
-#include "util/types.h"
-#include "vplib/vptrack.h"
+#include "limap/base/linebase.h"
+#include "limap/base/linetrack.h"
+#include "limap/base/pointtrack.h"
+#include "limap/util/types.h"
+#include "limap/vplib/vptrack.h"
 
 namespace limap {
 

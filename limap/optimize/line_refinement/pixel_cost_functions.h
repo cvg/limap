@@ -1,24 +1,24 @@
 #ifndef LIMAP_OPTIMIZE_LINE_REFINEMENT_PIXEL_COST_FUNCTIONS_H_
 #define LIMAP_OPTIMIZE_LINE_REFINEMENT_PIXEL_COST_FUNCTIONS_H_
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
 #include <ceres/ceres.h>
 #include <colmap/sensor/models.h>
 
-#include "base/camera_models.h"
-#include "base/infinite_line.h"
-#include "base/linebase.h"
-#include "base/linetrack.h"
-#include "features/featuremap.h"
-#include "features/featurepatch.h"
-#include "util/types.h"
+#include "limap/base/camera_models.h"
+#include "limap/base/infinite_line.h"
+#include "limap/base/linebase.h"
+#include "limap/base/linetrack.h"
+#include "limap/features/featuremap.h"
+#include "limap/features/featurepatch.h"
+#include "limap/util/types.h"
 
-#include "ceresbase/line_dists.h"
-#include "ceresbase/line_projection.h"
-#include "ceresbase/line_transforms.h"
+#include "limap/ceresbase/line_dists.h"
+#include "limap/ceresbase/line_projection.h"
+#include "limap/ceresbase/line_transforms.h"
 
 namespace py = pybind11;
 

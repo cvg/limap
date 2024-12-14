@@ -1,5 +1,5 @@
-#include "base/infinite_line.h"
-#include "base/pose.h"
+#include "limap/base/infinite_line.h"
+#include "limap/base/pose.h"
 
 #include <cmath>
 #include <colmap/util/logging.h>

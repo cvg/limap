@@ -8,10 +8,10 @@
 
 namespace py = pybind11;
 
-#include "base/image_collection.h"
-#include "base/linetrack.h"
-#include "vplib/vpbase.h"
-#include "vplib/vptrack.h"
+#include "limap/base/image_collection.h"
+#include "limap/base/linetrack.h"
+#include "limap/vplib/vpbase.h"
+#include "limap/vplib/vptrack.h"
 
 namespace limap {
 

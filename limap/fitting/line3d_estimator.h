@@ -1,10 +1,10 @@
 #ifndef LIMAP_FITTING_LINE_ESTIMATOR_H_
 #define LIMAP_FITTING_LINE_ESTIMATOR_H_
 
-#include "_limap/helpers.h"
-#include "base/infinite_line.h"
-#include "base/linebase.h"
-#include "util/types.h"
+#include "limap/_limap/helpers.h"
+#include "limap/base/infinite_line.h"
+#include "limap/base/linebase.h"
+#include "limap/util/types.h"
 
 #include <RansacLib/ransac.h>
 

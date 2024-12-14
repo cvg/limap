@@ -1,12 +1,12 @@
 #ifndef LIMAP_BASE_LINE_LINKER_H_
 #define LIMAP_BASE_LINE_LINKER_H_
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
-#include "base/line_dists.h"
-#include "base/linebase.h"
+#include "limap/base/line_dists.h"
+#include "limap/base/linebase.h"
 
 #include <cmath>
 

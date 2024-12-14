@@ -1,13 +1,13 @@
 #ifndef LIMAP_MERGING_AGGREGATOR_H_
 #define LIMAP_MERGING_AGGREGATOR_H_
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
 namespace py = pybind11;
 
-#include "base/linebase.h"
+#include "limap/base/linebase.h"
 
 namespace limap {
 

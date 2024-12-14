@@ -1,11 +1,11 @@
 #ifndef LIMAP_OPTIMIZE_HYBRID_LOCALIZATION_HYBRID_LOCALIZATION_CONFIG_H_
 #define LIMAP_OPTIMIZE_HYBRID_LOCALIZATION_HYBRID_LOCALIZATION_CONFIG_H_
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
-#include "limap/ceresbase/ceres_extensions.h"
+#include "limap/limap/ceresbase/ceres_extensions.h"
 #include <ceres/ceres.h>
 
 namespace py = pybind11;

@@ -1,10 +1,10 @@
 #ifndef LIMAP_TRIANGULATION_FUNCTIONS_H_
 #define LIMAP_TRIANGULATION_FUNCTIONS_H_
 
-#include "base/camera_view.h"
-#include "base/infinite_line.h"
-#include "base/linebase.h"
-#include "util/types.h"
+#include "limap/base/camera_view.h"
+#include "limap/base/infinite_line.h"
+#include "limap/base/linebase.h"
+#include "limap/util/types.h"
 #include <tuple>
 
 namespace limap {
