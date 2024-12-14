@@ -5,7 +5,7 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
-#include "limap/limap/ceresbase/ceres_extensions.h"
+#include "limap/ceresbase/ceres_extensions.h"
 #include <ceres/ceres.h>
 
 namespace py = pybind11;

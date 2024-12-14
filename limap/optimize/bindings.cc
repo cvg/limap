@@ -7,10 +7,10 @@
 #include <Eigen/Core>
 #include <vector>
 
-#include "optimize/global_pl_association/bindings.cc"
-#include "optimize/hybrid_bundle_adjustment/bindings.cc"
-#include "optimize/hybrid_localization/bindings.cc"
-#include "optimize/line_refinement/bindings.cc"
+#include "limap/optimize/global_pl_association/bindings.cc"
+#include "limap/optimize/hybrid_bundle_adjustment/bindings.cc"
+#include "limap/optimize/hybrid_localization/bindings.cc"
+#include "limap/optimize/line_refinement/bindings.cc"
 
 namespace py = pybind11;
 

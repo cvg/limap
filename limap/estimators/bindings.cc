@@ -9,7 +9,7 @@
 
 #include <RansacLib/ransac.h>
 
-#include "estimators/absolute_pose/bindings.cc"
+#include "limap/estimators/absolute_pose/bindings.cc"
 #include "limap/estimators/extended_hybrid_ransac.h"
 
 namespace py = pybind11;
