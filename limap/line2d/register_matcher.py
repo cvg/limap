@@ -55,13 +55,13 @@ def get_matcher(cfg_matcher, extractor, n_neighbors=20, weight_path=None):
         dense_options = BaseDenseLineMatcherOptions()
         if "one_to_many" in cfg_matcher:
             dense_options = dense_options._replace(
-                one_to_many=cfg_matcher["one_to_many"]
+                one_to_many=cfg_matcher["dense"]["one_to_many"]
             )
         return RoMaLineMatcher(
             extractor,
             options=options,
             dense_options=dense_options,
-            mode=cfg_matcher["mode"],
+            mode=cfg_matcher["dense"]["weights"],
         )
     else:
         raise NotImplementedError

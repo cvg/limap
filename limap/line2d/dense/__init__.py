@@ -1,4 +1,4 @@
 from .extractor import DenseNaiveExtractor
-from .matcher import RoMaLineMatcher
+from .matcher import BaseDenseLineMatcherOptions, RoMaLineMatcher
 
-__all__ = ["DenseNaiveExtractor", "RoMaLineMatcher"]
+__all__ = ["BaseDenseLineMatcherOptions", "DenseNaiveExtractor", "RoMaLineMatcher"]
