@@ -1,5 +1,4 @@
-#ifndef LIMAP_MERGING_MERGING_H_
-#define LIMAP_MERGING_MERGING_H_
+#pragma once
 
 #include "_limap/helpers.h"
 #include <pybind11/numpy.h>
@@ -48,5 +47,3 @@ RemergeLineTracks(const std::vector<LineTrack> &linetracks,
 } // namespace merging
 
 } // namespace limap
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef LIMAP_CERESBASE_LOSS_FUNCTIONS_H
-#define LIMAP_CERESBASE_LOSS_FUNCTIONS_H
+#pragma once
 
 // Modified from the pixel-perfect-sfm project.
 
@@ -249,5 +248,3 @@ inline ceres::LossFunction *CreateLossFunction(py::dict dict) {
 }
 
 } // namespace limap
-
-#endif

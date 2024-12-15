@@ -1,5 +1,4 @@
-#ifndef LIMAP_HYBRIDBA_COST_FUNCTIONS_H_
-#define LIMAP_HYBRIDBA_COST_FUNCTIONS_H_
+#pragma once
 
 #include "_limap/helpers.h"
 #include <ceres/ceres.h>
@@ -90,5 +89,3 @@ protected:
 } // namespace optimize
 
 } // namespace limap
-
-#endif

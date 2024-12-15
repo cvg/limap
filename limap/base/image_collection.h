@@ -1,5 +1,4 @@
-#ifndef LIMAP_BASE_IMAGE_COLLECTION_H_
-#define LIMAP_BASE_IMAGE_COLLECTION_H_
+#pragma once
 
 #include <cmath>
 #include <fstream>
@@ -115,5 +114,3 @@ private:
 };
 
 } // namespace limap
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef LIMAP_ESTIMATORS_POSE_JOINT_POSE_ESTIMATOR_H_
-#define LIMAP_ESTIMATORS_POSE_JOINT_POSE_ESTIMATOR_H_
+#pragma once
 
 #include "_limap/helpers.h"
 #include "base/camera.h"
@@ -105,5 +104,3 @@ EstimateAbsolutePose_PointLine(const std::vector<Line3d> &l3ds,
 } // namespace estimators
 
 } // namespace limap
-
-#endif

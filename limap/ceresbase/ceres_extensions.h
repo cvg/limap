@@ -1,5 +1,4 @@
-#ifndef LIMAP_CERESBASE_CERES_EXTENSIONS_H
-#define LIMAP_CERESBASE_CERES_EXTENSIONS_H
+#pragma once
 
 // Modified from the pixel-perfect-sfm project
 
@@ -49,5 +48,3 @@ inline void AssignSolverOptionsFromDict(ceres::Solver::Options &solver_options,
   ASSIGN_PYDICT_ITEM_TO_MEMBER(solver_options, dict, inner_iteration_tolerance,
                                double)
 }
-
-#endif

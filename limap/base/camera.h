@@ -1,5 +1,4 @@
-#ifndef LIMAP_BASE_CAMERA_H_
-#define LIMAP_BASE_CAMERA_H_
+#pragma once
 
 #include <cmath>
 #include <fstream>
@@ -114,5 +113,3 @@ public:
 };
 
 } // namespace limap
-
-#endif

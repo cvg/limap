@@ -1,5 +1,4 @@
-#ifndef LIMAP_BASE_POINTTRACK_H_
-#define LIMAP_BASE_POINTTRACK_H_
+#pragma once
 
 #include <cmath>
 #include <map>
@@ -53,5 +52,3 @@ public:
 };
 
 } // namespace limap
-
-#endif

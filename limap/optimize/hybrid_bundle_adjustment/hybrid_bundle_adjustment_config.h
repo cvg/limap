@@ -1,5 +1,4 @@
-#ifndef LIMAP_OPTIMIZE_HYBRIDBA_HYBRIDBA_CONFIG_H_
-#define LIMAP_OPTIMIZE_HYBRIDBA_HYBRIDBA_CONFIG_H_
+#pragma once
 
 #include "_limap/helpers.h"
 #include <pybind11/numpy.h>
@@ -54,5 +53,3 @@ private:
 } // namespace optimize
 
 } // namespace limap
-
-#endif

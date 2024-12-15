@@ -1,5 +1,4 @@
-#ifndef LIMAP_BASE_LINE_LINKER_H_
-#define LIMAP_BASE_LINE_LINKER_H_
+#pragma once
 
 #include "_limap/helpers.h"
 #include <pybind11/numpy.h>
@@ -228,5 +227,3 @@ public:
 };
 
 } // namespace limap
-
-#endif

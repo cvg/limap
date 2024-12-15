@@ -1,5 +1,4 @@
-#ifndef LIMAP_STRUCTURES_PL_BIPARTITE_H
-#define LIMAP_STRUCTURES_PL_BIPARTITE_H
+#pragma once
 
 #include <pybind11/eigen.h>
 #include <pybind11/numpy.h>
@@ -76,5 +75,3 @@ public:
 } // namespace structures
 
 } // namespace limap
-
-#endif

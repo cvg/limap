@@ -1,5 +1,4 @@
-#ifndef LIMAP_MERGING_MERGING_UTILS_H_
-#define LIMAP_MERGING_MERGING_UTILS_H_
+#pragma once
 
 #include "_limap/helpers.h"
 #include <pybind11/numpy.h>
@@ -49,5 +48,3 @@ void FilterTracksByOverlap(std::vector<LineTrack> &new_linetracks,
 } // namespace merging
 
 } // namespace limap
-
-#endif

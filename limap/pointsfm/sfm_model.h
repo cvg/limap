@@ -1,5 +1,4 @@
-#ifndef LIMAP_POINTSFM_SFM_MODEL_H_
-#define LIMAP_POINTSFM_SFM_MODEL_H_
+#pragma once
 
 #include "_limap/helpers.h"
 #include <pybind11/numpy.h>
@@ -68,5 +67,3 @@ private:
 } // namespace pointsfm
 
 } // namespace limap
-
-#endif

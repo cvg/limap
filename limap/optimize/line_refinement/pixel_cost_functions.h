@@ -1,5 +1,4 @@
-#ifndef LIMAP_OPTIMIZE_LINE_REFINEMENT_PIXEL_COST_FUNCTIONS_H_
-#define LIMAP_OPTIMIZE_LINE_REFINEMENT_PIXEL_COST_FUNCTIONS_H_
+#pragma once
 
 #include "_limap/helpers.h"
 #include <pybind11/numpy.h>
@@ -405,5 +404,3 @@ protected:
 } // namespace optimize
 
 } // namespace limap
-
-#endif

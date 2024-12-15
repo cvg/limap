@@ -1,5 +1,4 @@
-#ifndef LIMAP_TRIANGULATION_GLOBAL_LINE_TRIANGULATOR_H_
-#define LIMAP_TRIANGULATION_GLOBAL_LINE_TRIANGULATOR_H_
+#pragma once
 
 #include "base/graph.h"
 #include "base/line_linker.h"
@@ -107,5 +106,3 @@ protected:
 } // namespace triangulation
 
 } // namespace limap
-
-#endif

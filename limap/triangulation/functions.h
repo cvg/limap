@@ -1,5 +1,4 @@
-#ifndef LIMAP_TRIANGULATION_FUNCTIONS_H_
-#define LIMAP_TRIANGULATION_FUNCTIONS_H_
+#pragma once
 
 #include "base/camera_view.h"
 #include "base/infinite_line.h"
@@ -80,5 +79,3 @@ Line3d triangulate_line_with_direction(const Line2d &l1,
 } // namespace triangulation
 
 } // namespace limap
-
-#endif

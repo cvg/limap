@@ -1,5 +1,4 @@
-#ifndef LIMAP_CERESBASE_INTERPOLATION_H
-#define LIMAP_CERESBASE_INTERPOLATION_H
+#pragma once
 
 // Modified from the pixel-perfect-sfm project
 // [LINK] https://github.com/cvg/pixel-perfect-sfm
@@ -745,5 +744,3 @@ private:
 };
 
 } // namespace limap
-
-#endif

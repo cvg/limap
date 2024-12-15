@@ -1,5 +1,4 @@
-#ifndef LIMAP_OPTIMIZE_HYBRID_LOCALIZATION_HYBRID_LOCALIZATION_H_
-#define LIMAP_OPTIMIZE_HYBRID_LOCALIZATION_HYBRID_LOCALIZATION_H_
+#pragma once
 
 #include "_limap/helpers.h"
 #include <pybind11/numpy.h>
@@ -131,5 +130,3 @@ public:
 } // namespace optimize
 
 } // namespace limap
-
-#endif
