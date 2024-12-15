@@ -1,5 +1,4 @@
-#ifndef LIMAP_BASE_POINTTRACK_H_
-#define LIMAP_BASE_POINTTRACK_H_
+#pragma once
 
 #include <cmath>
 #include <map>
@@ -10,8 +9,8 @@
 
 namespace py = pybind11;
 
-#include "_limap/helpers.h"
-#include "util/types.h"
+#include "limap/_limap/helpers.h"
+#include "limap/util/types.h"
 
 namespace limap {
 
@@ -53,5 +52,3 @@ public:
 };
 
 } // namespace limap
-
-#endif

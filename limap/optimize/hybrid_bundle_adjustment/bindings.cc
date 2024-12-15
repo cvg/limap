@@ -3,12 +3,12 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <Eigen/Core>
 #include <vector>
 
-#include "optimize/hybrid_bundle_adjustment/hybrid_bundle_adjustment.h"
-#include "optimize/hybrid_bundle_adjustment/hybrid_bundle_adjustment_config.h"
+#include "limap/optimize/hybrid_bundle_adjustment/hybrid_bundle_adjustment.h"
+#include "limap/optimize/hybrid_bundle_adjustment/hybrid_bundle_adjustment_config.h"
 
 namespace py = pybind11;
 

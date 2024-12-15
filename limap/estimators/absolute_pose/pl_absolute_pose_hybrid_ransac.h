@@ -28,8 +28,7 @@
 //
 // author: Torsten Sattler, torsten.sattler.de@googlemail.com
 
-#ifndef LIMAP_ESTIMATORS_POSE_PL_ABSOLUTE_POSE_HYBRID_RANSAC_H_
-#define LIMAP_ESTIMATORS_POSE_PL_ABSOLUTE_POSE_HYBRID_RANSAC_H_
+#pragma once
 
 #include <algorithm>
 #include <cmath>
@@ -622,5 +621,3 @@ protected:
 } // namespace estimators
 
 } // namespace limap
-
-#endif

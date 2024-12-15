@@ -1,7 +1,4 @@
-#ifndef LIMAP_CERESBASE_POINT_PROJECTION_H
-#define LIMAP_CERESBASE_POINT_PROJECTION_H
-
-// Modified from the pixel-perfect-sfm project
+#pragma once
 
 #include <ceres/ceres.h>
 #include <ceres/rotation.h>
@@ -64,5 +61,3 @@ template <typename T> inline bool IsInsideZeroL(const T &value, double L) {
 }
 
 } // namespace limap
-
-#endif

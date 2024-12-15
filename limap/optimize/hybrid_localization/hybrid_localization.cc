@@ -1,6 +1,6 @@
-#include "optimize/hybrid_localization/hybrid_localization.h"
-#include "ceresbase/parameterization.h"
-#include "optimize/hybrid_localization/cost_functions.h"
+#include "limap/optimize/hybrid_localization/hybrid_localization.h"
+#include "limap/ceresbase/parameterization.h"
+#include "limap/optimize/hybrid_localization/cost_functions.h"
 
 #include <colmap/estimators/bundle_adjustment.h>
 #include <colmap/util/logging.h>

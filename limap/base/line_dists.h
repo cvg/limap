@@ -1,5 +1,4 @@
-#ifndef LIMAP_BASE_LINE_DISTS_H_
-#define LIMAP_BASE_LINE_DISTS_H_
+#pragma once
 
 #include <cmath>
 #include <pybind11/eigen.h>
@@ -7,7 +6,7 @@
 #include <pybind11/pybind11.h>
 #include <set>
 
-#include "base/linebase.h"
+#include "limap/base/linebase.h"
 
 namespace limap {
 
@@ -221,5 +220,3 @@ double infinite_dist_perpendicular_scaleinv_line3dpp(const Line3d &l1,
                                                      const Line3d &l2);
 
 } // namespace limap
-
-#endif

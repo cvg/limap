@@ -1,5 +1,5 @@
-#include "triangulation/functions.h"
-#include "solvers/triangulation/triangulate_line_with_one_point.h"
+#include "limap/triangulation/functions.h"
+#include "limap/solvers/triangulation/triangulate_line_with_one_point.h"
 
 namespace limap {
 

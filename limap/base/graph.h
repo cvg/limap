@@ -1,5 +1,4 @@
-#ifndef LIMAP_BASE_GRAPH_H_
-#define LIMAP_BASE_GRAPH_H_
+#pragma once
 
 #include <algorithm>
 #include <chrono>
@@ -13,7 +12,7 @@
 #include <unistd.h>
 #include <vector>
 
-#include "util/simple_logger.h"
+#include "limap/util/simple_logger.h"
 #include <colmap/util/logging.h>
 
 // Copyright (c) 2020, ETH Zurich, CVG, Mihai Dusmanu
@@ -97,5 +96,3 @@ CountTrackEdges(const Graph &graph, const std::vector<size_t> &track_labels,
                 const std::vector<bool> is_root);
 
 } // namespace limap
-
-#endif

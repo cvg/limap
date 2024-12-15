@@ -1,4 +1,4 @@
-#include "base/image_collection.h"
+#include "limap/base/image_collection.h"
 #include <colmap/util/logging.h>
 
 namespace limap {

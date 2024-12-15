@@ -1,5 +1,4 @@
-#ifndef LIMAP_BASE_LINETRACK_H_
-#define LIMAP_BASE_LINETRACK_H_
+#pragma once
 
 #include <cmath>
 #include <map>
@@ -10,10 +9,10 @@
 
 namespace py = pybind11;
 
-#include "base/camera_view.h"
-#include "base/infinite_line.h"
-#include "base/linebase.h"
-#include "util/types.h"
+#include "limap/base/camera_view.h"
+#include "limap/base/infinite_line.h"
+#include "limap/base/linebase.h"
+#include "limap/util/types.h"
 
 namespace limap {
 
@@ -82,5 +81,3 @@ void ComputeFConsistencySamples(
     const std::pair<double, double> sample_range, const int n_samples);
 
 } // namespace limap
-
-#endif

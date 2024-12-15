@@ -1,10 +1,10 @@
-#include "estimators/absolute_pose/joint_pose_estimator.h"
-#include "base/graph.h"
-#include "base/infinite_line.h"
-#include "ceresbase/line_projection.h"
-#include "ceresbase/point_projection.h"
-#include "estimators/absolute_pose/pl_absolute_pose_ransac.h"
-#include "optimize/hybrid_localization/cost_functions.h"
+#include "limap/estimators/absolute_pose/joint_pose_estimator.h"
+#include "limap/base/graph.h"
+#include "limap/base/infinite_line.h"
+#include "limap/ceresbase/line_projection.h"
+#include "limap/ceresbase/point_projection.h"
+#include "limap/estimators/absolute_pose/pl_absolute_pose_ransac.h"
+#include "limap/optimize/hybrid_localization/cost_functions.h"
 
 #include <PoseLib/camera_pose.h>
 #include <PoseLib/solvers/p1p2ll.h>

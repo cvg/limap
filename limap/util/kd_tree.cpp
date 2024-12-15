@@ -4,8 +4,8 @@
 #include <fstream>
 #include <iostream>
 
-#include "util/kd_tree.h"
-#include "util/nanoflann.hpp"
+#include "limap/util/kd_tree.h"
+#include "limap/util/nanoflann.hpp"
 
 namespace limap {
 

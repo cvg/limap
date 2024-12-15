@@ -3,12 +3,12 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <Eigen/Core>
 #include <vector>
 
-#include "optimize/line_refinement/refine.h"
-#include "optimize/line_refinement/refinement_config.h"
+#include "limap/optimize/line_refinement/refine.h"
+#include "limap/optimize/line_refinement/refinement_config.h"
 
 namespace py = pybind11;
 

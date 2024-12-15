@@ -1,7 +1,7 @@
-#include "estimators/absolute_pose/hybrid_pose_estimator.h"
-#include "estimators/absolute_pose/pl_absolute_pose_hybrid_ransac.h"
-#include "estimators/absolute_pose/pl_absolute_pose_ransac.h"
-#include "optimize/hybrid_localization/cost_functions.h"
+#include "limap/estimators/absolute_pose/hybrid_pose_estimator.h"
+#include "limap/estimators/absolute_pose/pl_absolute_pose_hybrid_ransac.h"
+#include "limap/estimators/absolute_pose/pl_absolute_pose_ransac.h"
+#include "limap/optimize/hybrid_localization/cost_functions.h"
 
 namespace limap {
 

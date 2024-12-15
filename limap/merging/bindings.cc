@@ -3,15 +3,15 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
-#include "_limap/helpers.h"
-#include "base/line_linker.h"
-#include "base/linebase.h"
-#include "base/linetrack.h"
+#include "limap/_limap/helpers.h"
+#include "limap/base/line_linker.h"
+#include "limap/base/linebase.h"
+#include "limap/base/linetrack.h"
 #include <Eigen/Core>
 #include <vector>
 
-#include "merging/merging.h"
-#include "merging/merging_utils.h"
+#include "limap/merging/merging.h"
+#include "limap/merging/merging_utils.h"
 
 namespace py = pybind11;
 

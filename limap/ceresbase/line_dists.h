@@ -1,5 +1,4 @@
-#ifndef LIMAP_CERESBASE_LINE_DISTS_H
-#define LIMAP_CERESBASE_LINE_DISTS_H
+#pragma once
 
 #include <ceres/ceres.h>
 #include <ceres/rotation.h>
@@ -88,5 +87,3 @@ T CeresComputeDist3D_angle(const T dir1[3], const T dir2[3]) {
 }
 
 } // namespace limap
-
-#endif

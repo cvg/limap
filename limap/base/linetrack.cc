@@ -1,5 +1,5 @@
-#include "base/linetrack.h"
-#include "base/line_dists.h"
+#include "limap/base/linetrack.h"
+#include "limap/base/line_dists.h"
 
 #include <colmap/util/logging.h>
 #include <fstream>
