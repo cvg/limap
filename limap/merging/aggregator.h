@@ -1,5 +1,4 @@
-#ifndef LIMAP_MERGING_AGGREGATOR_H_
-#define LIMAP_MERGING_AGGREGATOR_H_
+#pragma once
 
 #include "limap/_limap/helpers.h"
 #include <pybind11/numpy.h>
@@ -32,5 +31,3 @@ public:
 } // namespace merging
 
 } // namespace limap
-
-#endif

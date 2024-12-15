@@ -1,5 +1,4 @@
-#ifndef LIMAP_UNDISTORTION_UNDISTORT_H_
-#define LIMAP_UNDISTORTION_UNDISTORT_H_
+#pragma once
 
 #include "limap/_limap/helpers.h"
 #include <pybind11/numpy.h>
@@ -30,5 +29,3 @@ std::vector<V2D> UndistortPoints(const std::vector<V2D> &points,
 } // namespace undistortion
 
 } // namespace limap
-
-#endif

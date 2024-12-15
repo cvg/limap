@@ -1,5 +1,4 @@
-#ifndef LIMAP_FEATURES_FEATUREMAP_H_
-#define LIMAP_FEATURES_FEATUREMAP_H_
+#pragma once
 
 #include "limap/_limap/helpers.h"
 #include <pybind11/numpy.h>
@@ -95,5 +94,3 @@ bool FeatureInterpolator<DTYPE, CHANNELS>::CheckBounds(const T *xy) const {
 } // namespace features
 
 } // namespace limap
-
-#endif

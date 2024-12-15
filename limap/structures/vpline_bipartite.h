@@ -1,5 +1,4 @@
-#ifndef LIMAP_STRUCTURES_VPLINE_BIPARTITE_H
-#define LIMAP_STRUCTURES_VPLINE_BIPARTITE_H
+#pragma once
 
 #include <pybind11/eigen.h>
 #include <pybind11/numpy.h>
@@ -47,5 +46,3 @@ std::map<int, VPLine_Bipartite2d> GetAllBipartites_VPLine2d(
 } // namespace structures
 
 } // namespace limap
-
-#endif

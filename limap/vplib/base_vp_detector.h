@@ -1,5 +1,4 @@
-#ifndef LIMAP_VPLIB_BASE_VP_DETECTOR_H_
-#define LIMAP_VPLIB_BASE_VP_DETECTOR_H_
+#pragma once
 
 #include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
@@ -53,5 +52,3 @@ protected:
 } // namespace vplib
 
 } // namespace limap
-
-#endif

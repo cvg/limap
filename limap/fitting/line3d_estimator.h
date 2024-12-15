@@ -1,5 +1,4 @@
-#ifndef LIMAP_FITTING_LINE_ESTIMATOR_H_
-#define LIMAP_FITTING_LINE_ESTIMATOR_H_
+#pragma once
 
 #include "limap/_limap/helpers.h"
 #include "limap/base/infinite_line.h"
@@ -55,5 +54,3 @@ Fit3DPoints(const Eigen::Matrix3Xd points,
 } // namespace fitting
 
 } // namespace limap
-
-#endif

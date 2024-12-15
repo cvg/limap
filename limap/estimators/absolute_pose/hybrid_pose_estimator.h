@@ -1,5 +1,4 @@
-#ifndef LIMAP_ESTIMATORS_POSE_HYBRID_POSE_ESTIMATOR_H_
-#define LIMAP_ESTIMATORS_POSE_HYBRID_POSE_ESTIMATOR_H_
+#pragma once
 
 #include "limap/_limap/helpers.h"
 #include "limap/base/camera.h"
@@ -139,5 +138,3 @@ EstimateAbsolutePose_PointLine_Hybrid(
 } // namespace estimators
 
 } // namespace limap
-
-#endif

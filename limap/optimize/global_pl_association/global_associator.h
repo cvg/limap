@@ -1,5 +1,4 @@
-#ifndef LIMAP_OPTIMIZE_GLOBAL_PL_ASSOCIATION_GLOBAL_ASSOCIATOR_H_
-#define LIMAP_OPTIMIZE_GLOBAL_PL_ASSOCIATION_GLOBAL_ASSOCIATOR_H_
+#pragma once
 
 #include "limap/base/image_collection.h"
 #include "limap/base/infinite_line.h"
@@ -160,5 +159,3 @@ private:
 } // namespace optimize
 
 } // namespace limap
-
-#endif

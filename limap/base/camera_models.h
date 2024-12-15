@@ -1,5 +1,4 @@
-#ifndef LIMAP_BASE_CAMERA_MODELS_H_
-#define LIMAP_BASE_CAMERA_MODELS_H_
+#pragma once
 
 #include <colmap/sensor/models.h>
 
@@ -45,5 +44,3 @@ void ParamsToKvec(const colmap::CameraModelId model_id, const T *params,
 }
 
 } // namespace limap
-
-#endif

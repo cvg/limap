@@ -1,5 +1,4 @@
-#ifndef LIMAP_EVALUATION_POINT_CLOUD_EVALUATOR_H_
-#define LIMAP_EVALUATION_POINT_CLOUD_EVALUATOR_H_
+#pragma once
 
 #include "limap/base/linebase.h"
 #include "limap/evaluation/base_evaluator.h"
@@ -47,5 +46,3 @@ private:
 } // namespace evaluation
 
 } // namespace limap
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef LIMAP_OPTIMIZE_LINE_REFINEMENT_REFINEMENT_CONFIG_H_
-#define LIMAP_OPTIMIZE_LINE_REFINEMENT_REFINEMENT_CONFIG_H_
+#pragma once
 
 #include "limap/_limap/helpers.h"
 #include <pybind11/numpy.h>
@@ -95,5 +94,3 @@ public:
 } // namespace optimize
 
 } // namespace limap
-
-#endif

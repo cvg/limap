@@ -1,5 +1,4 @@
-#ifndef LIMAP_FEATURES_LINE_PATCH_EXTRACTOR_H_
-#define LIMAP_FEATURES_LINE_PATCH_EXTRACTOR_H_
+#pragma once
 
 #include "limap/_limap/helpers.h"
 #include <pybind11/numpy.h>
@@ -64,5 +63,3 @@ private:
 } // namespace features
 
 } // namespace limap
-
-#endif

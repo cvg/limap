@@ -1,4 +1,3 @@
-// Copyright (c) 2019, Torsten Sattler
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -28,8 +27,7 @@
 //
 // author: Torsten Sattler, torsten.sattler.de@googlemail.com
 
-#ifndef LIMAP_ESTIMATORS_POSE_PL_ABSOLUTE_POSE_RANSAC_H_
-#define LIMAP_ESTIMATORS_POSE_PL_ABSOLUTE_POSE_RANSAC_H_
+#pragma once
 
 #include <algorithm>
 #include <cmath>
@@ -457,5 +455,3 @@ protected:
 } // namespace estimators
 
 } // namespace limap
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef LIMAP_BASE_LINETRACK_H_
-#define LIMAP_BASE_LINETRACK_H_
+#pragma once
 
 #include <cmath>
 #include <map>
@@ -82,5 +81,3 @@ void ComputeFConsistencySamples(
     const std::pair<double, double> sample_range, const int n_samples);
 
 } // namespace limap
-
-#endif

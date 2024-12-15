@@ -1,5 +1,4 @@
-#ifndef LIMAP_BASE_TRANSFORMS_H_
-#define LIMAP_BASE_TRANSFORMS_H_
+#pragma once
 
 #include "limap/base/camera.h"
 #include "limap/base/pose.h"
@@ -30,5 +29,3 @@ CameraPose pose_similarity_transform(const CameraPose &pose,
                                      const SimilarityTransform3 &transform);
 
 } // namespace limap
-
-#endif

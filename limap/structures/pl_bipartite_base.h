@@ -1,5 +1,4 @@
-#ifndef LIMAP_STRUCTURES_PL_BIPARTITE_BASE_H
-#define LIMAP_STRUCTURES_PL_BIPARTITE_BASE_H
+#pragma once
 
 #include <map>
 #include <set>
@@ -100,5 +99,3 @@ protected:
 } // namespace structures
 
 } // namespace limap
-
-#endif

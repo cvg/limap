@@ -1,5 +1,4 @@
-#ifndef LIMAP_BASE_LINEBASE_H_
-#define LIMAP_BASE_LINEBASE_H_
+#pragma once
 
 #include <cmath>
 #include <pybind11/eigen.h>
@@ -69,5 +68,3 @@ Line3d unprojection_line2d(const Line2d &line2d, const CameraView &view,
                            const std::pair<double, double> &depths);
 
 } // namespace limap
-
-#endif

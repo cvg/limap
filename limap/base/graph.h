@@ -1,5 +1,4 @@
-#ifndef LIMAP_BASE_GRAPH_H_
-#define LIMAP_BASE_GRAPH_H_
+#pragma once
 
 #include <algorithm>
 #include <chrono>
@@ -97,5 +96,3 @@ CountTrackEdges(const Graph &graph, const std::vector<size_t> &track_labels,
                 const std::vector<bool> is_root);
 
 } // namespace limap
-
-#endif
