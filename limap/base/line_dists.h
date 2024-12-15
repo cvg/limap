@@ -6,7 +6,7 @@
 #include <pybind11/pybind11.h>
 #include <set>
 
-#include "base/linebase.h"
+#include "limap/base/linebase.h"
 
 namespace limap {
 

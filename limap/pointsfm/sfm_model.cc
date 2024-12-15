@@ -1,4 +1,4 @@
-#include "pointsfm/sfm_model.h"
+#include "limap/pointsfm/sfm_model.h"
 
 #include <colmap/math/math.h>
 #include <colmap/scene/reconstruction.h>

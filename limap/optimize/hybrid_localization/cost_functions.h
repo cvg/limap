@@ -1,19 +1,19 @@
 #pragma once
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
-#include "base/camera.h"
-#include "base/linebase.h"
-#include "util/types.h"
+#include "limap/base/camera.h"
+#include "limap/base/linebase.h"
+#include "limap/util/types.h"
 
-#include "base/line_dists.h"
-#include "ceresbase/line_dists.h"
-#include "ceresbase/point_projection.h"
+#include "limap/base/line_dists.h"
+#include "limap/ceresbase/line_dists.h"
+#include "limap/ceresbase/point_projection.h"
 #include <ceres/ceres.h>
 
-#include "optimize/hybrid_localization/hybrid_localization_config.h"
+#include "limap/optimize/hybrid_localization/hybrid_localization_config.h"
 
 namespace py = pybind11;
 

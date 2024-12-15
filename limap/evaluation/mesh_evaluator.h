@@ -1,8 +1,8 @@
 #pragma once
 
-#include "base/linebase.h"
-#include "evaluation/base_evaluator.h"
-#include "util/types.h"
+#include "limap/base/linebase.h"
+#include "limap/evaluation/base_evaluator.h"
+#include "limap/util/types.h"
 
 #include <igl/AABB.h>
 #include <string>

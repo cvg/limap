@@ -1,10 +1,10 @@
 #pragma once
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
-#include "ceresbase/interpolation.h"
+#include "limap/ceresbase/interpolation.h"
 #include <ceres/ceres.h>
 
 namespace py = pybind11;

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "_limap/helpers.h"
-#include "base/camera.h"
-#include "base/linetrack.h"
-#include "optimize/hybrid_localization/hybrid_localization.h"
-#include "util/types.h"
+#include "limap/_limap/helpers.h"
+#include "limap/base/camera.h"
+#include "limap/base/linetrack.h"
+#include "limap/optimize/hybrid_localization/hybrid_localization.h"
+#include "limap/util/types.h"
 
 #include <RansacLib/ransac.h>
 

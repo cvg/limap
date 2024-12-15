@@ -1,12 +1,12 @@
 #pragma once
 
-#include "base/image_collection.h"
-#include "base/infinite_line.h"
-#include "optimize/hybrid_bundle_adjustment/hybrid_bundle_adjustment.h"
-#include "optimize/hybrid_bundle_adjustment/hybrid_bundle_adjustment_config.h"
-#include "structures/pl_bipartite.h"
-#include "structures/vpline_bipartite.h"
-#include "util/types.h"
+#include "limap/base/image_collection.h"
+#include "limap/base/infinite_line.h"
+#include "limap/optimize/hybrid_bundle_adjustment/hybrid_bundle_adjustment.h"
+#include "limap/optimize/hybrid_bundle_adjustment/hybrid_bundle_adjustment_config.h"
+#include "limap/structures/pl_bipartite.h"
+#include "limap/structures/vpline_bipartite.h"
+#include "limap/util/types.h"
 
 #include <ceres/ceres.h>
 

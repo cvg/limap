@@ -6,11 +6,11 @@
 
 namespace py = pybind11;
 
-#include "base/linebase.h"
-#include "base/linetrack.h"
-#include "base/pointtrack.h"
-#include "structures/pl_bipartite_base.h"
-#include "util/types.h"
+#include "limap/base/linebase.h"
+#include "limap/base/linetrack.h"
+#include "limap/base/pointtrack.h"
+#include "limap/structures/pl_bipartite_base.h"
+#include "limap/util/types.h"
 
 namespace limap {
 

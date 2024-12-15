@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ceresbase/line_transforms.h"
-#include "ceresbase/point_projection.h"
-#include "util/types.h"
+#include "limap/ceresbase/line_transforms.h"
+#include "limap/ceresbase/point_projection.h"
+#include "limap/util/types.h"
 #include <ceres/ceres.h>
 #include <ceres/rotation.h>
 

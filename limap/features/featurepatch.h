@@ -1,11 +1,11 @@
 #pragma once
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
-#include "features/featuremap.h"
-#include "util/types.h"
+#include "limap/features/featuremap.h"
+#include "limap/util/types.h"
 
 #include <colmap/util/logging.h>
 

@@ -1,14 +1,14 @@
 #pragma once
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
-#include "base/camera_view.h"
-#include "base/linebase.h"
-#include "base/linetrack.h"
-#include "features/featurepatch.h"
-#include "util/types.h"
+#include "limap/base/camera_view.h"
+#include "limap/base/linebase.h"
+#include "limap/base/linetrack.h"
+#include "limap/features/featurepatch.h"
+#include "limap/util/types.h"
 
 namespace py = pybind11;
 

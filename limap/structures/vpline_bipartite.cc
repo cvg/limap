@@ -1,4 +1,4 @@
-#include "structures/vpline_bipartite.h"
+#include "limap/structures/vpline_bipartite.h"
 
 namespace limap {
 

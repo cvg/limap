@@ -8,8 +8,8 @@
 
 namespace py = pybind11;
 
-#include "base/camera_view.h"
-#include "util/types.h"
+#include "limap/base/camera_view.h"
+#include "limap/util/types.h"
 
 namespace limap {
 

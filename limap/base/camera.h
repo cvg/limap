@@ -9,9 +9,9 @@
 
 namespace py = pybind11;
 
-#include "_limap/helpers.h"
-#include "base/pose.h"
-#include "util/types.h"
+#include "limap/_limap/helpers.h"
+#include "limap/base/pose.h"
+#include "limap/util/types.h"
 
 #include <colmap/scene/camera.h>
 #include <colmap/sensor/models.h>

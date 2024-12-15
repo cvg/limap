@@ -1,8 +1,8 @@
-#include "optimize/hybrid_bundle_adjustment/hybrid_bundle_adjustment.h"
-#include "base/camera_models.h"
-#include "ceresbase/parameterization.h"
-#include "optimize/hybrid_bundle_adjustment/cost_functions.h"
-#include "optimize/line_refinement/cost_functions.h"
+#include "limap/optimize/hybrid_bundle_adjustment/hybrid_bundle_adjustment.h"
+#include "limap/base/camera_models.h"
+#include "limap/ceresbase/parameterization.h"
+#include "limap/optimize/hybrid_bundle_adjustment/cost_functions.h"
+#include "limap/optimize/line_refinement/cost_functions.h"
 
 #include <colmap/estimators/bundle_adjustment.h>
 #include <colmap/util/logging.h>

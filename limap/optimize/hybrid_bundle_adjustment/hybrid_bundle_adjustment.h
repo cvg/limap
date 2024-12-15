@@ -1,17 +1,17 @@
 #pragma once
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
-#include "base/image_collection.h"
-#include "base/infinite_line.h"
-#include "base/linetrack.h"
-#include "base/pointtrack.h"
-#include "util/types.h"
-#include "vplib/vpbase.h"
+#include "limap/base/image_collection.h"
+#include "limap/base/infinite_line.h"
+#include "limap/base/linetrack.h"
+#include "limap/base/pointtrack.h"
+#include "limap/util/types.h"
+#include "limap/vplib/vpbase.h"
 
-#include "optimize/hybrid_bundle_adjustment/hybrid_bundle_adjustment_config.h"
+#include "limap/optimize/hybrid_bundle_adjustment/hybrid_bundle_adjustment_config.h"
 #include <ceres/ceres.h>
 
 namespace py = pybind11;

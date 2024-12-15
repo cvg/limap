@@ -1,6 +1,6 @@
-#include "features/line_patch_extractor.h"
-#include "ceresbase/interpolation.h"
-#include "features/featuremap.h"
+#include "limap/features/line_patch_extractor.h"
+#include "limap/ceresbase/interpolation.h"
+#include "limap/features/featuremap.h"
 
 #include <algorithm>
 #include <iostream>

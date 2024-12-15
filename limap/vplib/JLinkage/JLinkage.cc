@@ -1,4 +1,4 @@
-#include "vplib/JLinkage/JLinkage.h"
+#include "limap/vplib/JLinkage/JLinkage.h"
 
 #include <JLinkage/include/VPCluster.h>
 #include <JLinkage/include/VPSample.h>

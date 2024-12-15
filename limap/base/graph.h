@@ -12,7 +12,7 @@
 #include <unistd.h>
 #include <vector>
 
-#include "util/simple_logger.h"
+#include "limap/util/simple_logger.h"
 #include <colmap/util/logging.h>
 
 // Copyright (c) 2020, ETH Zurich, CVG, Mihai Dusmanu

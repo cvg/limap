@@ -1,5 +1,5 @@
-#include "triangulation/base_line_triangulator.h"
-#include "triangulation/functions.h"
+#include "limap/triangulation/base_line_triangulator.h"
+#include "limap/triangulation/functions.h"
 
 #include <algorithm>
 #include <colmap/util/logging.h>

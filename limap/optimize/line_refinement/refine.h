@@ -1,25 +1,25 @@
 #pragma once
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
-#include "base/camera_view.h"
-#include "base/infinite_line.h"
-#include "base/linebase.h"
-#include "base/linetrack.h"
-#include "util/types.h"
-#include "vplib/vpbase.h"
+#include "limap/base/camera_view.h"
+#include "limap/base/infinite_line.h"
+#include "limap/base/linebase.h"
+#include "limap/base/linetrack.h"
+#include "limap/util/types.h"
+#include "limap/vplib/vpbase.h"
 
 #ifdef INTERPOLATION_ENABLED
-#include "features/featuremap.h"
-#include "features/featurepatch.h"
+#include "limap/features/featuremap.h"
+#include "limap/features/featurepatch.h"
 #endif // INTERPOLATION_ENABLED
 
 #include <ceres/ceres.h>
 #include <tuple>
 
-#include "optimize/line_refinement/refinement_config.h"
+#include "limap/optimize/line_refinement/refinement_config.h"
 
 namespace py = pybind11;
 

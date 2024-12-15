@@ -8,23 +8,23 @@
 
 namespace py = pybind11;
 
-#include "base/bindings.cc"
-#include "ceresbase/bindings.cc"
-#include "estimators/bindings.cc"
-#include "evaluation/bindings.cc"
-#include "fitting/bindings.cc"
-#include "merging/bindings.cc"
-#include "optimize/bindings.cc"
-#include "pointsfm/bindings.cc"
-#include "structures/bindings.cc"
-#include "triangulation/bindings.cc"
-#include "undistortion/bindings.cc"
-#include "vplib/bindings.cc"
+#include "limap/base/bindings.cc"
+#include "limap/ceresbase/bindings.cc"
+#include "limap/estimators/bindings.cc"
+#include "limap/evaluation/bindings.cc"
+#include "limap/fitting/bindings.cc"
+#include "limap/merging/bindings.cc"
+#include "limap/optimize/bindings.cc"
+#include "limap/pointsfm/bindings.cc"
+#include "limap/structures/bindings.cc"
+#include "limap/triangulation/bindings.cc"
+#include "limap/undistortion/bindings.cc"
+#include "limap/vplib/bindings.cc"
 #ifdef INTERPOLATION_ENABLED
-#include "features/bindings.cc"
+#include "limap/features/bindings.cc"
 #endif // INTERPOLATION_ENABLED
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 
 void bind_base(py::module &);
 void bind_ceresbase(py::module &);

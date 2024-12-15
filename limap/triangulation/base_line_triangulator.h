@@ -1,11 +1,11 @@
 #pragma once
 
-#include "base/image_collection.h"
-#include "base/linebase.h"
-#include "base/linetrack.h"
-#include "structures/pl_bipartite.h"
-#include "util/types.h"
-#include "vplib/vpbase.h"
+#include "limap/base/image_collection.h"
+#include "limap/base/linebase.h"
+#include "limap/base/linetrack.h"
+#include "limap/structures/pl_bipartite.h"
+#include "limap/util/types.h"
+#include "limap/vplib/vpbase.h"
 #include <tuple>
 
 namespace limap {

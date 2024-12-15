@@ -1,7 +1,7 @@
 #pragma once
 
-#include "base/camera.h"
-#include "base/pose.h"
+#include "limap/base/camera.h"
+#include "limap/base/pose.h"
 
 namespace limap {
 

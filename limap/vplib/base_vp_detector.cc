@@ -1,7 +1,7 @@
-#include "vplib/base_vp_detector.h"
+#include "limap/vplib/base_vp_detector.h"
 
-#include "base/graph.h"
-#include "base/infinite_line.h"
+#include "limap/base/graph.h"
+#include "limap/base/infinite_line.h"
 
 #include <third-party/progressbar.hpp>
 

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "base/linebase.h"
-#include "evaluation/base_evaluator.h"
-#include "util/kd_tree.h"
-#include "util/types.h"
+#include "limap/base/linebase.h"
+#include "limap/evaluation/base_evaluator.h"
+#include "limap/util/kd_tree.h"
+#include "limap/util/types.h"
 
 #include <string>
 #include <tuple>

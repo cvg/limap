@@ -1,8 +1,8 @@
 #pragma once
 
-#include "base/graph.h"
-#include "base/line_linker.h"
-#include "triangulation/base_line_triangulator.h"
+#include "limap/base/graph.h"
+#include "limap/base/line_linker.h"
+#include "limap/triangulation/base_line_triangulator.h"
 
 namespace limap {
 

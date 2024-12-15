@@ -1,4 +1,4 @@
-#include "base/camera.h"
+#include "limap/base/camera.h"
 #include <colmap/util/logging.h>
 
 namespace limap {
