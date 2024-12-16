@@ -27,5 +27,5 @@ clang-format==19.1.0
 
 pytlsd@git+https://github.com/iago-suarez/pytlsd.git@37ac583
 deeplsd@git+https://github.com/cvg/DeepLSD.git@88c589d
--e git+https://github.com/cvg/GlueStick.git@0f28efd#egg=gluestick
+gluestick@git+https://github.com/cvg/GlueStick.git@0f28efd
 -e git+https://github.com/B1ueber2y/Hierarchical-Localization.git@f91076b#egg=hloc
