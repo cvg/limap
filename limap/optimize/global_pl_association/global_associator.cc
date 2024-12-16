@@ -1,10 +1,10 @@
-#include "optimize/global_pl_association/global_associator.h"
-#include "optimize/global_pl_association/cost_functions.h"
+#include "limap/optimize/global_pl_association/global_associator.h"
+#include "limap/optimize/global_pl_association/cost_functions.h"
 
-#include "base/line_linker.h"
-#include "base/linetrack.h"
-#include "ceresbase/parameterization.h"
-#include "optimize/line_refinement/cost_functions.h"
+#include "limap/base/line_linker.h"
+#include "limap/base/linetrack.h"
+#include "limap/ceresbase/parameterization.h"
+#include "limap/optimize/line_refinement/cost_functions.h"
 
 #include <cmath>
 #include <colmap/estimators/bundle_adjustment.h>

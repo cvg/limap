@@ -1,5 +1,4 @@
-#ifndef LIMAP_BASE_CAMERA_VIEW_H_
-#define LIMAP_BASE_CAMERA_VIEW_H_
+#pragma once
 
 #include <cmath>
 #include <fstream>
@@ -10,10 +9,10 @@
 
 namespace py = pybind11;
 
-#include "_limap/helpers.h"
-#include "util/types.h"
+#include "limap/_limap/helpers.h"
+#include "limap/util/types.h"
 
-#include "base/camera.h"
+#include "limap/base/camera.h"
 
 namespace limap {
 
@@ -89,5 +88,3 @@ public:
 };
 
 } // namespace limap
-
-#endif

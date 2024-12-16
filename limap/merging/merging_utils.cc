@@ -1,9 +1,9 @@
-#include "merging/merging_utils.h"
-#include "merging/aggregator.h"
+#include "limap/merging/merging_utils.h"
+#include "limap/merging/aggregator.h"
 
-#include "base/line_dists.h"
-#include "base/linebase.h"
-#include "util/types.h"
+#include "limap/base/line_dists.h"
+#include "limap/base/linebase.h"
+#include "limap/util/types.h"
 
 #include <algorithm>
 #include <third-party/progressbar.hpp>

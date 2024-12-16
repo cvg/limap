@@ -1,10 +1,9 @@
-#ifndef LIMAP_CERESBASE_INTERPOLATION_H
-#define LIMAP_CERESBASE_INTERPOLATION_H
+#pragma once
 
 // Modified from the pixel-perfect-sfm project
 // [LINK] https://github.com/cvg/pixel-perfect-sfm
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
@@ -23,7 +22,7 @@ namespace py = pybind11;
 #include <utility>
 #include <vector>
 
-#include "util/types.h"
+#include "limap/util/types.h"
 #include <colmap/util/logging.h>
 
 namespace limap {
@@ -745,5 +744,3 @@ private:
 };
 
 } // namespace limap
-
-#endif

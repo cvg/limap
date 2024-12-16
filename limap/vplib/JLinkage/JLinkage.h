@@ -1,12 +1,11 @@
-#ifndef LIMAP_VPLIB_JLINKAGE_H_
-#define LIMAP_VPLIB_JLINKAGE_H_
+#pragma once
 
 #include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
-#include "vplib/base_vp_detector.h"
+#include "limap/vplib/base_vp_detector.h"
 
 namespace py = pybind11;
 
@@ -44,5 +43,3 @@ private:
 } // namespace vplib
 
 } // namespace limap
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef LIMAP_VPLIB_VPTRACK_H_
-#define LIMAP_VPLIB_VPTRACK_H_
+#pragma once
 
 #include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
@@ -8,10 +7,10 @@
 
 namespace py = pybind11;
 
-#include "_limap/helpers.h"
-#include "util/types.h"
+#include "limap/_limap/helpers.h"
+#include "limap/util/types.h"
 
-#include "base/pointtrack.h"
+#include "limap/base/pointtrack.h"
 
 namespace limap {
 
@@ -41,5 +40,3 @@ MergeVPTracksByDirection(const std::vector<VPTrack> &vptracks,
 } // namespace vplib
 
 } // namespace limap
-
-#endif

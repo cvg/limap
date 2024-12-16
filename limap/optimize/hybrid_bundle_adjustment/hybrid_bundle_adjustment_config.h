@@ -1,11 +1,10 @@
-#ifndef LIMAP_OPTIMIZE_HYBRIDBA_HYBRIDBA_CONFIG_H_
-#define LIMAP_OPTIMIZE_HYBRIDBA_HYBRIDBA_CONFIG_H_
+#pragma once
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
-#include "optimize/line_refinement/refinement_config.h"
+#include "limap/optimize/line_refinement/refinement_config.h"
 
 namespace py = pybind11;
 
@@ -54,5 +53,3 @@ private:
 } // namespace optimize
 
 } // namespace limap
-
-#endif

@@ -1,4 +1,4 @@
-#include "base/linebase.h"
+#include "limap/base/linebase.h"
 #include <cmath>
 #include <colmap/util/logging.h>
 

@@ -1,5 +1,4 @@
-#ifndef LIMAP_BASE_POSE_H_
-#define LIMAP_BASE_POSE_H_
+#pragma once
 
 #include <colmap/geometry/pose.h>
 
@@ -30,5 +29,3 @@ Eigen::Matrix3d QuaternionToRotationMatrix(const Eigen::Vector4d &qvec);
 Eigen::Vector4d NormalizeQuaternion(const Eigen::Vector4d &qvec);
 
 } // namespace limap
-
-#endif

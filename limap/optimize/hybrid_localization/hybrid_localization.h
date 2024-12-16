@@ -1,14 +1,13 @@
-#ifndef LIMAP_OPTIMIZE_HYBRID_LOCALIZATION_HYBRID_LOCALIZATION_H_
-#define LIMAP_OPTIMIZE_HYBRID_LOCALIZATION_HYBRID_LOCALIZATION_H_
+#pragma once
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
-#include "util/types.h"
+#include "limap/util/types.h"
 
-#include "base/linebase.h"
-#include "optimize/hybrid_localization/hybrid_localization_config.h"
+#include "limap/base/linebase.h"
+#include "limap/optimize/hybrid_localization/hybrid_localization_config.h"
 #include <ceres/ceres.h>
 
 namespace py = pybind11;
@@ -131,5 +130,3 @@ public:
 } // namespace optimize
 
 } // namespace limap
-
-#endif

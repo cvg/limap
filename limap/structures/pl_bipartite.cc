@@ -1,8 +1,8 @@
-#include "structures/pl_bipartite.h"
+#include "limap/structures/pl_bipartite.h"
 
-#include "base/graph.h"
-#include "base/infinite_line.h"
-#include "util/kd_tree.h"
+#include "limap/base/graph.h"
+#include "limap/base/infinite_line.h"
+#include "limap/util/kd_tree.h"
 
 namespace limap {
 

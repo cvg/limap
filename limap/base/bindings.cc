@@ -5,22 +5,22 @@
 
 namespace py = pybind11;
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 
-#include "util/kd_tree.h"
-#include "util/types.h"
+#include "limap/util/kd_tree.h"
+#include "limap/util/types.h"
 #include <colmap/util/threading.h>
 
-#include "base/camera.h"
-#include "base/camera_view.h"
-#include "base/graph.h"
-#include "base/image_collection.h"
-#include "base/infinite_line.h"
-#include "base/line_dists.h"
-#include "base/line_linker.h"
-#include "base/linebase.h"
-#include "base/linetrack.h"
-#include "base/pointtrack.h"
+#include "limap/base/camera.h"
+#include "limap/base/camera_view.h"
+#include "limap/base/graph.h"
+#include "limap/base/image_collection.h"
+#include "limap/base/infinite_line.h"
+#include "limap/base/line_dists.h"
+#include "limap/base/line_linker.h"
+#include "limap/base/linebase.h"
+#include "limap/base/linetrack.h"
+#include "limap/base/pointtrack.h"
 
 namespace limap {
 

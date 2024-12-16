@@ -1,5 +1,4 @@
-#ifndef LIMAP_ESTIMATORS_EXTENDED_HYBRID_RANSAC_H_
-#define LIMAP_ESTIMATORS_EXTENDED_HYBRID_RANSAC_H_
+#pragma once
 
 #include <RansacLib/hybrid_ransac.h>
 
@@ -18,5 +17,3 @@ public:
 } // namespace estimators
 
 } // namespace limap
-
-#endif

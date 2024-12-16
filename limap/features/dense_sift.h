@@ -1,3 +1,4 @@
+#pragma once
 
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
@@ -11,14 +12,14 @@ namespace py = pybind11;
 #include <string>
 #include <vector>
 
-#include "VLFeat/covdet.h"
-#include "VLFeat/dsift.h"
-#include "VLFeat/sift.h"
+#include "limap/VLFeat/covdet.h"
+#include "limap/VLFeat/dsift.h"
+#include "limap/VLFeat/sift.h"
 #include <cstdlib>
 
 #include <chrono>
 
-#include "util/simple_logger.h"
+#include "limap/util/simple_logger.h"
 #include <colmap/util/logging.h>
 
 namespace limap {

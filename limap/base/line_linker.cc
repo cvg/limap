@@ -1,5 +1,5 @@
-#include "base/line_linker.h"
-#include "base/line_dists.h"
+#include "limap/base/line_linker.h"
+#include "limap/base/line_dists.h"
 #include <cmath>
 
 namespace limap {

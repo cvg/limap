@@ -1,13 +1,12 @@
-#ifndef LIMAP_BASE_INFINITE_LINE_H_
-#define LIMAP_BASE_INFINITE_LINE_H_
+#pragma once
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
-#include "base/camera_view.h"
-#include "base/linebase.h"
-#include "util/types.h"
+#include "limap/base/camera_view.h"
+#include "limap/base/linebase.h"
+#include "limap/util/types.h"
 
 #include <ceres/ceres.h>
 
@@ -86,5 +85,3 @@ Line3d GetLineSegmentFromInfiniteLine3d(const InfiniteLine3d &inf_line,
                                         const int num_outliers = 2);
 
 } // namespace limap
-
-#endif

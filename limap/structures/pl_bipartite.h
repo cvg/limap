@@ -1,5 +1,4 @@
-#ifndef LIMAP_STRUCTURES_PL_BIPARTITE_H
-#define LIMAP_STRUCTURES_PL_BIPARTITE_H
+#pragma once
 
 #include <pybind11/eigen.h>
 #include <pybind11/numpy.h>
@@ -7,11 +6,11 @@
 
 namespace py = pybind11;
 
-#include "base/linebase.h"
-#include "base/linetrack.h"
-#include "base/pointtrack.h"
-#include "structures/pl_bipartite_base.h"
-#include "util/types.h"
+#include "limap/base/linebase.h"
+#include "limap/base/linetrack.h"
+#include "limap/base/pointtrack.h"
+#include "limap/structures/pl_bipartite_base.h"
+#include "limap/util/types.h"
 
 namespace limap {
 
@@ -76,5 +75,3 @@ public:
 } // namespace structures
 
 } // namespace limap
-
-#endif
