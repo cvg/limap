@@ -1,5 +1,4 @@
-#ifndef LIMAP_STRUCTURES_VPLINE_BIPARTITE_H
-#define LIMAP_STRUCTURES_VPLINE_BIPARTITE_H
+#pragma once
 
 #include <pybind11/eigen.h>
 #include <pybind11/numpy.h>
@@ -7,10 +6,10 @@
 
 namespace py = pybind11;
 
-#include "base/linetrack.h"
-#include "structures/pl_bipartite_base.h"
-#include "vplib/vpbase.h"
-#include "vplib/vptrack.h"
+#include "limap/base/linetrack.h"
+#include "limap/structures/pl_bipartite_base.h"
+#include "limap/vplib/vpbase.h"
+#include "limap/vplib/vptrack.h"
 
 namespace limap {
 
@@ -47,5 +46,3 @@ std::map<int, VPLine_Bipartite2d> GetAllBipartites_VPLine2d(
 } // namespace structures
 
 } // namespace limap
-
-#endif

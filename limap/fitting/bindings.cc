@@ -3,11 +3,11 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <Eigen/Core>
 #include <vector>
 
-#include "fitting/line3d_estimator.h"
+#include "limap/fitting/line3d_estimator.h"
 
 namespace py = pybind11;
 

@@ -1,14 +1,13 @@
-#ifndef LIMAP_VPLIB_VPBASE_H_
-#define LIMAP_VPLIB_VPBASE_H_
+#pragma once
 
 #include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
-#include "_limap/helpers.h"
-#include "base/linebase.h"
-#include "util/types.h"
+#include "limap/_limap/helpers.h"
+#include "limap/base/linebase.h"
+#include "limap/util/types.h"
 
 namespace py = pybind11;
 
@@ -48,5 +47,3 @@ public:
 } // namespace vplib
 
 } // namespace limap
-
-#endif

@@ -1,18 +1,17 @@
-#ifndef LIMAP_HYBRIDBA_COST_FUNCTIONS_H_
-#define LIMAP_HYBRIDBA_COST_FUNCTIONS_H_
+#pragma once
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <ceres/ceres.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
-#include "base/camera_models.h"
-#include "base/infinite_line.h"
-#include "util/types.h"
+#include "limap/base/camera_models.h"
+#include "limap/base/infinite_line.h"
+#include "limap/util/types.h"
 
-#include "ceresbase/line_dists.h"
-#include "ceresbase/line_projection.h"
-#include "ceresbase/point_projection.h"
+#include "limap/ceresbase/line_dists.h"
+#include "limap/ceresbase/line_projection.h"
+#include "limap/ceresbase/point_projection.h"
 
 namespace py = pybind11;
 
@@ -90,5 +89,3 @@ protected:
 } // namespace optimize
 
 } // namespace limap
-
-#endif

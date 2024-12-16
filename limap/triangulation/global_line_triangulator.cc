@@ -1,6 +1,6 @@
-#include "triangulation/global_line_triangulator.h"
-#include "merging/aggregator.h"
-#include "merging/merging.h"
+#include "limap/triangulation/global_line_triangulator.h"
+#include "limap/merging/aggregator.h"
+#include "limap/merging/merging.h"
 
 #include <algorithm>
 #include <iostream>

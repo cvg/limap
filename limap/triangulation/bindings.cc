@@ -3,16 +3,16 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
-#include "_limap/helpers.h"
-#include "base/linebase.h"
-#include "base/linetrack.h"
+#include "limap/_limap/helpers.h"
+#include "limap/base/linebase.h"
+#include "limap/base/linetrack.h"
 #include <Eigen/Core>
 #include <vector>
 
 namespace py = pybind11;
 
-#include "triangulation/functions.h"
-#include "triangulation/global_line_triangulator.h"
+#include "limap/triangulation/functions.h"
+#include "limap/triangulation/global_line_triangulator.h"
 
 namespace limap {
 

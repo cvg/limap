@@ -3,14 +3,14 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <Eigen/Core>
 #include <vector>
 
 namespace py = pybind11;
 
-#include "structures/pl_bipartite.h"
-#include "structures/vpline_bipartite.h"
+#include "limap/structures/pl_bipartite.h"
+#include "limap/structures/vpline_bipartite.h"
 
 namespace limap {
 

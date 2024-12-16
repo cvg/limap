@@ -1,7 +1,4 @@
-#ifndef LIMAP_CERESBASE_PARAMETERIZATION_H
-#define LIMAP_CERESBASE_PARAMETERIZATION_H
-
-// Inspired by COLMAP: https://colmap.github.io/
+#pragma once
 
 #include <ceres/ceres.h>
 #include <ceres/rotation.h>
@@ -38,5 +35,3 @@ inline void SetSphereManifold(ceres::Problem *problem, double *params) {
 }
 
 } // namespace limap
-
-#endif

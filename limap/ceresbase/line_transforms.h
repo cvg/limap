@@ -1,5 +1,4 @@
-#ifndef LIMAP_CERESBASE_LINE_TRANSFORMS_H
-#define LIMAP_CERESBASE_LINE_TRANSFORMS_H
+#pragma once
 
 #include <ceres/ceres.h>
 #include <ceres/rotation.h>
@@ -73,5 +72,3 @@ bool Ceres_IntersectLineCoordinates(const T coor1[3], const T coor2[3],
 }
 
 } // namespace limap
-
-#endif

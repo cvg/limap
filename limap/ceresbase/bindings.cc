@@ -7,10 +7,10 @@
 
 namespace py = pybind11;
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 
-#include "ceresbase/ceres_extensions.h"
-#include "ceresbase/interpolation.h"
+#include "limap/ceresbase/ceres_extensions.h"
+#include "limap/ceresbase/interpolation.h"
 #include <ceres/ceres.h>
 
 PYBIND11_MAKE_OPAQUE(std::vector<ceres::IterationCallback *>);

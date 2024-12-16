@@ -1,4 +1,4 @@
-#include "solvers/triangulation/triangulate_line_with_one_point.h"
+#include "limap/solvers/triangulation/triangulate_line_with_one_point.h"
 #include <PoseLib/misc/univariate.h>
 #include <iostream>
 

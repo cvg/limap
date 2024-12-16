@@ -1,5 +1,4 @@
-#ifndef LIMAP_SOLVERS_TRIANGULATION_TRIANGULATE_LINE_WITH_ONE_POINT_H_
-#define LIMAP_SOLVERS_TRIANGULATION_TRIANGULATE_LINE_WITH_ONE_POINT_H_
+#pragma once
 
 #include <Eigen/Core>
 
@@ -40,5 +39,3 @@ std::pair<double, double> triangulate_line_with_one_point(
 } // namespace solvers
 
 } // namespace limap
-
-#endif

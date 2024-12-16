@@ -1,17 +1,16 @@
-#ifndef LIMAP_MERGING_MERGING_UTILS_H_
-#define LIMAP_MERGING_MERGING_UTILS_H_
+#pragma once
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
 namespace py = pybind11;
 
-#include "base/camera_view.h"
-#include "base/graph.h"
-#include "base/image_collection.h"
-#include "base/linebase.h"
-#include "base/linetrack.h"
+#include "limap/base/camera_view.h"
+#include "limap/base/graph.h"
+#include "limap/base/image_collection.h"
+#include "limap/base/linebase.h"
+#include "limap/base/linetrack.h"
 
 namespace limap {
 
@@ -49,5 +48,3 @@ void FilterTracksByOverlap(std::vector<LineTrack> &new_linetracks,
 } // namespace merging
 
 } // namespace limap
-
-#endif

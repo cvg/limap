@@ -3,14 +3,14 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <Eigen/Core>
 #include <vector>
 
 #include <RansacLib/ransac.h>
 
-#include "estimators/absolute_pose/hybrid_pose_estimator.h"
-#include "estimators/absolute_pose/joint_pose_estimator.h"
+#include "limap/estimators/absolute_pose/hybrid_pose_estimator.h"
+#include "limap/estimators/absolute_pose/joint_pose_estimator.h"
 
 namespace py = pybind11;
 using namespace py::literals;

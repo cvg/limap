@@ -3,13 +3,13 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <Eigen/Core>
 #include <vector>
 
 namespace py = pybind11;
 
-#include "optimize/global_pl_association/global_associator.h"
+#include "limap/optimize/global_pl_association/global_associator.h"
 
 namespace limap {
 

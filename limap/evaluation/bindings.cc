@@ -3,16 +3,16 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
-#include "_limap/helpers.h"
-#include "base/linebase.h"
+#include "limap/_limap/helpers.h"
+#include "limap/base/linebase.h"
 #include <Eigen/Core>
 #include <vector>
 
 namespace py = pybind11;
 
-#include "evaluation/mesh_evaluator.h"
-#include "evaluation/point_cloud_evaluator.h"
-#include "evaluation/refline_evaluator.h"
+#include "limap/evaluation/mesh_evaluator.h"
+#include "limap/evaluation/point_cloud_evaluator.h"
+#include "limap/evaluation/refline_evaluator.h"
 
 namespace limap {
 

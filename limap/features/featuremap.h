@@ -1,16 +1,15 @@
-#ifndef LIMAP_FEATURES_FEATUREMAP_H_
-#define LIMAP_FEATURES_FEATUREMAP_H_
+#pragma once
 
-#include "_limap/helpers.h"
+#include "limap/_limap/helpers.h"
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
-#include "ceresbase/interpolation.h"
-#include "ceresbase/point_projection.h"
+#include "limap/ceresbase/interpolation.h"
+#include "limap/ceresbase/point_projection.h"
 #include <ceres/ceres.h>
 #include <ceres/cubic_interpolation.h>
 
-#include "util/types.h"
+#include "limap/util/types.h"
 #include <colmap/util/logging.h>
 
 namespace py = pybind11;
@@ -95,5 +94,3 @@ bool FeatureInterpolator<DTYPE, CHANNELS>::CheckBounds(const T *xy) const {
 } // namespace features
 
 } // namespace limap
-
-#endif

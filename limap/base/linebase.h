@@ -1,5 +1,4 @@
-#ifndef LIMAP_BASE_LINEBASE_H_
-#define LIMAP_BASE_LINEBASE_H_
+#pragma once
 
 #include <cmath>
 #include <pybind11/eigen.h>
@@ -9,8 +8,8 @@
 
 namespace py = pybind11;
 
-#include "base/camera_view.h"
-#include "util/types.h"
+#include "limap/base/camera_view.h"
+#include "limap/util/types.h"
 
 namespace limap {
 
@@ -69,5 +68,3 @@ Line3d unprojection_line2d(const Line2d &line2d, const CameraView &view,
                            const std::pair<double, double> &depths);
 
 } // namespace limap
-
-#endif
