@@ -1,6 +1,7 @@
 import _limap._base as _base
 import numpy as np
 
+
 def umeyama_alignment(x, y, with_scale=True):
     """
     Computes the least squares solution parameters of an Sim(m) matrix
