@@ -20,12 +20,12 @@ namespace vplib {
 class BaseVPDetectorConfig {
 public:
   BaseVPDetectorConfig() {}
-  BaseVPDetectorConfig(py::dict dict){
-      ASSIGN_PYDICT_ITEM(dict, min_length, double);
-      ASSIGN_PYDICT_ITEM(dict, inlier_threshold, double);
-      ASSIGN_PYDICT_ITEM(dict, min_num_supports, int);
-      ASSIGN_PYDICT_ITEM(dict, th_perp_supports, double);
-  } 
+  BaseVPDetectorConfig(py::dict dict) {
+    ASSIGN_PYDICT_ITEM(dict, min_length, double);
+    ASSIGN_PYDICT_ITEM(dict, inlier_threshold, double);
+    ASSIGN_PYDICT_ITEM(dict, min_num_supports, int);
+    ASSIGN_PYDICT_ITEM(dict, th_perp_supports, double);
+  }
   py::dict as_dict() const;
 
   double min_length = 40;        // in pixel

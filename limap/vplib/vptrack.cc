@@ -12,13 +12,14 @@ py::dict VPTrack::as_dict() const {
   return output;
 }
 
-VPTrack::VPTrack(py::dict dict){
-    ASSIGN_PYDICT_ITEM(dict, direction, V3D);
-    ASSIGN_PYDICT_ITEM(dict, supports, std::vector<Node2d>);
+VPTrack::VPTrack(py::dict dict) {
+  ASSIGN_PYDICT_ITEM(dict, direction, V3D);
+  ASSIGN_PYDICT_ITEM(dict, supports, std::vector<Node2d>);
 }
 
-std::vector<VPTrack> MergeVPTracksByDirection(
-    const std::vector<VPTrack> &tracks, const double th_angle_merge) {
+std::vector<VPTrack>
+MergeVPTracksByDirection(const std::vector<VPTrack> &tracks,
+                         const double th_angle_merge) {
   std::vector<int> parent_nodes(tracks.size(), -1);
   std::vector<std::set<int>> images_in_track(tracks.size());
   for (size_t i = 0; i < tracks.size(); ++i) {

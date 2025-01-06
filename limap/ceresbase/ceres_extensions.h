@@ -31,8 +31,10 @@ public:
 
 inline void AssignSolverOptionsFromDict(ceres::Solver::Options &solver_options,
                                         py::dict dict) {
-  ASSIGN_PYDICT_ITEM_TO_MEMBER(solver_options, dict, function_tolerance, double);
-  ASSIGN_PYDICT_ITEM_TO_MEMBER(solver_options, dict, gradient_tolerance, double);
+  ASSIGN_PYDICT_ITEM_TO_MEMBER(solver_options, dict, function_tolerance,
+                               double);
+  ASSIGN_PYDICT_ITEM_TO_MEMBER(solver_options, dict, gradient_tolerance,
+                               double);
   ASSIGN_PYDICT_ITEM_TO_MEMBER(solver_options, dict, parameter_tolerance,
                                double);
   ASSIGN_PYDICT_ITEM_TO_MEMBER(solver_options, dict,
@@ -44,7 +46,8 @@ inline void AssignSolverOptionsFromDict(ceres::Solver::Options &solver_options,
                                max_num_consecutive_invalid_steps, int);
   ASSIGN_PYDICT_ITEM_TO_MEMBER(solver_options, dict,
                                max_consecutive_nonmonotonic_steps, int);
-  ASSIGN_PYDICT_ITEM_TO_MEMBER(solver_options, dict, use_inner_iterations, bool);
+  ASSIGN_PYDICT_ITEM_TO_MEMBER(solver_options, dict, use_inner_iterations,
+                               bool);
   ASSIGN_PYDICT_ITEM_TO_MEMBER(solver_options, dict, inner_iteration_tolerance,
                                double);
 }

@@ -1,6 +1,6 @@
 #include "limap/base/line_linker.h"
-#include "limap/base/line_dists.h"
 #include "limap/_limap/helpers.h"
+#include "limap/base/line_dists.h"
 #include <cmath>
 
 namespace limap {
@@ -10,7 +10,7 @@ double get_multiplier(const double &score_th) {
   // exp(- (val / sigma)^2 / 2.0) >= 0.5 <--> val <= 1.1774100 sigma
   return 1.0 / sqrt(-log(score_th) * 2.0);
 }
-}
+} // namespace
 
 double expscore(const double &val, const double &sigma) {
   return exp(-pow(val / sigma, 2) / 2.0);
@@ -33,9 +33,7 @@ LineLinker2dConfig::LineLinker2dConfig(py::dict dict) {
   ASSIGN_PYDICT_ITEM(dict, use_innerseg, bool);
 }
 
-LineLinker2dConfig::multipler() const {
-  return get_multiplier(score_th);
-}
+LineLinker2dConfig::multipler() const { return get_multiplier(score_th); }
 
 double LineLinker2d::compute_score_angle(const Line2d &l1,
                                          const Line2d &l2) const {
@@ -178,9 +176,7 @@ LineLinker3dConfig::LineLinker3dConfig(py::dict dict) {
   ASSIGN_PYDICT_ITEM(dict, use_scaleinv, bool);
 }
 
-LineLinker3dConfig::multiplier() const {
-  return get_multiplier(score_th);
-}
+LineLinker3dConfig::multiplier() const { return get_multiplier(score_th); }
 
 double LineLinker3d::compute_score_angle(const Line3d &l1,
                                          const Line3d &l2) const {
