@@ -13,8 +13,9 @@ py::dict VPTrack::as_dict() const {
 }
 
 VPTrack::VPTrack(py::dict dict){
-    ASSIGN_PYDICT_ITEM(dict, direction, V3D)
-        ASSIGN_PYDICT_ITEM(dict, supports, std::vector<Node2d>)}
+    ASSIGN_PYDICT_ITEM(dict, direction, V3D);
+    ASSIGN_PYDICT_ITEM(dict, supports, std::vector<Node2d>);
+}
 
 std::vector<VPTrack> MergeVPTracksByDirection(
     const std::vector<VPTrack> &tracks, const double th_angle_merge) {

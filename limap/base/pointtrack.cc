@@ -28,10 +28,10 @@ py::dict PointTrack::as_dict() const {
 }
 
 PointTrack::PointTrack(py::dict dict) {
-  ASSIGN_PYDICT_ITEM(dict, p, V3D)
-  ASSIGN_PYDICT_ITEM(dict, image_id_list, std::vector<int>)
-  ASSIGN_PYDICT_ITEM(dict, p2d_id_list, std::vector<int>)
-  ASSIGN_PYDICT_ITEM(dict, p2d_list, std::vector<V2D>)
+  ASSIGN_PYDICT_ITEM(dict, p, V3D);
+  ASSIGN_PYDICT_ITEM(dict, image_id_list, std::vector<int>);
+  ASSIGN_PYDICT_ITEM(dict, p2d_id_list, std::vector<int>);
+  ASSIGN_PYDICT_ITEM(dict, p2d_list, std::vector<V2D>);
 }
 
 } // namespace limap

@@ -19,8 +19,10 @@ template <typename PTYPE> struct Feature2dWith3dIndex {
   Feature2dWith3dIndex(PTYPE p_, int point3D_id_ = -1)
       : p(p_), point3D_id(point3D_id_) {}
   Feature2dWith3dIndex(py::dict dict){
-      ASSIGN_PYDICT_ITEM(dict, p, PTYPE)
-          ASSIGN_PYDICT_ITEM(dict, point3D_id, int)} py::dict as_dict() const {
+      ASSIGN_PYDICT_ITEM(dict, p, PTYPE);
+      ASSIGN_PYDICT_ITEM(dict, point3D_id, int);
+  } 
+  py::dict as_dict() const {
     py::dict output;
     output["p"] = p;
     output["point3D_id"] = point3D_id;

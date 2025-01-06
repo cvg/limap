@@ -27,8 +27,10 @@ public:
     output["vps"] = vps;
     return output;
   }
-  VPResult(py::dict dict){ASSIGN_PYDICT_ITEM(dict, labels, std::vector<int>)
-                              ASSIGN_PYDICT_ITEM(dict, vps, std::vector<V3D>)}
+  VPResult(py::dict dict){
+    ASSIGN_PYDICT_ITEM(dict, labels, std::vector<int>);
+    ASSIGN_PYDICT_ITEM(dict, vps, std::vector<V3D>);
+  }
 
   std::vector<int> labels; // -1 denotes the unassociated lines
   std::vector<V3D> vps;

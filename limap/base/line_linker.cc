@@ -1,16 +1,40 @@
 #include "limap/base/line_linker.h"
 #include "limap/base/line_dists.h"
+#include "limap/_limap/helpers.h"
 #include <cmath>
 
 namespace limap {
+
+namespace {
+double get_multiplier(const double &score_th) {
+  // exp(- (val / sigma)^2 / 2.0) >= 0.5 <--> val <= 1.1774100 sigma
+  return 1.0 / sqrt(-log(score_th) * 2.0);
+}
+}
 
 double expscore(const double &val, const double &sigma) {
   return exp(-pow(val / sigma, 2) / 2.0);
 }
 
-double get_multiplier(const double &score_th) {
-  // exp(- (val / sigma)^2 / 2.0) >= 0.5 <--> val <= 1.1774100 sigma
-  return 1.0 / sqrt(-log(score_th) * 2.0);
+LineLinker2dConfig::LineLinker2dConfig() {}
+
+LineLinker2dConfig::LineLinker2dConfig(py::dict dict) {
+  ASSIGN_PYDICT_ITEM(dict, score_th, double);
+  ASSIGN_PYDICT_ITEM(dict, th_angle, double);
+  ASSIGN_PYDICT_ITEM(dict, th_overlap, double);
+  ASSIGN_PYDICT_ITEM(dict, th_smartoverlap, double);
+  ASSIGN_PYDICT_ITEM(dict, th_smartangle, double);
+  ASSIGN_PYDICT_ITEM(dict, th_perp, double);
+  ASSIGN_PYDICT_ITEM(dict, th_innerseg, double);
+  ASSIGN_PYDICT_ITEM(dict, use_angle, bool);
+  ASSIGN_PYDICT_ITEM(dict, use_overlap, bool);
+  ASSIGN_PYDICT_ITEM(dict, use_smartangle, bool);
+  ASSIGN_PYDICT_ITEM(dict, use_perp, bool);
+  ASSIGN_PYDICT_ITEM(dict, use_innerseg, bool);
+}
+
+LineLinker2dConfig::multipler() const {
+  return get_multiplier(score_th);
 }
 
 double LineLinker2d::compute_score_angle(const Line2d &l1,
@@ -133,6 +157,29 @@ double LineLinker2d::compute_score(const Line2d &l1, const Line2d &l2) const {
   if (config.use_innerseg)
     score = std::min(score, compute_score_innerseg(l1, l2));
   return score;
+}
+
+LineLinker3dConfig::LineLinker3dConfig() {}
+
+LineLinker3dConfig::LineLinker3dConfig(py::dict dict) {
+  ASSIGN_PYDICT_ITEM(dict, score_th, double);
+  ASSIGN_PYDICT_ITEM(dict, th_angle, double);
+  ASSIGN_PYDICT_ITEM(dict, th_overlap, double);
+  ASSIGN_PYDICT_ITEM(dict, th_smartoverlap, double);
+  ASSIGN_PYDICT_ITEM(dict, th_smartangle, double);
+  ASSIGN_PYDICT_ITEM(dict, th_perp, double);
+  ASSIGN_PYDICT_ITEM(dict, th_innerseg, double);
+  ASSIGN_PYDICT_ITEM(dict, th_scaleinv, double);
+  ASSIGN_PYDICT_ITEM(dict, use_angle, bool);
+  ASSIGN_PYDICT_ITEM(dict, use_overlap, bool);
+  ASSIGN_PYDICT_ITEM(dict, use_smartangle, bool);
+  ASSIGN_PYDICT_ITEM(dict, use_perp, bool);
+  ASSIGN_PYDICT_ITEM(dict, use_innerseg, bool);
+  ASSIGN_PYDICT_ITEM(dict, use_scaleinv, bool);
+}
+
+LineLinker3dConfig::multiplier() const {
+  return get_multiplier(score_th);
 }
 
 double LineLinker3d::compute_score_angle(const Line3d &l1,

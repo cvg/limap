@@ -1,6 +1,7 @@
 #include "limap/triangulation/global_line_triangulator.h"
 #include "limap/merging/aggregator.h"
 #include "limap/merging/merging.h"
+#include "limap/_limap/helpers.h"
 
 #include <algorithm>
 #include <iostream>
@@ -10,6 +11,20 @@
 namespace limap {
 
 namespace triangulation {
+
+GlobalLineTriangulatorConfig::GlobalLineTriangulatorConfig(): BaseLineTriangulatorConfig() {}
+
+GlobalLineTriangulatorConfig::GlobalLineTriangulatorConfig(py::dict dict): BaseLineTriangulatorConfig(dict) {
+  ASSIGN_PYDICT_ITEM(dict, fullscore_th, double);
+  ASSIGN_PYDICT_ITEM(dict, max_valid_conns, int);
+  ASSIGN_PYDICT_ITEM(dict, min_num_outer_edges, int);
+  ASSIGN_PYDICT_ITEM(dict, merging_strategy, std::string);
+  ASSIGN_PYDICT_ITEM(dict, num_outliers_aggregator, int);
+  if (dict.contains("linker2d_config"))
+    linker2d_config = LineLinker2dConfig(dict["linker2d_config"]);
+  if (dict.contains("linker3d_config"))
+    linker3d_config = LineLinker3dConfig(dict["linker3d_config"]);
+}
 
 void GlobalLineTriangulator::Init(
     const std::map<int, std::vector<Line2d>> &all_2d_segs,
