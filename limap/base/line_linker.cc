@@ -33,7 +33,9 @@ LineLinker2dConfig::LineLinker2dConfig(py::dict dict) {
   ASSIGN_PYDICT_ITEM(dict, use_innerseg, bool);
 }
 
-LineLinker2dConfig::multipler() const { return get_multiplier(score_th); }
+double LineLinker2dConfig::multiplier() const {
+  return get_multiplier(score_th);
+}
 
 double LineLinker2d::compute_score_angle(const Line2d &l1,
                                          const Line2d &l2) const {
@@ -176,7 +178,9 @@ LineLinker3dConfig::LineLinker3dConfig(py::dict dict) {
   ASSIGN_PYDICT_ITEM(dict, use_scaleinv, bool);
 }
 
-LineLinker3dConfig::multiplier() const { return get_multiplier(score_th); }
+double LineLinker3dConfig::multiplier() const {
+  return get_multiplier(score_th);
+}
 
 double LineLinker3d::compute_score_angle(const Line3d &l1,
                                          const Line3d &l2) const {

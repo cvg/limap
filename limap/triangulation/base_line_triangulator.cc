@@ -11,9 +11,9 @@ namespace limap {
 
 namespace triangulation {
 
-BaseLineTriangulationConfig::BaseLineTriangulationConfig() {}
+BaseLineTriangulatorConfig::BaseLineTriangulatorConfig() {}
 
-BaseLineTriangulationConfig::BaseLineTriangulationConfig(py::dict dict) {
+BaseLineTriangulatorConfig::BaseLineTriangulatorConfig(py::dict dict) {
   ASSIGN_PYDICT_ITEM(dict, add_halfpix, bool);
   ASSIGN_PYDICT_ITEM(dict, use_vp, bool);
   ASSIGN_PYDICT_ITEM(dict, use_endpoints_triangulation, bool);
