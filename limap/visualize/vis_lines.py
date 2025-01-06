@@ -86,7 +86,9 @@ def open3d_get_line_set(lines, color=None, ranges=None, scale=1.0):
         o3d_colors.append(color)
     line_set = o3d.geometry.LineSet()
     line_set.points = o3d.utility.Vector3dVector(np.array(o3d_points))
-    line_set.lines = o3d.utility.Vector2iVector(np.array(o3d_lines).astype(np.int32))
+    line_set.lines = o3d.utility.Vector2iVector(
+        np.array(o3d_lines).astype(np.int32)
+    )
     line_set.colors = o3d.utility.Vector3dVector(np.array(o3d_colors))
     return line_set
 
