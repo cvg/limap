@@ -19,7 +19,7 @@ imagesize
 einops
 ninja
 yacs
-numpy==1.26.4 # Tag numpy 1.26.4 for Open3D issue (https://github.com/numpy/numpy/issues/26853)
+numpy<=1.26.4 # Tag numpy 1.26.4 for Open3D issue (https://github.com/numpy/numpy/issues/26853)
 open3d==0.18.0
 pycolmap>=3.11.1
 ruff==0.6.7
