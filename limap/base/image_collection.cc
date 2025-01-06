@@ -461,10 +461,14 @@ double *ImageCollection::tvec_data(const int img_id) {
 }
 
 ImageCollection ImageCollection::apply_similarity_transform(
-    const SimilarityTransform3 &transform) const {
+    const colmap::Sim3d &transform) const {
   ImageCollection imagecols = ImageCollection(cameras, images);
   for (auto it = imagecols.images.begin(); it != imagecols.images.end(); ++it) {
-    it->second.pose = pose_similarity_transform(it->second.pose, transform);
+    // TODO: use colmap::TransformCameraWorld after we switched pose to colmap::Rigid3d
+    CameraPose& pose = it->second.pose;
+    M3D new_R = pose.R() * transform.rotation.toRotationMatrix().transpose();
+    V3D new_T = transform.scale * pose.T() - new_R * transform.translation;
+    it->second.pose = CameraPose(new_R, new_T);
   }
   return imagecols;
 }

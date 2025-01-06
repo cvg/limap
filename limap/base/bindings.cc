@@ -125,18 +125,6 @@ void bind_graph(py::module &m) {
   m.def("count_track_edges", &CountTrackEdges);
 }
 
-void bind_transforms(py::module &m) {
-  py::class_<SimilarityTransform3>(m, "SimilarityTransform3")
-      .def(py::init<>())
-      .def(py::init<V4D, V3D, double>(), py::arg("qvec"), py::arg("tvec"),
-           py::arg("scale") = 1.0)
-      .def(py::init<M3D, V3D, double>(), py::arg("R"), py::arg("T"),
-           py::arg("scale") = 1.0)
-      .def("R", &SimilarityTransform3::R)
-      .def("T", &SimilarityTransform3::T)
-      .def("s", &SimilarityTransform3::s);
-}
-
 void bind_linebase(py::module &m) {
   py::class_<Line2d>(m, "Line2d", "A finite 2D line (segment).")
       .def(py::init<>(), R"(
@@ -1292,7 +1280,7 @@ void bind_camera(py::module &m) {
             Apply similarity transform to all image poses.
 
             Args:
-                transform (:class:`limap.base.SimilarityTransform3`)
+                transform (:class:`pycolmap.Sim3d`)
         )",
            py::arg("transform"))
       .def("get_first_image_id_by_camera_id",
@@ -1322,8 +1310,6 @@ void bind_camera(py::module &m) {
             Returns:
                 bool: True if all camera models are undistorted.
         )");
-
-  m.def("pose_similarity_transform", &pose_similarity_transform);
 }
 
 void bind_pointtrack(py::module &m) {
@@ -1365,7 +1351,6 @@ void bind_pointtrack(py::module &m) {
 void bind_base(py::module &m) {
   bind_general_structures(m);
   bind_graph(m);
-  bind_transforms(m);
   bind_pointtrack(m);
   bind_camera(m);
   bind_linebase(m);
