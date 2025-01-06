@@ -1,4 +1,4 @@
-import limap
+import _limap._base as _base
 import numpy as np
 
 def umeyama_alignment(x, y, with_scale=True):
@@ -60,7 +60,7 @@ def align_imagecols_umeyama(imagecols_src, imagecols_dst):
     xyz_dst = np.array(imagecols_dst.get_locations()).transpose()
     r, t, c = umeyama_alignment(xyz_src, xyz_dst, with_scale=True)
     matrix = np.concatenate([c * r, t[:, None]], 1)
-    transform = limap.base.pycolmap.Sim3d(matrix)
+    transform = _base.pycolmap.Sim3d(matrix)
     imagecols_aligned = imagecols_src.apply_similarity_transform(transform)
     return transform, imagecols_aligned
 
@@ -143,7 +143,7 @@ def align_imagecols_colmap(
     R = transform[:3, :3] / scale
     t = transform[:3, 3]
     matrix = np.concatenate([scale * R, t[:, None]], 1)
-    transform = limap.base.pycolmap.Sim3d(matrix)
+    transform = _base.pycolmap.Sim3d(matrix)
     imagecols_aligned = imagecols_src.apply_similarity_transform(transform)
 
     # delete tmp folder
