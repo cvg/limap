@@ -10,7 +10,6 @@ import logging
 import pickle
 from pathlib import Path
 
-from hloc.utils.parsers import parse_retrieval
 from utils import (
     eval,
     get_result_filenames,
@@ -23,6 +22,7 @@ from utils import (
 import limap.runners as runners
 import limap.util.config as cfgutils
 import limap.util.io as limapio
+from hloc.utils.parsers import parse_retrieval
 
 formatter = logging.Formatter(
     fmt="[%(asctime)s %(name)s %(levelname)s] %(message)s",

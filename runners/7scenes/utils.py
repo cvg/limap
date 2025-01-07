@@ -7,6 +7,11 @@ import PIL
 import PIL.Image
 import pycolmap
 import torch
+from tqdm import tqdm
+
+import limap.base as base
+import limap.pointsfm as pointsfm
+import limap.util.io as limapio
 from hloc import (
     extract_features,
     localize_sfm,
@@ -19,11 +24,6 @@ from hloc.pipelines.Cambridge.utils import (
     evaluate,
 )
 from hloc.utils.read_write_model import read_model, write_model
-from tqdm import tqdm
-
-import limap.base as base
-import limap.pointsfm as pointsfm
-import limap.util.io as limapio
 
 ###############################################################################
 # The following utils functions are taken/modified from hloc.pipelines.7scenes

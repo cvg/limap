@@ -1,15 +1,16 @@
 import collections.abc as collections
 import pprint
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Optional, Union
 
 import h5py
 import numpy as np
 import torch
-from hloc import extract_features
-from hloc.utils.io import list_h5_names
 from pycolmap import logging
 from tqdm import tqdm
+
+from hloc import extract_features
+from hloc.utils.io import list_h5_names
 
 from .superpoint import SuperPoint
 
@@ -34,11 +35,11 @@ def map_tensor(input_, func):
 
 @torch.no_grad()
 def run_superpoint(
-    conf: Dict,
+    conf: dict,
     image_dir: Path,
     export_dir: Optional[Path] = None,
     as_half: bool = True,
-    image_list: Optional[Union[Path, List[str]]] = None,
+    image_list: Optional[Union[Path, list[str]]] = None,
     feature_path: Optional[Path] = None,
     overwrite: bool = False,
     keypoints=None,

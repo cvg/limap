@@ -10,9 +10,7 @@ import logging
 import pickle
 from pathlib import Path
 
-import hloc.utils.read_write_model as colmap_utils
 import pycolmap
-from hloc.utils.parsers import parse_retrieval
 from utils import (
     DepthReader,
     evaluate,
@@ -22,9 +20,11 @@ from utils import (
     run_hloc_7scenes,
 )
 
+import hloc.utils.read_write_model as colmap_utils
 import limap.runners as runners
 import limap.util.config as cfgutils
 import limap.util.io as limapio
+from hloc.utils.parsers import parse_retrieval
 
 formatter = logging.Formatter(
     fmt="[%(asctime)s %(name)s %(levelname)s] %(message)s",

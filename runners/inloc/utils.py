@@ -3,13 +3,13 @@ from pathlib import Path
 
 import imagesize
 import numpy as np
-from hloc import extract_features, localize_inloc, match_features
-from hloc.utils.parsers import parse_retrieval
 from scipy.io import loadmat
 from tqdm import tqdm
 
 import limap.base as base
 import limap.util.io as limapio
+from hloc import extract_features, localize_inloc, match_features
+from hloc.utils.parsers import parse_retrieval
 
 
 class InLocP3DReader(base.BaseP3DReader):

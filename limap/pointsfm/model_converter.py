@@ -4,8 +4,9 @@ import sys
 from limap.util.geometry import rotation_from_quaternion
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-import hloc.utils.read_write_model as colmap_utils
 from colmap_reader import PyReadCOLMAP
+
+import hloc.utils.read_write_model as colmap_utils
 
 
 def convert_colmap_to_visualsfm(colmap_model_path, output_nvm_file):
