@@ -1358,7 +1358,8 @@ void bind_base_pycolmap(py::module &m_parent) {
   py::module_ m = m_parent.def_submodule("pycolmap");
 
   // The following copied from pycolmap
-  py::class_<Eigen::Quaterniond> PyRotation3d(m, "Rotation3d");
+  py::class_<Eigen::Quaterniond> PyRotation3d(m, "Rotation3d",
+                                              py::module_local());
   PyRotation3d.def(py::init([]() { return Eigen::Quaterniond::Identity(); }))
       .def(py::init<const Eigen::Vector4d &>(), "xyzw"_a,
            "Quaternion in [x,y,z,w] format.")
@@ -1405,7 +1406,7 @@ void bind_base_pycolmap(py::module &m_parent) {
   py::implicitly_convertible<py::array, Eigen::Quaterniond>();
   MakeDataclass(PyRotation3d);
 
-  py::class_<colmap::Rigid3d> PyRigid3d(m, "Rigid3d");
+  py::class_<colmap::Rigid3d> PyRigid3d(m, "Rigid3d", py::module_local());
   PyRigid3d.def(py::init<>())
       .def(py::init<const Eigen::Quaterniond &, const Eigen::Vector3d &>(),
            "rotation"_a, "translation"_a)
@@ -1436,7 +1437,7 @@ void bind_base_pycolmap(py::module &m_parent) {
   py::implicitly_convertible<py::array, Rigid3d>();
   MakeDataclass(PyRigid3d);
 
-  py::class_<colmap::Sim3d> PySim3d(m, "Sim3d");
+  py::class_<colmap::Sim3d> PySim3d(m, "Sim3d", py::module_local());
   PySim3d.def(py::init<>())
       .def(py::init<double, const Eigen::Quaterniond &,
                     const Eigen::Vector3d &>(),
