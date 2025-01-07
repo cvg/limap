@@ -1,9 +1,9 @@
 import os
+
 import pycolmap
 
-from limap.util.geometry import rotation_from_quaternion
-
 import hloc.utils.read_write_model as colmap_utils
+
 
 def convert_colmap_to_visualsfm(colmap_model_path, output_nvm_file):
     reconstruction = pycolmap.Reconstruction(colmap_model_path)
@@ -55,7 +55,7 @@ def convert_colmap_to_visualsfm(colmap_model_path, output_nvm_file):
             f.write(f"{xyz[0]} {xyz[1]} {xyz[2]}")
             f.write(" 128 128 128")  # dummy color
             f.write(f" {len(track.elements)}")
-            for idx, elem in enumerate(track.elements):
+            for _, elem in enumerate(track.elements):
                 img_id = elem.image_id
                 xy_id = elem.point2D_idx
                 img_index = map_image_id[img_id]

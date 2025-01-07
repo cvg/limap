@@ -2,9 +2,9 @@ from _limap import _pointsfm as _pointsfm
 from _limap._pointsfm import *  # noqa: F403
 
 from .colmap_reader import (
+    ReadPointTracks,
     check_exists_colmap_model,
     convert_colmap_to_imagecols,
-    ReadPointTracks,
 )
 from .colmap_sfm import (
     run_colmap_sfm,

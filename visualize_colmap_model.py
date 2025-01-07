@@ -1,6 +1,7 @@
-import pycolmap
 import numpy as np
 import open3d as o3d
+import pycolmap
+
 import limap.pointsfm as pointsfm
 import limap.visualize as limapvis
 
@@ -8,13 +9,11 @@ import limap.visualize as limapvis
 def parse_args():
     import argparse
 
-    arg_parser = argparse.ArgumentParser(description="visualize colmap model using Open3D backend")
+    arg_parser = argparse.ArgumentParser(
+        description="visualize colmap model using Open3D backend"
+    )
     arg_parser.add_argument(
-        "-i",
-        "--input_dir",
-        type=str,
-        required=True,
-        help="input colmap folder"
+        "-i", "--input_dir", type=str, required=True, help="input colmap folder"
     )
     arg_parser.add_argument(
         "--use_robust_ranges",
@@ -36,6 +35,7 @@ def parse_args():
     args = arg_parser.parse_args()
     return args
 
+
 def vis_colmap_reconstruction(recon: pycolmap.Reconstruction, ranges=None):
     vis = o3d.visualization.Visualizer()
     vis.create_window(height=1080, width=1920)
@@ -53,6 +53,7 @@ def vis_colmap_reconstruction(recon: pycolmap.Reconstruction, ranges=None):
     vis.run()
     vis.destroy_window()
 
+
 def main(args):
     recon = pycolmap.Reconstruction(args.input_dir)
     ranges = None
@@ -60,6 +61,7 @@ def main(args):
         points = np.array([point.xyz for _, point in recon.points3D.items()])
         ranges = limapvis.compute_robust_range_points(points)
     vis_colmap_reconstruction(recon, ranges=ranges)
+
 
 if __name__ == "__main__":
     args = parse_args()

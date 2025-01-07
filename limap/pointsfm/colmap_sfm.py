@@ -1,7 +1,6 @@
 import copy
 import os
 import shutil
-import sys
 from pathlib import Path
 
 import cv2
@@ -10,7 +9,6 @@ from pycolmap import logging
 
 import hloc.utils.database as database
 import hloc.utils.read_write_model as colmap_utils
-
 from limap.pointsfm.model_converter import convert_imagecols_to_colmap
 
 

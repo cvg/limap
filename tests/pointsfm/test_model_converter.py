@@ -1,8 +1,8 @@
-import pytest
 import pycolmap
+import pytest
+
 from limap.pointsfm.model_converter import convert_colmap_to_visualsfm
-from limap.pointsfm.visualsfm_reader import ReadModelVisualSfM
-import numpy.testing as npt
+
 
 @pytest.mark.ci_workflow
 def test_convert_colmap_to_visualsfm(tmp_path):
@@ -11,4 +11,3 @@ def test_convert_colmap_to_visualsfm(tmp_path):
     recon.write(tmp_path)
     output_nvm_file = tmp_path / "test_output.nvm"
     convert_colmap_to_visualsfm(tmp_path, output_nvm_file)
-
