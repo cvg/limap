@@ -92,4 +92,5 @@ jobs:
           python runners/hypersim/triangulation.py --default_config_file cfgs/triangulation/default_fast.yaml \
               --output_dir outputs/quickstart_test --triangulation.use_exhaustive_matcher --skip_exists --visualize 0
           python runners/tests/localization.py
+          pytest -m ci_workflow tests
 
