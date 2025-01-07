@@ -4,7 +4,7 @@
 namespace limap {
 
 CameraImage::CameraImage(py::dict dict) {
-  ASSIGN_PYDICT_ITEM(dict, cam_id, int)
+  ASSIGN_PYDICT_ITEM(dict, cam_id, int);
   pose = CameraPose(dict["pose"]);
 
   // load image name

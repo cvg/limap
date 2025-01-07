@@ -53,10 +53,10 @@ LineTrack::LineTrack(py::dict dict) {
   else
     throw std::runtime_error("Error! Key \"line\" does not exist!");
   line = Line3d(py_line);
-  ASSIGN_PYDICT_ITEM(dict, image_id_list, std::vector<int>)
-  ASSIGN_PYDICT_ITEM(dict, line_id_list, std::vector<int>)
-  ASSIGN_PYDICT_ITEM(dict, node_id_list, std::vector<int>)
-  ASSIGN_PYDICT_ITEM(dict, score_list, std::vector<double>)
+  ASSIGN_PYDICT_ITEM(dict, image_id_list, std::vector<int>);
+  ASSIGN_PYDICT_ITEM(dict, line_id_list, std::vector<int>);
+  ASSIGN_PYDICT_ITEM(dict, node_id_list, std::vector<int>);
+  ASSIGN_PYDICT_ITEM(dict, score_list, std::vector<double>);
   std::vector<Eigen::MatrixXd> py_line2d_list, py_line3d_list;
   if (dict.contains("line2d_list")) {
     py_line2d_list = dict["line2d_list"].cast<std::vector<Eigen::MatrixXd>>();
@@ -68,7 +68,7 @@ LineTrack::LineTrack(py::dict dict) {
     for (auto it = py_line3d_list.begin(); it != py_line3d_list.end(); ++it)
       line3d_list.push_back(Line3d(*it));
   }
-  ASSIGN_PYDICT_ITEM(dict, active, bool)
+  ASSIGN_PYDICT_ITEM(dict, active, bool);
 }
 
 std::vector<int> LineTrack::GetSortedImageIds() const {
