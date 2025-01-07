@@ -48,8 +48,8 @@ PL_Bipartite2d::PL_Bipartite2d(py::dict dict) {
 
   // load connections
 #define TMPMAPTYPE std::map<int, std::set<int>>
-  ASSIGN_PYDICT_ITEM(dict, np2l_, TMPMAPTYPE)
-  ASSIGN_PYDICT_ITEM(dict, nl2p_, TMPMAPTYPE)
+  ASSIGN_PYDICT_ITEM(dict, np2l_, TMPMAPTYPE);
+  ASSIGN_PYDICT_ITEM(dict, nl2p_, TMPMAPTYPE);
 #undef TMPMAPTYPE
 }
 
@@ -262,8 +262,8 @@ PL_Bipartite3d::PL_Bipartite3d(py::dict dict) {
 
   // load connections
 #define TMPMAPTYPE std::map<int, std::set<int>>
-  ASSIGN_PYDICT_ITEM(dict, np2l_, TMPMAPTYPE)
-  ASSIGN_PYDICT_ITEM(dict, nl2p_, TMPMAPTYPE)
+  ASSIGN_PYDICT_ITEM(dict, np2l_, TMPMAPTYPE);
+  ASSIGN_PYDICT_ITEM(dict, nl2p_, TMPMAPTYPE);
 #undef TMPMAPTYPE
 }
 
