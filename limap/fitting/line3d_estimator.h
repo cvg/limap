@@ -13,7 +13,7 @@ namespace fitting {
 
 // Implements a simple solver that estimates a 3D line from two data points.
 // Reference link:
-// https://github.com/B1ueber2y/RansacLib/blob/master/examples/line_estimator.h
+// https://github.com/tsattler/RansacLib/blob/master/examples/line_estimator.h
 class Line3dEstimator {
 public:
   Line3dEstimator(const Eigen::Matrix3Xd &data);

@@ -1,4 +1,5 @@
 #include "limap/triangulation/base_line_triangulator.h"
+#include "limap/_limap/helpers.h"
 #include "limap/triangulation/functions.h"
 
 #include <algorithm>
@@ -9,6 +10,25 @@
 namespace limap {
 
 namespace triangulation {
+
+BaseLineTriangulatorConfig::BaseLineTriangulatorConfig() {}
+
+BaseLineTriangulatorConfig::BaseLineTriangulatorConfig(py::dict dict) {
+  ASSIGN_PYDICT_ITEM(dict, add_halfpix, bool);
+  ASSIGN_PYDICT_ITEM(dict, use_vp, bool);
+  ASSIGN_PYDICT_ITEM(dict, use_endpoints_triangulation, bool);
+  ASSIGN_PYDICT_ITEM(dict, disable_many_points_triangulation, bool);
+  ASSIGN_PYDICT_ITEM(dict, disable_one_point_triangulation, bool);
+  ASSIGN_PYDICT_ITEM(dict, disable_algebraic_triangulation, bool);
+  ASSIGN_PYDICT_ITEM(dict, disable_vp_triangulation, bool);
+  ASSIGN_PYDICT_ITEM(dict, min_length_2d, double);
+  ASSIGN_PYDICT_ITEM(dict, line_tri_angle_threshold, double);
+  ASSIGN_PYDICT_ITEM(dict, IoU_threshold, double);
+  ASSIGN_PYDICT_ITEM(dict, debug_mode, bool);
+  ASSIGN_PYDICT_ITEM(dict, sensitivity_threshold, double);
+  ASSIGN_PYDICT_ITEM(dict, var2d, double);
+  ;
+}
 
 void BaseLineTriangulator::offsetHalfPixel() {
   std::vector<int> image_ids = imagecols_->get_img_ids();

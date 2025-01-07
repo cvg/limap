@@ -20,9 +20,9 @@ class GlobalVPTrackConstructorConfig {
 public:
   GlobalVPTrackConstructorConfig() {}
   GlobalVPTrackConstructorConfig(py::dict dict) {
-    ASSIGN_PYDICT_ITEM(dict, min_common_lines, int)
-    ASSIGN_PYDICT_ITEM(dict, th_angle_verify, double)
-    ASSIGN_PYDICT_ITEM(dict, min_track_length, int)
+    ASSIGN_PYDICT_ITEM(dict, min_common_lines, int);
+    ASSIGN_PYDICT_ITEM(dict, th_angle_verify, double);
+    ASSIGN_PYDICT_ITEM(dict, min_track_length, int);
   }
   int min_common_lines = 3;
   double th_angle_verify = 10.0; // in degree, verify edge with poses

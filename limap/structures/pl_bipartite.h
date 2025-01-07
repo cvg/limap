@@ -22,9 +22,9 @@ typedef Junction<PointTrack> Junction3d;
 struct PL_Bipartite2dConfig {
   PL_Bipartite2dConfig() {}
   PL_Bipartite2dConfig(py::dict dict) {
-    ASSIGN_PYDICT_ITEM(dict, threshold_intersection, double)
-    ASSIGN_PYDICT_ITEM(dict, threshold_merge_junctions, double)
-    ASSIGN_PYDICT_ITEM(dict, threshold_keypoints, double)
+    ASSIGN_PYDICT_ITEM(dict, threshold_intersection, double);
+    ASSIGN_PYDICT_ITEM(dict, threshold_merge_junctions, double);
+    ASSIGN_PYDICT_ITEM(dict, threshold_keypoints, double);
   }
 
   double threshold_keypoints = 2.0;       // in pixels

@@ -19,7 +19,7 @@ In this project, we provide interfaces for various geometric operations on 2D/3D
 ## Installation
 
 **Install the dependencies as follows:**
-* Python 3.8/9/10
+* Python 3.8/9/10/11
 * CMake >= 3.17
 * CUDA (for deep learning based detectors/matchers)
 * System dependencies [[Command line](./misc/install/dependencies.md)]

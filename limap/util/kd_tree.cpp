@@ -5,7 +5,6 @@
 #include <iostream>
 
 #include "limap/util/kd_tree.h"
-#include "limap/util/nanoflann.hpp"
 
 namespace limap {
 

@@ -23,14 +23,14 @@ py::dict PL_Bipartite<PTYPE, LTYPE>::as_dict() const {
 template <typename PTYPE, typename LTYPE>
 PL_Bipartite<PTYPE, LTYPE>::PL_Bipartite(py::dict dict) {
 #define TMPMAPTYPE std::map<int, PTYPE>
-  ASSIGN_PYDICT_ITEM(dict, points_, TMPMAPTYPE)
+  ASSIGN_PYDICT_ITEM(dict, points_, TMPMAPTYPE);
 #undef TMPMAPTYPE
 #define TMPMAPTYPE std::map<int, LTYPE>
-  ASSIGN_PYDICT_ITEM(dict, lines_, TMPMAPTYPE)
+  ASSIGN_PYDICT_ITEM(dict, lines_, TMPMAPTYPE);
 #undef TMPMAPTYPE
 #define TMPMAPTYPE std::map<int, std::set<int>>
-  ASSIGN_PYDICT_ITEM(dict, np2l_, TMPMAPTYPE)
-  ASSIGN_PYDICT_ITEM(dict, nl2p_, TMPMAPTYPE)
+  ASSIGN_PYDICT_ITEM(dict, np2l_, TMPMAPTYPE);
+  ASSIGN_PYDICT_ITEM(dict, nl2p_, TMPMAPTYPE);
 #undef TMPMAPTYPE
 }
 
