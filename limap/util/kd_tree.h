@@ -5,8 +5,8 @@
 #include <memory>
 #include <string.h>
 
-#include "limap/util/nanoflann.hpp"
 #include <Eigen/Core>
+#include <third-party/nanoflann.hpp>
 
 using namespace nanoflann;
 

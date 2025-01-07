@@ -10,19 +10,8 @@ namespace triangulation {
 
 class GlobalLineTriangulatorConfig : public BaseLineTriangulatorConfig {
 public:
-  GlobalLineTriangulatorConfig() : BaseLineTriangulatorConfig() {}
-  GlobalLineTriangulatorConfig(py::dict dict)
-      : BaseLineTriangulatorConfig(dict) {
-    ASSIGN_PYDICT_ITEM(dict, fullscore_th, double)
-    ASSIGN_PYDICT_ITEM(dict, max_valid_conns, int)
-    ASSIGN_PYDICT_ITEM(dict, min_num_outer_edges, int)
-    ASSIGN_PYDICT_ITEM(dict, merging_strategy, std::string)
-    ASSIGN_PYDICT_ITEM(dict, num_outliers_aggregator, int)
-    if (dict.contains("linker2d_config"))
-      linker2d_config = LineLinker2dConfig(dict["linker2d_config"]);
-    if (dict.contains("linker3d_config"))
-      linker3d_config = LineLinker3dConfig(dict["linker3d_config"]);
-  }
+  GlobalLineTriangulatorConfig();
+  GlobalLineTriangulatorConfig(py::dict dict);
 
   double fullscore_th = 1.0;
   int max_valid_conns = 1000;  // maximum valid connections for each node

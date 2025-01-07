@@ -1,6 +1,5 @@
 #pragma once
 
-#include "limap/_limap/helpers.h"
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
@@ -14,29 +13,15 @@ namespace py = pybind11;
 namespace limap {
 
 double expscore(const double &val, const double &sigma);
-double get_multiplier(const double &score_th);
 
 class LineLinker2dConfig {
 public:
-  LineLinker2dConfig() {}
-  LineLinker2dConfig(py::dict dict) {
-    ASSIGN_PYDICT_ITEM(dict, score_th, double)
-    ASSIGN_PYDICT_ITEM(dict, th_angle, double)
-    ASSIGN_PYDICT_ITEM(dict, th_overlap, double)
-    ASSIGN_PYDICT_ITEM(dict, th_smartoverlap, double)
-    ASSIGN_PYDICT_ITEM(dict, th_smartangle, double)
-    ASSIGN_PYDICT_ITEM(dict, th_perp, double)
-    ASSIGN_PYDICT_ITEM(dict, th_innerseg, double)
-    ASSIGN_PYDICT_ITEM(dict, use_angle, bool)
-    ASSIGN_PYDICT_ITEM(dict, use_overlap, bool)
-    ASSIGN_PYDICT_ITEM(dict, use_smartangle, bool)
-    ASSIGN_PYDICT_ITEM(dict, use_perp, bool)
-    ASSIGN_PYDICT_ITEM(dict, use_innerseg, bool)
-  }
+  LineLinker2dConfig();
+  LineLinker2dConfig(py::dict dict);
 
   // for scoring
   double score_th = 0.5; // only score that is higher than 0.5 survives the test
-  double multiplier() const { return get_multiplier(score_th); }
+  double multiplier() const;
 
   // angle
   double th_angle = 8.0;
@@ -93,27 +78,12 @@ private:
 
 class LineLinker3dConfig {
 public:
-  LineLinker3dConfig() {}
-  LineLinker3dConfig(py::dict dict) {
-    ASSIGN_PYDICT_ITEM(dict, score_th, double)
-    ASSIGN_PYDICT_ITEM(dict, th_angle, double)
-    ASSIGN_PYDICT_ITEM(dict, th_overlap, double)
-    ASSIGN_PYDICT_ITEM(dict, th_smartoverlap, double)
-    ASSIGN_PYDICT_ITEM(dict, th_smartangle, double)
-    ASSIGN_PYDICT_ITEM(dict, th_perp, double)
-    ASSIGN_PYDICT_ITEM(dict, th_innerseg, double)
-    ASSIGN_PYDICT_ITEM(dict, th_scaleinv, double)
-    ASSIGN_PYDICT_ITEM(dict, use_angle, bool)
-    ASSIGN_PYDICT_ITEM(dict, use_overlap, bool)
-    ASSIGN_PYDICT_ITEM(dict, use_smartangle, bool)
-    ASSIGN_PYDICT_ITEM(dict, use_perp, bool)
-    ASSIGN_PYDICT_ITEM(dict, use_innerseg, bool)
-    ASSIGN_PYDICT_ITEM(dict, use_scaleinv, bool)
-  }
+  LineLinker3dConfig();
+  LineLinker3dConfig(py::dict dict);
 
   // for scoring
   double score_th = 0.5; // only score that is higher than 0.5 survives the test
-  double multiplier() const { return get_multiplier(score_th); }
+  double multiplier() const;
 
   // angle
   double th_angle = 10.0;
