@@ -2,18 +2,8 @@ import os
 import sys
 
 from _limap import _base
+import pycolmap
 from pycolmap import logging
-
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from hloc.utils.read_write_model import (
-    read_cameras_binary,
-    read_cameras_text,
-    read_images_binary,
-    read_images_text,
-    read_points3D_binary,
-    read_points3D_text,
-)
-
 
 def check_exists_colmap_model(model_path):
     if (
@@ -28,30 +18,10 @@ def check_exists_colmap_model(model_path):
         and os.path.exists(os.path.join(model_path, "points3D.txt"))
     )
 
-
-def ReadInfos(colmap_path, model_path="sparse", image_path="images"):
-    logging.info("Start loading COLMAP sparse reconstruction.")
-    model_path = os.path.join(colmap_path, model_path)
-    image_path = os.path.join(colmap_path, image_path)
-    if os.path.exists(os.path.join(model_path, "cameras.bin")):
-        fname_cameras = os.path.join(model_path, "cameras.bin")
-        fname_images = os.path.join(model_path, "images.bin")
-        colmap_cameras = read_cameras_binary(fname_cameras)
-        colmap_images = read_images_binary(fname_images)
-    elif os.path.exists(os.path.join(model_path, "cameras.txt")):
-        fname_cameras = os.path.join(model_path, "cameras.txt")
-        fname_images = os.path.join(model_path, "images.txt")
-        colmap_cameras = read_cameras_text(fname_cameras)
-        colmap_images = read_images_text(fname_images)
-    else:
-        raise ValueError(
-            f"Error! The model file does not exist at {model_path}"
-        )
-    logging.info(f"Reconstruction loaded. (n_images = {len(colmap_images)})")
-
+def convert_colmap_to_imagecols(reconstruction: pycolmap.Reconstruction, image_path=None):
     # read cameras
     cameras = {}
-    for cam_id, colmap_cam in colmap_cameras.items():
+    for cam_id, colmap_cam in reconstruction.cameras.items():
         cameras[cam_id] = _base.Camera(
             colmap_cam.model,
             colmap_cam.params,
@@ -61,17 +31,29 @@ def ReadInfos(colmap_path, model_path="sparse", image_path="images"):
 
     # read images
     camimages = {}
-    for img_id, colmap_image in colmap_images.items():
+    for img_id, colmap_image in reconstruction.images.items():
         imname = colmap_image.name
         cam_id = colmap_image.camera_id
-        pose = _base.CameraPose(colmap_image.qvec, colmap_image.tvec)
-        camimage = _base.CameraImage(
-            cam_id, pose, image_name=os.path.join(image_path, imname)
-        )
+        qvec_xyzw = colmap_image.cam_from_world.rotation.quat
+        qvec = [qvec_xyzw[3], qvec_xyzw[0], qvec_xyzw[1], qvec_xyzw[2]]
+        tvec = colmap_image.cam_from_world.translation
+        pose = _base.CameraPose(qvec, tvec)
+        image_name = imname if image_path is None else os.path.join(image_path, imname)
+        camimage = _base.CameraImage(cam_id, pose, image_name=image_name)
         camimages[img_id] = camimage
 
     # get image collection
     imagecols = _base.ImageCollection(cameras, camimages)
+    return imagecols
+
+
+def ReadInfos(colmap_path, model_path="sparse", image_path="images"):
+    logging.info("Start loading COLMAP sparse reconstruction.")
+    model_path = os.path.join(colmap_path, model_path)
+    image_path = os.path.join(colmap_path, image_path)
+    reconstruction = pycolmap.Reconstruction(model_path)
+    logging.info(f"Reconstruction loaded. (n_images = {reconstruction.num_images()}")
+    imagecols = convert_colmap_to_imagecols(reconstruction, image_path=image_path)
     return imagecols
 
 
@@ -80,42 +62,19 @@ def PyReadCOLMAP(colmap_path, model_path=None):
         model_path = os.path.join(colmap_path, model_path)
     else:
         model_path = colmap_path
-    if os.path.exists(os.path.join(model_path, "points3D.bin")):
-        fname_cameras = os.path.join(model_path, "cameras.bin")
-        fname_points = os.path.join(model_path, "points3D.bin")
-        fname_images = os.path.join(model_path, "images.bin")
-        colmap_cameras = read_cameras_binary(fname_cameras)
-        colmap_images = read_images_binary(fname_images)
-        colmap_points = read_points3D_binary(fname_points)
-    elif os.path.exists(os.path.join(model_path, "points3D.txt")):
-        fname_cameras = os.path.join(model_path, "cameras.txt")
-        fname_points = os.path.join(model_path, "points3D.txt")
-        fname_images = os.path.join(model_path, "images.txt")
-        colmap_cameras = read_cameras_text(fname_cameras)
-        colmap_images = read_images_text(fname_images)
-        colmap_points = read_points3D_text(fname_points)
-    else:
-        raise ValueError(
-            f"Error! The model file does not exist at {model_path}"
-        )
-    reconstruction = {}
-    reconstruction["cameras"] = colmap_cameras
-    reconstruction["images"] = colmap_images
-    reconstruction["points"] = colmap_points
-    return reconstruction
+    return pycolmap.Reconstruction(model_path)
 
 
-def ReadPointTracks(colmap_reconstruction):
+def ReadPointTracks(reconstruction: pycolmap.Reconstruction):
     pointtracks = {}
-    for point3d_id, p in colmap_reconstruction["points"].items():
-        p_image_ids, point2d_ids = p.image_ids, p.point2D_idxs
+    for point3d_id, p in reconstruction.points3D.items():
+        p_image_ids = []
+        point2d_ids = []
         p2d_list = []
-        for p_img_id, point2d_id in zip(
-            p_image_ids.tolist(), point2d_ids.tolist()
-        ):
-            p2d_list.append(
-                colmap_reconstruction["images"][p_img_id].xys[point2d_id]
-            )
+        for elem in p.track.elements:
+            p_image_ids.append(elem.image_id)
+            point2d_ids.append(elem.point2D_idx)
+            p2d_list.append(reconstruction.images[elem.image_id].points2D[elem.point2D_idx].xy)
         ptrack = _base.PointTrack(p.xyz, p_image_ids, point2d_ids, p2d_list)
         pointtracks[point3d_id] = ptrack
     return pointtracks

@@ -1,6 +1,7 @@
 import os
 
 import numpy as np
+import pycolmap
 from pycolmap import logging
 from tqdm import tqdm
 
@@ -78,19 +79,14 @@ def compute_colmap_model_with_junctions(
 
 
 def compute_2d_bipartites_from_colmap(
-    reconstruction, imagecols, all_2d_lines, cfg=None
+    reconstruction: pycolmap.Reconstruction, imagecols, all_2d_lines, cfg=None
 ):
     if cfg is None:
         cfg = dict()
     all_bpt2ds = {}
     cfg_bpt2d = structures.PL_Bipartite2dConfig(cfg)
-    colmap_cameras, colmap_images, colmap_points = (
-        reconstruction["cameras"],
-        reconstruction["images"],
-        reconstruction["points"],
-    )
     logging.info("Start computing 2D bipartites...")
-    for img_id, colmap_image in tqdm(colmap_images.items()):
+    for img_id, colmap_image in tqdm(reconstruction.images.items()):
         n_points = colmap_image.xys.shape[0]
         indexes = np.arange(0, n_points)
         xys = colmap_image.xys
@@ -100,8 +96,8 @@ def compute_2d_bipartites_from_colmap(
         # resize xys if needed
         cam_id = imagecols.camimage(img_id).cam_id
         orig_size = (
-            colmap_cameras[cam_id].width,
-            colmap_cameras[cam_id].height,
+            reconstruction.cameras[cam_id].width,
+            reconstruction.cameras[cam_id].height,
         )
         cam = imagecols.cam(cam_id)
         new_size = (cam.w(), cam.h())
@@ -117,6 +113,6 @@ def compute_2d_bipartites_from_colmap(
         )
         all_bpt2ds[img_id] = bpt2d
     points = {}
-    for point3d_id, p in tqdm(colmap_points.items()):
+    for point3d_id, p in tqdm(reconstruction.points3D.items()):
         points[point3d_id] = p.xyz
     return all_bpt2ds, points
