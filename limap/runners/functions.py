@@ -227,7 +227,6 @@ def compute_2d_segs(cfg, imagecols, compute_descinfo=True):
                 cfg["line2d"]["detector"]["method"], imagecols.NumImages()
             )
         )
-    import limap.line2d
 
     if not imagecols.IsUndistorted():
         logging.warning("The input images are distorted!", stacklevel=2)

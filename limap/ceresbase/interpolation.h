@@ -40,9 +40,9 @@ enum class InterpolatorType {
 struct InterpolationConfig {
   InterpolationConfig() {}
   InterpolationConfig(py::dict dict) {
-    ASSIGN_PYDICT_ITEM(dict, l2_normalize, bool)
-    ASSIGN_PYDICT_ITEM(dict, ncc_normalize, bool)
-    ASSIGN_PYDICT_ITEM(dict, fill_channel_differences, bool)
+    ASSIGN_PYDICT_ITEM(dict, l2_normalize, bool);
+    ASSIGN_PYDICT_ITEM(dict, ncc_normalize, bool);
+    ASSIGN_PYDICT_ITEM(dict, fill_channel_differences, bool);
     ASSIGN_PYDICT_ITEM(dict, nodes,
                        SINGLE_ARG(std::vector<std::array<double, 2>>));
     if (dict.contains("type")) {

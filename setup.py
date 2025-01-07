@@ -69,7 +69,7 @@ setup(
     name="limap",
     version="1.0.0",
     packages=find_packages(),
-    python_requires=">=3.8, < 3.11",
+    python_requires=">=3.8, < 3.12",
     author="Shaohui Liu",
     author_email="b1ueber2y@gmail.com",
     description="A toolbox for mapping and localization with line features",

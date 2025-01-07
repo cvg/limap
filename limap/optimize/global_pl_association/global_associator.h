@@ -24,20 +24,20 @@ public:
   GlobalAssociatorConfig(py::dict dict)
       : hybrid_bundle_adjustment::HybridBAConfig(dict) {
     InitConfig();
-    ASSIGN_PYDICT_ITEM(dict, constant_vp, bool)
-    ASSIGN_PYDICT_ITEM(dict, th_angle_lineline, double)
-    ASSIGN_PYDICT_ITEM(dict, th_count_lineline, int)
-    ASSIGN_PYDICT_ITEM(dict, lw_pointline_association, double)
-    ASSIGN_PYDICT_ITEM(dict, th_pixel, double)
-    ASSIGN_PYDICT_ITEM(dict, th_weight_pointline, double)
-    ASSIGN_PYDICT_ITEM(dict, lw_vpline_association, double)
-    ASSIGN_PYDICT_ITEM(dict, th_count_vpline, int)
-    ASSIGN_PYDICT_ITEM(dict, lw_vp_orthogonality, double)
-    ASSIGN_PYDICT_ITEM(dict, th_angle_orthogonality, double)
-    ASSIGN_PYDICT_ITEM(dict, lw_vp_collinearity, double)
-    ASSIGN_PYDICT_ITEM(dict, th_angle_collinearity, double)
-    ASSIGN_PYDICT_ITEM(dict, th_hard_pl_dist3d, double)
-    ASSIGN_PYDICT_ITEM(dict, th_hard_vpline_angle3d, double)
+    ASSIGN_PYDICT_ITEM(dict, constant_vp, bool);
+    ASSIGN_PYDICT_ITEM(dict, th_angle_lineline, double);
+    ASSIGN_PYDICT_ITEM(dict, th_count_lineline, int);
+    ASSIGN_PYDICT_ITEM(dict, lw_pointline_association, double);
+    ASSIGN_PYDICT_ITEM(dict, th_pixel, double);
+    ASSIGN_PYDICT_ITEM(dict, th_weight_pointline, double);
+    ASSIGN_PYDICT_ITEM(dict, lw_vpline_association, double);
+    ASSIGN_PYDICT_ITEM(dict, th_count_vpline, int);
+    ASSIGN_PYDICT_ITEM(dict, lw_vp_orthogonality, double);
+    ASSIGN_PYDICT_ITEM(dict, th_angle_orthogonality, double);
+    ASSIGN_PYDICT_ITEM(dict, lw_vp_collinearity, double);
+    ASSIGN_PYDICT_ITEM(dict, th_angle_collinearity, double);
+    ASSIGN_PYDICT_ITEM(dict, th_hard_pl_dist3d, double);
+    ASSIGN_PYDICT_ITEM(dict, th_hard_vpline_angle3d, double);
   }
 
   // association config

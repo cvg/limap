@@ -183,7 +183,6 @@ double dist_innerseg(const LineType &l1, const LineType &l2) {
     return MAX_DIST;
   if (!get_innerseg<LineType>(l1, l2, l2_innerseg))
     return MAX_DIST;
-  // return dist_minpoint<Line3d>(l1_innerseg, l2_innerseg);
   return dist_endpoints_perpendicular<LineType>(l1_innerseg, l2_innerseg);
 }
 
