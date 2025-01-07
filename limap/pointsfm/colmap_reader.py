@@ -57,14 +57,6 @@ def ReadInfos(colmap_path, model_path="sparse", image_path="images"):
     return imagecols
 
 
-def PyReadCOLMAP(colmap_path, model_path=None):
-    if model_path is not None:
-        model_path = os.path.join(colmap_path, model_path)
-    else:
-        model_path = colmap_path
-    return pycolmap.Reconstruction(model_path)
-
-
 def ReadPointTracks(reconstruction: pycolmap.Reconstruction):
     pointtracks = {}
     for point3d_id, p in reconstruction.points3D.items():

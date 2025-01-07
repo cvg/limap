@@ -4,11 +4,9 @@ import pycolmap
 from limap.util.geometry import rotation_from_quaternion
 
 import hloc.utils.read_write_model as colmap_utils
-from limap.pointsfm.colmap_reader import PyReadCOLMAP
-
 
 def convert_colmap_to_visualsfm(colmap_model_path, output_nvm_file):
-    reconstruction = PyReadCOLMAP(colmap_model_path)
+    reconstruction = pycolmap.Reconstruction(colmap_model_path)
     with open(output_nvm_file, "w") as f:
         f.write("NVM_V3\n\n")
 
