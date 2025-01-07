@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from typing import List
 
 import numpy as np
 import torch
@@ -64,7 +63,7 @@ def print_gpu_memory():
 class AdapLayers(nn.Module):
     """Small adaptation layers."""
 
-    def __init__(self, hypercolumn_layers: List[str], output_dim: int = 128):
+    def __init__(self, hypercolumn_layers: list[str], output_dim: int = 128):
         """Initialize one adaptation layer for every extraction point.
         Args:
             hypercolumn_layers: The list of the hypercolumn layer names.
@@ -84,7 +83,7 @@ class AdapLayers(nn.Module):
             self.layers.append(layer)
             self.add_module(f"adap_layer_{i}", layer)
 
-    def forward(self, features: List[torch.tensor]):
+    def forward(self, features: list[torch.tensor]):
         """Apply adaptation layers."""
         for i, _ in enumerate(features):
             features[i] = getattr(self, f"adap_layer_{i}")(features[i])
