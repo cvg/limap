@@ -37,7 +37,7 @@ jobs:
             exit 0
           fi
           set +x -euo pipefail
-          python -m pip install ruff==0.6.7 clang-format==19.1.0
+          python -m pip install ruff==0.8.6 clang-format==19.1.0
           ./scripts/format/clang_format.sh
           ./scripts/format/python.sh
           git diff --name-only

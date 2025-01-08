@@ -43,14 +43,13 @@
 import os
 from copy import deepcopy
 from pathlib import Path
-from typing import List, Tuple
 
 import torch
 from pycolmap import logging
 from torch import nn
 
 
-def MLP(channels: List[int], do_bn: bool = True) -> nn.Module:
+def MLP(channels: list[int], do_bn: bool = True) -> nn.Module:
     """Multi-layer perceptron"""
     n = len(channels)
     layers = []
@@ -78,7 +77,7 @@ def normalize_keypoints(kpts, image_shape):
 class KeypointEncoder(nn.Module):
     """Joint encoding of visual appearance and location using MLPs"""
 
-    def __init__(self, feature_dim: int, layers: List[int]) -> None:
+    def __init__(self, feature_dim: int, layers: list[int]) -> None:
         super().__init__()
         self.encoder = MLP([3] + layers + [feature_dim])
         nn.init.constant_(self.encoder[-1].bias, 0.0)
@@ -90,7 +89,7 @@ class KeypointEncoder(nn.Module):
 
 def attention(
     query: torch.Tensor, key: torch.Tensor, value: torch.Tensor
-) -> Tuple[torch.Tensor, torch.Tensor]:
+) -> tuple[torch.Tensor, torch.Tensor]:
     dim = query.shape[1]
     scores = torch.einsum("bdhn,bdhm->bhnm", query, key) / dim**0.5
     prob = torch.nn.functional.softmax(scores, dim=-1)
@@ -135,7 +134,7 @@ class AttentionalPropagation(nn.Module):
 
 
 class AttentionalGNN(nn.Module):
-    def __init__(self, feature_dim: int, layer_names: List[str]) -> None:
+    def __init__(self, feature_dim: int, layer_names: list[str]) -> None:
         super().__init__()
         self.layers = nn.ModuleList(
             [
@@ -147,7 +146,7 @@ class AttentionalGNN(nn.Module):
 
     def forward(
         self, desc0: torch.Tensor, desc1: torch.Tensor
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    ) -> tuple[torch.Tensor, torch.Tensor]:
         for layer, name in zip(self.layers, self.names):
             if name == "cross":
                 src0, src1 = desc1, desc0
