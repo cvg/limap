@@ -15,6 +15,7 @@ namespace py = pybind11;
 
 #include <colmap/scene/camera.h>
 #include <colmap/sensor/models.h>
+#include <colmap/geometry/rigid3.h>
 
 namespace limap {
 
@@ -85,31 +86,47 @@ public:
   bool IsInitialized() const;
 };
 
-class CameraPose {
-public:
-  CameraPose(bool initialized = false) : initialized(initialized) {}
-  CameraPose(V4D qvec, V3D tvec, bool initialized = true)
-      : qvec(qvec.normalized()), tvec(tvec), initialized(initialized) {}
-  CameraPose(M3D R, V3D T, bool initiallized = true)
-      : tvec(T), initialized(initialized) {
-    qvec = RotationMatrixToQuaternion(R);
-  }
-  CameraPose(py::dict dict);
-  CameraPose(const CameraPose &campose)
-      : qvec(campose.qvec), tvec(campose.tvec),
-        initialized(campose.initialized) {}
+// We use std::optional<colmap::Rigid3d> as CameraPose
+using CameraPose = std::optional<colmap::Rigid3d>;
+class CameraPoseImpl {
+  static CameraPose CreateCameraPose(py::dict dict);
 
-  V4D qvec = V4D(1., 0., 0., 0.);
-  V3D tvec = V3D::Zero();
-  bool initialized = false;
+  static py::dict as_dict(const CameraPose& pose);
 
-  py::dict as_dict() const;
-  M3D R() const { return QuaternionToRotationMatrix(qvec); }
-  V3D T() const { return tvec; }
+  static M3D R(const CameraPose& pose);
 
-  V3D center() const { return -R().transpose() * T(); }
-  double projdepth(const V3D &p3d) const;
-  void SetInitFlag(bool flag) { initialized = flag; }
+  static V3D t(const CameraPose& pose);
+
+  static V3D center(const CameraPose& pose);
+
+  static double projdepth(const V3D& p3d);
 };
+
+// class CameraPose {
+// public:
+//   CameraPose(bool initialized = false) : initialized(initialized) {}
+//   CameraPose(V4D qvec, V3D tvec, bool initialized = true)
+//       : qvec(qvec.normalized()), tvec(tvec), initialized(initialized) {}
+//   CameraPose(M3D R, V3D T, bool initiallized = true)
+//       : tvec(T), initialized(initialized) {
+//     qvec = RotationMatrixToQuaternion(R);
+//   }
+//   CameraPose(py::dict dict);
+//   CameraPose(const CameraPose &campose)
+//       : qvec(campose.qvec), tvec(campose.tvec),
+//         initialized(campose.initialized) {}
+// 
+//   V4D qvec = V4D(1., 0., 0., 0.);
+//   V3D tvec = V3D::Zero();
+//   bool initialized = false;
+// 
+//   py::dict as_dict() const;
+//   M3D R() const { return QuaternionToRotationMatrix(qvec); }
+//   V3D T() const { return tvec; }
+// 
+//   V3D center() const { return -R().transpose() * T(); }
+//   double projdepth(const V3D &p3d) const;
+//   void SetInitFlag(bool flag) { initialized = flag; }
+// };
 
 } // namespace limap
