@@ -83,6 +83,15 @@ jobs:
       - name: Run Python tests
         run:  python -c "import limap; print(limap.__version__)"
 
+      - name: Run tests
+        run: |
+          pytest -m ci_workflow tests
+
+
+      - name: Run localization test
+        run: |
+          python runners/tests/localization.py
+
       - name: Run E2E tests
         run: |
           bash scripts/quickstart.sh
@@ -90,5 +99,4 @@ jobs:
               --output_dir outputs/quickstart_test --visualize 0
           python runners/hypersim/triangulation.py --default_config_file cfgs/triangulation/default_fast.yaml \
               --output_dir outputs/quickstart_test --triangulation.use_exhaustive_matcher --skip_exists --visualize 0
-          python runners/tests/localization.py
 

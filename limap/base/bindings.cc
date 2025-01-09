@@ -678,7 +678,6 @@ void bind_line_linker(py::module &m) {
 }
 
 void bind_camera(py::module &m) {
-  // TODO: use pycolmap
   py::enum_<colmap::CameraModelId> PyCameraModelId(m, "CameraModelId",
                                                    py::module_local());
   PyCameraModelId.value("INVALID", colmap::CameraModelId::kInvalid);

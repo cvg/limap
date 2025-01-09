@@ -334,6 +334,27 @@ def compute_robust_range(arr, range_robust=None, k_stretch=2.0):
     return start_stretched, end_stretched
 
 
+def compute_robust_range_points(points, range_robust=None, k_stretch=2.0):
+    if range_robust is None:
+        range_robust = [0.05, 0.95]
+    points_array = np.array(points)
+    x_array = points_array.reshape(-1, 3)[:, 0]
+    y_array = points_array.reshape(-1, 3)[:, 1]
+    z_array = points_array.reshape(-1, 3)[:, 2]
+
+    x_start, x_end = compute_robust_range(
+        x_array, range_robust=range_robust, k_stretch=k_stretch
+    )
+    y_start, y_end = compute_robust_range(
+        y_array, range_robust=range_robust, k_stretch=k_stretch
+    )
+    z_start, z_end = compute_robust_range(
+        z_array, range_robust=range_robust, k_stretch=k_stretch
+    )
+    ranges = np.array([[x_start, y_start, z_start], [x_end, y_end, z_end]])
+    return ranges
+
+
 def compute_robust_range_lines(lines, range_robust=None, k_stretch=2.0):
     if range_robust is None:
         range_robust = [0.05, 0.95]
