@@ -12,6 +12,7 @@ from .vis_lines import (
 )
 from .vis_utils import (
     compute_robust_range_lines,
+    compute_robust_range_points,
     draw_segments,
     vis_vpresult,
     visualize_line_track,
@@ -28,6 +29,7 @@ __all__ = [
     "open3d_vis_3d_lines",
     "vis_vpresult",
     "draw_segments",
+    "compute_robust_range_points",
     "compute_robust_range_lines",
     "visualize_line_track",
 ]
