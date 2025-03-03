@@ -251,8 +251,12 @@ Camera::Camera(py::dict dict) {
   ASSIGN_PYDICT_ITEM(dict, params, std::vector<double>);
   THROW_CHECK(VerifyParams());
 
+  // camera id
+  int camera_id_loaded;
+  ASSIGN_PYDICT_ITEM_TKEY(dict, cam_id, camera_id_loaded, int);
+  camera_id = static_cast<colmap::camera_t>(camera_id_loaded);
+
   // other fields
-  ASSIGN_PYDICT_ITEM(dict, camera_id, int);
   ASSIGN_PYDICT_ITEM(dict, height, int);
   ASSIGN_PYDICT_ITEM(dict, width, int);
   ASSIGN_PYDICT_ITEM(dict, initialized, std::vector<bool>);
