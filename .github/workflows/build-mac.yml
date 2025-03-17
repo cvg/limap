@@ -56,16 +56,11 @@ jobs:
             glog \
             googletest \
             ceres-solver \
-            qt5 \
             glew \
             cgal \
             sqlite3 \
             ccache \
             hdf5
-
-          export LDFLAGS="-L/opt/homebrew/opt/qt@5/lib"
-          export CPPFLAGS="-I/opt/homebrew/opt/qt@5/include"
-          export PATH="/usr/homebrew/opt/qt@5/bin:$PATH"
 
       - name: Set up Python ${{ matrix.config.python-version  }}
         uses: actions/setup-python@v5
@@ -81,6 +76,8 @@ jobs:
 
       - name: Build
         run: |
+
+          export CMAKE_PREFIX_PATH=$(brew --prefix hdf5):$CMAKE_PREFIX_PATH
           python -m pip install -v .
 
       - name: Run Python tests
