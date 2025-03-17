@@ -1,8 +1,8 @@
 name: limap (Mac)
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+# concurrency:
+#   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+#   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 on:
   push:
@@ -60,7 +60,7 @@ jobs:
             cgal \
             sqlite3 \
             ccache \
-            hdf5
+            hdf5@1.10
 
       - name: Set up Python ${{ matrix.config.python-version  }}
         uses: actions/setup-python@v5
