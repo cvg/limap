@@ -73,7 +73,7 @@ jobs:
 
       - name: Build
         run: |
-          export PATH="/usr/local/opt/qt@5/bin:$PATH"
+          export PATH="/usr/homebrew/opt/qt@5/bin:$PATH"
           export DCMAKE_PREFIX_PATH="$(brew --prefix qt@5)"
           python -m pip install -v .
 
