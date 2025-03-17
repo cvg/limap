@@ -10,4 +10,4 @@
 	url = https://github.com/libigl/libigl.git
 [submodule "third-party/highfive"]
 	path = third-party/highfive
-	url = git@github.com:highfive-devs/highfive.git
+	url = https://github.com/highfive-devs/highfive.git
