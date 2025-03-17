@@ -1,0 +1,101 @@
+name: limap
+
+on:
+  push:
+    branches:
+      - main
+      - release/*
+  pull_request:
+    types: [ assigned, opened, synchronize, reopened ]
+  release:
+    types: [ published, edited ]
+
+jobs:
+  build:
+    name: ${{ matrix.config.os }} ${{ matrix.config.arch }} with Python ${{ matrix.config.python-version }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [
+          {os: ubuntu-latest, python-version: "3.9"},
+          {os: ubuntu-latest, python-version: "3.10"},
+          {os: ubuntu-latest, python-version: "3.11"},
+        ]
+    env:
+      COMPILER_CACHE_VERSION: 1
+      COMPILER_CACHE_DIR: ${{ github.workspace }}/compiler-cache
+      CCACHE_DIR: ${{ github.workspace }}/compiler-cache/ccache
+      CCACHE_BASEDIR: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        id: cache-builds
+        with:
+          key: limap-v${{ env.COMPILER_CACHE_VERSION }}-${{ matrix.config.os }}-${{ matrix.config.arch }}-${{ github.run_id }}-${{ github.run_number }}
+          restore-keys: limap-v${{ env.COMPILER_CACHE_VERSION }}-${{ matrix.config.os }}-${{ matrix.config.arch }}
+          path: ${{ env.COMPILER_CACHE_DIR }}
+
+      - name: Set env (Linux)
+        run: |
+          sudo apt-get update && sudo apt-get install -y \
+            git \
+            build-essential \
+            cmake \
+            ninja-build \
+            libboost-program-options-dev \
+            libboost-graph-dev \
+            libboost-system-dev \
+            libeigen3-dev \
+            libceres-dev \
+            libflann-dev \
+            libfreeimage-dev \
+            libmetis-dev \
+            libgoogle-glog-dev \
+            libgtest-dev \
+            libgmock-dev \
+            libsqlite3-dev \
+            libglew-dev \
+            qtbase5-dev \
+            libqt5opengl5-dev \
+            libcgal-dev \
+            libcgal-qt5-dev \
+            libgl1-mesa-dri \
+            libunwind-dev \
+            xvfb
+
+      - name: Set up Python ${{ matrix.config.python-version  }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.config.python-version  }}
+
+      - name: Install Python dependencies
+        run: |
+          git submodule update --init --recursive
+          python -m pip install --upgrade pip
+          python -m pip install setuptools
+          python -m pip install -r requirements.txt
+
+      - name: Build
+        run:  python -m pip install -v .
+
+      - name: Run Python tests
+        run:  python -c "import limap; print(limap.__version__)"
+
+      - name: Run tests
+        run: |
+          pytest -m ci_workflow tests
+
+
+      - name: Run localization test
+        run: |
+          python runners/tests/localization.py
+
+      - name: Run E2E tests
+        run: |
+          bash scripts/quickstart.sh
+          python runners/hypersim/fitnmerge.py --default_config_file cfgs/fitnmerge/default_cpu.yaml \
+              --output_dir outputs/quickstart_test --visualize 0
+          python runners/hypersim/triangulation.py --default_config_file cfgs/triangulation/default_fast.yaml \
+              --output_dir outputs/quickstart_test --triangulation.use_exhaustive_matcher --skip_exists --visualize 0
+

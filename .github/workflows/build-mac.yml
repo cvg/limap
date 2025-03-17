@@ -18,9 +18,9 @@ jobs:
       fail-fast: false
       matrix:
         config: [
-          {os: ubuntu-latest, python-version: "3.9"},
-          {os: ubuntu-latest, python-version: "3.10"},
-          {os: ubuntu-latest, python-version: "3.11"},
+          {os: macos-14, arch: arm64, python-version: "3.9"},
+          {os: macos-14, arch: arm64, python-version: "3.10"},
+          {os: macos-14, arch: arm64, python-version: "3.11"},
         ]
     env:
       COMPILER_CACHE_VERSION: 1
@@ -36,34 +36,28 @@ jobs:
           restore-keys: limap-v${{ env.COMPILER_CACHE_VERSION }}-${{ matrix.config.os }}-${{ matrix.config.arch }}
           path: ${{ env.COMPILER_CACHE_DIR }}
 
-      - name: Set env (Linux)
-        if: runner.os == 'Linux'
+      - name: Setup Mac
         run: |
-          sudo apt-get update && sudo apt-get install -y \
-            git \
-            build-essential \
+          # Fix `brew link` error.
+          find /usr/local/bin -lname '*/Library/Frameworks/Python.framework/*' -delete
+
+          brew install \
             cmake \
-            ninja-build \
-            libboost-program-options-dev \
-            libboost-graph-dev \
-            libboost-system-dev \
-            libeigen3-dev \
-            libceres-dev \
-            libflann-dev \
-            libfreeimage-dev \
-            libmetis-dev \
-            libgoogle-glog-dev \
-            libgtest-dev \
-            libgmock-dev \
-            libsqlite3-dev \
-            libglew-dev \
-            qtbase5-dev \
-            libqt5opengl5-dev \
-            libcgal-dev \
-            libcgal-qt5-dev \
-            libgl1-mesa-dri \
-            libunwind-dev \
-            xvfb
+            ninja \
+            boost \
+            eigen \
+            flann \
+            freeimage \
+            metis \
+            glog \
+            googletest \
+            ceres-solver \
+            qt5 \
+            glew \
+            cgal \
+            sqlite3 \
+            ccache \
+            hdf5
 
       - name: Set up Python ${{ matrix.config.python-version  }}
         uses: actions/setup-python@v4
