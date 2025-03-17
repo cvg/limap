@@ -5,9 +5,9 @@
 	path = third-party/RansacLib
 	url = https://github.com/B1ueber2y/RansacLib.git
     branch = header-only
-[submodule "third-party/HighFive"]
-	path = third-party/HighFive
-	url = https://github.com/B1ueber2y/HighFive.git
 [submodule "third-party/libigl"]
 	path = third-party/libigl
 	url = https://github.com/libigl/libigl.git
+[submodule "third-party/highfive"]
+	path = third-party/highfive
+	url = https://github.com/highfive-devs/highfive.git
