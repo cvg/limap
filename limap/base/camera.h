@@ -87,11 +87,10 @@ public:
 
 class CameraPose {
 public:
-  CameraPose(bool initialized = false) : initialized(initialized) {}
-  CameraPose(V4D qvec, V3D tvec, bool initialized = true)
-      : qvec(qvec.normalized()), tvec(tvec), initialized(initialized) {}
-  CameraPose(M3D R, V3D T, bool initiallized = true)
-      : tvec(T), initialized(initialized) {
+  CameraPose(bool init = false) : initialized(init) {}
+  CameraPose(V4D qvec, V3D tvec, bool init = true)
+      : qvec(qvec.normalized()), tvec(tvec), initialized(init) {}
+  CameraPose(M3D R, V3D T, bool init = true) : tvec(T), initialized(init) {
     qvec = RotationMatrixToQuaternion(R);
   }
   CameraPose(py::dict dict);
