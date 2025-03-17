@@ -63,7 +63,7 @@ jobs:
             hdf5
 
       - name: Set up Python ${{ matrix.config.python-version  }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.config.python-version  }}
 
