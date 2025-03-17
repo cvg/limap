@@ -54,6 +54,7 @@ endif()
 message(STATUS "Configuring PoseLib... done")
 
 # COLMAP
+set(GUI_ENABLED OFF)
 FetchContent_Declare(COLMAP
     GIT_REPOSITORY    https://github.com/colmap/colmap.git
     GIT_TAG           c9097b031ee00da22609c7ac4b3f6b45b4178de2
