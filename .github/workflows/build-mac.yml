@@ -76,7 +76,7 @@ jobs:
 
       - name: Build
         run: |
-
+          export HDF5_ROOT=$(brew --prefix hdf5)
           export CMAKE_PREFIX_PATH=$(brew --prefix hdf5):$CMAKE_PREFIX_PATH
           python -m pip install -v .
 
