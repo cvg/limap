@@ -90,7 +90,7 @@ public:
   CameraPose(bool init = false) : initialized(init) {}
   CameraPose(V4D qvec, V3D tvec, bool init = true)
       : qvec(qvec.normalized()), tvec(tvec), initialized(init) {}
-  CameraPose(M3D R, V3D T, bool init = true) : tvec(T), initialized(init) {
+  CameraPose(M3D R, V3D t, bool init = true) : tvec(t), initialized(init) {
     qvec = RotationMatrixToQuaternion(R);
   }
   CameraPose(py::dict dict);
