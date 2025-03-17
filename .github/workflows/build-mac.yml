@@ -60,7 +60,7 @@ jobs:
             hdf5
 
       - name: Set up Python ${{ matrix.config.python-version  }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.config.python-version  }}
 
@@ -74,7 +74,7 @@ jobs:
       - name: Build
         run: |
           export PATH="/usr/local/opt/qt@5/bin:$PATH"
-          DCMAKE_PREFIX_PATH="${brew --prefix qt@5}" python -m pip install -v .
+          python -m pip install -v .
 
       - name: Run Python tests
         run:  python -c "import limap; print(limap.__version__)"
