@@ -98,3 +98,9 @@ jobs:
           python runners/hypersim/triangulation.py --default_config_file cfgs/triangulation/default_fast.yaml \
               --output_dir outputs/quickstart_test --triangulation.use_exhaustive_matcher --skip_exists --visualize 0
 
+      - name: Cleanup compiler cache
+        run: |
+          set -x
+          ccache --show-stats --verbose
+          ccache --evict-older-than 1d
+          ccache --show-stats --verbose
