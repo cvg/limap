@@ -72,7 +72,7 @@ message(STATUS "Configuring COLMAP... done")
 # JLinkage
 FetchContent_Declare(JLinkage
     GIT_REPOSITORY    https://github.com/B1ueber2y/JLinkage.git
-    GIT_TAG           452d67eda005db01a02071a5af8f0eced0a02079
+    GIT_TAG           75dadd555f81b1cf1b0f016d8cac76f3b554ba9b
     EXCLUDE_FROM_ALL
 )
 message(STATUS "Configuring JLinkage...")
