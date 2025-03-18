@@ -218,8 +218,6 @@ double compute_distance<Line2d>(const Line2d &l1, const Line2d &l2,
   case LineDistType::ENDPOINTS_SCALEINV:
     throw std::runtime_error(
         "Type error. Scale invariance distance is not supported for Line2d.");
-  default:
-    throw std::runtime_error("Distance type not supported.");
   }
   return -1.0;
 }
@@ -262,8 +260,6 @@ double compute_distance<Line3d>(const Line3d &l1, const Line3d &l2,
     return dist_endpoints_scaleinv_oneway(l1, l2);
   case LineDistType::ENDPOINTS_SCALEINV:
     return dist_endpoints_scaleinv(l1, l2);
-  default:
-    throw std::runtime_error("Distance type not supported.");
   }
   return -1.0;
 }

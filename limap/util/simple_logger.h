@@ -170,7 +170,7 @@ public:
     if (update_is_called)
       progress += inc;
     std::string out = get_update_str();
-    if (out != "\r") {
+    if (out.c_str() != "\r") {
       STDLOG(CERR) << out;
     }
   }
@@ -189,7 +189,7 @@ public:
     if (update_is_called)
       progress += inc;
     std::string out = get_update_str();
-    if (out != "\r") {
+    if (out.c_str() != "\r") {
       SYNC_LOG(CERR) << out;
     }
   }
