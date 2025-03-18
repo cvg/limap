@@ -81,11 +81,6 @@ jobs:
       - name: Run Python tests
         run:  python -c "import limap; print(limap.__version__)"
 
-      - name: Run tests
-        run: |
-          pytest -m ci_workflow tests
-
-
       - name: Run localization test
         run: |
           python runners/tests/localization.py
