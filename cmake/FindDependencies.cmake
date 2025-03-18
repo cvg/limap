@@ -54,7 +54,7 @@ endif()
 message(STATUS "Configuring PoseLib... done")
 
 # COLMAP
-# set(GUI_ENABLED OFF CACHE BOOL "Disable GUI" FORCE)
+set(GUI_ENABLED OFF CACHE BOOL "Disable GUI" FORCE)
 # set(LSD_ENABLED OFF CACHE BOOL "Disable LSD in COLMAP" FORCE)
 FetchContent_Declare(COLMAP
     GIT_REPOSITORY    https://github.com/colmap/colmap.git
