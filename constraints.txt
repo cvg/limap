@@ -1,0 +1,1 @@
+pycolmap --no-binary=:all:
