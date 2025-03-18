@@ -804,7 +804,7 @@ void bind_camera(py::module &m) {
       .def(py::init<bool>(), R"(
             Default constructor: identity pose
         )",
-           py::arg("initialized") = false)
+           py::arg("init") = false)
       .def(py::init<const CameraPose &>(), R"(
             Copy constructor
         )",
@@ -812,11 +812,11 @@ void bind_camera(py::module &m) {
       .def(py::init<V4D, V3D, bool>(), R"(
             Constructor from a quaternion vector and a translation vector
         )",
-           py::arg("qvec"), py::arg("tvec"), py::arg("initialized") = true)
+           py::arg("qvec"), py::arg("tvec"), py::arg("init") = true)
       .def(py::init<M3D, V3D, bool>(), R"(
             Constructor from a rotation matrix and a translation vector
         )",
-           py::arg("R"), py::arg("tvec"), py::arg("initialized") = true)
+           py::arg("R"), py::arg("tvec"), py::arg("init") = true)
       .def(py::init<py::dict>(), R"(
             Constructor from a Python dict
         )",
