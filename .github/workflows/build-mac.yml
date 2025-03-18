@@ -52,6 +52,7 @@ jobs:
             glog \
             googletest \
             ceres-solver \
+            qt5 \
             glew \
             cgal \
             sqlite3 \
