@@ -55,6 +55,9 @@ line2d:
         skip_exists: False
         superglue:
             weights: "outdoor" # ["indoor", "outdoor"] for selecting superglue models
+        dense:
+            one_to_many: False
+            weights: "outdoor" # ["indoor", "outdoor", "tiny_outdoor"] for selecting RoMa models
 var2d: # in pixels
     sold2: 5.0
     lsd: 2.0
