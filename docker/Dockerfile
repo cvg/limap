@@ -19,9 +19,6 @@ RUN git clone --recursive git@github.com:cvg/limap.git
 
 # From here, final image
 FROM nvidia/cuda:11.5.2-devel-ubuntu20.04
-
-ARG COLMAP_VERSION=3.8
-# ARG CUDA_ARCHITECTURES=86
 ARG CUDA_ARCHITECTURES=all
 
 # Prevent stop building ubuntu at time zone selection.  
@@ -49,6 +46,7 @@ RUN apt-get update && apt-get install -y \
     libqt5opengl5-dev \
     libcgal-dev \
     libceres-dev \
+    libhdf5-dev \
     wget \
     software-properties-common \
     lsb-core
@@ -68,17 +66,6 @@ RUN apt-add-repository "deb https://apt.kitware.com/ubuntu/ $(lsb_release -cs) m
 RUN apt update && \
     apt install -y cmake
 
-# Build and install COLMAP.
-RUN git clone https://github.com/colmap/colmap.git
-RUN cd colmap && \
-    git reset --hard ${COLMAP_VERSION} && \
-    mkdir build && \
-    cd build && \
-    cmake .. -GNinja -DCMAKE_CUDA_ARCHITECTURES=${CUDA_ARCHITECTURES} && \
-    ninja && \
-    ninja install && \
-    cd .. && rm -rf colmap
-
 # Enable GUI
 RUN apt-get update \
   && apt-get install -y -qq --no-install-recommends \
@@ -93,17 +80,6 @@ RUN apt-get update \
 # Env vars for the nvidia-container-runtime.
 ENV NVIDIA_VISIBLE_DEVICES all
 ENV NVIDIA_DRIVER_CAPABILITIES graphics,utility,compute
-
-# PoseLib Dependency for LIMAP
-RUN git clone --recursive https://github.com/vlarsson/PoseLib.git && \
-    cd PoseLib && \
-    mkdir build && cd build && \
-    cmake .. && \
-    make install -j8
-
-RUN apt-get update && \
-    apt-get install -y \
-    libhdf5-dev
 
 # Only Python 3.9 seems to satisfy all dependencies
 RUN add-apt-repository ppa:deadsnakes/ppa
