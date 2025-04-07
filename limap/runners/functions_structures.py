@@ -86,12 +86,17 @@ def compute_2d_bipartites_from_colmap(
     all_bpt2ds = {}
     cfg_bpt2d = structures.PL_Bipartite2dConfig(cfg)
     logging.info("Start computing 2D bipartites...")
+    # TODO: use pycolmap when a new release is available: https://github.com/colmap/colmap/pull/3072
+    INVALID_POINT3D_ID = 2**64 - 1
     for img_id, colmap_image in tqdm(reconstruction.images.items()):
-        n_points = colmap_image.xys.shape[0]
+        xys = np.array([p2d.xy for p2d in colmap_image.points2D])
+        n_points = xys.shape[0]
         indexes = np.arange(0, n_points)
-        xys = colmap_image.xys
-        point3D_ids = colmap_image.point3D_ids
-        mask = colmap_image.point3D_ids >= 0
+        point3D_ids = np.array(
+            [p2d.point3D_id for p2d in colmap_image.points2D]
+        ).astype(int)
+        point3D_ids[point3D_ids == INVALID_POINT3D_ID] = -1
+        mask = point3D_ids >= 0
 
         # resize xys if needed
         cam_id = imagecols.camimage(img_id).cam_id
