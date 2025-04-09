@@ -97,6 +97,10 @@ jobs:
           bash scripts/quickstart.sh
           python runners/hypersim/fitnmerge.py --default_config_file cfgs/fitnmerge/default_cpu.yaml \
               --output_dir outputs/quickstart_test --visualize 0
-          python runners/hypersim/triangulation.py --default_config_file cfgs/triangulation/default_fast.yaml \
+          python runners/hypersim/triangulation.py --default_config_file cfgs/triangulation/default_cpu.yaml \
               --output_dir outputs/quickstart_test --triangulation.use_exhaustive_matcher --skip_exists --visualize 0
+          python runners/colmap_triangulation.py -a outputs/quickstart_test/colmap_outputs \
+              --config_file cfgs/triangulation/default_cpu.yaml \
+              --output_dir outputs/quickstart_test_colmap --triangulation.use_exhaustive_matcher --visualize 0 \
+              --triangulation.use_pointsfm.enable --triangulation.use_pointsfm.colmap_folder outputs/quickstart_test/colmap_outputs/sparse
 

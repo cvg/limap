@@ -79,7 +79,7 @@ def parse_config():
     arg_parser.add_argument(
         "--default_config_file",
         type=str,
-        default="cfgs/triangulation/default.yaml",
+        default=None,
         help="default config file",
     )
     arg_parser.add_argument(
