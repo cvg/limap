@@ -47,9 +47,11 @@ CameraView UndistortCameraView(const std::string &imname_in,
 
 V2D UndistortPoint(const V2D &point, const Camera &distorted_camera,
                    const Camera &undistorted_camera) {
-  const std::optional<Eigen::Vector2d> cam_point = distorted_camera.CamFromImg(point);
+  const std::optional<Eigen::Vector2d> cam_point =
+      distorted_camera.CamFromImg(point);
   THROW_CHECK(cam_point.has_value());
-  const std::optional<Eigen::Vector2d> undistorted_point = undistorted_camera.ImgFromCam(cam_point->homogeneous());
+  const std::optional<Eigen::Vector2d> undistorted_point =
+      undistorted_camera.ImgFromCam(cam_point->homogeneous());
   THROW_CHECK(undistorted_point.has_value());
   return *undistorted_point;
 }
