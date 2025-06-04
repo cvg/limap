@@ -37,9 +37,9 @@ def convert_colmap_to_imagecols(
     for img_id, colmap_image in reconstruction.images.items():
         imname = colmap_image.name
         cam_id = colmap_image.camera_id
-        qvec_xyzw = colmap_image.cam_from_world().rotation.quat
+        qvec_xyzw = colmap_image.cam_from_world.rotation.quat
         qvec = [qvec_xyzw[3], qvec_xyzw[0], qvec_xyzw[1], qvec_xyzw[2]]
-        tvec = colmap_image.cam_from_world().translation
+        tvec = colmap_image.cam_from_world.translation
         pose = _base.CameraPose(qvec, tvec)
         image_name = (
             imname if image_path is None else os.path.join(image_path, imname)
