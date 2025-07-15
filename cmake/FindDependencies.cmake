@@ -54,9 +54,10 @@ endif()
 message(STATUS "Configuring PoseLib... done")
 
 # COLMAP
+set(LSD_ENABLED OFF CACHE BOOL "Disable LSD in COLMAP" FORCE)
 FetchContent_Declare(COLMAP
     GIT_REPOSITORY    https://github.com/colmap/colmap.git
-    GIT_TAG           63b2cc000de32dc697f45ef1576dec7e67abddbc 
+    GIT_TAG           ce16b54984fb147046a46a3d5cd0049375123a3c
     EXCLUDE_FROM_ALL
 )
 message(STATUS "Configuring COLMAP...")
@@ -70,7 +71,7 @@ message(STATUS "Configuring COLMAP... done")
 # JLinkage
 FetchContent_Declare(JLinkage
     GIT_REPOSITORY    https://github.com/B1ueber2y/JLinkage.git
-    GIT_TAG           452d67eda005db01a02071a5af8f0eced0a02079
+    GIT_TAG           75dadd555f81b1cf1b0f016d8cac76f3b554ba9b
     EXCLUDE_FROM_ALL
 )
 message(STATUS "Configuring JLinkage...")

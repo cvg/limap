@@ -2,7 +2,6 @@ import os
 from collections import defaultdict
 
 import numpy as np
-from hloc.utils.io import get_keypoints, get_matches
 from pycolmap import logging
 from tqdm import tqdm
 
@@ -11,6 +10,7 @@ import limap.estimators as estimators
 import limap.line2d
 import limap.runners as runners
 import limap.util.io as limapio
+from hloc.utils.io import get_keypoints, get_matches
 from limap.optimize.hybrid_localization.functions import (
     filter_line_2to2_epipolarIoU,
     get_reprojection_dist_func,

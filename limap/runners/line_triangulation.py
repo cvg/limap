@@ -1,5 +1,6 @@
 import os
 
+import pycolmap
 from pycolmap import logging
 from tqdm import tqdm
 
@@ -145,7 +146,7 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
             colmap_model_path = cfg["triangulation"]["use_pointsfm"][
                 "colmap_folder"
             ]
-        reconstruction = pointsfm.PyReadCOLMAP(colmap_model_path)
+        reconstruction = pycolmap.Reconstruction(colmap_model_path)
         all_bpt2ds, sfm_points = runners.compute_2d_bipartites_from_colmap(
             reconstruction, imagecols, all_2d_lines, cfg["structures"]["bpt2d"]
         )

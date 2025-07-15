@@ -11,17 +11,17 @@ from pathlib import Path
 
 import imagesize
 import pycolmap
+from tqdm import tqdm
+
+import limap.base as base
+import limap.pointsfm as pointsfm
+import limap.util.io as limapio
 from hloc import (
     extract_features,
     localize_sfm,
     match_features,
     pairs_from_retrieval,
 )
-from tqdm import tqdm
-
-import limap.base as base
-import limap.pointsfm as pointsfm
-import limap.util.io as limapio
 
 
 def read_scene_visualsfm(

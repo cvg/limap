@@ -11,12 +11,13 @@
 
 namespace py = pybind11;
 
+#include <colmap/geometry/sim3.h>
+
 #include "limap/_limap/helpers.h"
 #include "limap/util/types.h"
 
 #include "limap/base/camera.h"
 #include "limap/base/camera_view.h"
-#include "limap/base/transforms.h"
 
 namespace limap {
 
@@ -93,7 +94,7 @@ public:
   double *tvec_data(const int img_id);
 
   ImageCollection
-  apply_similarity_transform(const SimilarityTransform3 &transform) const;
+  apply_similarity_transform(const colmap::Sim3d &transform) const;
 
   // inverse indexing
   int get_first_image_id_by_camera_id(const int cam_id) const;

@@ -18,7 +18,6 @@ jobs:
       fail-fast: false
       matrix:
         config: [
-          {os: ubuntu-latest, python-version: "3.8"},
           {os: ubuntu-latest, python-version: "3.9"},
           {os: ubuntu-latest, python-version: "3.10"},
           {os: ubuntu-latest, python-version: "3.11"},
@@ -84,12 +83,24 @@ jobs:
       - name: Run Python tests
         run:  python -c "import limap; print(limap.__version__)"
 
+      - name: Run tests
+        run: |
+          pytest -m ci_workflow tests
+
+
+      - name: Run localization test
+        run: |
+          python runners/tests/localization.py
+
       - name: Run E2E tests
         run: |
           bash scripts/quickstart.sh
           python runners/hypersim/fitnmerge.py --default_config_file cfgs/fitnmerge/default_cpu.yaml \
               --output_dir outputs/quickstart_test --visualize 0
-          python runners/hypersim/triangulation.py --default_config_file cfgs/triangulation/default_fast.yaml \
+          python runners/hypersim/triangulation.py --default_config_file cfgs/triangulation/default_cpu.yaml \
               --output_dir outputs/quickstart_test --triangulation.use_exhaustive_matcher --skip_exists --visualize 0
-          python runners/tests/localization.py
+          python runners/colmap_triangulation.py -a outputs/quickstart_test/colmap_outputs \
+              --config_file cfgs/triangulation/default_cpu.yaml \
+              --output_dir outputs/quickstart_test_colmap --triangulation.use_exhaustive_matcher --visualize 0 \
+              --triangulation.use_pointsfm.enable --triangulation.use_pointsfm.colmap_folder outputs/quickstart_test/colmap_outputs/sparse
 

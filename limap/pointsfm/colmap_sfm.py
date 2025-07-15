@@ -1,17 +1,15 @@
 import copy
 import os
 import shutil
-import sys
 from pathlib import Path
 
 import cv2
 import pycolmap
 from pycolmap import logging
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 import hloc.utils.database as database
 import hloc.utils.read_write_model as colmap_utils
-from model_converter import convert_imagecols_to_colmap
+from limap.pointsfm.model_converter import convert_imagecols_to_colmap
 
 
 def import_images_with_known_cameras(image_dir, database_path, imagecols):

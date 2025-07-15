@@ -69,7 +69,7 @@ setup(
     name="limap",
     version="1.0.0",
     packages=find_packages(),
-    python_requires=">=3.8, < 3.12",
+    python_requires=">=3.9, < 3.12",
     author="Shaohui Liu",
     author_email="b1ueber2y@gmail.com",
     description="A toolbox for mapping and localization with line features",
@@ -78,9 +78,9 @@ setup(
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     classifiers=[
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Operating System :: OS Independent",
     ],
 )
