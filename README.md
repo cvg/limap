@@ -98,6 +98,7 @@ If you wish to use the methods with **separate installation needed** you need to
 - Endpoint matching with [SuperPoint](https://github.com/magicleap/SuperPointPretrainedNetwork) + Nearest Neighbors
 - Endpoint matching with [SuperPoint](https://github.com/magicleap/SuperPointPretrainedNetwork) + [SuperGlue](https://github.com/magicleap/SuperGluePretrainedNetwork)
 - [GlueStick](https://github.com/cvg/GlueStick)
+- Custom line matcher based on dense matcher [RoMa](https://github.com/Parskatt/RoMa) (separate installation needed [[Guide](misc/install/roma.md)])
 
 **The following vanishing point estimators are currently supported:**
 - [JLinkage](https://github.com/B1ueber2y/JLinkage)
