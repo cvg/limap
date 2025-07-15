@@ -57,7 +57,7 @@ message(STATUS "Configuring PoseLib... done")
 set(LSD_ENABLED OFF CACHE BOOL "Disable LSD in COLMAP" FORCE)
 FetchContent_Declare(COLMAP
     GIT_REPOSITORY    https://github.com/colmap/colmap.git
-    GIT_TAG           ce16b54984fb147046a46a3d5cd0049375123a3c
+    GIT_TAG           0cc16151e09b00588b16e18c8a858abee5f7f980
     EXCLUDE_FROM_ALL
 )
 message(STATUS "Configuring COLMAP...")
