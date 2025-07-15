@@ -39,9 +39,9 @@ def convert_colmap_to_visualsfm(colmap_model_path, output_nvm_file):
                 raise ValueError("Camera model not supported in VisualSfM.")
             f.write(f"{img_name}\t")
             f.write(f" {focal}")
-            qvec_xyzw = colmap_image.cam_from_world.rotation.quat
+            qvec_xyzw = colmap_image.cam_from_world().rotation.quat
             qvec = [qvec_xyzw[3], qvec_xyzw[0], qvec_xyzw[1], qvec_xyzw[2]]
-            center = colmap_image.cam_from_world.inverse().translation
+            center = colmap_image.cam_from_world().inverse().translation
             f.write(f" {qvec[0]} {qvec[1]} {qvec[2]} {qvec[3]}")
             f.write(f" {center[0]} {center[1]} {center[2]}")
             f.write(f" {k1} 0\n")

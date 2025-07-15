@@ -22,7 +22,7 @@ yacs
 pytest
 numpy<=1.26.4 # Tag numpy 1.26.4 for Open3D issue (https://github.com/numpy/numpy/issues/26853)
 open3d==0.18.0
-pycolmap>=3.11.1
+pycolmap>=3.12.1
 ruff==0.6.7
 clang-format==19.1.0
 
