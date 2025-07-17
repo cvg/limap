@@ -14,7 +14,7 @@ def test_convert_colmap_to_imagecols(tmp_path):
     assert imagecols.NumCameras() == recon.num_cameras()
     assert imagecols.NumImages() == recon.num_images()
     npt.assert_allclose(
-        recon.images[1].cam_from_world.inverse().translation,
+        recon.images[1].cam_from_world().inverse().translation,
         imagecols.camimage(1).pose.center(),
         rtol=1e-5,
         atol=1e-8,

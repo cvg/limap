@@ -19,7 +19,8 @@ def get_lineloc_cost_func(func_name):
         return _optimize.LineLocCostFunction.E2DMidpointAngleDist3
     if func_name in [
         "PerpendicularDist",
-        "PerpendicularDist2" "2DPerpendicularDist",
+        "PerpendicularDist2",
+        "2DPerpendicularDist",
         "2DPerpendicularDist2",
     ]:
         return _optimize.LineLocCostFunction.E2DPerpendicularDist2
