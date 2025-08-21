@@ -1,6 +1,6 @@
 # LIMAP 
 
-**The documentations on brief tutorials and APIs are available [here](http://b1ueber2y.me/projects/LIMAP/docs/)**.
+**The documentations on brief tutorials and APIs are available [here](https://b1ueber2y.me/projects/LIMAP/docs/)**.
 
 <p align="center">
 <img src="./misc/media/supp_qualitative_5x3.png">
