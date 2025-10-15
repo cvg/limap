@@ -1,4 +1,4 @@
-name: limap
+name: limap (Ubuntu)
 
 on:
   push:
@@ -37,7 +37,6 @@ jobs:
           path: ${{ env.COMPILER_CACHE_DIR }}
 
       - name: Set env (Linux)
-        if: runner.os == 'Linux'
         run: |
           sudo apt-get update && sudo apt-get install -y \
             git \
@@ -103,4 +102,18 @@ jobs:
               --config_file cfgs/triangulation/default_cpu.yaml \
               --output_dir outputs/quickstart_test_colmap --triangulation.use_exhaustive_matcher --visualize 0 \
               --triangulation.use_pointsfm.enable --triangulation.use_pointsfm.colmap_folder outputs/quickstart_test/colmap_outputs/sparse
+
+      - name: Cleanup compiler cache
+        run: |
+          set -x
+          ccache --show-stats --verbose
+          ccache --evict-older-than 1d
+          ccache --show-stats --verbose
+
+          echo "Size of ctcache before: $(du -sh $CTCACHE_DIR)"
+          echo "Number of ctcache files before: $(find $CTCACHE_DIR | wc -l)"
+          # Delete cache older than 10 days.
+          find "$CTCACHE_DIR"/*/ -mtime +10 -print0 | xargs -0 rm -rf
+          echo "Size of ctcache after:  $(du -sh $CTCACHE_DIR)"
+          echo "Number of ctcache files after: $(find $CTCACHE_DIR | wc -l)"
 
