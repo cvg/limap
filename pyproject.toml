@@ -1,0 +1,29 @@
+[build-system]
+requires = [
+  "scikit-build-core>=0.10",
+  "cmake>=3.18",
+  "pybind11>=2.11",        
+]
+build-backend = "scikit_build_core.build"
+
+
+[project]
+name = "limap"
+version = "1.0.0.dev0"
+description = "A toolbox for mapping and localization with line features"
+authors = [
+  { name = "Shaohui Liu", email = "b1ueber2y@gmail.com" }
+]
+urls = {Repository = "https://github.com/cvg/limap"}
+requires-python = ">=3.9,<3.12"
+classifiers = [
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Operating System :: OS Independent",
+]
+
+[tool.scikit-build]
+cmake.source-dir = "./"
+wheel.packages = ["limap"]
+
