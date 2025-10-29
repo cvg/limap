@@ -260,7 +260,8 @@ def line_triangulation(cfg, imagecols, neighbors=None, ranges=None):
             )
 
         logging.info(
-            "Visualization about to start. Please ensure you have a graphical backend (e.g., X11, Wayland, or a Jupyter display) available."
+            "Visualization about to start. Please ensure you have a graphical "
+            "backend (e.g., X11, Wayland, or a Jupyter display) available."
         )
         input(
             "Press Enter to continue with visualization, or Ctrl+C to abort..."

@@ -301,7 +301,8 @@ def line_fitnmerge(cfg, imagecols, depths, neighbors=None, ranges=None):
 
     if cfg["visualize"]:
         logging.info(
-            "Visualization about to start. Please ensure you have a graphical backend (e.g., X11, Wayland, or a Jupyter display) available."
+            "Visualization about to start. Please ensure you have a graphical "
+            "backend (e.g., X11, Wayland, or a Jupyter display) available."
         )
         input(
             "Press Enter to continue with visualization, or Ctrl+C to abort..."
