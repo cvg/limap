@@ -13,6 +13,8 @@ version = "1.0.0.dev0"
 description = "A toolbox for mapping and localization with line features"
 authors = [
   { name = "Shaohui Liu", email = "b1ueber2y@gmail.com" }
+  { name = "Yifan Yu", email = "markyu98@outlook.com" }
+  { name = "Rémi Pautrat", email = "pautratrmi@microsoft.com" }
 ]
 urls = {Repository = "https://github.com/cvg/limap"}
 requires-python = ">=3.9,<3.12"
