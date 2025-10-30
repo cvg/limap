@@ -1,4 +1,5 @@
 from . import _limap
+from .limap import _base
 
 __all__ = []
 __version__ = _limap.__version__
