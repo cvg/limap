@@ -1,6 +1,7 @@
 from __future__ import annotations
+from . import base
 
-__all__ = ["__version__", "__ceres_version__", "_limap"]
+__all__ = ["__version__", "__ceres_version__", "_limap", "base"]
 
 try:
     from importlib.metadata import version, PackageNotFoundError
