@@ -2,11 +2,13 @@ import os
 import sys
 
 import numpy as np
+import importlib
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
+sys.modules["_limap"] = importlib.import_module("limap._limap")
 
 import argparse
 import logging
