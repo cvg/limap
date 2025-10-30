@@ -8,7 +8,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 )
-sys.modules["_limap"] = importlib.import_module("limap._limap")
 
 import argparse
 import logging
@@ -18,6 +17,8 @@ import cv2
 
 import limap.base as base
 import limap.estimators as estimators
+
+sys.modules["_limap"] = importlib.import_module("limap._limap")
 
 formatter = logging.Formatter(
     fmt="[%(asctime)s %(name)s %(levelname)s] %(message)s",
