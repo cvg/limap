@@ -27,5 +27,5 @@ classifiers = [
 
 [tool.scikit-build]
 cmake.source-dir = "./"
-wheel.packages = ["limap"]
+wheel.packages = ["src/limap"]
 cmake.define.VERSION_INFO = "1.0.0.dev0"

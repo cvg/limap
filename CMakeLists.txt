@@ -2,7 +2,7 @@
 cmake_minimum_required( VERSION 3.17 )
 
 # project name
-project(LIMAP)
+project(limap)
 
 ################################################################################
 # Include CMake dependencies
@@ -34,6 +34,7 @@ include(cmake/InitVariables.cmake)
 # include directories
 include_directories(
     ${PROJECT_SOURCE_DIR}
+    ${PROJECT_SOURCE_DIR}/src
     ${LIMAP_INCLUDE_DIRS}
 )
 link_directories(${LIMAP_LINK_DIRS})
@@ -41,7 +42,7 @@ link_directories(${LIMAP_LINK_DIRS})
 # Add sources
 add_subdirectory(third-party)
 include_directories(${RANSACLIB_INCLUDE_DIRS})
-add_subdirectory(limap)
+add_subdirectory(src/limap)
 
 # Install find_package scripts for dependencies.
 install(
