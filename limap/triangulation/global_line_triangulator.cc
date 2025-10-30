@@ -1,5 +1,5 @@
 #include "limap/triangulation/global_line_triangulator.h"
-#include "limap/_limap/helpers.h"
+#include "limap/internal/helpers.h"
 #include "limap/merging/aggregator.h"
 #include "limap/merging/merging.h"
 

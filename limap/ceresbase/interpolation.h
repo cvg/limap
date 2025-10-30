@@ -3,7 +3,7 @@
 // Modified from the pixel-perfect-sfm project
 // [LINK] https://github.com/cvg/pixel-perfect-sfm
 
-#include "limap/_limap/helpers.h"
+#include "limap/internal/helpers.h"
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 

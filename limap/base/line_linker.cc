@@ -1,5 +1,5 @@
 #include "limap/base/line_linker.h"
-#include "limap/_limap/helpers.h"
+#include "limap/internal/helpers.h"
 #include "limap/base/line_dists.h"
 #include <cmath>
 

@@ -1,5 +1,5 @@
 #include "limap/triangulation/base_line_triangulator.h"
-#include "limap/_limap/helpers.h"
+#include "limap/internal/helpers.h"
 #include "limap/triangulation/functions.h"
 
 #include <algorithm>

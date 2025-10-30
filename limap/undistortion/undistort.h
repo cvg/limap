@@ -1,6 +1,6 @@
 #pragma once
 
-#include "limap/_limap/helpers.h"
+#include "limap/internal/helpers.h"
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 

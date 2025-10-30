@@ -9,7 +9,7 @@
 
 namespace py = pybind11;
 
-#include "limap/_limap/helpers.h"
+#include "limap/internal/helpers.h"
 #include "limap/util/types.h"
 
 namespace limap {

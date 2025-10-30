@@ -1,6 +1,6 @@
 #pragma once
 
-#include "limap/_limap/helpers.h"
+#include "limap/internal/helpers.h"
 #include "limap/base/camera.h"
 #include "limap/base/linetrack.h"
 #include "limap/optimize/hybrid_localization/hybrid_localization.h"

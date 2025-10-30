@@ -2,7 +2,7 @@
 
 // Modified from the pixel-perfect-sfm project
 
-#include "limap/_limap/helpers.h"
+#include "limap/internal/helpers.h"
 #include <ceres/ceres.h>
 #include <pybind11/pybind11.h>
 

@@ -24,7 +24,7 @@ namespace py = pybind11;
 #include "limap/features/bindings.cc"
 #endif // INTERPOLATION_ENABLED
 
-#include "limap/_limap/helpers.h"
+#include "limap/internal/helpers.h"
 
 void bind_base(py::module &);
 void bind_ceresbase(py::module &);

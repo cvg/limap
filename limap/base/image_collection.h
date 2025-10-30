@@ -13,7 +13,7 @@ namespace py = pybind11;
 
 #include <colmap/geometry/sim3.h>
 
-#include "limap/_limap/helpers.h"
+#include "limap/internal/helpers.h"
 #include "limap/util/types.h"
 
 #include "limap/base/camera.h"
