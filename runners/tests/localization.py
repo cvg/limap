@@ -18,7 +18,9 @@ import cv2
 import limap.base as base
 import limap.estimators as estimators
 
+# legacy since https://github.com/cvg/limap/pull/144
 sys.modules["_limap"] = importlib.import_module("limap._limap")
+sys.modules["_limap._base"] = importlib.import_module("limap._limap._base")
 
 formatter = logging.Formatter(
     fmt="[%(asctime)s %(name)s %(levelname)s] %(message)s",
