@@ -5,6 +5,7 @@ __all__ = ["__version__", "__ceres_version__", "_limap", "base"]
 
 import importlib
 
+
 def __getattr__(name: str):
     if name == "_limap":
         return importlib.import_module("._limap", __name__)
