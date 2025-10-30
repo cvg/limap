@@ -1,10 +1,10 @@
 #pragma once
 
-#include "limap/internal/helpers.h"
 #include "limap/base/camera.h"
 #include "limap/base/linetrack.h"
 #include "limap/estimators/absolute_pose/joint_pose_estimator.h"
 #include "limap/estimators/extended_hybrid_ransac.h"
+#include "limap/internal/helpers.h"
 #include "limap/optimize/hybrid_localization/hybrid_localization.h"
 #include "limap/util/types.h"
 

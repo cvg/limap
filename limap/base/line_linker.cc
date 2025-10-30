@@ -1,6 +1,6 @@
 #include "limap/base/line_linker.h"
-#include "limap/internal/helpers.h"
 #include "limap/base/line_dists.h"
+#include "limap/internal/helpers.h"
 #include <cmath>
 
 namespace limap {

@@ -5,8 +5,8 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
-#include "limap/internal/helpers.h"
 #include "limap/base/linebase.h"
+#include "limap/internal/helpers.h"
 #include "limap/util/types.h"
 
 #include "limap/vplib/vpbase.h"

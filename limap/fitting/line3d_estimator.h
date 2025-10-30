@@ -1,8 +1,8 @@
 #pragma once
 
-#include "limap/internal/helpers.h"
 #include "limap/base/infinite_line.h"
 #include "limap/base/linebase.h"
+#include "limap/internal/helpers.h"
 #include "limap/util/types.h"
 
 #include <RansacLib/ransac.h>

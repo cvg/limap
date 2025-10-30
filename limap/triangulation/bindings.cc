@@ -3,9 +3,9 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
-#include "limap/internal/helpers.h"
 #include "limap/base/linebase.h"
 #include "limap/base/linetrack.h"
+#include "limap/internal/helpers.h"
 #include <Eigen/Core>
 #include <vector>
 
