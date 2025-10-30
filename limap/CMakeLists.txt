@@ -16,7 +16,7 @@ if(INTERPOLATION_ENABLED)
     add_subdirectory(features)
 endif()
 
-add_subdirectory(_limap)
+add_subdirectory(internal)
 
 LIMAP_ADD_STATIC_LIBRARY(limap ${LIMAP_SOURCES})
 target_link_libraries(limap

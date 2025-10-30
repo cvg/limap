@@ -1,4 +1,4 @@
-set(FOLDER_NAME "pylimap")
+set(FOLDER_NAME "internal")
 
 LIMAP_ADD_SOURCES(
     helpers.h
