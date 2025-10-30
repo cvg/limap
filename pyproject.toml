@@ -28,4 +28,4 @@ classifiers = [
 [tool.scikit-build]
 cmake.source-dir = "./"
 wheel.packages = ["limap"]
-
+cmake.define.VERSION_INFO = "1.0.0.dev0"
