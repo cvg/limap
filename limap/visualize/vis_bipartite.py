@@ -1,6 +1,6 @@
 import copy
 
-import _limap._base as _base
+from limap._limap import _base
 import numpy as np
 
 from .vis_lines import (

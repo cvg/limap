@@ -1,5 +1,5 @@
 import numpy as np
-from _limap import _ceresbase
+from limap._limap import _ceresbase
 
 import limap.base as base
 import limap.estimators as _estimators

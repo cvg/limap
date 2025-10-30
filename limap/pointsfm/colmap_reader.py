@@ -1,7 +1,7 @@
 import os
 
 import pycolmap
-from _limap import _base
+from limap._limap import _base
 from pycolmap import logging
 
 

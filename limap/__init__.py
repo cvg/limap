@@ -1,4 +1,4 @@
-import _limap
+from . import _limap
 
 from . import base
 

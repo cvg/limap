@@ -1,5 +1,5 @@
 import numpy as np
-from _limap import _features
+from limap._limap import _features
 
 
 def write_patch(fname, patch, dtype="float16"):

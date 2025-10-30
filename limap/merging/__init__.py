@@ -1,5 +1,5 @@
-from _limap import _merging as _merging
-from _limap._merging import *  # noqa: F403
+from limap._limap import _merging
+from limap._limap._merging import *  # noqa: F403
 
 from .merging import (
     check_sensitivity,

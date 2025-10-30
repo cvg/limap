@@ -1,4 +1,4 @@
-from _limap import _ceresbase, _optimize
+from limap._limap import _ceresbase, _optimize
 
 
 def solve_line_refinement(

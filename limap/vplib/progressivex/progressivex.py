@@ -2,7 +2,7 @@ from collections import namedtuple
 
 import numpy as np
 import pyprogressivex
-from _limap import _vplib
+from limap._limap import _vplib
 
 from ..base_vp_detector import BaseVPDetector, DefaultVPDetectorOptions
 

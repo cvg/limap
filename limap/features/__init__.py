@@ -1,5 +1,5 @@
-from _limap import _features as _features
-from _limap._features import *  # noqa: F403
+from limap._limap import _features
+from limap._limap._features import *  # noqa: F403
 
 from .extract_line_patches import (
     extract_line_patch_one_image,

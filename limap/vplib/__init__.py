@@ -1,5 +1,5 @@
-from _limap import _vplib as _vplib
-from _limap._vplib import *  # noqa: F403
+from limap._limap import _vplib
+from limap._limap._vplib import *  # noqa: F403
 
 from .register_vp_detector import get_vp_detector
 

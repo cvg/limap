@@ -2,7 +2,7 @@ import os
 
 import imagesize
 import numpy as np
-from _limap import _base, _pointsfm
+from limap._limap import _base, _pointsfm
 from tqdm import tqdm
 
 from limap.util.geometry import rotation_from_quaternion
