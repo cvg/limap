@@ -70,11 +70,13 @@ jobs:
         with:
           python-version: ${{ matrix.config.python-version  }}
 
+      - name: Clean workspace artifacts
+        run: rm -rf build/ dist/ *.egg-info/ .eggs/
+
       - name: Install Python dependencies
         run: |
           git submodule update --init --recursive
           python -m pip install --upgrade pip
-          python -m pip install setuptools
           python -m pip install -r requirements.txt
 
       - name: Build
