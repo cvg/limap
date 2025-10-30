@@ -33,14 +33,13 @@ include(cmake/InitVariables.cmake)
 
 # include directories
 include_directories(
-    ${PROJECT_SOURCE_DIR}
     ${PROJECT_SOURCE_DIR}/src
     ${LIMAP_INCLUDE_DIRS}
 )
 link_directories(${LIMAP_LINK_DIRS})
 
 # Add sources
-add_subdirectory(third-party)
+add_subdirectory(src/third-party)
 include_directories(${RANSACLIB_INCLUDE_DIRS})
 add_subdirectory(src/limap)
 
