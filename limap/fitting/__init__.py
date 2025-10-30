@@ -1,5 +1,5 @@
-from _limap import _fitting as _fitting
-from _limap._fitting import *  # noqa: F403
+from limap._limap import _fitting
+from limap._limap._fitting import *  # noqa: F403
 
 from .fitting import (
     estimate_seg3d,

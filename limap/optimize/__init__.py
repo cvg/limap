@@ -1,5 +1,5 @@
-from _limap import _optimize as _optimize
-from _limap._optimize import *  # noqa: F403
+from limap._limap import _optimize
+from limap._limap._optimize import *  # noqa: F403
 
 from .global_pl_association import solve_global_pl_association
 from .hybrid_bundle_adjustment import (

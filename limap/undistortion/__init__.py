@@ -1,5 +1,5 @@
-from _limap import _undistortion as _undistortion
-from _limap._undistortion import *  # noqa: F403
+from limap._limap import _undistortion
+from limap._limap._undistortion import *  # noqa: F403
 
 from .undistort import undistort_image_camera, undistort_points
 

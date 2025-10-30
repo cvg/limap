@@ -1,4 +1,4 @@
-from _limap import _triangulation as _tri
+from limap._limap import _triangulation as _tri
 
 
 def get_normal_direction(line2d, view):

@@ -1,5 +1,5 @@
 import cv2
-from _limap import _base, _undistortion
+from limap._limap import _base, _undistortion
 
 
 def undistort_image_camera(camera, imname_in, imname_out):

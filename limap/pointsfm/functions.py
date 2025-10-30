@@ -1,4 +1,4 @@
-from _limap import _pointsfm
+from limap._limap import _pointsfm
 from pycolmap import logging
 
 

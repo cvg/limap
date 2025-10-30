@@ -1,5 +1,5 @@
-from _limap import _base as _base
-from _limap._base import *  # noqa: F403
+from limap._limap import _base
+from limap._limap._base import *  # noqa: F403
 
 from .align import align_imagecols
 from .depth_reader_base import BaseDepthReader

@@ -1,5 +1,5 @@
-from _limap import _triangulation as _triangulation
-from _limap._triangulation import *  # noqa: F403
+from limap._limap import _triangulation
+from limap._limap._triangulation import *  # noqa: F403
 
 from .triangulation import (
     compute_epipolar_IoU,

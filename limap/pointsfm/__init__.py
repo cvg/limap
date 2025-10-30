@@ -1,5 +1,5 @@
-from _limap import _pointsfm as _pointsfm
-from _limap._pointsfm import *  # noqa: F403
+from limap._limap import _pointsfm
+from limap._limap._pointsfm import *  # noqa: F403
 
 from .colmap_reader import (
     ReadPointTracks,

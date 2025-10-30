@@ -7,7 +7,7 @@ import numpy as np
 import PIL
 import torch
 import torchvision.transforms.functional as tvf
-from _limap import _features
+from limap._limap import _features
 from pycolmap import logging
 from torchvision import transforms
 

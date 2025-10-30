@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from _limap import _ceresbase, _optimize
+from limap._limap import _ceresbase, _optimize
 
 
 def get_lineloc_cost_func(func_name):

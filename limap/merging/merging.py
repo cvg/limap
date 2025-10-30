@@ -1,5 +1,5 @@
-from _limap import _base
-from _limap import _merging as _mrg
+from limap._limap import _base
+from limap._limap import _merging as _mrg
 from pycolmap import logging
 
 
