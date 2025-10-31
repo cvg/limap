@@ -17,7 +17,7 @@ void bind_pointsfm(py::module &m) {
   using namespace pointsfm;
 
   // bind the colmap mvs image
-  py::class_<colmap::mvs::Image>(m, "SfmImage")
+  py::class_<colmap::mvs::Image>(m, "SfmImage", py::module_local())
       .def(py::init<>())
       .def(py::init(&CreateSfmImage))
       .def("GetR", &colmap::mvs::Image::GetR)
