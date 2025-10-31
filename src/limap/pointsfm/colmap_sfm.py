@@ -214,7 +214,6 @@ def run_colmap_sfm_with_known_poses(
     output_path="tmp/tmp_colmap",
     keypoints=None,
     skip_exists=False,
-    map_to_original_image_names=False,
     neighbors=None,
 ):
     ### set up path
@@ -267,13 +266,4 @@ def run_colmap_sfm_with_known_poses(
     pycolmap.triangulate_points(
         input_reconstruction, db_path, image_path, point_triangulation_path
     )
-
-    # map to original image names
-    if map_to_original_image_names:
-        recon = pycolmap.Reconstruction(os.path.join(model_path, "0"))
-        for img_id in imagecols.get_img_ids():
-            if img_id not in recon.images:
-                continue
-            recon.images[img_id].name = imagecols.image_name(img_id)
-        recon.write(os.path.join(model_path, "0"))
     return Path(point_triangulation_path)
