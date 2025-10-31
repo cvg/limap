@@ -1,9 +1,9 @@
 ## TP-LSD installation
 
 ```bash
-git clone --recursive https://github.com/rpautrat/TP-LSD.git ./third-party/TP-LSD
-python -m pip install -e ./third-party/TP-LSD/tp_lsd/modeling/DCNv2
-python -m pip install -e ./third-party/TP-LSD
+git clone --recursive https://github.com/rpautrat/TP-LSD.git ./src/third-party/TP-LSD
+python -m pip install -e ./src/third-party/TP-LSD/tp_lsd/modeling/DCNv2
+python -m pip install -e ./src/third-party/TP-LSD
 ```
 
 The TP-LSD Python package is tested under gcc-8 and gcc-9. However, it is known that gcc-10 is currently not supported for the installation of TP-LSD.
