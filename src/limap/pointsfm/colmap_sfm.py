@@ -7,8 +7,14 @@ import cv2
 import pycolmap
 from pycolmap import logging
 
-import hloc.utils.database as database
-import hloc.utils.read_write_model as colmap_utils
+from hloc import (
+    extract_features,
+    match_features,
+    reconstruction,
+    pairs_from_exhaustive,
+    triangulation,
+)
+import hloc.utils.io as open_colmap_database
 from limap.pointsfm.model_converter import convert_imagecols_to_colmap
 
 
@@ -18,19 +24,25 @@ def import_images_with_known_cameras(image_dir, database_path, imagecols):
     assert len(image_name_list) == len(image_ids)
 
     # connect to the database
-    db = database.COLMAPDatabase(database_path)
-    db.create_tables()
-    # add camera
-    for cam_id in imagecols.get_cam_ids():
-        cam = imagecols.cam(cam_id)
-        db.add_camera(
-            int(cam.model), cam.w(), cam.h(), cam.params, camera_id=cam_id
-        )
-    # add image
-    for img_name, img_id in zip(image_name_list, image_ids):
-        cam_id = imagecols.camimage(img_id).cam_id
-        db.add_image(img_name, cam_id, image_id=img_id)
-    db.commit()
+    with open_colmap_database(database_path) as db:
+        # add camera
+        for cam_id in imagecols.get_cam_ids():
+            cam = imagecols.cam(cam_id)
+            pycolmap_camera = pycolmap.Camera(
+                camera_id=cam_id,
+                model=int(cam.model),
+                width=cam.w(),
+                height=cam.h(),
+                params=cam.params,
+            )
+            db.write_camera(pycolmap_camera, use_camera_id=True)
+        # add image
+        for img_name, img_id in zip(image_name_list, image_ids):
+            cam_id = imagecols.camimage(img_id).cam_id
+            pycolmap_image = pycolmap.Image(
+                name=img_name, camera_id=cam_id, image_id=img_id
+            )
+            db.write_image(pycolmap_image)
 
 
 def write_pairs_from_neighbors(output_path, image_path, neighbors, image_ids):
@@ -72,14 +84,6 @@ def run_hloc_matches(
         _base.ImageCollection to do the match
     """
     image_path = Path(image_path)
-    from hloc import (
-        extract_features,
-        match_features,
-        pairs_from_exhaustive,
-        reconstruction,
-        triangulation,
-    )
-
     outputs = Path(os.path.join(os.path.dirname(db_path), "hloc_outputs"))
     sfm_dir = Path(os.path.join(outputs, "sfm"))
     feature_conf = extract_features.confs[cfg["descriptor"]]
@@ -135,10 +139,11 @@ def run_hloc_matches(
             image_path, db_path, imagecols
         )  # use cameras and id mapping
     image_ids = reconstruction.get_image_ids(db_path)
-    reconstruction.import_features(image_ids, db_path, feature_path)
-    reconstruction.import_matches(
-        image_ids, db_path, sfm_pairs, match_path, None, None
-    )
+    with open_colmap_database(db_path) as db:
+        reconstruction.import_features(image_ids, db, feature_path)
+        reconstruction.import_matches(
+            image_ids, db, sfm_pairs, match_path, None, None
+        )
     triangulation.estimation_and_geometric_verification(db_path, sfm_pairs)
 
 
