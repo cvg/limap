@@ -17,7 +17,7 @@ namespace limap {
 void bind_undistortion(py::module &m) {
   using namespace undistortion;
 
-  py::class_<colmap::Bitmap>(m, "COLMAP_Bitmap")
+  py::class_<colmap::Bitmap>(m, "COLMAP_Bitmap", py::module_local())
       .def(py::init<>())
       .def("Read", &colmap::Bitmap::Read, py::arg("imname"),
            py::arg("as_rgb") = true)
