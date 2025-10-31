@@ -200,15 +200,12 @@ def run_colmap_sfm(
 
     # map to original image names
     if map_to_original_image_names:
-        fname_images_bin = os.path.join(model_path, "0", "images.bin")
-        colmap_images = colmap_utils.read_images_binary(fname_images_bin)
+        recon = pycolmap.Reconstruction(os.path.join(model_path, "0"))
         for img_id in imagecols.get_img_ids():
-            if img_id not in colmap_images:
+            if img_id not in recon.images:
                 continue
-            colmap_images[img_id] = colmap_images[img_id]._replace(
-                name=imagecols.image_name(img_id)
-            )
-        colmap_utils.write_images_binary(colmap_images, fname_images_bin)
+            recon.images[img_id].name = imagecols.image_name(img_id)
+        recon.write(os.path.join(model_path, "0"))
 
 
 def run_colmap_sfm_with_known_poses(
@@ -273,12 +270,10 @@ def run_colmap_sfm_with_known_poses(
 
     # map to original image names
     if map_to_original_image_names:
-        fname_images_bin = os.path.join(point_triangulation_path, "images.bin")
-        colmap_images = colmap_utils.read_images_binary(fname_images_bin)
+        recon = pycolmap.Reconstruction(os.path.join(model_path, "0"))
         for img_id in imagecols.get_img_ids():
-            colmap_images[img_id] = colmap_images[img_id]._replace(
-                name=imagecols.image_name(img_id)
-            )
-        colmap_utils.write_images_binary(colmap_images, fname_images_bin)
-
+            if img_id not in recon.images:
+                continue
+            recon.images[img_id].name = imagecols.image_name(img_id)
+        recon.write(os.path.join(model_path, "0"))
     return Path(point_triangulation_path)
