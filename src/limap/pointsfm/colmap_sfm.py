@@ -14,7 +14,7 @@ from hloc import (
     pairs_from_exhaustive,
     triangulation,
 )
-import hloc.utils.io as open_colmap_database
+from hloc.utils.io import open_colmap_database
 from limap.pointsfm.model_converter import convert_imagecols_to_colmap
 
 
