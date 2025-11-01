@@ -7,8 +7,14 @@ import cv2
 import pycolmap
 from pycolmap import logging
 
-import hloc.utils.database as database
-import hloc.utils.read_write_model as colmap_utils
+from hloc import (
+    extract_features,
+    match_features,
+    reconstruction,
+    pairs_from_exhaustive,
+    triangulation,
+)
+from hloc.utils.io import open_colmap_database
 from limap.pointsfm.model_converter import convert_imagecols_to_colmap
 
 
@@ -18,19 +24,25 @@ def import_images_with_known_cameras(image_dir, database_path, imagecols):
     assert len(image_name_list) == len(image_ids)
 
     # connect to the database
-    db = database.COLMAPDatabase(database_path)
-    db.create_tables()
-    # add camera
-    for cam_id in imagecols.get_cam_ids():
-        cam = imagecols.cam(cam_id)
-        db.add_camera(
-            int(cam.model), cam.w(), cam.h(), cam.params, camera_id=cam_id
-        )
-    # add image
-    for img_name, img_id in zip(image_name_list, image_ids):
-        cam_id = imagecols.camimage(img_id).cam_id
-        db.add_image(img_name, cam_id, image_id=img_id)
-    db.commit()
+    with open_colmap_database(database_path) as db:
+        # add camera
+        for cam_id in imagecols.get_cam_ids():
+            cam = imagecols.cam(cam_id)
+            pycolmap_camera = pycolmap.Camera(
+                camera_id=cam_id,
+                model=int(cam.model),
+                width=cam.w(),
+                height=cam.h(),
+                params=cam.params,
+            )
+            db.write_camera(pycolmap_camera, use_camera_id=True)
+        # add image
+        for img_name, img_id in zip(image_name_list, image_ids):
+            cam_id = imagecols.camimage(img_id).cam_id
+            pycolmap_image = pycolmap.Image(
+                name=img_name, camera_id=cam_id, image_id=img_id
+            )
+            db.write_image(pycolmap_image, use_image_id=True)
 
 
 def write_pairs_from_neighbors(output_path, image_path, neighbors, image_ids):
@@ -72,14 +84,6 @@ def run_hloc_matches(
         _base.ImageCollection to do the match
     """
     image_path = Path(image_path)
-    from hloc import (
-        extract_features,
-        match_features,
-        pairs_from_exhaustive,
-        reconstruction,
-        triangulation,
-    )
-
     outputs = Path(os.path.join(os.path.dirname(db_path), "hloc_outputs"))
     sfm_dir = Path(os.path.join(outputs, "sfm"))
     feature_conf = extract_features.confs[cfg["descriptor"]]
@@ -135,10 +139,11 @@ def run_hloc_matches(
             image_path, db_path, imagecols
         )  # use cameras and id mapping
     image_ids = reconstruction.get_image_ids(db_path)
-    reconstruction.import_features(image_ids, db_path, feature_path)
-    reconstruction.import_matches(
-        image_ids, db_path, sfm_pairs, match_path, None, None
-    )
+    with open_colmap_database(db_path) as db:
+        reconstruction.import_features(image_ids, db, feature_path)
+        reconstruction.import_matches(
+            image_ids, db, sfm_pairs, match_path, None, None
+        )
     triangulation.estimation_and_geometric_verification(db_path, sfm_pairs)
 
 
@@ -195,15 +200,12 @@ def run_colmap_sfm(
 
     # map to original image names
     if map_to_original_image_names:
-        fname_images_bin = os.path.join(model_path, "0", "images.bin")
-        colmap_images = colmap_utils.read_images_binary(fname_images_bin)
+        recon = pycolmap.Reconstruction(os.path.join(model_path, "0"))
         for img_id in imagecols.get_img_ids():
-            if img_id not in colmap_images:
+            if img_id not in recon.images:
                 continue
-            colmap_images[img_id] = colmap_images[img_id]._replace(
-                name=imagecols.image_name(img_id)
-            )
-        colmap_utils.write_images_binary(colmap_images, fname_images_bin)
+            recon.images[img_id].name = imagecols.image_name(img_id)
+        recon.write(os.path.join(model_path, "0"))
 
 
 def run_colmap_sfm_with_known_poses(
@@ -212,7 +214,6 @@ def run_colmap_sfm_with_known_poses(
     output_path="tmp/tmp_colmap",
     keypoints=None,
     skip_exists=False,
-    map_to_original_image_names=False,
     neighbors=None,
 ):
     ### set up path
@@ -265,15 +266,4 @@ def run_colmap_sfm_with_known_poses(
     pycolmap.triangulate_points(
         input_reconstruction, db_path, image_path, point_triangulation_path
     )
-
-    # map to original image names
-    if map_to_original_image_names:
-        fname_images_bin = os.path.join(point_triangulation_path, "images.bin")
-        colmap_images = colmap_utils.read_images_binary(fname_images_bin)
-        for img_id in imagecols.get_img_ids():
-            colmap_images[img_id] = colmap_images[img_id]._replace(
-                name=imagecols.image_name(img_id)
-            )
-        colmap_utils.write_images_binary(colmap_images, fname_images_bin)
-
     return Path(point_triangulation_path)

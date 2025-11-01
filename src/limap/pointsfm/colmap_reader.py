@@ -58,7 +58,7 @@ def ReadInfos(colmap_path, model_path="sparse", image_path="images"):
     image_path = os.path.join(colmap_path, image_path)
     reconstruction = pycolmap.Reconstruction(model_path)
     logging.info(
-        f"Reconstruction loaded. (n_images = {reconstruction.num_images()}"
+        f"Reconstruction loaded. (n_images = {reconstruction.num_images()})"
     )
     imagecols = convert_colmap_to_imagecols(
         reconstruction, image_path=image_path

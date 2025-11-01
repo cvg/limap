@@ -317,7 +317,6 @@ def run_hloc_cambridge(
         imagecols_train,
         os.path.join(cfg["output_dir"], "tmp_colmap"),
         neighbors=neighbors_train,
-        map_to_original_image_names=False,
         skip_exists=cfg["skip_exists"],
     )
     ref_sfm = pycolmap.Reconstruction(ref_sfm_path)
