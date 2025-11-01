@@ -42,7 +42,7 @@ def import_images_with_known_cameras(image_dir, database_path, imagecols):
             pycolmap_image = pycolmap.Image(
                 name=img_name, camera_id=cam_id, image_id=img_id
             )
-            db.write_image(pycolmap_image)
+            db.write_image(pycolmap_image, use_image_id=True)
 
 
 def write_pairs_from_neighbors(output_path, image_path, neighbors, image_ids):
