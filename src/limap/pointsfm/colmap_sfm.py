@@ -14,7 +14,6 @@ from hloc import (
     pairs_from_exhaustive,
     triangulation,
 )
-from hloc.utils.io import open_colmap_database
 from limap.pointsfm.model_converter import convert_imagecols_to_colmap
 
 
@@ -24,7 +23,7 @@ def import_images_with_known_cameras(image_dir, database_path, imagecols):
     assert len(image_name_list) == len(image_ids)
 
     # connect to the database
-    with open_colmap_database(database_path) as db:
+    with pycolmap.Database.open(database_path) as db:
         # add camera
         for cam_id in imagecols.get_cam_ids():
             cam = imagecols.cam(cam_id)
@@ -139,7 +138,7 @@ def run_hloc_matches(
             image_path, db_path, imagecols
         )  # use cameras and id mapping
     image_ids = reconstruction.get_image_ids(db_path)
-    with open_colmap_database(db_path) as db:
+    with pycolmap.Database.open(db_path) as db:
         reconstruction.import_features(image_ids, db, feature_path)
         reconstruction.import_matches(
             image_ids, db, sfm_pairs, match_path, None, None
