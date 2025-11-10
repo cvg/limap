@@ -5,6 +5,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import math
 
 import numpy as np
+import pycolmap
 
 import limap.base as base
 import limap.optimize as optimize
@@ -61,7 +62,7 @@ def pointline_association(cfg, input_folder, output_folder, colmap_folder):
     # Point-line bipartite
     ############################################################
     # initiate point-line bipartites on 2d for each image
-    reconstruction = pointsfm.PyReadCOLMAP(colmap_folder)
+    reconstruction = pycolmap.Reconstruction(colmap_folder)
     pointtracks = pointsfm.ReadPointTracks(reconstruction)
     all_bpt2ds, _ = limap.runners.compute_2d_bipartites_from_colmap(
         reconstruction, imagecols, all_2d_lines
