@@ -42,13 +42,17 @@ def parse_args():
     return args
 
 
-def vis_colmap_reconstruction(recon: pycolmap.Reconstruction, ranges=None):
+def vis_colmap_reconstruction(
+    args, recon: pycolmap.Reconstruction, ranges=None
+):
     vis = o3d.visualization.Visualizer()
     vis.create_window(height=1080, width=1920)
     pts = np.array([p.xyz for p in recon.points3D.values()], dtype=np.float32)
     if args.reproj_error_thresh > 0.0:
-        errs = np.array([p.error for p in recon.points3D.values()], dtype=np.float32)
-        mask = (errs <= args.reproj_error_thresh)  # e.g. keep colored, low-error
+        errs = np.array(
+            [p.error for p in recon.points3D.values()], dtype=np.float32
+        )
+        mask = errs <= args.reproj_error_thresh  # e.g. keep colored, low-error
         pts = pts[mask]
     print(f"Number of valid points for visualization: {pts.shape[0]}")
     pcd = limapvis.open3d_get_points(pts, ranges=ranges)
@@ -74,7 +78,7 @@ def main(args):
     if args.use_robust_ranges:
         points = np.array([point.xyz for _, point in recon.points3D.items()])
         ranges = limapvis.compute_robust_range_points(points)
-    vis_colmap_reconstruction(recon, ranges=ranges)
+    vis_colmap_reconstruction(args, recon, ranges=ranges)
 
 
 if __name__ == "__main__":
