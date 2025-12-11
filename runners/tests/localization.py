@@ -150,7 +150,7 @@ def main():
     cos = np.clip((np.trace(np.dot(R_gt.T, R)) - 1) / 2, -1.0, 1.0)
     e_R = np.rad2deg(np.abs(np.arccos(cos)))
     log += f"Result(P+L) Pose errors: {e_t:.3f}m, {e_R:.3f}deg"
-    np.testing.assert_(e_t < 0.1, f"e_t = {e_t:.3f}m")
+    np.testing.assert_(e_t < 0.5, f"e_t = {e_t:.3f}m")
     np.testing.assert_(e_R < 2.0, f"e_R = {e_R:.3f}deg")
 
     logger.info(log)

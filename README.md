@@ -27,7 +27,7 @@ In this project, we provide interfaces for various geometric operations on 2D/3D
 To install the LIMAP Python package:
 ```
 git submodule update --init --recursive
-python -m pip install --src deps -r requirements.txt
+python -m pip install -r requirements.txt
 python -m pip install -Ive . 
 ```
 To double check if the package is successfully installed:
