@@ -70,6 +70,13 @@ jobs:
         with:
           python-version: ${{ matrix.config.python-version  }}
 
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          docker system prune -af || true
+
       - name: Clean workspace artifacts
         run: rm -rf build/ dist/ *.egg-info/ .eggs/
 
