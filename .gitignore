@@ -2,7 +2,7 @@
 /dist/
 cmake-build-*
 *.egg-info/
-src/hloc
+deps/
 
 *.npy
 *.png

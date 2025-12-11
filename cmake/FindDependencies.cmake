@@ -12,6 +12,7 @@ endif()
 find_package(Boost REQUIRED COMPONENTS
              graph
              program_options
+             OPTIONAL_COMPONENTS
              system)
 
 # Ceres
