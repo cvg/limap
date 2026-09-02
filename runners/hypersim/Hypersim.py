@@ -3,7 +3,6 @@ import os
 import cv2
 import h5py
 import numpy as np
-import pyvista as pv
 
 
 def to_homogeneous(arr):
@@ -239,23 +238,3 @@ class Hypersim:
             all_points.append(points)
         all_points = np.concatenate(all_points, 0)
         return all_points
-
-    @classmethod
-    def set_camera_properties(cls, cam, Rt):
-        h, w = cls.h, cls.w
-        cam.view_frustum(w / h)
-        cam.SetViewAngle(cls.fov_y * 180 / np.pi)
-        cam.SetViewUp(0.0, -1.0, 0.0)
-        cam.SetPosition(0, 0, 0)
-        cam.SetFocalPoint(0.0, 0.0, 2.0)
-        cam.clipping_range = (0.001, 100)
-        cam.SetModelTransformMatrix(Rt.ravel())
-
-    @classmethod
-    def get_camera_frustrum(cls, Rt):
-        h, w = cls.h, cls.w
-        view_camera = pv.Camera()
-        Hypersim.set_camera_properties(view_camera, Rt)
-        view_camera.clipping_range = (1e-5, 0.5)
-        frustum = view_camera.view_frustum(w / h)
-        return frustum

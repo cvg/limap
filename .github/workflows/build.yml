@@ -108,24 +108,21 @@ jobs:
           python runners/hypersim/geometry_guided_line_reconstruction.py \
               --default_config_file cfgs/geometry_guided_line_reconstruction/default_cpu.yaml \
               --output_dir outputs/quickstart_test
+          # Geometry-guided fits lines to depth and triangulates no points.
+          python scripts/check_reconstruction.py \
+              outputs/quickstart_test/geometry_guided_final_model \
+              --min-points 0
           python runners/hypersim/structure_triangulation.py \
               --default_config_file cfgs/structure_triangulation/default_cpu.yaml \
               --output_dir outputs/quickstart_test --skip_exists
+          python scripts/check_reconstruction.py \
+              outputs/quickstart_test/final_model
           python -m limap.cli.automatic_point_line_triangulation \
               -m outputs/quickstart_test/init_model \
               -i data/ai_001_001/images/scene_cam_00_final_preview \
               -o outputs/quickstart_test_colmap \
               -c cfgs/structure_triangulation/default_cpu.yaml \
               --max_image_dim 800
-
-      - name: Check E2E reconstructions are non-empty
-        run: |
-          # Geometry-guided fits lines to depth and triangulates no points.
-          python scripts/check_reconstruction.py \
-              outputs/quickstart_test/geometry_guided_final_model \
-              --min-points 0
-          python scripts/check_reconstruction.py \
-              outputs/quickstart_test/final_model
           python scripts/check_reconstruction.py \
               outputs/quickstart_test_colmap/final_model
 
