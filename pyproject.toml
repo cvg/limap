@@ -2,7 +2,8 @@
 requires = [
   "scikit-build-core>=0.10",
   "cmake>=3.18",
-  "pybind11>=2.11",        
+  # Must match COLMAP's pin: limap's bindings inherit pycolmap's types.
+  "pybind11==3.0.4",
 ]
 build-backend = "scikit_build_core.build"
 
