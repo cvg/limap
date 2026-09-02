@@ -40,7 +40,6 @@ This yields a sparse 3D reconstruction with geometric primitives (planes, sphere
 
 To install the LIMAP Python package:
 ```
-git submodule update --init --recursive
 python -m pip install -r requirements.txt
 python -m pip install -Ive . 
 ```

@@ -70,7 +70,14 @@ if(LIMAP_BENCHMARK_ENABLED)
 endif()
 
 ################################################################################
-# Submodule dependencies (always built)
+# libigl
 ################################################################################
-add_subdirectory(highfive)
-add_subdirectory(libigl)
+message(STATUS "Configuring libigl...")
+set(LIBIGL_INSTALL OFF CACHE BOOL "Disable libigl install" FORCE)
+FetchContent_Declare(libigl
+    GIT_REPOSITORY    https://github.com/libigl/libigl.git
+    GIT_TAG           cab03717c7f6f3657bed6438601abf43d84a208f
+    EXCLUDE_FROM_ALL
+)
+FetchContent_MakeAvailable(libigl)
+message(STATUS "Configuring libigl... done")
