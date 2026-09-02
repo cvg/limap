@@ -30,7 +30,7 @@ double RefLineEvaluator::ComputeRecallLength(
     }
     std::vector<int> flags(num_samples, 0);
 #pragma omp parallel for
-    for (size_t i = 0; i < num_samples; ++i) {
+    for (int i = 0; i < num_samples; ++i) {
       double dist = DistPointLines(points[i], lines);
       if (dist < threshold)
         flags[i] = 1;

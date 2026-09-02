@@ -11,4 +11,6 @@ LIMAP_ADD_LIBRARY(
         limap_geometry
         limap_util
         igl::core
+    PRIVATE_LINK_LIBS
+        OpenMP::OpenMP_CXX
 )

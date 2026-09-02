@@ -1,5 +1,7 @@
 #include "limap/scene/colmap_mvs_model.h"
 
+#include <cstdint>
+
 #include <colmap/math/math.h>
 #include <colmap/scene/reconstruction.h>
 #include <colmap/util/logging.h>
@@ -137,7 +139,7 @@ COLMAPMVSModel::GetMaxIoUImages(const size_t num_images,
   const std::vector<int> num_points = ComputeNumPoints();
 
 #pragma omp parallel for
-  for (size_t image_idx = 0; image_idx < images.size(); ++image_idx) {
+  for (int64_t image_idx = 0; image_idx < (int64_t)images.size(); ++image_idx) {
     const std::map<int, int> &shared_images = shared_num_points.at(image_idx);
     const int &num_point_1 = num_points.at(image_idx);
     const auto &overlapping_triangulation_angles =
@@ -198,7 +200,7 @@ std::map<int, std::vector<int>> COLMAPMVSModel::GetMaxDiceCoeffImages(
   const std::vector<int> num_points = ComputeNumPoints();
 
 #pragma omp parallel for
-  for (size_t image_idx = 0; image_idx < images.size(); ++image_idx) {
+  for (int64_t image_idx = 0; image_idx < (int64_t)images.size(); ++image_idx) {
     const std::map<int, int> &shared_images = shared_num_points.at(image_idx);
     const int &num_point_1 = num_points.at(image_idx);
     const auto &overlapping_triangulation_angles =

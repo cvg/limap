@@ -34,6 +34,11 @@ std::map<int, VPResult> BaseVPDetector::AssociateVPsParallel(
           std::make_pair(img_id, AssociateVPs(all_lines.at(img_id))));
     }
   } else {
+// NOTE: inert by design. limap_image deliberately does not link OpenMP:
+// JLinkage's RandomSampler calls srand() in its constructor and samples
+// with rand(), so running this in parallel races on the global RNG state
+// and makes VP results non-reproducible. Re-enable once JLinkage takes a
+// per-instance RNG.
 #pragma omp parallel for num_threads(n_jobs) schedule(dynamic)
     for (int i = 0; i < (int)image_ids.size(); ++i) {
       int img_id = image_ids[i];

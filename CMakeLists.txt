@@ -8,8 +8,14 @@ project(limap)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
+   AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1)
     message(FATAL_ERROR "GCC version needs to be at least 9.1")
+endif()
+
+# MSVC does not define M_PI and friends without this.
+if(MSVC)
+    add_compile_definitions(_USE_MATH_DEFINES)
 endif()
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 

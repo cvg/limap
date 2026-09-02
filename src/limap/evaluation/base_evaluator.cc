@@ -49,7 +49,7 @@ std::vector<Line3d> BaseEvaluator::ComputeInlierSegsOneLine(const Line3d &line,
   std::vector<Line3d> res;
   double interval = 1.0 / n_samples;
   std::vector<double> dists(n_samples);
-  std::vector<bool> flags(n_samples, false);
+  std::vector<char> flags(n_samples, false);
 #pragma omp parallel for
   for (int i = 0; i < n_samples; ++i) {
     V3D p = line.start + (i + 0.5) * interval * (line.end - line.start);
@@ -103,7 +103,7 @@ std::vector<Line3d> BaseEvaluator::ComputeOutlierSegsOneLine(const Line3d &line,
   std::vector<Line3d> res;
   double interval = 1.0 / n_samples;
   std::vector<double> dists(n_samples);
-  std::vector<bool> flags(n_samples, true);
+  std::vector<char> flags(n_samples, true);
 #pragma omp parallel for
   for (int i = 0; i < n_samples; ++i) {
     V3D p = line.start + (i + 0.5) * interval * (line.end - line.start);
