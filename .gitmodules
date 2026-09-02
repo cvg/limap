@@ -1,6 +1,0 @@
-[submodule "src/third-party/libigl"]
-	path = src/thirdparty/libigl
-	url = https://github.com/libigl/libigl.git
-[submodule "src/third-party/highfive"]
-	path = src/thirdparty/highfive
-	url = https://github.com/highfive-devs/highfive.git

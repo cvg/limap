@@ -24,7 +24,4 @@ LIMAP_ADD_LIBRARY(
         limap_geometry
         limap_util
         ${LIMAP_COLMAP_TARGET}
-    PRIVATE_LINK_LIBS
-        HighFive
-        ${HDF5_C_LIBRARIES}
 )

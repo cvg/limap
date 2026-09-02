@@ -16,7 +16,6 @@ Install LIMAP
 
 .. code-block:: bash
 
-    git submodule update --init --recursive
     python -m pip install -r requirements.txt
     python -m pip install -Ive .
 

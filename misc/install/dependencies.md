@@ -20,7 +20,6 @@ sudo apt-get install \
     libqt5opengl5-dev \
     libcgal-dev \
     libceres-dev \
-    libhdf5-dev
 ```
 
 Many of the above dependencies are for the third-party COLMAP following its [official guide](https://colmap.github.io/install.html).

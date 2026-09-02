@@ -24,7 +24,6 @@ endif()
 
 # Include/link directories
 set(LIMAP_INCLUDE_DIRS
-    ${HDF5_INCLUDE_DIRS}
     ${COLMAP_INCLUDE_DIRS}
 )
 
