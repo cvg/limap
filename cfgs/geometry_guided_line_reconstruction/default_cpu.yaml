@@ -1,0 +1,17 @@
+---
+###############################
+# CPU-only config used by CI
+base_config_file: "cfgs/geometry_guided_line_reconstruction/default.yaml"
+
+metainfo:
+  point_triangulation:
+    point_detection:
+      method: "sift"
+    point_matcher:
+      method: "NN-ratio"
+
+# Lines are fitted against depth, so no descriptors are needed.
+_line_detection:
+  detector_method: "lsd"
+  extractor_method: null
+  compute_descinfo: False

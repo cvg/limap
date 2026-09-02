@@ -125,6 +125,7 @@ class Hypersim:
     def set_scene_id(self, scene_id):
         self.scene_dir = os.path.join(self.data_dir, scene_id)
         self.mpau = self.read_mpau(self.scene_dir)
+        self.cam_id = -1  # Invalidate camera cache
 
     def filter_index_list(self, index_list, cam_id=0):
         new_index_list = []

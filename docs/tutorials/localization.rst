@@ -1,28 +1,17 @@
 Localization with points & lines
 =================================
 
-Currently, runner scripts are provided to run visual localization integrating line along with point features on the following Datasets: 
+LIMAP provides a runner script to run visual localization integrating lines along with point features on the `7Scenes Dataset <https://www.microsoft.com/en-us/research/project/rgb-d-dataset-7-scenes/>`_.
 
-* `7Scenes Dataset <https://www.microsoft.com/en-us/research/project/rgb-d-dataset-7-scenes/>`_
-* `Cambridge Landmarks Dataset <https://arxiv.org/abs/1505.07427>`_
-* `InLoc Dataset <http://www.ok.sc.e.titech.ac.jp/INLOC/>`_
+Use ``runners/7scenes/localization.py`` to run the localization experiment; use the ``--help`` option and take a look at the ``cfgs/localization`` folder for all the possible options and configurations.
 
-Please follow hloc's guide for downloading and preparing Cambridge and 7Scenes dataset:
-
-* `7Scenes <https://github.com/cvg/Hierarchical-Localization/tree/master/hloc/pipelines/7Scenes>`_
-* `Cambridge <https://github.com/cvg/Hierarchical-Localization/tree/master/hloc/pipelines/Cambridge>`_
-
-Use ``runners/<dataset>/localization.py`` to run localization experiments on these supported datasets, use ``--help`` option and take a look at ``cfgs/localization`` folder for all the possible options and configurations.
-
-Alternatively, take a look at the :py:meth:`limap.estimators.absolute_pose.pl_estimate_absolute_pose` API or the :py:meth:`limap.runners.line_localization.line_localization` runner to run localization with points and lines, using 2D-3D point and line correspondences directly.
+Alternatively, take a look at the :py:meth:`limap.runners.point_line_localization` runner or the :py:mod:`limap.estimators.absolute_pose` API to run localization with points and lines, using 2D-3D point and line correspondences directly.
 
 ------------------------------------
 Example on 7Scenes
 ------------------------------------
 
-Here we provide a tutorial to reproduce the visual localization experiment in paper `3D Line Mapping Revisited <https://arxiv.org/abs/2303.17504>`_ (in CVPR 2023), specifically on the *Stairs* scene of the `7Scenes <https://www.microsoft.com/en-us/research/project/rgb-d-dataset-7-scenes/>`_ dataset.
-
-This scene best demonstrates the improvement that could be achieved by integrating lines along with point features for visual localization, since traditionally point-based localization struggles in performance.
+Here we provide a tutorial for the visual localization experiment from the paper `3D Line Mapping Revisited <https://arxiv.org/abs/2303.17504>`_ (in CVPR 2023), specifically on the *Stairs* scene of the `7Scenes <https://www.microsoft.com/en-us/research/project/rgb-d-dataset-7-scenes/>`_ dataset.
 
 Follow `hloc <https://github.com/cvg/Hierarchical-Localization/tree/master/hloc/pipelines/7Scenes>`_, download the images from the project page:
 
@@ -36,7 +25,7 @@ Follow `hloc <https://github.com/cvg/Hierarchical-Localization/tree/master/hloc/
 Download the SIFT SfM models and DenseVLAD image pairs, courtesy of Torsten Sattler:
 
 .. code-block:: bash
-    
+
     function download {
     wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate "https://docs.google.com/uc?export=download&id=$1" -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=$1" -O $2 && rm -rf /tmp/cookies.txt
     unzip $2 -d $dataset && rm $2;
@@ -54,19 +43,31 @@ Download the rendered depth maps, courtesy of Eric Brachmann for `DSAC* <https:/
 
 The download could take some time as the compressed data files contain all 7Scenes. You could delete the other scenes since for this example we are only using the Stairs scene.
 
-Now, to run the localization pipeline with points and lines. As shown above, the configs are passed in as command line arguments.
+Now, run the localization pipeline with points and lines:
 
 .. code-block:: bash
 
-    python runners/7scenes/localization.py --dataset $dataset -s stairs --skip_exists \
-                                           --localization.optimize.loss_func TrivialLoss
+    python runners/7scenes/localization.py --dataset $dataset -s stairs --skip_exists
 
-It is also possible to use the rendered depth with the ``--use_dense_depth`` flag, in which case the 3D line map will be built using LIMAP's Fit&Merge (enable merging by adding ``--merging.do_merging``) utilities instead of triangulation.
+It is also possible to use the rendered depth with the ``--use_dense_depth`` flag, in which case the 3D line map is built from the depth maps instead of triangulation:
 
 .. code-block:: bash
 
-    python runners/7scenes/localization.py --dataset $dataset -s stairs --skip_exists \
-                                           --use_dense_depth \
-                                           --localization.optimize.loss_func TrivialLoss
+    python runners/7scenes/localization.py --dataset $dataset -s stairs --skip_exists --use_dense_depth
 
-The runner scripts will also run `hloc <https://github.com/cvg/Hierarchical-Localization/tree/master/hloc/pipelines/7Scenes>`_ for extracting and matching the feature points and for comparing the results. The evaluation result will be printed in terminal after localization is finished. You could also evaluate different result ``.txt`` files using the ``--eval`` flag.
+Add ``--use_points_only`` to run the point-only baseline. The runner also runs `hloc <https://github.com/cvg/Hierarchical-Localization/tree/master/hloc/pipelines/7Scenes>`_ for extracting and matching the feature points and for comparing the results. The evaluation result is printed in the terminal after localization is finished. You can also evaluate an existing result ``.txt`` file with the ``--eval_file`` option.
+
+Uncalibrated queries
+--------------------
+
+We also support localization without knowing the query intrinsics, by adding
+the ``--uncalibrated`` flag:
+
+.. code-block:: bash
+
+    python runners/7scenes/localization.py --dataset $dataset -s stairs --skip_exists --uncalibrated
+
+The focal length is then estimated jointly with the pose from the same point
+and line correspondences, while the map keeps its own calibration. The
+principal point is taken from the input camera, and the runner reports the
+distribution of the estimated focal lengths once localization is finished.

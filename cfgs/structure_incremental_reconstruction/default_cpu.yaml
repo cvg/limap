@@ -1,0 +1,25 @@
+---
+###############################
+# CPU-only config used by CI
+base_config_file: "cfgs/structure_incremental_reconstruction/default.yaml"
+
+# No line descriptors on CPU, so pair lines geometrically instead.
+use_exhaustive_line_matching: True
+
+metainfo:
+  point_triangulation:
+    point_detection:
+      method: "sift"
+    point_matcher:
+      method: "NN-ratio"
+
+_image_description:
+  point_detection:
+    method: "sift"
+  line_detection:
+    detector_method: "lsd"
+    extractor_method: null
+
+_image_association:
+  point_matcher:
+    method: "NN-ratio"

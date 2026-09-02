@@ -1,0 +1,28 @@
+---
+output_dir: "tmp"
+max_image_dim: null
+skip_exists: False
+skip_frontend_if_exists_database: False
+n_visible_views: 4
+
+metainfo:
+  pair_generation:
+    n_neighbors: 20
+
+_image_description:
+  point_detection:
+    method: "aliked-n16"
+  line_detection:
+    detector_method: "deeplsd"
+    extractor_method: "wireframe"
+  use_joint_point_line_detection: False
+
+_image_association:
+  use_dense_matching: False
+  use_dense_matching_for_groups: False
+  use_joint_point_line_matcher: False
+  point_matcher:
+    method: "aliked+lightglue"
+  line_matcher:
+    method: "gluestick"
+

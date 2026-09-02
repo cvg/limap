@@ -1,24 +1,19 @@
-add_subdirectory(base)
-add_subdirectory(ceresbase)
-add_subdirectory(solvers)
-add_subdirectory(vplib)
 add_subdirectory(util)
-add_subdirectory(pointsfm)
-add_subdirectory(triangulation)
-add_subdirectory(merging)
-add_subdirectory(undistortion)
+add_subdirectory(geometry)
 add_subdirectory(evaluation)
-add_subdirectory(fitting)
+add_subdirectory(scene)
+add_subdirectory(image)
 add_subdirectory(estimators)
-add_subdirectory(optimize)
-add_subdirectory(structures)
-if(INTERPOLATION_ENABLED)
-    add_subdirectory(features)
-endif()
+add_subdirectory(sfm)
 
-add_subdirectory(internal)
-
-LIMAP_ADD_STATIC_LIBRARY(limap ${LIMAP_SOURCES})
-target_link_libraries(limap
-    ${LIMAP_INTERNAL_LIBRARIES} ${LIMAP_EXTERNAL_LIBRARIES})
-
+# Umbrella interface library for backward compatibility (pybind11, etc.)
+add_library(limap INTERFACE)
+target_link_libraries(limap INTERFACE
+    limap_util
+    limap_geometry
+    limap_evaluation
+    limap_scene
+    limap_image
+    limap_estimators
+    limap_sfm
+)

@@ -1,8 +1,14 @@
 #include "limap/evaluation/mesh_evaluator.h"
 
 #include <cmath>
+// libigl's readOBJ/readOFF ignore fgets/fscanf return values, which triggers
+// -Wunused-result. In header-only mode these bodies are #include'd inline here,
+// so scope the suppression to just these third-party includes.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
 #include <igl/readOBJ.h>
 #include <igl/readOFF.h>
+#pragma GCC diagnostic pop
 #include <iostream>
 #include <numeric>
 #include <queue>

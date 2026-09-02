@@ -1,8 +1,12 @@
 /build/
 /dist/
 cmake-build-*
+pylimap_build/
 *.egg-info/
 deps/
+reference/
+CLAUDE.md
+.claude/
 
 *.npy
 *.png
@@ -18,11 +22,18 @@ deps/
 *.tar.gz
 *.th
 *.so
+*.pt
+*.pth
 
-experiments
 data
 results
 outputs
 tmp
 
 docs/_build
+
+log_*.txt
+log_*.md
+/logs*/
+global_*.md
+run_*.sh

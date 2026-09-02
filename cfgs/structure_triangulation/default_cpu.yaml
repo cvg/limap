@@ -1,0 +1,29 @@
+---
+###############################
+# CPU-only config used by CI
+base_config_file: "cfgs/structure_triangulation/default.yaml"
+
+# Group description needs the MoGe model (weight download + GPU).
+use_groups: False
+
+# No line descriptors available on CPU, so pair lines geometrically instead.
+use_exhaustive_line_matching: True
+
+metainfo:
+  point_triangulation:
+    point_detection:
+      method: "sift"
+    point_matcher:
+      method: "NN-ratio"
+
+_image_description:
+  point_detection:
+    method: "sift"
+  line_detection:
+    detector_method: "lsd"
+    # Not needed: exhaustive matching below uses no descriptors.
+    extractor_method: null
+
+_image_association:
+  point_matcher:
+    method: "NN-ratio"

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "limap/base/linebase.h"
 #include "limap/evaluation/base_evaluator.h"
+#include "limap/geometry/line3d.h"
+#include "limap/util/eigen_types.h"
 #include "limap/util/kd_tree.h"
-#include "limap/util/types.h"
 
 #include <string>
 #include <tuple>

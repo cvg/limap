@@ -1,7 +1,0 @@
----
-##############################
-# global config
-cfg_type: "evaluation"
-n_visible_views: 4 # for loading npy file and folder to linetracks
-visualize: False
-
