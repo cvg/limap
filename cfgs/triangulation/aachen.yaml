@@ -1,6 +1,0 @@
----
-##############################
-# global config
-n_neighbors: 20
-max_image_dim: -1 
-

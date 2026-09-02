@@ -1,0 +1,9 @@
+from limap._limap._image._groups import _vplib
+from limap._limap._image._groups._vplib import *  # noqa: F403
+
+from .register_vp_detector import get_vp_detector, DetectorOptions
+
+__all__ = [n for n in _vplib.__dict__ if not n.startswith("_")] + [
+    "get_vp_detector",
+    "DetectorOptions",
+]

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "limap/base/linebase.h"
-#include "limap/util/types.h"
+#include "limap/geometry/line3d.h"
+#include "limap/util/eigen_types.h"
 
 #include <tuple>
 

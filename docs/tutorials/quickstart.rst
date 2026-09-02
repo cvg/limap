@@ -1,7 +1,7 @@
 Quickstart
 =================================
 
-Some examples are prepared for users to quickly try out LIMAP for mapping and localization with lines.
+Some examples are prepared for users to quickly try out LIMAP for mapping, localization and SfM with lines and the other structured primitives.
 
 ------------------
 Line Mapping
@@ -13,49 +13,72 @@ For this example we are using the first scene ``ai_001_001`` from `Hypersim <htt
 
     bash scripts/quickstart.sh
 
-To run line mapping using **Line Mapping** (RGB-only) on Hypersim:
+First, prepare the Hypersim scene by undistorting the images and creating a COLMAP model:
 
 .. code-block:: bash
 
-    python runners/hypersim/triangulation.py --output_dir outputs/quickstart_triangulation
+    python runners/hypersim/undistort_images.py \
+        --data_dir data \
+        --scene_id ai_001_001 \
+        --output_dir outputs/quickstart \
+        --max_image_dim 800
 
-To run line mapping using **Fitnmerge** (line mapping with available depth maps) on Hypersim:
-
-.. code-block:: bash
-
-    python runners/hypersim/fitnmerge.py --output_dir outputs/quickstart_fitnmerge
-
-To run **Visualization** of the 3D line maps after the reconstruction:
+Then, run point-line triangulation on the undistorted images:
 
 .. code-block:: bash
 
-    python visualize_3d_lines.py --input_dir outputs/quickstart_triangulation/finaltracks \
-                                 # add the camera frustums with "--imagecols outputs/quickstart_triangulation/imagecols.npy"
+    python -m limap.cli.automatic_point_line_triangulation \
+        -m outputs/quickstart/undistorted/sparse \
+        -i outputs/quickstart/undistorted/images \
+        -o outputs/quickstart/triangulation
 
-[**Tips**] Options are stored in the config folder: ``cfgs``. You can easily change the options with the Python argument parser. Here's an example:
+To visualize the full reconstruction (points + lines):
 
 .. code-block:: bash
 
-    python runners/hypersim/triangulation.py --line2d.detector.method lsd \
-                                             --line2d.visualize --triangulation.IoU_threshold 0.2 \
-                                             --skip_exists --n_visible_views 5
+    python visualize_holistic_recon.py --input_dir outputs/quickstart/triangulation/final_model --cam_scale 0.1
 
-In particular, ``skip_exists`` is a very useful option to avoid running point-based SfM and line detection/description repeatedly in each pass.
+To visualize points only (using pycolmap):
 
-Also, the combination  ``LSD detector + Endpoints NN matcher`` can be enabled with ``--default_config_file cfgs/triangulation/default_fast.yaml`` for high efficiency (while with non-negligible performance degradation).
+.. code-block:: bash
+
+    python visualize_colmap_model.py --input_dir outputs/quickstart/triangulation/final_model --cam_scale 0.1
+
+To additionally reconstruct the vanishing points, planes and the wireframe on the same scene, swap the CLI for ``python -m limap.cli.automatic_structure_triangulation`` with the same arguments (a GPU is needed for plane detection). See :doc:`triangulation`.
+
+[**Tips**] Options are stored in the config folder ``cfgs`` (default: ``cfgs/structure_triangulation/default.yaml``). You can override the config file with ``-c``, or override individual options directly on the command line. The ``--skip_exists`` option is useful to avoid re-running point-based SfM and line detection/description in each pass.
+
+------------------------------------------
+Holistic Incremental SfM
+------------------------------------------
+
+The same scene can be reconstructed from scratch, with no input poses, using
+the holistic incremental mapper, which jointly optimizes points, lines,
+vanishing points, planes and the wireframe:
+
+.. code-block:: bash
+
+    python experiments/benchmark_sfm.py \
+        --dataset hypersim \
+        --scenes ai_001_001 \
+        --data_dir data \
+        --output_dir outputs/quickstart_sfm
+
+This writes ``outputs/quickstart_sfm/hypersim/ai_001_001/holistic/models/`` and
+prints the relative pose AUC against the ground-truth poses. Add
+``--methods holistic points_only`` to run the point-only baseline alongside it;
+it reuses the same frontend, so the comparison isolates the mapper.
+
+See :doc:`sfm` for the mapper itself and for running the frontend separately.
 
 -------------------------------------------------
 Hybrid Localization with Points and Lines
 -------------------------------------------------
 
-We provide two query examples for localization from the Stairs scene in the `7Scenes <https://www.microsoft.com/en-us/research/project/rgb-d-dataset-7-scenes/>`_ Dataset, where traditional point-based methods normally struggle due to the repeated steps and lack of texture. The examples are provided in ``.npy`` files: ``runners/tests/localization/data/localization/localization_test_data_stairs_[1|2].npy``, which contains the necessary 2D-3D point and line correspondences along with the necessary configurations.
-
-To run the examples, for instance the first one:
+We provide an example of hybrid point-line localization on the *Stairs* scene of the `7Scenes <https://www.microsoft.com/en-us/research/project/rgb-d-dataset-7-scenes/>`_ dataset. Prepare the dataset following hloc's `7Scenes pipeline <https://github.com/cvg/Hierarchical-Localization/tree/master/hloc/pipelines/7Scenes>`_ (scene images together with the SIFT SfM models, DenseVLAD retrieval pairs, and rendered depth maps), laid out under a single ``datasets/7scenes`` root. Then run:
 
 .. code-block:: bash
 
-    python runners/tests/localization.py --data runners/tests/data/localization/localization_test_data_stairs_1.npy
+    python runners/7scenes/localization.py --dataset datasets/7scenes -s stairs --skip_exists
 
-The script will print the pose error estimated using point-only (hloc), and the pose error estimated by our hybrid point-line localization framework. In addition, two images will be created in the output folder (default to ``outputs/test_outputs/localization``) showing the inliers point and line correspondences in hybrid localization projected using the two estimated camera pose (by point-only and point+line) onto the query image with 2D point and line detections marked. 
-
-An improved accuracy of the hybrid point-line method is expected to be observed.
+Add ``--use_dense_depth`` to build the line map from rendered depth maps instead of triangulation, or ``--use_points_only`` for the point-only baseline. The runner prints the pose errors for point-only (hloc) versus hybrid point-line localization; an improved accuracy from adding lines is expected. See :doc:`localization` for the full tutorial.

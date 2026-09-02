@@ -8,7 +8,8 @@ sudo apt-get install \
     libboost-system-dev \
     libeigen3-dev \
     libflann-dev \
-    libfreeimage-dev \
+    libopenimageio-dev \
+    openimageio-tools \
     libmetis-dev \
     libgoogle-glog-dev \
     libgtest-dev \

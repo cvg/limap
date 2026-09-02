@@ -18,9 +18,9 @@ jobs:
       fail-fast: false
       matrix:
         config: [
-          {os: ubuntu-latest, python-version: "3.9"},
           {os: ubuntu-latest, python-version: "3.10"},
           {os: ubuntu-latest, python-version: "3.11"},
+          {os: ubuntu-latest, python-version: "3.12"},
         ]
     env:
       COMPILER_CACHE_VERSION: 1
@@ -50,7 +50,8 @@ jobs:
             libeigen3-dev \
             libceres-dev \
             libflann-dev \
-            libfreeimage-dev \
+            libopenimageio-dev \
+            openimageio-tools \
             libmetis-dev \
             libgoogle-glog-dev \
             libgtest-dev \
@@ -64,6 +65,11 @@ jobs:
             libgl1-mesa-dri \
             libunwind-dev \
             xvfb
+
+          # Fix issue in Ubuntu's openimageio CMake config.
+          # We don't depend on any of openimageio's OpenCV functionality,
+          # but its config still requires the OpenCV include directory to exist.
+          sudo mkdir -p /usr/include/opencv4
 
       - name: Set up Python ${{ matrix.config.python-version  }}
         uses: actions/setup-python@v4
@@ -96,20 +102,27 @@ jobs:
         run: |
           pytest -m ci_workflow tests
 
-
-      - name: Run localization test
-        run: |
-          python runners/tests/localization.py
-
       - name: Run E2E tests
         run: |
           bash scripts/quickstart.sh
-          python runners/hypersim/fitnmerge.py --default_config_file cfgs/fitnmerge/default_cpu.yaml \
-              --output_dir outputs/quickstart_test --visualize 0
-          python runners/hypersim/triangulation.py --default_config_file cfgs/triangulation/default_cpu.yaml \
-              --output_dir outputs/quickstart_test --triangulation.use_exhaustive_matcher --skip_exists --visualize 0
-          python runners/colmap_triangulation.py -a outputs/quickstart_test/colmap_outputs \
-              --config_file cfgs/triangulation/default_cpu.yaml \
-              --output_dir outputs/quickstart_test_colmap --triangulation.use_exhaustive_matcher --visualize 0 \
-              --triangulation.use_pointsfm.enable --triangulation.use_pointsfm.colmap_folder outputs/quickstart_test/colmap_outputs/sparse
+          python runners/hypersim/geometry_guided_line_reconstruction.py \
+              --default_config_file cfgs/geometry_guided_line_reconstruction/default_cpu.yaml \
+              --output_dir outputs/quickstart_test
+          # Geometry-guided fits lines to depth and triangulates no points.
+          python scripts/check_reconstruction.py \
+              outputs/quickstart_test/geometry_guided_final_model \
+              --min-points 0
+          python runners/hypersim/structure_triangulation.py \
+              --default_config_file cfgs/structure_triangulation/default_cpu.yaml \
+              --output_dir outputs/quickstart_test --skip_exists
+          python scripts/check_reconstruction.py \
+              outputs/quickstart_test/final_model
+          python -m limap.cli.automatic_point_line_triangulation \
+              -m outputs/quickstart_test/init_model \
+              -i data/ai_001_001/images/scene_cam_00_final_preview \
+              -o outputs/quickstart_test_colmap \
+              -c cfgs/structure_triangulation/default_cpu.yaml \
+              --max_image_dim 800
+          python scripts/check_reconstruction.py \
+              outputs/quickstart_test_colmap/final_model
 

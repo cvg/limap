@@ -1,7 +1,5 @@
-# cmake version to be used
-cmake_minimum_required( VERSION 3.17 )
+cmake_minimum_required(VERSION 3.17)
 
-# project name
 project(limap)
 
 ################################################################################
@@ -9,6 +7,7 @@ project(limap)
 ################################################################################
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.1)
     message(FATAL_ERROR "GCC version needs to be at least 9.1")
 endif()
@@ -20,54 +19,40 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CMakeHelper.cmake NO_POLICY_SCOPE)
 
 ################################################################################
 # Options
+#
+# Build with tests and benchmarks (from the build/ directory):
+#   cmake -DLIMAP_TESTS_ENABLED=ON -DLIMAP_BENCHMARK_ENABLED=ON ..
 ################################################################################
-option(OPENMP_ENABLED "Whether to enable OpenMP parallelization" ON)
-option(INTERPOLATION_ENABLED "Whether to enable interpolation-based pixel-perfect optimization" OFF)
 option(FETCH_POSELIB "Whether to use PoseLib with FetchContent or with self-installed software" ON)
 option(FETCH_COLMAP "Whether to use COLMAP with FetchContent or with self-installed software" ON)
-option(CUDA_ENABLED "Whether to use CUDA (only for the third-party COLMAP)" OFF)
 option(FETCH_JLINKAGE "Whether to use JLinkage with FetchContent or with self-installed software" ON)
+option(CUDA_ENABLED "Whether to use CUDA (only for the third-party COLMAP)" OFF)
+option(LIMAP_TESTS_ENABLED "Build test executables" OFF)
+option(LIMAP_BENCHMARK_ENABLED "Build benchmark executables" OFF)
 
 include(cmake/FindDependencies.cmake)
-include(cmake/InitVariables.cmake)
 
-# include directories
+if(LIMAP_TESTS_ENABLED)
+    enable_testing()
+endif()
+
+# Include directories
 include_directories(
     ${PROJECT_SOURCE_DIR}/src
-    ${LIMAP_INCLUDE_DIRS}
 )
+
+# Add third-party dependencies (FetchContent + submodules)
+add_subdirectory(src/thirdparty)
+
+# Target name indirection (must come after thirdparty so targets exist)
+include(cmake/InitVariables.cmake)
+
 link_directories(${LIMAP_LINK_DIRS})
 
 # Add sources
-add_subdirectory(src/third-party)
-include_directories(${RANSACLIB_INCLUDE_DIRS})
 add_subdirectory(src/limap)
 
-# Install find_package scripts for dependencies.
-install(
-    DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/cmake
-    DESTINATION share/colmap
-    FILES_MATCHING PATTERN "Find*.cmake")
-
-################################################################################
-# Generate source groups for Visual Studio, XCode, etc.
-################################################################################
-LIMAP_ADD_SOURCE_DIR(limap/base BASE_SRCS *.h *.cc)
-LIMAP_ADD_SOURCE_DIR(limap/ceresbase BASE_SRCS *.h *.cc)
-LIMAP_ADD_SOURCE_DIR(limap/solvers BASE_SRCS *.h *.cc)
-LIMAP_ADD_SOURCE_DIR(limap/vplib BASE_SRCS *.h *.cc)
-LIMAP_ADD_SOURCE_DIR(limap/pointsfm BASE_SRCS *.h *.cc)
-LIMAP_ADD_SOURCE_DIR(limap/undistortion BASE_SRCS *.h *.cc)
-LIMAP_ADD_SOURCE_DIR(limap/fitting BASE_SRCS *.h *.cc)
-LIMAP_ADD_SOURCE_DIR(limap/estimators BASE_SRCS *.h *.cc)
-LIMAP_ADD_SOURCE_DIR(limap/triangulation BASE_SRCS *.h *.cc)
-LIMAP_ADD_SOURCE_DIR(limap/merging BASE_SRCS *.h *.cc)
-LIMAP_ADD_SOURCE_DIR(limap/features BASE_SRCS *.h *.cc)
-LIMAP_ADD_SOURCE_DIR(limap/evaluation BASE_SRCS *.h *.cc)
-LIMAP_ADD_SOURCE_DIR(limap/structures BASE_SRCS *.h *.cc)
-LIMAP_ADD_SOURCE_DIR(limap/optimize BASE_SRCS *.h *.cc)
-LIMAP_ADD_SOURCE_DIR(limap/optimize/line_refinement BASE_SRCS *.h *.cc)
-LIMAP_ADD_SOURCE_DIR(limap/optimize/hybrid_bundle_adjustment BASE_SRCS *.h *.cc)
-LIMAP_ADD_SOURCE_DIR(limap/optimize/global_pl_association BASE_SRCS *.h *.cc)
-LIMAP_ADD_SOURCE_DIR(limap/optimize/line_localization BASE_SRCS *.h *.cc)
-
+# Python bindings (only when building via scikit-build)
+if(DEFINED SKBUILD_PROJECT_NAME)
+    add_subdirectory(src/pylimap)
+endif()

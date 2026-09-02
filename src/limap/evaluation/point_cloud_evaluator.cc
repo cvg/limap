@@ -3,7 +3,7 @@
 #include <iostream>
 #include <numeric>
 #include <queue>
-#include <third-party/progressbar.hpp>
+#include <thirdparty/progressbar.hpp>
 
 namespace limap {
 
@@ -26,7 +26,7 @@ std::vector<double> PointCloudEvaluator::ComputeDistsforEachPoint(
     V3D p = tree_.point(i);
     double min_dist = std::numeric_limits<double>::max();
     for (auto it = lines.begin(); it != lines.end(); ++it) {
-      double dist = it->point_distance(p);
+      double dist = it->PointDistance(p);
       if (dist < min_dist)
         min_dist = dist;
     }
@@ -47,7 +47,7 @@ std::vector<double> PointCloudEvaluator::ComputeDistsforEachPoint_KDTree(
   std::vector<int> labels;
   for (size_t line_id = 0; line_id < lines.size(); ++line_id) {
     auto &line = lines[line_id];
-    double interval = line.length() / (n_samples - 1);
+    double interval = line.Length() / (n_samples - 1);
     for (size_t i = 0; i < n_samples; ++i) {
       V3D p = line.start + i * interval * (line.end - line.start);
       line_points.push_back(p);
@@ -66,7 +66,7 @@ std::vector<double> PointCloudEvaluator::ComputeDistsforEachPoint_KDTree(
     line_tree.query_knn(p, res, 1);
     int index = res[0];
     int line_id = labels[index];
-    double min_dist = lines[line_id].point_distance(p);
+    double min_dist = lines[line_id].PointDistance(p);
     dists[i] = min_dist;
   }
   return dists;

@@ -2,17 +2,20 @@ import os
 import sys
 
 import numpy as np
+import pycolmap
+from pathlib import Path
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from Hypersim import raydepth2depth, read_raydepth
 
-sys.path.append(
-    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-)
-import limap.base as base
+from limap.scene import BaseDepthReader
+
+# COLMAP's guess for a camera with no known focal length, as a factor of the
+# larger image side (ImageReaderOptions::default_focal_length_factor).
+DEFAULT_FOCAL_LENGTH_FACTOR = 1.2
 
 
-class HypersimDepthReader(base.BaseDepthReader):
+class HypersimDepthReader(BaseDepthReader):
     def __init__(self, filename, K, img_hw):
         super().__init__(filename)
         self.K = K
@@ -24,10 +27,26 @@ class HypersimDepthReader(base.BaseDepthReader):
         return depth
 
 
-def read_scene_hypersim(cfg, dataset, scene_id, cam_id=0, load_depth=False):
+def read_scene_hypersim(
+    cfg,
+    dataset,
+    scene_id,
+    cam_id=0,
+    load_depth=False,
+    load_poses=True,
+    uncalibrated=False,
+    per_image_cameras=False,
+) -> tuple[Path, pycolmap.Reconstruction, HypersimDepthReader | None]:
+    """Read a Hypersim scene into a pycolmap reconstruction.
+
+    With per_image_cameras every image gets its own camera instead of
+    sharing one. Combined with uncalibrated, that makes each camera
+    unconstrained when its image is registered, which is what exercises
+    per-image focal length estimation; a shared camera is pinned down by
+    the first image and left alone afterwards.
+    """
     # set scene id
     dataset.set_scene_id(scene_id)
-    dataset.set_max_dim(cfg["max_image_dim"])
 
     # generate image indexes
     index_list = np.arange(
@@ -35,18 +54,65 @@ def read_scene_hypersim(cfg, dataset, scene_id, cam_id=0, load_depth=False):
     ).tolist()
     index_list = dataset.filter_index_list(index_list, cam_id=cam_id)
 
-    # get image collections
+    # build pycolmap reconstruction
+    recon = pycolmap.Reconstruction()
     K = dataset.K.astype(np.float32)
     img_hw = [dataset.h, dataset.w]
-    Ts, Rs = dataset.load_cameras(cam_id=cam_id)
-    cameras, camimages = {}, {}
-    cameras[0] = base.Camera("SIMPLE_PINHOLE", K, cam_id=0, hw=img_hw)
+    if load_poses:
+        Ts, Rs = dataset.load_cameras(cam_id=cam_id)
+    fx, fy, cx, cy = K[0, 0], K[1, 1], K[0, 2], K[1, 2]
+    if uncalibrated:
+        # Start from COLMAP's guess for an unknown camera rather than from
+        # the true focal, so that it actually has to be recovered.
+        fx = fy = DEFAULT_FOCAL_LENGTH_FACTOR * max(img_hw[0], img_hw[1])
+
+    def _make_camera(camera_id):
+        cam = pycolmap.Camera(
+            camera_id=camera_id,
+            model="PINHOLE",
+            width=img_hw[1],  # w
+            height=img_hw[0],  # h
+            params=[fx, fy, cx, cy],
+        )
+        # GT intrinsics: mark the focal as a prior, else COLMAP re-estimates
+        # it.
+        cam.has_prior_focal_length = not uncalibrated
+        recon.add_camera(cam)
+        rig = pycolmap.Rig(rig_id=camera_id)
+        rig.add_ref_sensor(cam.sensor_id)
+        recon.add_rig(rig)
+        return camera_id
+
+    if not per_image_cameras:
+        _make_camera(cam_id)
+    image_dir = None
     for image_id in index_list:
-        pose = base.CameraPose(Rs[image_id], Ts[image_id])
-        imname = dataset.load_imname(image_id, cam_id=cam_id)
-        camimage = base.CameraImage(0, pose, image_name=imname)
-        camimages[image_id] = camimage
-    imagecols = base.ImageCollection(cameras, camimages)
+        # Camera and rig ids share the image id, offset past cam_id so the
+        # shared-camera layout above cannot collide with them.
+        image_camera_id = (
+            _make_camera(image_id + cam_id + 1) if per_image_cameras else cam_id
+        )
+        frame_kwargs = dict(frame_id=image_id, rig_id=image_camera_id)
+        if load_poses:
+            pose_mat = np.concatenate([Rs[image_id], Ts[image_id][:, None]], 1)
+            frame_kwargs["rig_from_world"] = pycolmap.Rigid3d(pose_mat)
+        frame = pycolmap.Frame(**frame_kwargs)
+        imname = Path(dataset.load_imname(image_id, cam_id=cam_id))
+        if image_dir is None:
+            image_dir = imname.parent
+        else:
+            assert image_dir == imname.parent
+        image = pycolmap.Image(
+            name=imname.name,
+            camera_id=image_camera_id,
+            image_id=image_id,
+            frame_id=image_id,
+        )
+        frame.add_data_id(image.data_id)
+        recon.add_frame(frame)
+        recon.add_image(image)
+        if load_poses:
+            recon.register_frame(frame.frame_id)
 
     if load_depth:
         # get depths
@@ -55,6 +121,6 @@ def read_scene_hypersim(cfg, dataset, scene_id, cam_id=0, load_depth=False):
             depth_fname = dataset.load_raydepth_fname(image_id, cam_id=cam_id)
             depth = HypersimDepthReader(depth_fname, K, img_hw)
             depths[image_id] = depth
-        return imagecols, depths
+        return Path(image_dir), recon, depths
     else:
-        return imagecols
+        return Path(image_dir), recon, None

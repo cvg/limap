@@ -34,12 +34,42 @@ def load_config(config_file, default_path=None):
     return cfg
 
 
+def _infer_type(value_str):
+    """Infer type from string value."""
+    if value_str.lower() in ("true", "false"):
+        return value_str.lower() == "true"
+    if value_str.lower() in ("none", "null"):
+        return None
+    # Try int
+    try:
+        return int(value_str)
+    except ValueError:
+        pass
+    # Try float
+    try:
+        return float(value_str)
+    except ValueError:
+        pass
+    # Return as string
+    return value_str
+
+
 def update_config(cfg, unknown, shortcuts):
     def get_val_from_keys(cfg, keys):
         v = cfg
         for key in keys:
+            if key not in v:
+                return None  # Key doesn't exist
             v = v[key]
         return v
+
+    def ensure_keys_exist(cfg, keys):
+        """Ensure intermediate dicts exist for nested keys."""
+        v = cfg
+        for key in keys[:-1]:
+            if key not in v:
+                v[key] = {}
+            v = v[key]
 
     for idx, arg in enumerate(unknown):
         if arg in shortcuts:
@@ -53,16 +83,23 @@ def update_config(cfg, unknown, shortcuts):
         # process value
         keys = arg.replace("--", "").split(".")
         val = get_val_from_keys(cfg, keys)
-        argtype = type(val)
-        if argtype is bool:
-            # test if it is a store action
+
+        if val is None:
+            # Key doesn't exist - infer type from value or treat as bool flag
             if idx == len(unknown) - 1 or unknown[idx + 1].startswith("--"):
-                v = True
+                v = True  # Flag without value
             else:
-                v = unknown[idx + 1].lower() == "true"
+                v = _infer_type(unknown[idx + 1])
         else:
-            v = unknown[idx + 1]
-            if val is not None:
+            argtype = type(val)
+            if argtype is bool:
+                # test if it is a store action
+                if idx == len(unknown) - 1 or unknown[idx + 1].startswith("--"):
+                    v = True
+                else:
+                    v = unknown[idx + 1].lower() == "true"
+            else:
+                v = unknown[idx + 1]
                 if argtype is list:
                     if v.startswith("["):
                         v = eval(v)
@@ -72,10 +109,16 @@ def update_config(cfg, unknown, shortcuts):
                                 break
                             v += "," + unknown[i]
                         v = eval("[" + v + "]")
-                v = argtype(v)
+                else:
+                    v = argtype(v)
 
-        if isinstance(v, str) and (v.lower() == "none" or v.lower() == "null"):
-            v = None
+            if isinstance(v, str) and (
+                v.lower() == "none" or v.lower() == "null"
+            ):
+                v = None
+
+        # Ensure intermediate dicts exist
+        ensure_keys_exist(cfg, keys)
 
         # modify value
         n_lvls = len(keys)

@@ -1,0 +1,25 @@
+---
+# 7scenes with the reference point frontend (SuperPoint + SuperGlue).
+#
+# Matches public LIMAP's point frontend for 7scenes exactly
+# (cfgs/localization/7scenes.yaml there pins superpoint_inloc + superglue),
+# so point-only here is comparable to its reported 48% at (5cm, 5deg).
+# Lines stay on our DeepLSD + GlueStick stack, so this isolates the change
+# of point frontend; public LIMAP pairs these points with LSD + SOLD2.
+
+pose_estimation:
+  max_error_point: 5.0
+  max_error_line: 5.0
+
+_image_description:
+  point_detection:
+    method: "superpoint_inloc"
+  line_detection:
+    detector_method: "deeplsd"
+    extractor_method: "wireframe"
+
+_image_association:
+  point_matcher:
+    method: "superglue"
+  line_matcher:
+    method: "gluestick"

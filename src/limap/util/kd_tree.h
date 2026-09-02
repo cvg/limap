@@ -6,7 +6,7 @@
 #include <string.h>
 
 #include <Eigen/Core>
-#include <third-party/nanoflann.hpp>
+#include <thirdparty/nanoflann.hpp>
 
 using namespace nanoflann;
 

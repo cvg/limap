@@ -11,7 +11,7 @@ namespace evaluation {
 double RefLineEvaluator::SumLength() const {
   double sum_length = 0;
   for (auto it = ref_lines_.begin(); it != ref_lines_.end(); ++it) {
-    sum_length += it->length();
+    sum_length += it->Length();
   }
   return sum_length;
 }
@@ -23,10 +23,10 @@ double RefLineEvaluator::ComputeRecallLength(
   double recall = 0;
   for (size_t ref_line_id = 0; ref_line_id < n_ref_lines; ++ref_line_id) {
     const Line3d &ref_line = ref_lines[ref_line_id];
-    double interval = ref_line.length() / (num_samples - 1);
+    double interval = ref_line.Length() / (num_samples - 1);
     std::vector<V3D> points;
     for (size_t i = 0; i < num_samples; ++i) {
-      points.push_back(ref_line.start + interval * i * ref_line.direction());
+      points.push_back(ref_line.start + interval * i * ref_line.Direction());
     }
     std::vector<int> flags(num_samples, 0);
 #pragma omp parallel for
@@ -38,7 +38,7 @@ double RefLineEvaluator::ComputeRecallLength(
     int counter = 0;
     for (size_t i = 0; i < num_samples; ++i)
       counter += flags[i];
-    recall += ref_line.length() * double(counter) / num_samples;
+    recall += ref_line.Length() * double(counter) / num_samples;
   }
   return recall;
 }
@@ -60,7 +60,7 @@ double RefLineEvaluator::DistPointLine(const V3D &p, const Line3d &line) const {
   double dist_end = (p - line.end).norm();
 
   double dist_perp_squared = (p - line.start).squaredNorm() -
-                             pow((p - line.start).dot(line.direction()), 2);
+                             pow((p - line.start).dot(line.Direction()), 2);
   double dist_perp = sqrt(std::max(dist_perp_squared, 0.0));
   return std::min(dist_perp, std::min(dist_start, dist_end));
 }
@@ -73,7 +73,7 @@ RefLineEvaluator::DistPointLines(const V3D &p,
     double dist = DistPointLine(p, *it);
     if (dist < min_dist)
       min_dist = dist;
-    if (min_dist < EPS)
+    if (min_dist < 0.0)
       return 0.0;
   }
   return min_dist;

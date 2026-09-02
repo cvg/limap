@@ -1,65 +1,66 @@
-Line detection, description and matching 
+Line detection, description and matching
 ============================================
 
-We support modular interfaces for running line detection, description and matching in LIMAP. In addition, we also provide minimal examples here and a mimimal test scripts at ``runners/tests/line2d.py``.
+LIMAP provides modular interfaces for line detection, description and matching under :py:mod:`limap.image.line`.
 
 -----------------------------------------------------
 Minimal example on line detection and description
 -----------------------------------------------------
-To use the interface you need to construct a :class:`limap.base.CameraView` instance for each image. Since the intrinsic and extrinsic parameters are not needed, you can leave it uninitialized. Here shows an minimal example on running line detection and description with `DeepLSD <https://github.com/cvg/DeepLSD>`_ and `SOLD2 <https://github.com/cvg/SOLD2>`_ on an image `example.png`:
+
+Detection and description operate directly on an image file path. Here is a minimal example running `DeepLSD <https://github.com/cvg/DeepLSD>`_ detection and `SOLD2 <https://github.com/cvg/SOLD2>`_ description on an image ``example.png``:
 
 .. code-block:: python
 
-    import limap.util.config
-    import limap.base
-    import limap.line2d
-    view = limap.base.CameraView("example.png") # initiate an limap.base.CameraView instance for detection. 
-    # You can specify the height and width to resize into in the limap.base.Camera instance at initialization (as the example below).
-    # view = limap.base.CameraView(limap.base.Camera("SIMPLE_PINHOLE", hw=(400, 400)), "example.png")
-    detector = limap.line2d.get_detector({"method": "deeplsd", "skip_exists": False}) # get a line detector
-    segs = detector.detect(view) # detection
-    extractor = limap.line2d.get_extractor({"method": "sold2", "skip_exists": False}) # get a line descriptor extractor
-    desc = extractor.extract(view, segs) # description
+    from pathlib import Path
+    import limap.image.line as line2d
+
+    image_path = Path("example.png")
+    detector = line2d.get_detector("deeplsd", line2d.DetectorOptions())
+    segs = detector.detect(image_path)          # (N, 5): x1, y1, x2, y2, score
+    extractor = line2d.get_extractor("sold2", line2d.ExtractorOptions())
+    desc = extractor.extract(image_path, segs)  # descriptors for the detected segments
 
 -----------------------------------------------------
-Minimal example on line matching 
+Minimal example on line matching
 -----------------------------------------------------
-And here shows a minimal example on running line matcher with `SOLD2 <https://github.com/cvg/SOLD2>`_. Note that the type of matcher should align with the type of extractors in terms of compatibility.
+
+The matcher type must be compatible with the extractor. Here is a minimal example running the `SOLD2 <https://github.com/cvg/SOLD2>`_ matcher on two sets of descriptors:
 
 .. code-block:: python
 
-    global desc1, desc2 # read in some extracted descriptors
-    import limap.util.config
-    import limap.base
-    import limap.line2d
-    extractor = limap.line2d.get_extractor({"method": "sold2", "skip_exists": False}) # get a line extractor
-    matcher = limap.line2d.get_matcher({"method": "sold2", "skip_exists": False, "n_jobs": 1, "topk": 0}, extractor) # initiate a line matcher
-    matches = matcher.match_pair(desc1, desc2) # matching
+    import limap.image.line as line2d
+
+    # desc1, desc2: descriptors extracted from two images (see above)
+    extractor = line2d.get_extractor("sold2", line2d.ExtractorOptions())
+    matcher = line2d.get_matcher("sold2", line2d.MatcherOptions(), extractor)
+    matches = matcher.match_pair(desc1, desc2)
 
 -----------------------------------------------------
 Visualization
 -----------------------------------------------------
-Here shows an example on visualizing the detections:
+
+Here is an example on visualizing the detected segments:
 
 .. code-block:: python
 
-    global view # the limap.base.CameraView instance used for detection
     import cv2
     import limap.visualize
-    img = view.read_image(set_gray = False)
-    img = limap.visualize.draw_segments(img, segs, (0, 255, 0))
-    cv2.imshow("detetions", img)
+
+    image = cv2.imread("example.png")
+    # segs is (N, 5); reshape the endpoints to (2, 2) per line
+    lines = [seg[:4].reshape(2, 2) for seg in segs]
+    image = limap.visualize.draw_2d_lines(image, lines, (0, 255, 0))
+    cv2.imshow("detections", image)
     cv2.waitKey(0)
 
 ----------------------------------------------------
 Multiple images
 ----------------------------------------------------
-To run line detection, description and matching on multiple images, one can resort to the following API:
 
-* :py:meth:`limap.runners.functions.compute_2d_segs`
-* :py:meth:`limap.runners.functions.compute_exhaustive_matches`
-* :py:meth:`limap.runners.functions.compute_matches`
+To run line detection, description and matching over many images at once, use the batch helpers in :py:mod:`limap.image.line`:
 
-The outputs detections, descriptions and matches will be saved into the corresponding output folders.
+* :py:func:`limap.image.line.line_detection`
+* :py:func:`limap.image.line.line_matching`
+* :py:func:`limap.image.line.exhaustive_line_matching`
 
-
+The output detections, descriptions and matches are saved into the corresponding output folders.

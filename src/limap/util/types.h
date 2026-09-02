@@ -1,47 +1,58 @@
 #pragma once
 
-#include <Eigen/Core>
+#include <colmap/util/hash_containers.h>
 #include <colmap/util/types.h>
-#include <third-party/half.h>
 
-#include <pybind11/numpy.h>
-#include <pybind11/pybind11.h>
-
-#include <colmap/util/logging.h>
-
-namespace py = pybind11;
+#include <utility>
 
 namespace limap {
 
-using Node2d = std::pair<uint16_t, uint16_t>; // (img_id, feature_id), change to
-                                              // int if there exists id > 65535
+// COLMAP's hash container aliases (backend picked at configure time).
+// Flat*: faster, but a rehash invalidates references to stored elements and
+// boost's erase(iterator) returns void. Node*: stable references, as
+// std::unordered_*. Use Node* for element stores, Ceres parameter blocks, and
+// iterator-based erase loops; Flat* elsewhere.
+using colmap::FlatHashMap;
+using colmap::FlatHashSet;
+using colmap::NodeHashMap;
+using colmap::NodeHashSet;
 
-using V2F = Eigen::Vector2f;
-using V3F = Eigen::Vector3f;
-using V2D = Eigen::Vector2d;
-using V3D = Eigen::Vector3d;
-using V4D = Eigen::Vector4d;
+using point2D_t = colmap::point2D_t;
+using line2D_t = colmap::point2D_t;
+using feature2D_t = colmap::point2D_t;
+using group2D_t = colmap::point2D_t;
 
-using M2F = Eigen::Matrix2f;
-using M3F = Eigen::Matrix3f;
-using M4F = Eigen::Matrix4f;
-using M2D = Eigen::Matrix2d;
-using M3D = Eigen::Matrix3d;
-using M4D = Eigen::Matrix4d;
-using M6D = Eigen::Matrix<double, 6, 6>;
-using M8D = Eigen::Matrix<double, 8, 8>;
+using point3D_t = colmap::point3D_t;
+using line3D_t = colmap::point3D_t;
+using feature3D_t = colmap::point3D_t;
+using group3D_t = colmap::point3D_t;
 
-const double EPS = 1e-12;
+constexpr point3D_t kInvalidPoint3dId = std::numeric_limits<point3D_t>::max();
+constexpr line3D_t kInvalidLine3dId = std::numeric_limits<line3D_t>::max();
+constexpr feature3D_t kInvalidFeature3dId =
+    std::numeric_limits<feature3D_t>::max();
+constexpr group3D_t kInvalidGroup3dId = std::numeric_limits<group3D_t>::max();
 
-inline V3D homogeneous(const V2D &v2d) { return V3D(v2d(0), v2d(1), 1.0); }
-inline V4D homogeneous(const V3D &v3d) {
-  return V4D(v3d(0), v3d(1), v3d(2), 1.0);
-}
-inline V2D dehomogeneous(const V3D &v3d) {
-  return V2D(v3d(0), v3d(1)) / (v3d(2) + EPS);
-}
-inline V3D dehomogeneous(const V4D &v4d) {
-  return V3D(v4d(0), v4d(1), v4d(2)) / (v4d(3) + EPS);
-}
+// A node in the graph (img_id, feature_id)
+using Node2d = std::pair<colmap::image_t, feature2D_t>;
+
+// COLMAP has no std::hash for std::pair, so Node2d containers need PairHash.
+using Node2dSet = FlatHashSet<Node2d, colmap::PairHash>;
+template <typename T>
+using Node2dMap = FlatHashMap<Node2d, T, colmap::PairHash>;
+
+// Represents a line correspondence between two images
+struct LineMatch {
+  line2D_t line2D_idx1;
+  line2D_t line2D_idx2;
+};
+typedef std::vector<LineMatch> LineMatches;
+
+// Represents a group correspondence between two images
+struct GroupMatch {
+  size_t group2D_idx1;
+  size_t group2D_idx2;
+};
+typedef std::vector<GroupMatch> GroupMatches;
 
 } // namespace limap

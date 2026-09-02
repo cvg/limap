@@ -1,0 +1,29 @@
+---
+output_dir: "tmp"
+max_image_dim: null
+skip_exists: False
+n_neighbors: 20
+n_visible_views: 4
+run_bundle_adjustment: True
+
+# Point features are only used to compute neighbors and ranges, via the
+# metainfo point triangulation. This pipeline does no point/line matching.
+metainfo:
+  point_triangulation:
+    point_detection:
+      method: "aliked-n16"
+    point_matcher:
+      method: "NN-mutual"
+
+_line_detection:
+  detector_method: "deeplsd"
+  extractor_method: "wireframe"
+
+_fitting:
+  ransac_th: 0.75
+  min_inlier_ratio: 0.9
+  n_jobs: 4
+
+bundle_adjustment:
+  refine_points: False
+  refine_lines: True

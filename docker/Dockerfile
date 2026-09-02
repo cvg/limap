@@ -36,7 +36,8 @@ RUN apt-get update && apt-get install -y \
     libboost-test-dev \
     libeigen3-dev \
     libflann-dev \
-    libfreeimage-dev \
+    libopenimageio-dev \
+    openimageio-tools \
     libmetis-dev \
     libgoogle-glog-dev \
     libgflags-dev \
