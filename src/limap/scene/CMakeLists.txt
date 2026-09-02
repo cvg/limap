@@ -27,5 +27,4 @@ LIMAP_ADD_LIBRARY(
     PRIVATE_LINK_LIBS
         HighFive
         ${HDF5_C_LIBRARIES}
-        ${FREEIMAGE_LIBRARIES}
 )
