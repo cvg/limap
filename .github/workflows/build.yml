@@ -50,7 +50,8 @@ jobs:
             libeigen3-dev \
             libceres-dev \
             libflann-dev \
-            libfreeimage-dev \
+            libopenimageio-dev \
+            openimageio-tools \
             libmetis-dev \
             libgoogle-glog-dev \
             libgtest-dev \
@@ -64,6 +65,11 @@ jobs:
             libgl1-mesa-dri \
             libunwind-dev \
             xvfb
+
+          # Fix issue in Ubuntu's openimageio CMake config.
+          # We don't depend on any of openimageio's OpenCV functionality,
+          # but its config still requires the OpenCV include directory to exist.
+          sudo mkdir -p /usr/include/opencv4
 
       - name: Set up Python ${{ matrix.config.python-version  }}
         uses: actions/setup-python@v4
