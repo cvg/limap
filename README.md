@@ -90,8 +90,9 @@ python -m pip install -r requirements.txt
   the point frontend will fail when it is first used.
 * **`open3d` publishes no wheels for Python 3.13+**, and all 3D visualization
   depends on it, so `visualize_holistic_recon.py`, `visualize_colmap_model.py`
-  and `limap.visualize`'s 3D helpers do not run there. Reconstruction itself is
-  unaffected — no pipeline touches open3d.
+  and the 3D helpers in `limap.visualize` do not run there. The `pxwplanar` plane
+  detector also depends on open3d, so it is skipped on 3.13 as well. Line and
+  point reconstruction are unaffected — no pipeline touches open3d.
 * Several further methods (HAWP, TP-LSD, LBD, RoMa, Progressive-X) are not
   installed by any of the above. Each is cloned and pip-installed separately.
   See the per-method guides under [`misc/install/`](./misc/install/), also

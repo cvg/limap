@@ -11,4 +11,6 @@ pytlsd@git+https://github.com/iago-suarez/pytlsd.git@4180ab8
 deeplsd@git+https://github.com/cvg/DeepLSD.git@88c589d
 gluestick@git+https://github.com/cvg/GlueStick.git@7d81673
 hloc@git+https://github.com/cvg/Hierarchical-Localization.git@a3e5731
-pxwplanar@git+https://github.com/alpayozkan/PixelwisePlanarity.git@06c997dc22fa6d90c9e5629dd56c37db70e7e4a9
+# pxwplanar depends on open3d, which publishes no wheels for 3.13+, so pip
+# cannot resolve it there at all. The plane detector is unavailable on 3.13.
+pxwplanar@git+https://github.com/alpayozkan/PixelwisePlanarity.git@06c997dc22fa6d90c9e5629dd56c37db70e7e4a9 ; python_version < "3.13"
