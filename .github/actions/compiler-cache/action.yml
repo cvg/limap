@@ -81,6 +81,8 @@ runs:
         cache_root="${{ inputs.path }}"
         if [ -x "${cache_root}/bin/ccache" ]; then
           ccache="${cache_root}/bin/ccache"
+        elif [ -x "${cache_root}/bin/ccache.exe" ]; then
+          ccache="${cache_root}/bin/ccache.exe"
         elif command -v ccache >/dev/null 2>&1; then
           ccache="$(command -v ccache)"
         else

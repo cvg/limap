@@ -27,6 +27,10 @@ if(FETCH_COLMAP)
     set(LSD_ENABLED OFF CACHE BOOL "Disable LSD in COLMAP" FORCE)
     set(GUI_ENABLED OFF CACHE BOOL "Disable GUI in COLMAP" FORCE)
     set(CGAL_ENABLED OFF CACHE BOOL "Disable CGAL in COLMAP" FORCE)
+    # limap's detectors come through hloc on the Python side; COLMAP's ONNX
+    # runtime is pure build time and wheel size here. pycolmap's own wheel
+    # scripts disable it for the same reason.
+    set(ONNX_ENABLED OFF CACHE BOOL "Disable ONNX in COLMAP" FORCE)
     set(TESTS_ENABLED OFF CACHE BOOL "Disable tests in COLMAP" FORCE)
     # Corresponding to COLMAP 4.2.0 release.
     FetchContent_Declare(COLMAP
