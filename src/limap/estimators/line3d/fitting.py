@@ -2,7 +2,6 @@ import numpy as np
 import pycolmap
 from bresenham import bresenham
 
-from hloc.localize_inloc import interpolate_scan
 from limap.estimators import PoseLibRansacOptions
 from limap.estimators.line3d import estimate_line3d_robust
 from limap.geometry import Line3d
@@ -121,7 +120,11 @@ def estimate_seg3d_from_points3d(
     )
     seg1_pts = seg1_pts[:, valid_pxs].T
 
-    # Interpolate 3D points from point cloud (already in world coordinates)
+    # Interpolate 3D points from point cloud (already in world coordinates).
+    # hloc is an optional dependency (limap[line2d]); import it lazily so
+    # that `import limap.estimators` does not require it.
+    from hloc.localize_inloc import interpolate_scan
+
     seg1_p3ds, valid = interpolate_scan(p3ds, seg1_pts)
     points = seg1_p3ds[valid].T  # (3, N)
     seg1_ray_depths = np.linalg.norm(seg1_p3ds[valid], axis=1)

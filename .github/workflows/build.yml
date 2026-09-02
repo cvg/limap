@@ -18,6 +18,7 @@ jobs:
   build:
     name: ${{ matrix.config.os }} with Python ${{ matrix.config.python-version }}
     runs-on: ${{ matrix.config.os }}
+    continue-on-error: ${{ matrix.config.experimental || false }}
     strategy:
       fail-fast: false
       matrix:
@@ -42,6 +43,21 @@ jobs:
             checkCodeFormat: true,
             cppTests: false,
             e2eTests: false,
+          },
+          # 3.13: every core dependency supports it. open3d does not, but it
+          # is confined to the `viz` extra behind a python_version marker, so
+          # `.[all]` resolves without it here -- nothing outside
+          # limap.visualize calls into it. What is genuinely unverified is the
+          # git-sourced detector stack (hloc, deeplsd, gluestick, pytlsd,
+          # pxwplanar), which this job does install. Run it for signal without
+          # letting it block merges; drop `experimental` once reliably green.
+          {
+            os: ubuntu-24.04,
+            python-version: "3.13",
+            checkCodeFormat: false,
+            cppTests: false,
+            e2eTests: false,
+            experimental: true,
           },
         ]
 
@@ -149,7 +165,7 @@ jobs:
 
       - name: Build
         run: |
-          python -m pip install -v . \
+          python -m pip install -v ".[all,dev]" \
             -Cbuild-dir=build \
             -Ccmake.define.CMAKE_C_COMPILER_LAUNCHER=ccache \
             -Ccmake.define.CMAKE_CXX_COMPILER_LAUNCHER=ccache \

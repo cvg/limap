@@ -17,13 +17,49 @@ authors = [
   { name = "Rémi Pautrat", email = "pautratrmi@microsoft.com" },
 ]
 urls = {Repository = "https://github.com/cvg/limap"}
-requires-python = ">=3.10,<3.13"
+# Capped below 3.14 until dacite supports it: limap converts every YAML config
+# into an Options dataclass through dacite.from_dict, which relies on runtime
+# annotation introspection -- exactly what 3.14's deferred annotations change.
+requires-python = ">=3.10,<3.14"
 classifiers = [
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Operating System :: OS Independent",
 ]
+dependencies = [
+  "numpy",
+  "pycolmap==4.1.1",
+  "pyyaml",
+  "tqdm",
+  "scipy",
+  "opencv-python",
+  "typeguard",
+  "dacite",
+  "joblib",
+  "h5py",
+  "omegaconf",
+  "imagesize",
+  "plyfile",
+  "bresenham",
+]
+
+[project.optional-dependencies]
+viz = [
+  "matplotlib",
+  "seaborn",
+  # open3d ships no wheels for 3.13+. All 3D visualization depends on it, so
+  # on 3.13 the viewers do not work at all; reconstruction is unaffected.
+  "open3d==0.19.0; python_version < '3.13'",
+]
+# PyPI-installable support for the 2D line detectors and matchers. The
+# detectors themselves (pytlsd, deeplsd, gluestick, hloc) are sourced from git
+# and cannot be declared here, because PyPI rejects direct references in
+# project metadata -- install requirements.txt for those.
+line2d = ["einops", "scikit-image", "pillow"]
+dev = ["pytest", "ruff==0.15.20", "clang-format==22.1.5"]
+all = ["limap[viz,line2d]"]
 
 [tool.scikit-build]
 cmake.source-dir = "./"
@@ -31,8 +67,8 @@ wheel.packages = ["src/limap"]
 cmake.define.VERSION_INFO = "2.0.0.dev"
 
 [tool.cibuildwheel]
-# requires-python is >=3.10,<3.13.
-build = "cp3{10,11,12}-{macosx,manylinux,win}*"
+# requires-python is >=3.10,<3.14.
+build = "cp3{10,11,12,13}-{macosx,manylinux,win}*"
 archs = ["auto64"]
 # A fresh PEP 517 isolation directory changes compiler include paths on every
 # run, preventing ccache reuse. Install the build requirements into the stable

@@ -32,16 +32,19 @@ This yields a sparse 3D reconstruction with geometric primitives (planes, sphere
 
 ## Installation
 
-**Install the dependencies as follows:**
-* Python 3.10/11/12
+**Dependencies:**
+* Python 3.10/11/12/13
 * CMake >= 3.17
 * CUDA (for deep learning based detectors/matchers)
 * System dependencies [[Command line](./misc/install/dependencies.md)]
 
+*Note that one cannot visualize reconstructions on Python 3.13, as there are no
+published wheels available for open3d and our 3D viewer depends on it.*
+
 To install the LIMAP Python package:
 ```
-python -m pip install -r requirements.txt
-python -m pip install -Ive . 
+python -m pip install -Ive ".[all]"
+python -m pip install -r requirements.txt   # git-sourced detectors and matchers
 ```
 To double check if the package is successfully installed:
 ```
@@ -54,7 +57,49 @@ directory instead of rebuilding from scratch):
 python -m pip install -Cbuild-dir=./pylimap_build --no-build-isolation -Ive .
 ```
 
-### Potential troubleshooting: conflicting Intel MKL installations
+<details>
+<summary><b>Other install modes</b> — library-only, and developer setup</summary>
+
+**Core only** — the compiled library and its Python API, without visualisation
+or the 2D detectors. Enough to use `limap.geometry`, `limap.scene`,
+`limap.estimators` and `limap.sfm` as a library:
+```
+python -m pip install -Ive .
+```
+
+**Developer** — adds pytest and the pinned formatters on top of the full install:
+```
+python -m pip install -Ive ".[all,dev]"
+python -m pip install -r requirements.txt
+```
+</details>
+
+<details>
+<summary><b>Extras, and what needs a separate install</b></summary>
+
+| extra | contents |
+| --- | --- |
+| `viz` | matplotlib, seaborn, open3d — needed by `limap.visualize` |
+| `line2d` | einops, scikit-image, pillow — support code for the 2D line detectors |
+| `dev` | pytest, ruff, clang-format |
+| `all` | `viz` + `line2d` |
+
+* **Running a reconstruction needs `hloc`**, which comes from `requirements.txt`
+  rather than from the package metadata: it is not published on PyPI, so it
+  cannot be declared as a dependency. Without it the package imports fine, but
+  the point frontend will fail when it is first used.
+* **`open3d` publishes no wheels for Python 3.13+**, and all 3D visualization
+  depends on it, so `visualize_holistic_recon.py`, `visualize_colmap_model.py`
+  and `limap.visualize`'s 3D helpers do not run there. Reconstruction itself is
+  unaffected — no pipeline touches open3d.
+* Several further methods (HAWP, TP-LSD, LBD, RoMa, Progressive-X) are not
+  installed by any of the above. Each is cloned and pip-installed separately.
+  See the per-method guides under [`misc/install/`](./misc/install/), also
+  linked from the detector and matcher lists further down.
+</details>
+
+<details>
+<summary><b>Potential troubleshooting</b>: conflicting Intel MKL installations</summary>
 
 If bundle adjustment aborts with `Intel MKL FATAL ERROR: Cannot load libmkl_avx2.so or libmkl_def.so`, `_limap.so` is resolving to an inconsistent system MKL. Point the extension at a coherent one (`${CONDA_PREFIX}/lib`, or any directory holding a consistent MKL):
 ```bash
@@ -64,6 +109,7 @@ patchelf --set-rpath "${CONDA_PREFIX}/lib" "$LIMAP_SO"
 ldd "$LIMAP_SO" | grep mkl   # none should resolve to /lib/x86_64-linux-gnu
 ```
 Re-apply after rebuilding. Prefer this to putting the directory on `LD_LIBRARY_PATH`, which affects every program in the shell.
+</details>
 
 ## Quickstart
 

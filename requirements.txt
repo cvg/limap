@@ -1,29 +1,12 @@
-pycolmap==4.1.1
-pyyaml
-tqdm
-h5py
-scipy
-matplotlib
-seaborn
-opencv-python
-opencv-contrib-python
-scikit-learn
-scikit-image
-bresenham
-omegaconf
-plyfile
-imagesize
-einops
-ninja
-pytest
-typeguard
-dacite
-numpy
-open3d==0.19.0
-pybind11==3.0.1
-ruff==0.15.20
-clang-format==22.1.5
-
+# Detectors, matchers and models sourced from git. These cannot live in
+# pyproject.toml because PyPI rejects direct references in project metadata,
+# so they are installed separately:
+#
+#     python -m pip install -Ive ".[all]"
+#     python -m pip install -r requirements.txt
+#
+# Several further methods (HAWP, TP-LSD, LBD, RoMa, Progressive-X) need manual
+# installation and are deliberately absent here.
 pytlsd@git+https://github.com/iago-suarez/pytlsd.git@4180ab8
 deeplsd@git+https://github.com/cvg/DeepLSD.git@88c589d
 gluestick@git+https://github.com/cvg/GlueStick.git@7d81673

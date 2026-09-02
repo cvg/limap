@@ -15,8 +15,6 @@ from pycolmap import logging
 from tqdm import tqdm
 from typeguard import typechecked
 
-import hloc.extract_features
-import hloc.match_features
 
 from limap.image.specs import (
     PointDetectionOptions,
@@ -325,6 +323,11 @@ def _match_all_points(
 
     Returns dict mapping query_id -> {keypoints, kp_idx_to_3D}
     """
+    # hloc is an optional, git-sourced dependency (see requirements.txt);
+    # import it lazily so that `import limap.runners` does not require it.
+    import hloc.extract_features
+    import hloc.match_features
+
     point_det_opts = options.point_detection
     point_match_opts = options.point_matching
 

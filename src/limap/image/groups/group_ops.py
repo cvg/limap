@@ -15,7 +15,6 @@ from .specs import (
 )
 from .vplib import get_vp_detector, VPResult, convert_vpresults_to_groups2d
 from .planelib import get_plane_detector, convert_plane_mask_to_groups2d
-from .planelib.viz import visualize_top_components
 from .group_io import get_group_mask_filename, read_group_mask, write_group_mask
 from .sam3_utils import load_sam3_data_for_image, convert_sam3_masks_to_groups2d
 
@@ -64,6 +63,9 @@ def plane_detection(
     Yields:
         (img_id, plane_mask, normal_map) tuples per image
     """
+    # seaborn lives in the `viz` extra; import on demand.
+    from .planelib.viz import visualize_top_components
+
     import cv2
 
     detector = get_plane_detector(options.method, options.options)
