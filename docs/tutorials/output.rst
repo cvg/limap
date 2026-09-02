@@ -32,7 +32,7 @@ The same directory opens in the COLMAP GUI, and can be fed back into COLMAP's ow
 Inheriting COLMAP advances
 ------------------------------------------
 
-Compatibility is not only about the file format. The point side of the pipeline is COLMAP's own: LIMAP builds directly on its scene types (``Image``, ``Camera``, ``Reconstruction``, ``Track``, ``Rig``, ``Frame``), its correspondence graph, its incremental mapper and its bundle adjustment, and adds the structures on top rather than maintaining a parallel implementation. Improvements on the COLMAP side are therefore inherited rather than reimplemented:
+Compatibility is not only about the file format. The point side of the pipeline comes directly from COLMAP: LIMAP consolidates with its scene types (``Image``, ``Camera``, ``Reconstruction``, ``Track``, ``Rig``, ``Frame``), its estimators, its correspondence graph and various incremental mapper logic, and adds the structures on top rather than maintaining a parallel implementation. Improvements on the COLMAP side are therefore inherited rather than reimplemented:
 
 * **Multi-camera rigs.** Reconstructions use COLMAP's rig and frame model - hence ``rigs.bin`` and ``frames.bin`` above, and the bundle adjustment can refine the rig extrinsics and the per-frame poses (``refine_sensor_from_rig``, ``refine_rig_from_world``), alongside the line, group and wireframe residuals.
 * **Two-view geometry.** Image pairs are verified and initialised with COLMAP's own two-view geometry estimation, and the line and group correspondences are carried in the same ``TwoViewGeometry`` structures as the point matches.

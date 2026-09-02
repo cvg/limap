@@ -15,7 +15,7 @@ Three pipelines are provided:
 * **Holistic incremental SfM** — recover the camera poses and the 3D model together from images alone, with nothing given as input. Calibrated and uncalibrated inputs are both supported.
 
 > [!NOTE]
-> **Starting from LIMAP 2.0.0, the toolbox is fully compatible with the COLMAP ecosystem**: a reconstruction is written as a plain COLMAP model, with the line, group and wireframe structures alongside it under `structures/`, so any output can be opened in COLMAP GUI and read with `pycolmap`. The unification runs deeper than the file format: the point side of the pipeline is COLMAP's own, reusing its scene types, correspondence graph, incremental mapper and bundle adjustment, with LIMAP adding the structures on top instead of maintaining a parallel implementation. Advances on the COLMAP side therefore carry over directly: multi-camera rig support, improved two-view geometry estimation, etc.
+> **Starting from LIMAP 2.0.0, the toolbox is fully compatible with the COLMAP ecosystem** (version 4.2.0 as of Sep 1, 2026): a reconstruction is written as a plain COLMAP model, with the line, group and wireframe structures alongside it under `structures/`, so any output can be opened in COLMAP GUI and read with `pycolmap`. The unification runs deeper than the file format: the point side of the pipeline comes directly from COLMAP, consolidating with its scene types, estimators, correspondence graph, and various incremental mapper logic, with LIMAP adding the structures on top instead of maintaining a parallel implementation. Advances on the COLMAP side therefore carry over directly: multi-camera rig support, improved two-view geometry estimation, etc.
 
 The line detectors, matchers, vanishing point estimators and plane detectors are abstracted behind registries to ensure flexibility to support recent advances and future development.
 
@@ -115,7 +115,7 @@ python visualize_colmap_model.py --input_dir outputs/quickstart/triangulation/fi
 ### Example of Hybrid Point-Line Localization
 We provide an example of hybrid point-line localization on the *Stairs* scene of the [7Scenes](https://www.microsoft.com/en-us/research/project/rgb-d-dataset-7-scenes/) dataset.
 
-Prepare the dataset following hloc's [7Scenes pipeline](https://github.com/cvg/Hierarchical-Localization/tree/master/hloc/pipelines/7Scenes) (scene images together with the SIFT SfM models, DenseVLAD retrieval pairs, and rendered depth maps), laid out under a single `datasets/7scenes` root. Then run:
+Prepare the dataset following the hloc [7Scenes pipeline](https://github.com/cvg/Hierarchical-Localization/tree/master/hloc/pipelines/7Scenes) (scene images together with the SIFT SfM models, DenseVLAD retrieval pairs, and rendered depth maps), laid out under a single `datasets/7scenes` root. Then run:
 ```bash
 python runners/7scenes/localization.py --dataset datasets/7scenes -s stairs --skip_exists
 ```
@@ -143,7 +143,7 @@ python experiments/benchmark_sfm.py \
 
 This writes `outputs/quickstart_sfm/hypersim/ai_001_001/holistic/models/` and
 prints relative pose AUC against the ground-truth poses. Add
-`--methods holistic pycolmap` to run COLMAP's own mapper alongside it on the
+`--methods holistic pycolmap` to run the COLMAP mapper alongside it on the
 same features and matches.
 
 We also support structure from motion without knowing the intrinsics, by adding the `--uncalibrated` flag:
