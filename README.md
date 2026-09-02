@@ -60,12 +60,15 @@ python -m pip install -Cbuild-dir=./pylimap_build --no-build-isolation -Ive .
 <details>
 <summary><b>Other install modes</b> — library-only, and developer setup</summary>
 
-**Core only** — the compiled library and its Python API, without visualisation
-or the 2D detectors. Enough to use `limap.geometry`, `limap.scene`,
-`limap.estimators` and `limap.sfm` as a library:
+**Core only** — the compiled library and its Python API, and nothing else:
 ```
 python -m pip install -Ive .
 ```
+This gives you the geometry types, reading and writing of reconstructions, and
+the estimators and bundle adjustment, all operating on data you already have.
+It does **not** let you reconstruct from images, which needs `hloc`, nor detect
+2D lines, nor visualize anything. This is also the mode a published wheel
+provides — the extras and the git-sourced detectors are always opt-in on top.
 
 **Developer** — adds pytest and the pinned formatters on top of the full install:
 ```

@@ -1,6 +1,6 @@
 {
     "name": "limap",
-    "description": "A toolbox for mapping and localization with line features.",
+    "description": "A toolbox for 3D visual mapping, localization, and SfM with structured geometric features (e.g., points, lines, planes, vanishing points, wireframes).",
     "homepage": "https://github.com/cvg/limap",
     "license": "BSD-3-Clause",
     "supports": "(linux | windows | osx) & (x64 | arm64)",
