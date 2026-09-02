@@ -8,6 +8,10 @@ include(FetchContent)
 ################################################################################
 message(STATUS "Configuring PoseLib...")
 if(FETCH_POSELIB)
+    # PoseLib compiles with -Werror -Wfatal-errors by default. GCC 14 reports a
+    # false-positive -Warray-bounds in Eigen's SSE loads under -O3, which breaks
+    # the manylinux wheel build. Do not fail our build on a dependency's warnings.
+    set(WERROR OFF CACHE BOOL "Disable -Werror in PoseLib" FORCE)
     FetchContent_Declare(PoseLib
         GIT_REPOSITORY    https://github.com/PoseLib/PoseLib.git
         GIT_TAG           1758bd6d20f607c276388d28b5ba88f3651e85e9
