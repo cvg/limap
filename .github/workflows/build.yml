@@ -1,5 +1,9 @@
 name: limap
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 on:
   push:
     branches:
@@ -12,32 +16,92 @@ on:
 
 jobs:
   build:
-    name: ${{ matrix.config.os }} ${{ matrix.config.arch }} with Python ${{ matrix.config.python-version }}
+    name: ${{ matrix.config.os }} with Python ${{ matrix.config.python-version }}
     runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: false
       matrix:
         config: [
-          {os: ubuntu-latest, python-version: "3.10"},
-          {os: ubuntu-latest, python-version: "3.11"},
-          {os: ubuntu-latest, python-version: "3.12"},
+          {
+            os: ubuntu-24.04,
+            python-version: "3.10",
+            checkCodeFormat: false,
+            cppTests: false,
+            e2eTests: true,
+          },
+          {
+            os: ubuntu-24.04,
+            python-version: "3.11",
+            checkCodeFormat: false,
+            cppTests: true,
+            e2eTests: false,
+          },
+          {
+            os: ubuntu-24.04,
+            python-version: "3.12",
+            checkCodeFormat: true,
+            cppTests: false,
+            e2eTests: false,
+          },
         ]
+
     env:
-      COMPILER_CACHE_VERSION: 1
       COMPILER_CACHE_DIR: ${{ github.workspace }}/compiler-cache
       CCACHE_DIR: ${{ github.workspace }}/compiler-cache/ccache
       CCACHE_BASEDIR: ${{ github.workspace }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/cache@v4
-        id: cache-builds
-        with:
-          key: limap-v${{ env.COMPILER_CACHE_VERSION }}-${{ matrix.config.os }}-${{ matrix.config.arch }}-${{ github.run_id }}-${{ github.run_number }}
-          restore-keys: limap-v${{ env.COMPILER_CACHE_VERSION }}-${{ matrix.config.os }}-${{ matrix.config.arch }}
-          path: ${{ env.COMPILER_CACHE_DIR }}
+      # scikit-build-core and the ctest configure use different build trees.
+      # Do not let the directory name take part in the hash.
+      CCACHE_NOHASHDIR: "true"
+      # Hosted runner compiler mtimes change even when contents do not.
+      CCACHE_COMPILERCHECK: content
+      CCACHE_MAXSIZE: 500M
+      # Shared between the scikit-build-core build and the ctest configure so
+      # COLMAP/PoseLib/JLinkage/libigl are fetched once per job. Deliberately
+      # outside COMPILER_CACHE_DIR: these trees are far too large to persist.
+      FETCHCONTENT_CACHE_DIR: ${{ github.workspace }}/fetchcontent
 
-      - name: Set env (Linux)
-        if: runner.os == 'Linux'
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python ${{ matrix.config.python-version }}
+        uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.config.python-version }}
+
+      - name: Check code format
+        if: matrix.config.checkCodeFormat
+        run: |
+          set +x -euo pipefail
+          python -m pip install ruff==0.15.20 clang-format==22.1.5
+          ./scripts/format/c++.sh --all
+          ./scripts/format/python.sh --all
+          git diff --name-only
+          git diff --exit-code || (echo "Code formatting failed" && exit 1)
+
+      - name: Restore compiler cache
+        uses: ./.github/actions/compiler-cache
+        id: cache-compiler
+        with:
+          mode: restore
+          path: ${{ env.COMPILER_CACHE_DIR }}
+          key-suffix: ${{ matrix.config.os }}-py${{ matrix.config.python-version }}
+
+      - name: Install compiler cache
+        run: |
+          mkdir -p "$CCACHE_DIR" "$FETCHCONTENT_CACHE_DIR"
+          echo "$COMPILER_CACHE_DIR/bin" >> $GITHUB_PATH
+
+          if [ ! -f "$COMPILER_CACHE_DIR/bin/ccache" ]; then
+            set -x
+            wget https://github.com/ccache/ccache/releases/download/v4.13.6/ccache-4.13.6-linux-x86_64-glibc.tar.xz
+            echo "508b2a1217dc6e04a23e967c7b95a0fb45d8a7e16fde9e180919698f2e2be060  ccache-4.13.6-linux-x86_64-glibc.tar.xz" | sha256sum --check
+            tar xf ccache-4.13.6-linux-x86_64-glibc.tar.xz
+            mkdir -p "$COMPILER_CACHE_DIR/bin"
+            mv ./ccache-4.13.6-linux-x86_64-glibc/ccache "$COMPILER_CACHE_DIR/bin"
+          fi
+          "$COMPILER_CACHE_DIR/bin/ccache" --zero-stats
+
+      - name: Setup Ubuntu
         run: |
           sudo apt-get update && sudo apt-get install -y \
             git \
@@ -71,11 +135,6 @@ jobs:
           # but its config still requires the OpenCV include directory to exist.
           sudo mkdir -p /usr/include/opencv4
 
-      - name: Set up Python ${{ matrix.config.python-version  }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.config.python-version  }}
-
       - name: Free disk space
         run: |
           sudo rm -rf /usr/share/dotnet
@@ -83,25 +142,40 @@ jobs:
           sudo rm -rf /opt/ghc
           docker system prune -af || true
 
-      - name: Clean workspace artifacts
-        run: rm -rf build/ dist/ *.egg-info/ .eggs/
-
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
       - name: Build
-        run:  python -m pip install -v .
+        run: |
+          python -m pip install -v . \
+            -Cbuild-dir=build \
+            -Ccmake.define.CMAKE_C_COMPILER_LAUNCHER=ccache \
+            -Ccmake.define.CMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -Ccmake.define.FETCHCONTENT_BASE_DIR="${FETCHCONTENT_CACHE_DIR}"
+
+      - name: Check import
+        run: python -c "import limap; print(limap.__version__)"
 
       - name: Run Python tests
-        run:  python -c "import limap; print(limap.__version__)"
+        run: pytest -m ci_workflow tests
 
-      - name: Run tests
+      - name: Build and run C++ tests
+        if: matrix.config.cppTests
         run: |
-          pytest -m ci_workflow tests
+          cmake -B build-tests -GNinja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DLIMAP_TESTS_ENABLED=ON \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DFETCHCONTENT_BASE_DIR="${FETCHCONTENT_CACHE_DIR}" \
+            .
+          cmake --build build-tests -j "$(nproc)"
+          ctest --test-dir build-tests --output-on-failure
 
       - name: Run E2E tests
+        if: matrix.config.e2eTests
         run: |
           bash scripts/quickstart.sh
           python runners/hypersim/geometry_guided_line_reconstruction.py \
@@ -125,3 +199,16 @@ jobs:
           python scripts/check_reconstruction.py \
               outputs/quickstart_test_colmap/final_model
 
+      - name: Show compiler cache stats
+        if: always()
+        run: |
+          ccache --show-stats --verbose || true
+
+      - name: Save compiler cache
+        uses: ./.github/actions/compiler-cache
+        with:
+          mode: save
+          key: ${{ steps.cache-compiler.outputs.key }}
+          path: ${{ env.COMPILER_CACHE_DIR }}
+          cache-hit: ${{ steps.cache-compiler.outputs.cache-hit }}
+          ccache-dir: ${{ env.CCACHE_DIR }}
