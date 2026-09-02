@@ -2,6 +2,8 @@
 /dist/
 cmake-build-*
 pylimap_build/
+compiler-cache/
+fetchcontent/
 *.egg-info/
 deps/
 reference/

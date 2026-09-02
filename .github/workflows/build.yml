@@ -164,15 +164,15 @@ jobs:
       - name: Build and run C++ tests
         if: matrix.config.cppTests
         run: |
-          cmake -B build-tests -GNinja \
+          cmake -B cmake-build-tests -GNinja \
             -DCMAKE_BUILD_TYPE=Release \
             -DLIMAP_TESTS_ENABLED=ON \
             -DCMAKE_C_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DFETCHCONTENT_BASE_DIR="${FETCHCONTENT_CACHE_DIR}" \
             .
-          cmake --build build-tests -j "$(nproc)"
-          ctest --test-dir build-tests --output-on-failure
+          cmake --build cmake-build-tests -j "$(nproc)"
+          ctest --test-dir cmake-build-tests --output-on-failure
 
       - name: Run E2E tests
         if: matrix.config.e2eTests
