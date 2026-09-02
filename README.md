@@ -43,8 +43,8 @@ published wheels available for open3d and our 3D viewer depends on it.*
 
 To install the LIMAP Python package:
 ```
-python -m pip install -Ive ".[all]"
 python -m pip install -r requirements.txt   # git-sourced detectors and matchers
+python -m pip install -Ive ".[all]"
 ```
 To double check if the package is successfully installed:
 ```
@@ -72,8 +72,8 @@ provides — the extras and the git-sourced detectors are always opt-in on top.
 
 **Developer** — adds pytest and the pinned formatters on top of the full install:
 ```
-python -m pip install -Ive ".[all,dev]"
 python -m pip install -r requirements.txt
+python -m pip install -Ive ".[all,dev]"
 ```
 </details>
 

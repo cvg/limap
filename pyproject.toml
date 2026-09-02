@@ -35,7 +35,9 @@ dependencies = [
   "pyyaml",
   "tqdm",
   "scipy",
-  "opencv-python",
+  # Overrides gluestick's opencv-python==4.7.0.* pin: 4.10 is the first
+  # release built against NumPy 2, below which `import cv2` fails.
+  "opencv-python>=4.10",
   "typeguard",
   "dacite",
   "joblib",

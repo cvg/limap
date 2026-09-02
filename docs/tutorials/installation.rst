@@ -22,8 +22,8 @@ know you want one of the others:
 
 .. code-block:: bash
 
-    python -m pip install -Ive ".[all]"
     python -m pip install -r requirements.txt   # git-sourced detectors and matchers
+    python -m pip install -Ive ".[all]"
 
 **Core only** -- the compiled library and its Python API, and nothing else:
 
@@ -42,8 +42,8 @@ top.
 
 .. code-block:: bash
 
-    python -m pip install -Ive ".[all,dev]"
     python -m pip install -r requirements.txt
+    python -m pip install -Ive ".[all,dev]"
 
 To double check if the package is successfully installed:
 
