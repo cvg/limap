@@ -102,7 +102,13 @@ def _members_of_module(module_name, include_undocumented):
         names = [n for n in dir(module) if not n.startswith("_")]
     resolved = set()
     for name in names:
-        member = getattr(module, name, None)
+        try:
+            member = getattr(module, name, None)
+        except ImportError:
+            # A lazy attribute whose optional dependency is missing here; it
+            # is exported, so autodoc documents it where the docs are built.
+            resolved.add(name)
+            continue
         if member is None or inspect.ismodule(member):
             continue
         if include_undocumented or getattr(member, "__doc__", None):
@@ -160,16 +166,23 @@ def _documented_names():
     return documented, unresolved
 
 
+def _is_submodule(module, name):
+    """Whether ``module.name`` is a submodule, optional dependencies aside."""
+    try:
+        value = getattr(module, name, None)
+    except ImportError:
+        # Lazy attributes (limap.visualize) raise when their optional
+        # dependency is absent; they are still names the docs must cover.
+        return False
+    return inspect.ismodule(value)
+
+
 def _public_names(module):
     """The public API of a module, submodules aside."""
     names = getattr(module, "__all__", None)
     if names is None:
         names = [n for n in dir(module) if not n.startswith("_")]
-    return {
-        name
-        for name in names
-        if not inspect.ismodule(getattr(module, name, None))
-    }
+    return {name for name in names if not _is_submodule(module, name)}
 
 
 @pytest.fixture(scope="module")
