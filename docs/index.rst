@@ -54,7 +54,9 @@ The line detectors, matchers, vanishing point estimators and plane detectors are
    api/limap.estimators
    api/limap.evaluation
    api/limap.runners
+   api/limap.cli
    api/limap.visualize
+   api/limap.util
 
 .. toctree::
    :maxdepth: 1

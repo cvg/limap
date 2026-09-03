@@ -5,7 +5,7 @@ LIMAP provides a runner script to run visual localization integrating lines alon
 
 Use ``runners/7scenes/localization.py`` to run the localization experiment; use the ``--help`` option and take a look at the ``cfgs/localization`` folder for all the possible options and configurations.
 
-Alternatively, take a look at the :py:meth:`limap.runners.point_line_localization` runner or the :py:mod:`limap.estimators.absolute_pose` API to run localization with points and lines, using 2D-3D point and line correspondences directly.
+Alternatively, take a look at the :py:func:`limap.runners.point_line_localization` runner or the :py:mod:`limap.estimators.absolute_pose` API to run localization with points and lines, using 2D-3D point and line correspondences directly.
 
 ------------------------------------
 Example on 7Scenes

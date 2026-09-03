@@ -1,10 +1,11 @@
-"""
+r"""
 Run structure-aware incremental SfM.
 
 This pipeline performs full incremental SfM with hybrid point+line registration,
 structure triangulation (points, lines, groups), and structure BA.
 
-Usage:
+Usage::
+
     python -m limap.cli.structure_incremental_sfm \
         --db_path <path_to_colmap_database.db> \
         --structure_db_path <path_to_structure_database.db> \

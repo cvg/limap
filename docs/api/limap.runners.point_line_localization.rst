@@ -1,7 +1,12 @@
 Point-line localization
 =======================
 
-.. automodule:: limap.runners.point_line_localization
+.. currentmodule:: limap.runners
+
+.. autoclass:: PointLineLocalizationOptions
    :members:
    :undoc-members:
-   :show-inheritance:
+   :special-members: __init__
+   :member-order: groupwise
+
+.. autofunction:: point_line_localization

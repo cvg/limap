@@ -6,7 +6,7 @@
 <img src="https://raw.githubusercontent.com/cvg/limap/main/misc/media/supp_qualitative_5x3.png">
 </p>
 
-LIMAP is a toolbox for holistic 3D mapping, localization and structure from motion (SfM) with structured features. Alongside keypoints, it treats **lines**, **vanishing points**, **planes**, **parametric primitives** (spheres, cylinders, ellipsoids, cuboids, cones) and the **wireframe** connecting them as first-class citizens of the reconstruction, optimized jointly with the camera poses. It grew out of the highlight paper [3D Line Mapping Revisited](https://arxiv.org/abs/2303.17504) at CVPR 2023 in Vancouver, Canada, with the SfM pipeline introduced and further improved in subsequent papers at [ECCV 2024](https://arxiv.org/abs/2409.19811) and ECCV 2026 (please refer to the [Citation](#citation) section for details). Contributors to this project are from the [Computer Vision and Geometry Group](https://cvg.ethz.ch/) at [ETH Zurich](https://ethz.ch/en.html).
+LIMAP is a toolbox for holistic 3D mapping, localization and structure from motion (SfM) with structured features. Alongside keypoints, it treats **lines**, **vanishing points**, **planes**, **parametric primitives** (spheres, cylinders, ellipsoids, cuboids, cones) and the **wireframe** connecting them as first-class citizens of the reconstruction, optimized jointly with the camera poses. It grew out of the highlight paper [3D Line Mapping Revisited](https://arxiv.org/abs/2303.17504) at CVPR 2023 in Vancouver, Canada, with the SfM pipeline introduced and further improved in subsequent papers at [ECCV 2024](https://arxiv.org/abs/2409.19811) and ECCV 2026 (please refer to the [Citations](#citations) section for details). Contributors to this project are from the [Computer Vision and Geometry Group](https://cvg.ethz.ch/) at [ETH Zurich](https://ethz.ch/en.html).
 
 Three pipelines are provided:
 
@@ -261,7 +261,7 @@ If you wish to use the methods with **separate installation needed** you need to
 
 No separate installation is needed: `pxwplanar` is pulled in by `requirements.txt` and its weights download from Hugging Face on first use. It does require the MoGe fork that `pxwplanar` pins; another MoGe install in the same environment will shadow it and break metric prediction on CUDA.
 
-## Citation
+## Citations
 If you use this code in your project, please consider citing the following paper:
 ```bibtex
 @InProceedings{Liu_2023_LIMAP,
