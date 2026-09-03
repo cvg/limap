@@ -1,7 +1,12 @@
 Automatic incremental reconstruction
 ====================================
 
-.. automodule:: limap.runners.automatic_structure_incremental_reconstruction
+.. currentmodule:: limap.runners
+
+.. autoclass:: AutomaticStructureIncrementalReconstructionOptions
    :members:
    :undoc-members:
-   :show-inheritance:
+   :special-members: __init__
+   :member-order: groupwise
+
+.. autofunction:: automatic_structure_incremental_reconstruction

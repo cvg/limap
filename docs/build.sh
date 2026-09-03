@@ -1,4 +1,4 @@
-python -m pip install -Ive ..
+# python -m pip install -Ive ..
 touch *.rst
 touch tutorials/*
 touch api/*

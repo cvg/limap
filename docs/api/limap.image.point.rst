@@ -6,7 +6,16 @@ Keypoint detection and matching are delegated to `hloc
 selecting the method are defined here. The results are written into COLMAP's
 ``database.db``.
 
-.. automodule:: limap.image.point.specs
+.. currentmodule:: limap.image.point
+
+.. autoclass:: PointDetectionOptions
    :members:
    :undoc-members:
-   :show-inheritance:
+   :special-members: __init__
+   :member-order: groupwise
+
+.. autoclass:: PointMatcherOptions
+   :members:
+   :undoc-members:
+   :special-members: __init__
+   :member-order: groupwise

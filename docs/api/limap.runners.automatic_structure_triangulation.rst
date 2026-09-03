@@ -1,7 +1,12 @@
 Automatic point-line triangulation
 ==================================
 
-.. automodule:: limap.runners.automatic_structure_triangulation
+.. currentmodule:: limap.runners
+
+.. autoclass:: AutomaticStructureTriangulationOptions
    :members:
    :undoc-members:
-   :show-inheritance:
+   :special-members: __init__
+   :member-order: groupwise
+
+.. autofunction:: automatic_structure_triangulation

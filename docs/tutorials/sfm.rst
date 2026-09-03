@@ -16,11 +16,11 @@ The frontend writes two databases:
 * ``database.db`` - the COLMAP database, holding keypoints and their matches
 * ``structure_database.db`` - the structure database, holding 2D lines, groups and their associations
 
-For SfM the entry point is :py:meth:`limap.runners.structure_frontend_from_images`, which takes the image directory and an in-memory ``pycolmap.Reconstruction``. It has to be in memory: COLMAP's on-disk model format drops unposed frames, which is precisely what we have at this stage.
+For SfM the entry point is :py:func:`limap.runners.structure_frontend_from_images`, which takes the image directory and an in-memory ``pycolmap.Reconstruction``. It has to be in memory: COLMAP's on-disk model format drops unposed frames, which is precisely what we have at this stage.
 
 .. note::
 
-   ``python -m limap.cli.structure_frontend`` is the *posed* variant (:py:meth:`limap.runners.structure_frontend_from_model`), intended for the pipelines in :doc:`triangulation`. It requires a COLMAP model and cannot be used for SfM from scratch.
+   ``python -m limap.cli.structure_frontend`` is the *posed* variant (:py:func:`limap.runners.structure_frontend_from_model`), intended for the pipelines in :doc:`triangulation`. It requires a COLMAP model and cannot be used for SfM from scratch.
 
 The detectors, matchers and their options are shared with the mapping pipelines; see :doc:`line2d` and :doc:`groups`.
 
@@ -44,7 +44,7 @@ Each reconstructed model is written to ``${OUTPUT_DIR}`` as a COLMAP model, with
 End-to-end incremental SfM
 -----------------------------------------
 
-In practice the two stages are run together. :py:meth:`limap.runners.automatic_structure_incremental_reconstruction` calls the frontend and then the mapper, starting from the images alone. The dataset runner ``runners/hypersim/automatic_structure_incremental_reconstruction.py`` wraps it and is configured through ``cfgs/structure_incremental_reconstruction/``.
+In practice the two stages are run together. :py:func:`limap.runners.automatic_structure_incremental_reconstruction` calls the frontend and then the mapper, starting from the images alone. The dataset runner ``runners/hypersim/automatic_structure_incremental_reconstruction.py`` wraps it and is configured through ``cfgs/structure_incremental_reconstruction/``.
 
 For a worked example on the quickstart scene, together with the relative pose AUC against the ground truth, see :doc:`quickstart`.
 

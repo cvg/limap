@@ -47,4 +47,4 @@ This poses the cameras from points alone and reconstructs the structures afterwa
 Using auxiliary depth maps
 -----------------------------------------
 
-When depth maps are available, the 3D line map can be built with geometry-guided line reconstruction instead of triangulation. See the runner ``runners/hypersim/geometry_guided_line_reconstruction.py`` and the :py:meth:`limap.runners.line_reconstruction_with_depth_maps` API, configured via ``cfgs/geometry_guided_line_reconstruction/``.
+When depth maps are available, the 3D line map can be built with geometry-guided line reconstruction instead of triangulation. See the runner ``runners/hypersim/geometry_guided_line_reconstruction.py`` and the :py:func:`limap.runners.line_reconstruction_with_depth_maps` API, configured via ``cfgs/geometry_guided_line_reconstruction/``.
