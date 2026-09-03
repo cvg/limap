@@ -5,16 +5,25 @@ import limap.sfm
 from pathlib import Path
 from typeguard import typechecked
 
-import hloc.extract_features
-import hloc.match_features
-import hloc.triangulation
-import hloc.reconstruction
-
 from .group_voting import vote_unmatched_groups
 from .specs import ImageDescriptionOptions, ImageAssociationOptions
 from .line import line_detection, line_matching
 from .groups import group_description
-from .dense_matcher import associate_via_dense_matching
+
+
+def _hloc():
+    """Import hloc on demand.
+
+    hloc is git-sourced (see requirements.txt) and cannot be declared as a
+    project dependency, so importing it at module level would make
+    ``import limap.image`` fail wherever it is not installed.
+    """
+    import hloc.extract_features  # noqa: F401
+    import hloc.match_features  # noqa: F401
+    import hloc.reconstruction  # noqa: F401
+    import hloc.triangulation  # noqa: F401
+
+    return hloc
 
 
 @typechecked
@@ -25,6 +34,8 @@ def create_empty_databases(
     image_dir: Path | None = None,
     camera_mode: pycolmap.CameraMode | None = None,
 ) -> None:
+    hloc = _hloc()
+
     if camera_mode is not None:
         # Infer cameras from images (EXIF or default focal length)
         assert image_dir is not None
@@ -47,6 +58,8 @@ def image_description(
     """
     Return point_descriptor_path and line_descriptor_path
     """
+    hloc = _hloc()
+
     image_names = {i: image_path / img.name for i, img in recon.images.items()}
     if options.use_joint_point_line_detection:
         # TODO: support in the future with UPAL
@@ -135,6 +148,9 @@ def image_association(
     db_path: Path,
     structure_db_path: Path,
 ) -> None:
+    hloc = _hloc()
+    from .dense_matcher import associate_via_dense_matching
+
     image_names = {i: image_path / img.name for i, img in recon.images.items()}
     # Use dense matching
     if options.use_dense_matching:

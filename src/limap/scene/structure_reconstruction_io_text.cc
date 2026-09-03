@@ -264,7 +264,7 @@ void ReadStructures2dText(StructureReconstruction &recon, std::istream &is) {
 }
 
 void ReadStructures2dText(StructureReconstruction &recon,
-                          const std::string &path) {
+                          const std::filesystem::path &path) {
   std::ifstream file(path);
   THROW_CHECK_FILE_OPEN(file, path);
   ReadStructures2dText(recon, file);
@@ -286,7 +286,7 @@ void WriteStructures2dText(const StructureReconstruction &recon,
 }
 
 void WriteStructures2dText(const StructureReconstruction &recon,
-                           const std::string &path) {
+                           const std::filesystem::path &path) {
   std::ofstream file(path);
   THROW_CHECK_FILE_OPEN(file, path);
   WriteStructures2dText(recon, file);
@@ -305,7 +305,8 @@ void ReadLines3DText(StructureReconstruction &recon, std::istream &is) {
   }
 }
 
-void ReadLines3DText(StructureReconstruction &recon, const std::string &path) {
+void ReadLines3DText(StructureReconstruction &recon,
+                     const std::filesystem::path &path) {
   std::ifstream file(path);
   THROW_CHECK_FILE_OPEN(file, path);
   ReadLines3DText(recon, file);
@@ -329,7 +330,7 @@ void WriteLines3DText(const StructureReconstruction &recon, std::ostream &os) {
 }
 
 void WriteLines3DText(const StructureReconstruction &recon,
-                      const std::string &path) {
+                      const std::filesystem::path &path) {
   std::ofstream file(path);
   THROW_CHECK_FILE_OPEN(file, path);
   WriteLines3DText(recon, file);
@@ -348,7 +349,8 @@ void ReadGroups3DText(StructureReconstruction &recon, std::istream &is) {
   }
 }
 
-void ReadGroups3DText(StructureReconstruction &recon, const std::string &path) {
+void ReadGroups3DText(StructureReconstruction &recon,
+                      const std::filesystem::path &path) {
   std::ifstream file(path);
   THROW_CHECK_FILE_OPEN(file, path);
   ReadGroups3DText(recon, file);
@@ -372,7 +374,7 @@ void WriteGroups3DText(const StructureReconstruction &recon, std::ostream &os) {
 }
 
 void WriteGroups3DText(const StructureReconstruction &recon,
-                       const std::string &path) {
+                       const std::filesystem::path &path) {
   std::ofstream file(path);
   THROW_CHECK_FILE_OPEN(file, path);
   WriteGroups3DText(recon, file);
@@ -384,7 +386,7 @@ void ReadWireframeText(StructureReconstruction &recon, std::istream &is) {
 }
 
 void ReadWireframeText(StructureReconstruction &recon,
-                       const std::string &path) {
+                       const std::filesystem::path &path) {
   std::ifstream file(path);
   THROW_CHECK_FILE_OPEN(file, path);
   ReadWireframeText(recon, file);
@@ -396,7 +398,7 @@ void WriteWireframeText(const StructureReconstruction &recon,
 }
 
 void WriteWireframeText(const StructureReconstruction &recon,
-                        const std::string &path) {
+                        const std::filesystem::path &path) {
   std::ofstream file(path);
   THROW_CHECK_FILE_OPEN(file, path);
   WriteWireframeText(recon, file);

@@ -1,6 +1,8 @@
 ################################################################################
 # Find system packages
 ################################################################################
+find_package(OpenMP REQUIRED COMPONENTS C CXX)
+
 find_package(Glog REQUIRED)
 if(DEFINED glog_VERSION_MAJOR)
   # Older versions of glog don't export version variables.

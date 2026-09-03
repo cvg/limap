@@ -1,5 +1,6 @@
 #include "limap/evaluation/point_cloud_evaluator.h"
 
+#include <cstdint>
 #include <iostream>
 #include <numeric>
 #include <queue>
@@ -16,12 +17,12 @@ double PointCloudEvaluator::ComputeDistPoint(const V3D &point) {
 
 std::vector<double> PointCloudEvaluator::ComputeDistsforEachPoint(
     const std::vector<Line3d> &lines) const {
-  size_t n_points = tree_.cloud.pts.size();
+  const int64_t n_points = tree_.cloud.pts.size();
   std::vector<double> dists(n_points);
 
   progressbar bar(n_points);
 #pragma omp parallel for
-  for (size_t i = 0; i < n_points; ++i) {
+  for (int64_t i = 0; i < n_points; ++i) {
     bar.update();
     V3D p = tree_.point(i);
     double min_dist = std::numeric_limits<double>::max();
@@ -37,7 +38,7 @@ std::vector<double> PointCloudEvaluator::ComputeDistsforEachPoint(
 
 std::vector<double> PointCloudEvaluator::ComputeDistsforEachPoint_KDTree(
     const std::vector<Line3d> &lines) const {
-  size_t n_points = tree_.cloud.pts.size();
+  const int64_t n_points = tree_.cloud.pts.size();
   std::vector<double> dists(n_points);
 
   // sample points uniformly on all the lines and build a kd tree
@@ -59,7 +60,7 @@ std::vector<double> PointCloudEvaluator::ComputeDistsforEachPoint_KDTree(
 
   progressbar bar(n_points);
 #pragma omp parallel for
-  for (size_t i = 0; i < n_points; ++i) {
+  for (int64_t i = 0; i < n_points; ++i) {
     bar.update();
     V3D p = tree_.point(i);
     std::vector<int> res;

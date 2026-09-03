@@ -2,13 +2,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 import shutil
 
-from hloc import (
-    extract_features,
-    match_features,
-    reconstruction,
-    pairs_from_exhaustive,
-    triangulation,
-)
 import pycolmap
 from typeguard import typechecked
 
@@ -33,6 +26,16 @@ def automatic_point_triangulation(
     output_path: Path,
     options: AutomaticPointTriangulationOptions,
 ) -> Path:
+    # hloc is an optional, git-sourced dependency (see requirements.txt);
+    # import it lazily so that `import limap.runners` does not require it.
+    from hloc import (
+        extract_features,
+        match_features,
+        reconstruction,
+        pairs_from_exhaustive,
+        triangulation,
+    )
+
     # Paths
     triangulated_model = output_path / "sparse"
     db_path = output_path / "database.db"

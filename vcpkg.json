@@ -1,0 +1,87 @@
+{
+    "name": "limap",
+    "description": "A toolbox for 3D visual mapping, localization, and SfM with structured geometric features (points, lines, planes, vanishing points, wireframes, etc.).",
+    "homepage": "https://github.com/cvg/limap",
+    "license": "BSD-3-Clause",
+    "supports": "(linux | windows | osx) & (x64 | arm64)",
+    "dependencies": [
+        "boost-algorithm",
+        "boost-graph",
+        "boost-heap",
+        "boost-program-options",
+        "boost-property-map",
+        "boost-property-tree",
+        "boost-unordered",
+        {
+            "name": "ceres",
+            "features": [
+                "lapack",
+                "schur",
+                "suitesparse"
+            ]
+        },
+        "eigen3",
+        "gflags",
+        "glog",
+        {
+            "name": "jasper",
+            "default-features": false
+        },
+        "metis",
+        {
+            "name": "openblas",
+            "features": [
+                "dynamic-arch"
+            ],
+            "platform": "linux"
+        },
+        "openimageio",
+        "sqlite3",
+        {
+            "name": "vcpkg-cmake",
+            "host": true
+        },
+        {
+            "name": "vcpkg-cmake-config",
+            "host": true
+        }
+    ],
+    "default-features": [
+        "download"
+    ],
+    "features": {
+        "tests": {
+            "description": "Build all tests (LIMAP_TESTS_ENABLED).",
+            "dependencies": [
+                "gtest"
+            ]
+        },
+        "download": {
+            "description": "COLMAP's resource download support, on by default upstream.",
+            "dependencies": [
+                {
+                    "name": "curl",
+                    "features": [
+                        "sspi"
+                    ],
+                    "platform": "windows"
+                },
+                {
+                    "name": "curl",
+                    "features": [
+                        "openssl"
+                    ],
+                    "platform": "!windows"
+                },
+                {
+                    "name": "cryptopp",
+                    "platform": "windows & arm64"
+                },
+                {
+                    "name": "openssl",
+                    "platform": "!(windows & arm64)"
+                }
+            ]
+        }
+    }
+}

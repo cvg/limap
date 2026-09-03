@@ -17,7 +17,10 @@ void bind_geometry(py::module &);
 void bind_sfm(py::module &);
 
 PYBIND11_MODULE(_limap, m) {
-  m.doc() = "A toolbox for mapping and localization with line features";
+  m.doc() =
+      "A toolbox for 3D visual mapping, localization, and SfM with structured "
+      "geometric features (points, lines, planes, vanishing points, "
+      "wireframes, etc.).";
 #ifdef VERSION_INFO
   m.attr("__version__") = py::str(VERSION_INFO);
 #else

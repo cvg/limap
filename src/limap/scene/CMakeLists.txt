@@ -24,4 +24,6 @@ LIMAP_ADD_LIBRARY(
         limap_geometry
         limap_util
         ${LIMAP_COLMAP_TARGET}
+    PRIVATE_LINK_LIBS
+        OpenMP::OpenMP_CXX
 )

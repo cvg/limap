@@ -1,5 +1,9 @@
 name: limap
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 on:
   push:
     branches:
@@ -12,41 +16,128 @@ on:
 
 jobs:
   build:
-    name: ${{ matrix.config.os }} ${{ matrix.config.arch }} with Python ${{ matrix.config.python-version }}
+    name: ${{ matrix.config.os }} with Python ${{ matrix.config.python-version }}
     runs-on: ${{ matrix.config.os }}
+    continue-on-error: ${{ matrix.config.experimental || false }}
     strategy:
       fail-fast: false
       matrix:
         config: [
-          {os: ubuntu-latest, python-version: "3.10"},
-          {os: ubuntu-latest, python-version: "3.11"},
-          {os: ubuntu-latest, python-version: "3.12"},
+          {
+            os: ubuntu-24.04,
+            python-version: "3.10",
+            checkCodeFormat: false,
+            cppTests: false,
+            e2eTests: true,
+          },
+          {
+            os: ubuntu-24.04,
+            python-version: "3.11",
+            checkCodeFormat: false,
+            cppTests: true,
+            e2eTests: false,
+          },
+          {
+            os: ubuntu-24.04,
+            python-version: "3.12",
+            checkCodeFormat: true,
+            cppTests: false,
+            e2eTests: false,
+          },
+          # 3.13: every core dependency supports it. open3d does not, but it
+          # is confined to the `viz` extra behind a python_version marker, so
+          # `.[all]` resolves without it here -- nothing outside
+          # limap.visualize calls into it. What is genuinely unverified is the
+          # git-sourced detector stack (hloc, deeplsd, gluestick, pytlsd,
+          # pxwplanar), which this job does install. Run it for signal without
+          # letting it block merges; drop `experimental` once reliably green.
+          {
+            os: ubuntu-24.04,
+            python-version: "3.13",
+            checkCodeFormat: false,
+            cppTests: false,
+            e2eTests: false,
+            experimental: true,
+          },
         ]
+
     env:
-      COMPILER_CACHE_VERSION: 1
       COMPILER_CACHE_DIR: ${{ github.workspace }}/compiler-cache
       CCACHE_DIR: ${{ github.workspace }}/compiler-cache/ccache
       CCACHE_BASEDIR: ${{ github.workspace }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/cache@v4
-        id: cache-builds
-        with:
-          key: limap-v${{ env.COMPILER_CACHE_VERSION }}-${{ matrix.config.os }}-${{ matrix.config.arch }}-${{ github.run_id }}-${{ github.run_number }}
-          restore-keys: limap-v${{ env.COMPILER_CACHE_VERSION }}-${{ matrix.config.os }}-${{ matrix.config.arch }}
-          path: ${{ env.COMPILER_CACHE_DIR }}
+      # scikit-build-core and the ctest configure use different build trees.
+      # Do not let the directory name take part in the hash.
+      CCACHE_NOHASHDIR: "true"
+      # Hosted runner compiler mtimes change even when contents do not.
+      CCACHE_COMPILERCHECK: content
+      CCACHE_MAXSIZE: 500M
+      # Shared between the scikit-build-core build and the ctest configure so
+      # COLMAP/PoseLib/JLinkage/libigl are fetched once per job. Deliberately
+      # outside COMPILER_CACHE_DIR: these trees are far too large to persist.
+      FETCHCONTENT_CACHE_DIR: ${{ github.workspace }}/fetchcontent
 
-      - name: Set env (Linux)
-        if: runner.os == 'Linux'
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Python ${{ matrix.config.python-version }}
+        uses: actions/setup-python@v7
+        with:
+          python-version: ${{ matrix.config.python-version }}
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            pyproject.toml
+
+      - name: Check code format
+        if: matrix.config.checkCodeFormat
+        run: |
+          set +x -euo pipefail
+          python -m pip install ruff==0.15.20 clang-format==22.1.5
+          ./scripts/format/c++.sh --all
+          ./scripts/format/python.sh --all
+          git diff --name-only
+          git diff --exit-code || (echo "Code formatting failed" && exit 1)
+
+      - name: Restore compiler cache
+        uses: ./.github/actions/compiler-cache
+        id: cache-compiler
+        with:
+          mode: restore
+          path: ${{ env.COMPILER_CACHE_DIR }}
+          key-suffix: ${{ matrix.config.os }}-py${{ matrix.config.python-version }}-${{ hashFiles('CMakeLists.txt', 'cmake/**', 'src/thirdparty/CMakeLists.txt', 'pyproject.toml') }}
+
+      - name: Install compiler cache
+        run: |
+          mkdir -p "$CCACHE_DIR" "$FETCHCONTENT_CACHE_DIR"
+          echo "$COMPILER_CACHE_DIR/bin" >> $GITHUB_PATH
+
+          if [ ! -f "$COMPILER_CACHE_DIR/bin/ccache" ]; then
+            set -x
+            wget https://github.com/ccache/ccache/releases/download/v4.13.6/ccache-4.13.6-linux-x86_64-glibc.tar.xz
+            echo "508b2a1217dc6e04a23e967c7b95a0fb45d8a7e16fde9e180919698f2e2be060  ccache-4.13.6-linux-x86_64-glibc.tar.xz" | sha256sum --check
+            tar xf ccache-4.13.6-linux-x86_64-glibc.tar.xz
+            mkdir -p "$COMPILER_CACHE_DIR/bin"
+            mv ./ccache-4.13.6-linux-x86_64-glibc/ccache "$COMPILER_CACHE_DIR/bin"
+          fi
+          "$COMPILER_CACHE_DIR/bin/ccache" --zero-stats
+
+      # COLMAP, PoseLib, JLinkage and libigl are pinned by commit, so the
+      # populated trees only change when those pins do.
+      - name: Cache FetchContent sources
+        uses: actions/cache@v6
+        with:
+          path: |
+            ${{ env.FETCHCONTENT_CACHE_DIR }}/*-src
+            ${{ env.FETCHCONTENT_CACHE_DIR }}/*-subbuild
+          key: limap-fetchcontent-v1-${{ matrix.config.os }}-${{ hashFiles('src/thirdparty/CMakeLists.txt') }}
+
+      - name: Setup Ubuntu
         run: |
           sudo apt-get update && sudo apt-get install -y \
             git \
             build-essential \
             cmake \
             ninja-build \
-            libboost-program-options-dev \
-            libboost-graph-dev \
-            libboost-system-dev \
             libeigen3-dev \
             libceres-dev \
             libflann-dev \
@@ -58,10 +149,6 @@ jobs:
             libgmock-dev \
             libsqlite3-dev \
             libglew-dev \
-            qtbase5-dev \
-            libqt5opengl5-dev \
-            libcgal-dev \
-            libcgal-qt5-dev \
             libgl1-mesa-dri \
             libunwind-dev \
             xvfb
@@ -71,10 +158,24 @@ jobs:
           # but its config still requires the OpenCV include directory to exist.
           sudo mkdir -p /usr/include/opencv4
 
-      - name: Set up Python ${{ matrix.config.python-version  }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.config.python-version  }}
+      # Ubuntu 24.04 ships Boost 1.83, one below the 1.84 COLMAP requires for
+      # its BOOST hash map backend -- which has to match the pycolmap wheels.
+      # TODO: drop once colmap/colmap#4673 lands.
+      - name: Install Boost
+        run: |
+          set -euo pipefail
+          BOOST_ROOT="${COMPILER_CACHE_DIR}/boost"
+          if [ ! -f "${BOOST_ROOT}/include/boost/version.hpp" ]; then
+            wget -q https://archives.boost.io/release/1.90.0/source/boost_1_90_0.tar.bz2
+            tar xf boost_1_90_0.tar.bz2
+            cd boost_1_90_0
+            ./bootstrap.sh --prefix="${BOOST_ROOT}" \
+              --with-libraries=graph,program_options
+            ./b2 -j"$(nproc)" --with-graph --with-program_options install
+          fi
+          grep "define BOOST_LIB_VERSION" "${BOOST_ROOT}/include/boost/version.hpp"
+          echo "BOOST_ROOT=${BOOST_ROOT}" >> "$GITHUB_ENV"
+          echo "CMAKE_PREFIX_PATH=${BOOST_ROOT}${CMAKE_PREFIX_PATH:+:${CMAKE_PREFIX_PATH}}" >> "$GITHUB_ENV"
 
       - name: Free disk space
         run: |
@@ -83,25 +184,40 @@ jobs:
           sudo rm -rf /opt/ghc
           docker system prune -af || true
 
-      - name: Clean workspace artifacts
-        run: rm -rf build/ dist/ *.egg-info/ .eggs/
-
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
       - name: Build
-        run:  python -m pip install -v .
+        run: |
+          python -m pip install -v ".[all,dev]" \
+            -Cbuild-dir=build \
+            -Ccmake.define.CMAKE_C_COMPILER_LAUNCHER=ccache \
+            -Ccmake.define.CMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -Ccmake.define.FETCHCONTENT_BASE_DIR="${FETCHCONTENT_CACHE_DIR}"
+
+      - name: Check import
+        run: python -c "import limap; print(limap.__version__)"
 
       - name: Run Python tests
-        run:  python -c "import limap; print(limap.__version__)"
+        run: pytest -m ci_workflow tests
 
-      - name: Run tests
+      - name: Build and run C++ tests
+        if: matrix.config.cppTests
         run: |
-          pytest -m ci_workflow tests
+          cmake -B cmake-build-tests -GNinja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DLIMAP_TESTS_ENABLED=ON \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DFETCHCONTENT_BASE_DIR="${FETCHCONTENT_CACHE_DIR}" \
+            .
+          cmake --build cmake-build-tests -j "$(nproc)"
+          ctest --test-dir cmake-build-tests --output-on-failure
 
       - name: Run E2E tests
+        if: matrix.config.e2eTests
         run: |
           bash scripts/quickstart.sh
           python runners/hypersim/geometry_guided_line_reconstruction.py \
@@ -125,3 +241,16 @@ jobs:
           python scripts/check_reconstruction.py \
               outputs/quickstart_test_colmap/final_model
 
+      - name: Show compiler cache stats
+        if: always()
+        run: |
+          ccache --show-stats --verbose || true
+
+      - name: Save compiler cache
+        uses: ./.github/actions/compiler-cache
+        with:
+          mode: save
+          key: ${{ steps.cache-compiler.outputs.key }}
+          path: ${{ env.COMPILER_CACHE_DIR }}
+          cache-hit: ${{ steps.cache-compiler.outputs.cache-hit }}
+          ccache-dir: ${{ env.CCACHE_DIR }}

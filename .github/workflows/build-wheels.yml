@@ -1,0 +1,191 @@
+name: wheels
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - release/*
+  pull_request:
+    types: [ assigned, opened, synchronize, reopened ]
+  release:
+    types: [ published, edited ]
+
+jobs:
+  build:
+    name: ${{ matrix.config.os }} ${{ matrix.config.arch || 'x64' }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config: [
+          {os: ubuntu-24.04, ccacheMaxSize: 800M},
+          {os: macos-14, arch: arm64, deploymentTarget: "14.0", ccacheMaxSize: 500M},
+          {os: windows-2025, ccacheMaxSize: 1000M},
+        ]
+    env:
+      COMPILER_CACHE_DIR: ${{ github.workspace }}/compiler-cache
+      CCACHE_DIR: ${{ github.workspace }}/compiler-cache/ccache
+      CCACHE_BASEDIR: ${{ github.workspace }}
+      CCACHE_NOHASHDIR: "true"
+      CCACHE_COMPILERCHECK: content
+      CCACHE_MAXSIZE: ${{ matrix.config.ccacheMaxSize }}
+      CACHE_PLATFORM: ${{ matrix.config.os }}-arch_${{ matrix.config.arch || 'x64' }}
+      FETCHCONTENT_CACHE_DIR: ${{ github.workspace }}/fetchcontent-cache
+      MACOSX_DEPLOYMENT_TARGET: ${{ matrix.config.deploymentTarget }}
+      # Building every Python on every PR is not worth the wall clock. Build
+      # only the oldest supported version there, and the full set on push.
+      PULL_REQUEST_CIBW_BUILD: cp310-{macosx,manylinux,win}*
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Restore compiler cache
+        uses: ./.github/actions/compiler-cache
+        id: cache-compiler
+        with:
+          mode: restore
+          path: ${{ env.COMPILER_CACHE_DIR }}
+          key-prefix: limap-wheels
+          key-suffix: ${{ env.CACHE_PLATFORM }}-${{ hashFiles('CMakeLists.txt', 'cmake/**', 'src/thirdparty/CMakeLists.txt', 'pyproject.toml') }}
+
+      # vcpkg builds ceres/boost/openimageio from source, which dominates the
+      # job. Cache the built packages in this repository's own Actions cache.
+      - name: Export GitHub Actions cache credentials for vcpkg
+        uses: actions/github-script@v9
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+
+      - name: Select Python (PR)
+        if: github.event_name == 'pull_request' && runner.os != 'Windows'
+        run: echo "CIBW_BUILD=${PULL_REQUEST_CIBW_BUILD}" >> "$GITHUB_ENV"
+      - name: Select Python (PR, Windows)
+        if: github.event_name == 'pull_request' && runner.os == 'Windows'
+        shell: pwsh
+        run: echo "CIBW_BUILD=${env:PULL_REQUEST_CIBW_BUILD}" >> "${env:GITHUB_ENV}"
+
+      - name: Set env (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          echo "VCPKG_TARGET_TRIPLET=x64-linux-release" >> "$GITHUB_ENV"
+          VCPKG_INSTALLATION_ROOT="${{ github.workspace }}/vcpkg"
+          CMAKE_TOOLCHAIN_FILE="${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
+          echo "VCPKG_INSTALLATION_ROOT=${VCPKG_INSTALLATION_ROOT}" >> "$GITHUB_ENV"
+          echo "CMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}" >> "$GITHUB_ENV"
+
+          # cibuildwheel cannot interpolate env variables into config settings.
+          CS="cmake.define.CMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
+          CS="${CS} cmake.define.VCPKG_TARGET_TRIPLET=x64-linux-release"
+          CS="${CS} cmake.define.VCPKG_INSTALLED_DIR=/project/build/vcpkg_installed"
+          CS="${CS} cmake.define.CMAKE_C_COMPILER_LAUNCHER=ccache"
+          CS="${CS} cmake.define.CMAKE_CXX_COMPILER_LAUNCHER=ccache"
+          CS="${CS} cmake.define.FETCHCONTENT_BASE_DIR=/fetchcontent-cache"
+          CS="${CS} cmake.define.pybind11_DIR=/compiler-cache/build-requirements/pybind11/share/cmake/pybind11"
+          echo "CIBW_CONFIG_SETTINGS_LINUX=${CS}" >> "$GITHUB_ENV"
+
+          # Remap the cache paths into the manylinux container.
+          echo "CIBW_CONTAINER_ENGINE=docker; create_args: -v ${COMPILER_CACHE_DIR}:/compiler-cache -v ${FETCHCONTENT_CACHE_DIR}:/fetchcontent-cache" >> "$GITHUB_ENV"
+          echo "CONTAINER_COMPILER_CACHE_DIR=/compiler-cache" >> "$GITHUB_ENV"
+          echo "CCACHE_DIR=/compiler-cache/ccache" >> "$GITHUB_ENV"
+          echo "CCACHE_BASEDIR=/project" >> "$GITHUB_ENV"
+          echo "VCPKG_BINARY_SOURCES=clear;x-gha,readwrite" >> "$GITHUB_ENV"
+          echo "CIBW_ENVIRONMENT_PASS_LINUX=VCPKG_TARGET_TRIPLET VCPKG_INSTALLATION_ROOT CMAKE_TOOLCHAIN_FILE VCPKG_BINARY_SOURCES CONTAINER_COMPILER_CACHE_DIR CCACHE_DIR CCACHE_BASEDIR CCACHE_NOHASHDIR CCACHE_COMPILERCHECK CCACHE_MAXSIZE ACTIONS_CACHE_URL ACTIONS_RUNTIME_TOKEN" >> "$GITHUB_ENV"
+          echo "CIBW_MANYLINUX_X86_64_IMAGE=quay.io/pypa/manylinux_2_28_x86_64" >> "$GITHUB_ENV"
+
+      - name: Set env (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          echo "VCPKG_TARGET_TRIPLET=arm64-osx-release" >> "$GITHUB_ENV"
+          VCPKG_INSTALLATION_ROOT="/Users/runner/work/vcpkg"
+          CMAKE_TOOLCHAIN_FILE="${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
+          echo "VCPKG_INSTALLATION_ROOT=${VCPKG_INSTALLATION_ROOT}" >> "$GITHUB_ENV"
+          echo "CMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}" >> "$GITHUB_ENV"
+          echo "CMAKE_OSX_ARCHITECTURES=${{ matrix.config.arch }}" >> "$GITHUB_ENV"
+          echo "ARCHFLAGS=-arch ${{ matrix.config.arch }}" >> "$GITHUB_ENV"
+
+          CS="cmake.define.CMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
+          CS="${CS} cmake.define.VCPKG_TARGET_TRIPLET=arm64-osx-release"
+          CS="${CS} cmake.define.VCPKG_INSTALLED_DIR=${{ github.workspace }}/build/vcpkg_installed"
+          CS="${CS} cmake.define.CMAKE_OSX_ARCHITECTURES=${{ matrix.config.arch }}"
+          CS="${CS} cmake.define.CMAKE_C_COMPILER_LAUNCHER=ccache"
+          CS="${CS} cmake.define.CMAKE_CXX_COMPILER_LAUNCHER=ccache"
+          CS="${CS} cmake.define.FETCHCONTENT_BASE_DIR=${FETCHCONTENT_CACHE_DIR}"
+          CS="${CS} cmake.define.pybind11_DIR=${COMPILER_CACHE_DIR}/build-requirements/pybind11/share/cmake/pybind11"
+          echo "CIBW_CONFIG_SETTINGS_MACOS=${CS}" >> "$GITHUB_ENV"
+          echo "VCPKG_BINARY_SOURCES=clear;x-gha,readwrite" >> "$GITHUB_ENV"
+
+      - name: Set env (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          echo "${{ env.COMPILER_CACHE_DIR }}/bin" >> "${env:GITHUB_PATH}"
+
+          # The Visual Studio generator ignores CMake compiler launchers, so use
+          # Ninja and persist the MSVC environment it needs into cibuildwheel.
+          & "./misc/ci/enter_vs_dev_shell.ps1"
+          echo "PATH=${env:PATH}" >> "${env:GITHUB_ENV}"
+          echo "INCLUDE=${env:INCLUDE}" >> "${env:GITHUB_ENV}"
+          echo "LIB=${env:LIB}" >> "${env:GITHUB_ENV}"
+          echo "LIBPATH=${env:LIBPATH}" >> "${env:GITHUB_ENV}"
+
+          $VCPKG_INSTALLATION_ROOT = "${{ github.workspace }}/vcpkg"
+          echo "VCPKG_INSTALLATION_ROOT=${VCPKG_INSTALLATION_ROOT}" >> "${env:GITHUB_ENV}"
+          $CMAKE_TOOLCHAIN_FILE = "${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake".replace('\', '/')
+          echo "CMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}" >> "${env:GITHUB_ENV}"
+          echo "VCPKG_TARGET_TRIPLET=x64-windows-release" >> "${env:GITHUB_ENV}"
+
+          $VCPKG_INSTALLED_DIR = "${{ github.workspace }}/build/vcpkg_installed".replace('\', '/')
+          $PYBIND11_DIR = "${env:COMPILER_CACHE_DIR}/build-requirements/pybind11/share/cmake/pybind11".replace('\', '/')
+          $FETCHCONTENT = "${env:FETCHCONTENT_CACHE_DIR}".replace('\', '/')
+          $CS = "cmake.define.CMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
+          $CS = "${CS} cmake.define.VCPKG_TARGET_TRIPLET=x64-windows-release"
+          $CS = "${CS} cmake.define.VCPKG_INSTALLED_DIR=${VCPKG_INSTALLED_DIR}"
+          $CS = "${CS} cmake.define.pybind11_DIR=${PYBIND11_DIR}"
+          $CS = "${CS} cmake.define.FETCHCONTENT_BASE_DIR=${FETCHCONTENT}"
+          $CS = "${CS} cmake.args=-GNinja"
+          echo "CIBW_CONFIG_SETTINGS_WINDOWS=${CS}" >> "${env:GITHUB_ENV}"
+
+          $CCACHE_DIR = "${env:CCACHE_DIR}".replace('\', '/')
+          $CCACHE_BASEDIR = "${env:CCACHE_BASEDIR}".replace('\', '/')
+          $CIBW_ENVIRONMENT = "CCACHE_DIR=${CCACHE_DIR} CCACHE_BASEDIR=${CCACHE_BASEDIR}"
+          $CIBW_ENVIRONMENT = "${CIBW_ENVIRONMENT} CCACHE_NOHASHDIR=${env:CCACHE_NOHASHDIR}"
+          $CIBW_ENVIRONMENT = "${CIBW_ENVIRONMENT} CCACHE_COMPILERCHECK=${env:CCACHE_COMPILERCHECK}"
+          $CIBW_ENVIRONMENT = "${CIBW_ENVIRONMENT} CCACHE_MAXSIZE=${env:CCACHE_MAXSIZE}"
+          echo "CIBW_ENVIRONMENT_WINDOWS=${CIBW_ENVIRONMENT}" >> "${env:GITHUB_ENV}"
+
+          $REPAIR = "delvewheel repair -v --add-path ${VCPKG_INSTALLED_DIR}/x64-windows-release/bin -w {dest_dir} {wheel}"
+          echo "CIBW_REPAIR_WHEEL_COMMAND_WINDOWS=${REPAIR}" >> "${env:GITHUB_ENV}"
+          echo "VCPKG_BINARY_SOURCES=clear;x-gha,readwrite" >> "${env:GITHUB_ENV}"
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v4.2.0
+        with:
+          package-dir: ./
+        env:
+          CIBW_ARCHS_MACOS: ${{ matrix.config.arch }}
+
+      - name: Show compiler cache stats
+        if: always()
+        shell: bash
+        run: ccache --show-stats --verbose || true
+
+      - name: Archive wheels
+        uses: actions/upload-artifact@v7
+        with:
+          name: limap-${{ matrix.config.os }}-${{ matrix.config.arch || 'x64' }}
+          path: wheelhouse/limap*.whl
+
+      - name: Save compiler cache
+        uses: ./.github/actions/compiler-cache
+        with:
+          mode: save
+          key: ${{ steps.cache-compiler.outputs.key }}
+          path: ${{ env.COMPILER_CACHE_DIR }}
+          cache-hit: ${{ steps.cache-compiler.outputs.cache-hit }}
+          ccache-dir: ${{ env.COMPILER_CACHE_DIR }}/ccache

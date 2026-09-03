@@ -8,6 +8,10 @@ include(FetchContent)
 ################################################################################
 message(STATUS "Configuring PoseLib...")
 if(FETCH_POSELIB)
+    # PoseLib compiles with -Werror -Wfatal-errors by default. GCC 14 reports a
+    # false-positive -Warray-bounds in Eigen's SSE loads under -O3, which breaks
+    # the manylinux wheel build. Do not fail our build on a dependency's warnings.
+    set(WERROR OFF CACHE BOOL "Disable -Werror in PoseLib" FORCE)
     FetchContent_Declare(PoseLib
         GIT_REPOSITORY    https://github.com/PoseLib/PoseLib.git
         GIT_TAG           1758bd6d20f607c276388d28b5ba88f3651e85e9
@@ -27,7 +31,17 @@ if(FETCH_COLMAP)
     set(LSD_ENABLED OFF CACHE BOOL "Disable LSD in COLMAP" FORCE)
     set(GUI_ENABLED OFF CACHE BOOL "Disable GUI in COLMAP" FORCE)
     set(CGAL_ENABLED OFF CACHE BOOL "Disable CGAL in COLMAP" FORCE)
+    # limap's detectors come through hloc on the Python side; COLMAP's ONNX
+    # runtime is pure build time and wheel size here. pycolmap's own wheel
+    # scripts disable it for the same reason.
+    set(ONNX_ENABLED OFF CACHE BOOL "Disable ONNX in COLMAP" FORCE)
     set(TESTS_ENABLED OFF CACHE BOOL "Disable tests in COLMAP" FORCE)
+    # ABI of the types shared with pycolmap. Needs Boost >= 1.84.
+    # TODO: drop once colmap/colmap#4673 lands.
+    if(NOT DEFINED COLMAP_HASH_MAP_BACKEND)
+        set(COLMAP_HASH_MAP_BACKEND "BOOST" CACHE STRING
+            "Match the hash map backend of the pycolmap wheels" FORCE)
+    endif()
     # Corresponding to COLMAP 4.2.0 release.
     FetchContent_Declare(COLMAP
         GIT_REPOSITORY    https://github.com/colmap/colmap.git

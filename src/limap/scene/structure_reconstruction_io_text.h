@@ -31,6 +31,7 @@
 
 #include "limap/scene/structure_reconstruction.h"
 
+#include <filesystem>
 #include <iostream>
 
 #include <Eigen/Core>
@@ -49,41 +50,41 @@ namespace limap {
 void ReadStructures2dText(StructureReconstruction &reconstruction,
                           std::istream &stream);
 void ReadStructures2dText(StructureReconstruction &reconstruction,
-                          const std::string &path);
+                          const std::filesystem::path &path);
 
 void ReadLines3DText(StructureReconstruction &reconstruction,
                      std::istream &stream);
 void ReadLines3DText(StructureReconstruction &reconstruction,
-                     const std::string &path);
+                     const std::filesystem::path &path);
 
 void ReadGroups3DText(StructureReconstruction &reconstruction,
                       std::istream &stream);
 void ReadGroups3DText(StructureReconstruction &reconstruction,
-                      const std::string &path);
+                      const std::filesystem::path &path);
 
 void ReadWireframeText(StructureReconstruction &reconstruction,
                        std::istream &stream);
 void ReadWireframeText(StructureReconstruction &reconstruction,
-                       const std::string &path);
+                       const std::filesystem::path &path);
 
 void WriteStructures2dText(const StructureReconstruction &reconstruction,
-                           std::istream &stream);
+                           std::ostream &stream);
 void WriteStructures2dText(const StructureReconstruction &reconstruction,
-                           const std::string &path);
+                           const std::filesystem::path &path);
 
 void WriteLines3DText(const StructureReconstruction &reconstruction,
-                      std::istream &stream);
+                      std::ostream &stream);
 void WriteLines3DText(const StructureReconstruction &reconstruction,
-                      const std::string &path);
+                      const std::filesystem::path &path);
 
 void WriteGroups3DText(const StructureReconstruction &reconstruction,
-                       std::istream &stream);
+                       std::ostream &stream);
 void WriteGroups3DText(const StructureReconstruction &reconstruction,
-                       const std::string &path);
+                       const std::filesystem::path &path);
 
 void WriteWireframeText(const StructureReconstruction &reconstruction,
-                        std::istream &stream);
+                        std::ostream &stream);
 void WriteWireframeText(const StructureReconstruction &reconstruction,
-                        const std::string &path);
+                        const std::filesystem::path &path);
 
 } // namespace limap
