@@ -32,7 +32,7 @@ This yields a sparse 3D reconstruction with geometric primitives (planes, sphere
 
 ## Installation
 
-LIMAP builds on **Linux**, **macOS** (Apple Silicon) and **Windows**.
+LIMAP has been tested on **Linux**, **macOS** and **Windows**.
 
 **Dependencies:**
 * Python 3.10/11/12/13
