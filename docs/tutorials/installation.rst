@@ -1,6 +1,8 @@
 Installation
 =================================
 
+LIMAP has been tested on **Linux**, **macOS** and **Windows**.
+
 ------------------
 Dependencies
 ------------------
