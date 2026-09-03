@@ -43,7 +43,17 @@ LIMAP has been tested on **Linux**, **macOS** and **Windows**.
 *Note that one cannot visualize reconstructions on Python 3.13, as there are no
 published wheels available for open3d and our 3D viewer depends on it.*
 
-To install the LIMAP Python package:
+Starting from 2.0.0, each official release is published to PyPI as
+[`pylimap`](https://pypi.org/p/pylimap), which installs the compiled core
+library without building it:
+```
+python -m pip install pylimap
+```
+The distribution is named `pylimap`; the import name is still `limap`. A wheel
+provides the **Core only** mode described below, so the extras and the
+git-sourced detectors remain opt-in on top.
+
+To build and install the LIMAP Python package from source:
 ```
 python -m pip install -r requirements.txt   # git-sourced detectors and matchers
 python -m pip install -Ive ".[all]"

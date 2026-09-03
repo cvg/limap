@@ -19,6 +19,17 @@ no published wheels available for open3d and our 3D viewer depends on it.*
 Install modes
 ------------------
 
+**From PyPI** -- starting from 2.0.0, each official release is published as
+`pylimap <https://pypi.org/p/pylimap>`_. This installs the compiled core
+library without building it; the import name is still ``limap``:
+
+.. code-block:: bash
+
+    python -m pip install pylimap
+
+This is the **Core only** mode described below, so the extras and the
+git-sourced detectors remain opt-in on top.
+
 **Full** -- everything the reconstruction pipelines need. Use this unless you
 know you want one of the others:
 
