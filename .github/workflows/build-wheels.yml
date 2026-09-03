@@ -36,9 +36,13 @@ jobs:
       CCACHE_MAXSIZE: ${{ matrix.config.ccacheMaxSize }}
       CACHE_PLATFORM: ${{ matrix.config.os }}-arch_${{ matrix.config.arch || 'x64' }}
       FETCHCONTENT_CACHE_DIR: ${{ github.workspace }}/fetchcontent-cache
+      # Inside COMPILER_CACHE_DIR so it rides along with the compiler cache
+      # that is already restored and saved below.
+      VCPKG_BINARY_CACHE_DIR: ${{ github.workspace }}/compiler-cache/vcpkg-binary-cache
       MACOSX_DEPLOYMENT_TARGET: ${{ matrix.config.deploymentTarget }}
       # Building every Python on every PR is not worth the wall clock. Build
-      # only the oldest supported version there, and the full set on push.
+      # only the oldest supported version there, and the full set on push:
+      # with a warm ccache each extra version is only its bindings and a link.
       PULL_REQUEST_CIBW_BUILD: cp310-{macosx,manylinux,win}*
 
     steps:
@@ -51,16 +55,7 @@ jobs:
           mode: restore
           path: ${{ env.COMPILER_CACHE_DIR }}
           key-prefix: limap-wheels
-          key-suffix: ${{ env.CACHE_PLATFORM }}-${{ hashFiles('CMakeLists.txt', 'cmake/**', 'src/thirdparty/CMakeLists.txt', 'pyproject.toml') }}
-
-      # vcpkg builds ceres/boost/openimageio from source, which dominates the
-      # job. Cache the built packages in this repository's own Actions cache.
-      - name: Export GitHub Actions cache credentials for vcpkg
-        uses: actions/github-script@v9
-        with:
-          script: |
-            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
-            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+          key-suffix: ${{ env.CACHE_PLATFORM }}-${{ hashFiles('CMakeLists.txt', 'cmake/**', 'src/thirdparty/CMakeLists.txt', 'pyproject.toml', 'vcpkg.json', 'vcpkg-configuration.json') }}
 
       - name: Select Python (PR)
         if: github.event_name == 'pull_request' && runner.os != 'Windows'
@@ -89,13 +84,17 @@ jobs:
           CS="${CS} cmake.define.pybind11_DIR=/compiler-cache/build-requirements/pybind11/share/cmake/pybind11"
           echo "CIBW_CONFIG_SETTINGS_LINUX=${CS}" >> "$GITHUB_ENV"
 
+          # vcpkg writes its binary packages here; the directory has to exist
+          # before docker mounts it, or it is created root-owned.
+          mkdir -p "${VCPKG_BINARY_CACHE_DIR}"
+
           # Remap the cache paths into the manylinux container.
           echo "CIBW_CONTAINER_ENGINE=docker; create_args: -v ${COMPILER_CACHE_DIR}:/compiler-cache -v ${FETCHCONTENT_CACHE_DIR}:/fetchcontent-cache" >> "$GITHUB_ENV"
           echo "CONTAINER_COMPILER_CACHE_DIR=/compiler-cache" >> "$GITHUB_ENV"
           echo "CCACHE_DIR=/compiler-cache/ccache" >> "$GITHUB_ENV"
           echo "CCACHE_BASEDIR=/project" >> "$GITHUB_ENV"
-          echo "VCPKG_BINARY_SOURCES=clear;x-gha,readwrite" >> "$GITHUB_ENV"
-          echo "CIBW_ENVIRONMENT_PASS_LINUX=VCPKG_TARGET_TRIPLET VCPKG_INSTALLATION_ROOT CMAKE_TOOLCHAIN_FILE VCPKG_BINARY_SOURCES CONTAINER_COMPILER_CACHE_DIR CCACHE_DIR CCACHE_BASEDIR CCACHE_NOHASHDIR CCACHE_COMPILERCHECK CCACHE_MAXSIZE ACTIONS_CACHE_URL ACTIONS_RUNTIME_TOKEN" >> "$GITHUB_ENV"
+          echo "VCPKG_BINARY_SOURCES=clear;files,/compiler-cache/vcpkg-binary-cache,readwrite" >> "$GITHUB_ENV"
+          echo "CIBW_ENVIRONMENT_PASS_LINUX=VCPKG_TARGET_TRIPLET VCPKG_INSTALLATION_ROOT CMAKE_TOOLCHAIN_FILE VCPKG_BINARY_SOURCES CONTAINER_COMPILER_CACHE_DIR CCACHE_DIR CCACHE_BASEDIR CCACHE_NOHASHDIR CCACHE_COMPILERCHECK CCACHE_MAXSIZE" >> "$GITHUB_ENV"
           echo "CIBW_MANYLINUX_X86_64_IMAGE=quay.io/pypa/manylinux_2_28_x86_64" >> "$GITHUB_ENV"
 
       - name: Set env (macOS)
@@ -118,7 +117,9 @@ jobs:
           CS="${CS} cmake.define.FETCHCONTENT_BASE_DIR=${FETCHCONTENT_CACHE_DIR}"
           CS="${CS} cmake.define.pybind11_DIR=${COMPILER_CACHE_DIR}/build-requirements/pybind11/share/cmake/pybind11"
           echo "CIBW_CONFIG_SETTINGS_MACOS=${CS}" >> "$GITHUB_ENV"
-          echo "VCPKG_BINARY_SOURCES=clear;x-gha,readwrite" >> "$GITHUB_ENV"
+
+          mkdir -p "${VCPKG_BINARY_CACHE_DIR}"
+          echo "VCPKG_BINARY_SOURCES=clear;files,${VCPKG_BINARY_CACHE_DIR},readwrite" >> "$GITHUB_ENV"
 
       - name: Set env (Windows)
         if: runner.os == 'Windows'
@@ -148,6 +149,11 @@ jobs:
           $CS = "${CS} cmake.define.VCPKG_INSTALLED_DIR=${VCPKG_INSTALLED_DIR}"
           $CS = "${CS} cmake.define.pybind11_DIR=${PYBIND11_DIR}"
           $CS = "${CS} cmake.define.FETCHCONTENT_BASE_DIR=${FETCHCONTENT}"
+          # Ninja, so that unlike the Visual Studio generator these launchers
+          # are honoured. Without them only COLMAP's own targets go through
+          # ccache, which enables it itself for its subtree.
+          $CS = "${CS} cmake.define.CMAKE_C_COMPILER_LAUNCHER=ccache"
+          $CS = "${CS} cmake.define.CMAKE_CXX_COMPILER_LAUNCHER=ccache"
           $CS = "${CS} cmake.args=-GNinja"
           echo "CIBW_CONFIG_SETTINGS_WINDOWS=${CS}" >> "${env:GITHUB_ENV}"
 
@@ -161,7 +167,9 @@ jobs:
 
           $REPAIR = "delvewheel repair -v --add-path ${VCPKG_INSTALLED_DIR}/x64-windows-release/bin -w {dest_dir} {wheel}"
           echo "CIBW_REPAIR_WHEEL_COMMAND_WINDOWS=${REPAIR}" >> "${env:GITHUB_ENV}"
-          echo "VCPKG_BINARY_SOURCES=clear;x-gha,readwrite" >> "${env:GITHUB_ENV}"
+          $VCPKG_BINARY_CACHE = "${env:VCPKG_BINARY_CACHE_DIR}".replace('\', '/')
+          New-Item -ItemType Directory -Force -Path ${VCPKG_BINARY_CACHE}
+          echo "VCPKG_BINARY_SOURCES=clear;files,${VCPKG_BINARY_CACHE},readwrite" >> "${env:GITHUB_ENV}"
 
       - name: Build wheels
         uses: pypa/cibuildwheel@v4.2.0
