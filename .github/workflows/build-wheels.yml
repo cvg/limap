@@ -51,7 +51,7 @@ jobs:
           mode: restore
           path: ${{ env.COMPILER_CACHE_DIR }}
           key-prefix: limap-wheels
-          key-suffix: ${{ env.CACHE_PLATFORM }}
+          key-suffix: ${{ env.CACHE_PLATFORM }}-${{ hashFiles('CMakeLists.txt', 'cmake/**', 'src/thirdparty/CMakeLists.txt', 'pyproject.toml') }}
 
       # vcpkg builds ceres/boost/openimageio from source, which dominates the
       # job. Cache the built packages in this repository's own Actions cache.
