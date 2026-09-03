@@ -187,7 +187,7 @@ jobs:
       - name: Archive wheels
         uses: actions/upload-artifact@v7
         with:
-          name: limap-${{ matrix.config.os }}-${{ matrix.config.arch || 'x64' }}
+          name: pylimap-${{ matrix.config.os }}-${{ matrix.config.arch || 'x64' }}
           path: wheelhouse/*.whl
 
       - name: Save compiler cache

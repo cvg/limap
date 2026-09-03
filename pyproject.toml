@@ -11,7 +11,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "pylimap"
-version = "2.0.0.dev"
+version = "2.0.0rc1"
 description = "A toolbox for 3D visual mapping, localization, and SfM with structured geometric features (points, lines, planes, vanishing points, wireframes, etc.)."
 authors = [
   { name = "Shaohui Liu", email = "b1ueber2y@gmail.com" },
