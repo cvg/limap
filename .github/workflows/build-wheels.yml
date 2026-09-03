@@ -6,6 +6,11 @@ concurrency:
 
 on:
   workflow_dispatch:
+    inputs:
+      cibw_build:
+        description: "Override CIBW_BUILD, e.g. cp310-manylinux*"
+        type: string
+        default: ""
   push:
     branches:
       - main
@@ -64,6 +69,10 @@ jobs:
         if: github.event_name == 'pull_request' && runner.os == 'Windows'
         shell: pwsh
         run: echo "CIBW_BUILD=${env:PULL_REQUEST_CIBW_BUILD}" >> "${env:GITHUB_ENV}"
+      - name: Select Python (manual override)
+        if: inputs.cibw_build != ''
+        shell: bash
+        run: echo "CIBW_BUILD=${{ inputs.cibw_build }}" >> "$GITHUB_ENV"
 
       - name: Set env (Linux)
         if: runner.os == 'Linux'
@@ -186,8 +195,8 @@ jobs:
       - name: Archive wheels
         uses: actions/upload-artifact@v7
         with:
-          name: limap-${{ matrix.config.os }}-${{ matrix.config.arch || 'x64' }}
-          path: wheelhouse/limap*.whl
+          name: pylimap-${{ matrix.config.os }}-${{ matrix.config.arch || 'x64' }}
+          path: wheelhouse/*.whl
 
       - name: Save compiler cache
         uses: ./.github/actions/compiler-cache
@@ -197,3 +206,27 @@ jobs:
           path: ${{ env.COMPILER_CACHE_DIR }}
           cache-hit: ${{ steps.cache-compiler.outputs.cache-hit }}
           ccache-dir: ${{ env.COMPILER_CACHE_DIR }}/ccache
+
+  publish-pypi:
+    name: Publish wheels to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/pylimap
+    permissions:
+      id-token: write
+    # `release` also fires on `edited`, hence skip-existing below.
+    if: ${{ github.event_name == 'release' }}
+    steps:
+      - name: Download wheels
+        uses: actions/download-artifact@v7
+        with:
+          path: ./artifacts/
+      - name: Move wheels
+        run: mkdir ./wheelhouse && mv ./artifacts/*/*.whl ./wheelhouse/
+      - name: Publish package
+        uses: pypa/gh-action-pypi-publish@v1.14.0
+        with:
+          skip-existing: true
+          packages-dir: ./wheelhouse/
