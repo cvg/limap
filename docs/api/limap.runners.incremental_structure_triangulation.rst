@@ -1,7 +1,12 @@
 Incremental structure triangulation
 ===================================
 
-.. automodule:: limap.runners.incremental_structure_triangulation
+.. currentmodule:: limap.runners
+
+.. autoclass:: IncrementalStructureTriangulationOptions
    :members:
    :undoc-members:
-   :show-inheritance:
+   :special-members: __init__
+   :member-order: groupwise
+
+.. autofunction:: incremental_structure_triangulation

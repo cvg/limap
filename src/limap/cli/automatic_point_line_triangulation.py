@@ -1,4 +1,4 @@
-"""
+r"""
 Runner for point-line triangulation from COLMAP.
 
 This is similar to automatic_structure_triangulation.py but with groups
@@ -6,7 +6,8 @@ disabled.
 It only triangulates points and lines, skipping group (plane) detection
 and triangulation.
 
-Usage:
+Usage::
+
     python -m limap.cli.automatic_point_line_triangulation \
         -m <path_to_colmap_model> \
         -i <path_to_images> \

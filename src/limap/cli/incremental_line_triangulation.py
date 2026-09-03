@@ -1,11 +1,12 @@
-"""
+r"""
 Runner for incremental line triangulation.
 
 This runner simulates incremental reconstruction by processing images one at a
 time, triangulating lines after each "registration". It requires a pre-computed
 structure database (from a previous structure_triangulation run).
 
-Usage:
+Usage::
+
     python -m limap.cli.incremental_line_triangulation \
         --structure_db_path <path_to_structure_database.db> \
         --model_path <path_to_colmap_model> \

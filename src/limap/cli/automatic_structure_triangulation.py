@@ -1,15 +1,16 @@
-"""
+r"""
 Runner for structure triangulation from COLMAP.
 
 Triangulates 3D points, lines, and groups (planes) from a COLMAP model.
 Runs the full pipeline: frontend (detection + matching), point triangulation,
 line/group triangulation, and optional bundle adjustment.
 
-Usage:
-    python -m limap.cli.automatic_structure_triangulation \\
-        -m <path_to_colmap_model> \\
-        -i <path_to_images> \\
-        -o <output_directory> \\
+Usage::
+
+    python -m limap.cli.automatic_structure_triangulation \
+        -m <path_to_colmap_model> \
+        -i <path_to_images> \
+        -o <output_directory> \
         -c cfgs/structure_triangulation/default.yaml
 """
 

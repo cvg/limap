@@ -1,10 +1,11 @@
-"""
+r"""
 Runner for global structure triangulation.
 
 This runner runs global structure triangulation (lines + groups) using a
 pre-computed structure database and COLMAP model.
 
-Usage:
+Usage::
+
     python -m limap.cli.global_structure_triangulation \
         --structure_db_path <path_to_structure_database.db> \
         --model_path <path_to_colmap_model> \

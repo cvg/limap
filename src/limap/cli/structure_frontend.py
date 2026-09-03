@@ -1,12 +1,14 @@
-"""
+r"""
 Runner for structure frontend (detection + matching).
 
 This runner takes a COLMAP model and images, runs line/point detection and
 matching, and outputs:
+
 - database.db: COLMAP database with point features and matches
 - structure_database.db: Structure database with line features and matches
 
-Usage:
+Usage::
+
     python -m limap.cli.structure_frontend \
         --image_dir <path_to_images> \
         --model_path <path_to_colmap_model> \
