@@ -21,7 +21,7 @@ sudo apt-get install \
 Many of the above dependencies are for the third-party COLMAP following its [official guide](https://colmap.github.io/install.html).
 
 **Boost >= 1.84** is required, to match the backend the `pycolmap` wheels are
-built with. Ubuntu 24.04 ships 1.83; in a conda environment:
+built with (see [colmap#4672](https://github.com/colmap/colmap/issues/4672)). Ubuntu 24.04 ships 1.83; in a conda environment:
 
 ```bash
 conda install -c conda-forge libboost-devel

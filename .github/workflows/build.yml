@@ -146,7 +146,7 @@ jobs:
 
       # Ubuntu 24.04 ships Boost 1.83, one below the 1.84 COLMAP requires for
       # its BOOST hash map backend -- which has to match the pycolmap wheels.
-      # TODO: drop once COLMAP no longer auto-detects the backend.
+      # TODO: drop once colmap/colmap#4673 lands.
       - name: Install Boost
         run: |
           set -euo pipefail

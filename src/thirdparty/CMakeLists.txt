@@ -37,7 +37,7 @@ if(FETCH_COLMAP)
     set(ONNX_ENABLED OFF CACHE BOOL "Disable ONNX in COLMAP" FORCE)
     set(TESTS_ENABLED OFF CACHE BOOL "Disable tests in COLMAP" FORCE)
     # ABI of the types shared with pycolmap. Needs Boost >= 1.84.
-    # TODO: drop once COLMAP no longer auto-detects the backend.
+    # TODO: drop once colmap/colmap#4673 lands.
     if(NOT DEFINED COLMAP_HASH_MAP_BACKEND)
         set(COLMAP_HASH_MAP_BACKEND "BOOST" CACHE STRING
             "Match the hash map backend of the pycolmap wheels" FORCE)
