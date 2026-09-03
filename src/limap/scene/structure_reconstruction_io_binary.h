@@ -31,6 +31,7 @@
 
 #include "limap/scene/structure_reconstruction.h"
 
+#include <filesystem>
 #include <iostream>
 
 #include <Eigen/Core>
@@ -49,41 +50,41 @@ namespace limap {
 void ReadStructures2dBinary(StructureReconstruction &reconstruction,
                             std::istream &stream);
 void ReadStructures2dBinary(StructureReconstruction &reconstruction,
-                            const std::string &path);
+                            const std::filesystem::path &path);
 
 void ReadLines3DBinary(StructureReconstruction &reconstruction,
                        std::istream &stream);
 void ReadLines3DBinary(StructureReconstruction &reconstruction,
-                       const std::string &path);
+                       const std::filesystem::path &path);
 
 void ReadGroups3DBinary(StructureReconstruction &reconstruction,
                         std::istream &stream);
 void ReadGroups3DBinary(StructureReconstruction &reconstruction,
-                        const std::string &path);
+                        const std::filesystem::path &path);
 
 void ReadWireframeBinary(StructureReconstruction &reconstruction,
                          std::istream &stream);
 void ReadWireframeBinary(StructureReconstruction &reconstruction,
-                         const std::string &path);
+                         const std::filesystem::path &path);
 
 void WriteStructures2dBinary(const StructureReconstruction &reconstruction,
-                             std::istream &stream);
+                             std::ostream &stream);
 void WriteStructures2dBinary(const StructureReconstruction &reconstruction,
-                             const std::string &path);
+                             const std::filesystem::path &path);
 
 void WriteLines3DBinary(const StructureReconstruction &reconstruction,
-                        std::istream &stream);
+                        std::ostream &stream);
 void WriteLines3DBinary(const StructureReconstruction &reconstruction,
-                        const std::string &path);
+                        const std::filesystem::path &path);
 
 void WriteGroups3DBinary(const StructureReconstruction &reconstruction,
-                         std::istream &stream);
+                         std::ostream &stream);
 void WriteGroups3DBinary(const StructureReconstruction &reconstruction,
-                         const std::string &path);
+                         const std::filesystem::path &path);
 
 void WriteWireframeBinary(const StructureReconstruction &reconstruction,
-                          std::istream &stream);
+                          std::ostream &stream);
 void WriteWireframeBinary(const StructureReconstruction &reconstruction,
-                          const std::string &path);
+                          const std::filesystem::path &path);
 
 } // namespace limap

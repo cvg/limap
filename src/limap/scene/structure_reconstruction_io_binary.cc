@@ -319,7 +319,7 @@ void ReadStructures2dBinary(StructureReconstruction &recon, std::istream &is) {
 }
 
 void ReadStructures2dBinary(StructureReconstruction &recon,
-                            const std::string &path) {
+                            const std::filesystem::path &path) {
   std::ifstream file(path, std::ios::binary);
   THROW_CHECK_FILE_OPEN(file, path);
   ReadStructures2dBinary(recon, file);
@@ -341,7 +341,7 @@ void WriteStructures2dBinary(const StructureReconstruction &recon,
 }
 
 void WriteStructures2dBinary(const StructureReconstruction &recon,
-                             const std::string &path) {
+                             const std::filesystem::path &path) {
   std::ofstream file(path, std::ios::binary);
   THROW_CHECK_FILE_OPEN(file, path);
   WriteStructures2dBinary(recon, file);
@@ -367,7 +367,7 @@ void ReadLines3DBinary(StructureReconstruction &recon, std::istream &is) {
 }
 
 void ReadLines3DBinary(StructureReconstruction &recon,
-                       const std::string &path) {
+                       const std::filesystem::path &path) {
   std::ifstream file(path, std::ios::binary);
   THROW_CHECK_FILE_OPEN(file, path);
   ReadLines3DBinary(recon, file);
@@ -392,7 +392,7 @@ void WriteLines3DBinary(const StructureReconstruction &recon,
 }
 
 void WriteLines3DBinary(const StructureReconstruction &recon,
-                        const std::string &path) {
+                        const std::filesystem::path &path) {
   std::ofstream file(path, std::ios::binary);
   THROW_CHECK_FILE_OPEN(file, path);
   WriteLines3DBinary(recon, file);
@@ -418,7 +418,7 @@ void ReadGroups3DBinary(StructureReconstruction &recon, std::istream &is) {
 }
 
 void ReadGroups3DBinary(StructureReconstruction &recon,
-                        const std::string &path) {
+                        const std::filesystem::path &path) {
   std::ifstream file(path, std::ios::binary);
   THROW_CHECK_FILE_OPEN(file, path);
   ReadGroups3DBinary(recon, file);
@@ -443,7 +443,7 @@ void WriteGroups3DBinary(const StructureReconstruction &recon,
 }
 
 void WriteGroups3DBinary(const StructureReconstruction &recon,
-                         const std::string &path) {
+                         const std::filesystem::path &path) {
   std::ofstream file(path, std::ios::binary);
   THROW_CHECK_FILE_OPEN(file, path);
   WriteGroups3DBinary(recon, file);
@@ -468,7 +468,7 @@ void ReadWireframeBinary(StructureReconstruction &recon, std::istream &is) {
 }
 
 void ReadWireframeBinary(StructureReconstruction &recon,
-                         const std::string &path) {
+                         const std::filesystem::path &path) {
   std::ifstream file(path, std::ios::binary);
   THROW_CHECK_FILE_OPEN(file, path);
   ReadWireframeBinary(recon, file);
@@ -488,7 +488,7 @@ void WriteWireframeBinary(const StructureReconstruction &recon,
 }
 
 void WriteWireframeBinary(const StructureReconstruction &recon,
-                          const std::string &path) {
+                          const std::filesystem::path &path) {
   std::ofstream file(path, std::ios::binary);
   THROW_CHECK_FILE_OPEN(file, path);
   WriteWireframeBinary(recon, file);
