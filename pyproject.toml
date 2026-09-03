@@ -1,6 +1,7 @@
 [build-system]
 requires = [
-  "scikit-build-core>=0.10",
+  # >=0.11 for PEP 639 license metadata (License-Expression).
+  "scikit-build-core>=0.11",
   "cmake>=3.18",
   # Must match COLMAP's pin: limap's bindings inherit pycolmap's types.
   "pybind11==3.0.4",
@@ -9,7 +10,7 @@ build-backend = "scikit_build_core.build"
 
 
 [project]
-name = "limap"
+name = "pylimap"
 version = "2.0.0.dev"
 description = "A toolbox for 3D visual mapping, localization, and SfM with structured geometric features (points, lines, planes, vanishing points, wireframes, etc.)."
 authors = [
@@ -18,6 +19,9 @@ authors = [
   { name = "Rémi Pautrat", email = "pautratrmi@microsoft.com" },
 ]
 urls = {Repository = "https://github.com/cvg/limap"}
+readme = "README.md"
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
 # Capped below 3.14 until dacite supports it: limap converts every YAML config
 # into an Options dataclass through dacite.from_dict, which relies on runtime
 # annotation introspection -- exactly what 3.14's deferred annotations change.
@@ -62,12 +66,11 @@ viz = [
 # project metadata -- install requirements.txt for those.
 line2d = ["einops", "scikit-image", "pillow"]
 dev = ["pytest", "ruff==0.15.20", "clang-format==22.1.5"]
-all = ["limap[viz,line2d]"]
+all = ["pylimap[viz,line2d]"]
 
 [tool.scikit-build]
 cmake.source-dir = "./"
 wheel.packages = ["src/limap"]
-cmake.define.VERSION_INFO = "2.0.0.dev"
 
 [tool.cibuildwheel]
 # requires-python is >=3.10,<3.14.

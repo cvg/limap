@@ -64,7 +64,7 @@ def __getattr__(name):
         if missing not in {"matplotlib", "seaborn", "open3d"}:
             raise
         hint = f"{name} needs {missing}, which is part of the `viz` extra:\n"
-        hint += '    python -m pip install "limap[viz]"'
+        hint += '    python -m pip install "pylimap[viz]"'
         if missing == "open3d":
             hint += (
                 "\nopen3d publishes no wheels for Python 3.13+, so it is "

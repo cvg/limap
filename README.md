@@ -3,7 +3,7 @@
 **The documentations on brief tutorials and APIs are available [here](https://b1ueber2y.me/projects/LIMAP/docs/index.html)**.
 
 <p align="center">
-<img src="./misc/media/supp_qualitative_5x3.png">
+<img src="https://raw.githubusercontent.com/cvg/limap/main/misc/media/supp_qualitative_5x3.png">
 </p>
 
 LIMAP is a toolbox for holistic 3D mapping, localization and structure from motion (SfM) with structured features. Alongside keypoints, it treats **lines**, **vanishing points**, **planes**, **parametric primitives** (spheres, cylinders, ellipsoids, cuboids, cones) and the **wireframe** connecting them as first-class citizens of the reconstruction, optimized jointly with the camera poses. It grew out of the highlight paper [3D Line Mapping Revisited](https://arxiv.org/abs/2303.17504) at CVPR 2023 in Vancouver, Canada, with the SfM pipeline introduced and further improved in subsequent papers at [ECCV 2024](https://arxiv.org/abs/2409.19811) and ECCV 2026 (please refer to the [Citation](#citation) section for details). Contributors to this project are from the [Computer Vision and Geometry Group](https://cvg.ethz.ch/) at [ETH Zurich](https://ethz.ch/en.html).
@@ -20,11 +20,11 @@ Three pipelines are provided:
 The line detectors, matchers, vanishing point estimators and plane detectors are abstracted behind registries to ensure flexibility to support recent advances and future development.
 
 <p align="center">
-<img width=100% src="./misc/media/barn_lsd.gif" style="margin:-300px 0px -300px 0px">
+<img width=100% src="https://raw.githubusercontent.com/cvg/limap/main/misc/media/barn_lsd.gif" style="margin:-300px 0px -300px 0px">
 </p>
 
 <p align="center">
-<img src="./misc/media/teaser_holistic.png">
+<img src="https://raw.githubusercontent.com/cvg/limap/main/misc/media/teaser_holistic.png">
 </p>
 
 <p align="center"><i>From multi-view images, LIMAP jointly optimizes the features, the camera poses and the structural constraints.<br>

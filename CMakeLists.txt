@@ -2,6 +2,16 @@ cmake_minimum_required(VERSION 3.17)
 
 project(limap)
 
+# limap.__version__. _FULL keeps the pre-release suffix that
+# SKBUILD_PROJECT_VERSION drops (2.0.0rc1 -> 2.0.0).
+if(NOT DEFINED VERSION_INFO)
+    if(DEFINED SKBUILD_PROJECT_VERSION_FULL)
+        set(VERSION_INFO "${SKBUILD_PROJECT_VERSION_FULL}")
+    else()
+        set(VERSION_INFO "dev")
+    endif()
+endif()
+
 ################################################################################
 # Include CMake dependencies
 ################################################################################
