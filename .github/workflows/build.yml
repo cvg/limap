@@ -124,9 +124,6 @@ jobs:
             build-essential \
             cmake \
             ninja-build \
-            libboost-program-options-dev \
-            libboost-graph-dev \
-            libboost-system-dev \
             libeigen3-dev \
             libceres-dev \
             libflann-dev \
@@ -138,10 +135,6 @@ jobs:
             libgmock-dev \
             libsqlite3-dev \
             libglew-dev \
-            qtbase5-dev \
-            libqt5opengl5-dev \
-            libcgal-dev \
-            libcgal-qt5-dev \
             libgl1-mesa-dri \
             libunwind-dev \
             xvfb
@@ -150,6 +143,25 @@ jobs:
           # We don't depend on any of openimageio's OpenCV functionality,
           # but its config still requires the OpenCV include directory to exist.
           sudo mkdir -p /usr/include/opencv4
+
+      # Ubuntu 24.04 ships Boost 1.83, one below the 1.84 COLMAP requires for
+      # its BOOST hash map backend -- which has to match the pycolmap wheels.
+      # TODO: drop once COLMAP no longer auto-detects the backend.
+      - name: Install Boost
+        run: |
+          set -euo pipefail
+          BOOST_ROOT="${COMPILER_CACHE_DIR}/boost"
+          if [ ! -f "${BOOST_ROOT}/include/boost/version.hpp" ]; then
+            wget -q https://archives.boost.io/release/1.90.0/source/boost_1_90_0.tar.bz2
+            tar xf boost_1_90_0.tar.bz2
+            cd boost_1_90_0
+            ./bootstrap.sh --prefix="${BOOST_ROOT}" \
+              --with-libraries=graph,program_options
+            ./b2 -j"$(nproc)" --with-graph --with-program_options install
+          fi
+          grep "define BOOST_LIB_VERSION" "${BOOST_ROOT}/include/boost/version.hpp"
+          echo "BOOST_ROOT=${BOOST_ROOT}" >> "$GITHUB_ENV"
+          echo "CMAKE_PREFIX_PATH=${BOOST_ROOT}${CMAKE_PREFIX_PATH:+:${CMAKE_PREFIX_PATH}}" >> "$GITHUB_ENV"
 
       - name: Free disk space
         run: |
