@@ -11,7 +11,7 @@ version = "2.0.0.dev"
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "LIMAP"
-copyright = "2023, CVG @ ETH Zurich"
+copyright = "CVG @ ETH Zurich"
 author = "LIMAP Contributors"
 release = version
 
