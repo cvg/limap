@@ -1,11 +1,12 @@
-"""
+r"""
 Runner for incremental structure triangulation.
 
 This runner runs incremental structure triangulation (points, lines, groups)
 using pre-computed databases. It requires a pre-computed structure database
 and a COLMAP database with point correspondences.
 
-Usage:
+Usage::
+
     python -m limap.cli.incremental_structure_triangulation \
         --structure_db_path <path_to_structure_database.db> \
         --db_path <path_to_colmap_database.db> \

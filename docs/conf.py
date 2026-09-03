@@ -48,3 +48,21 @@ html_theme_path = ["_themes"]
 html_css_files = [
     "css/fix-rtd-property.css"  # workaround readthedocs/sphinx_rtd_theme#1301
 ]
+
+
+# -- Autodoc tweaks -------------------------------------------------------
+
+
+# The overload lists pybind11 writes into the docstrings of the option classes
+# contain `**kwargs`, which docutils reads as an unterminated strong emphasis.
+# Escape the stars so those lines render literally.
+def _escape_star_args(app, what, name, obj, options, lines):
+    for i, line in enumerate(lines):
+        if "*args" in line or "**kwargs" in line:
+            lines[i] = line.replace("**kwargs", r"\*\*kwargs").replace(
+                "*args", r"\*args"
+            )
+
+
+def setup(app):
+    app.connect("autodoc-process-docstring", _escape_star_args)

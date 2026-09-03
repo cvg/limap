@@ -3,7 +3,7 @@ Holistic incremental SfM
 
 When no camera poses are available, LIMAP recovers them together with the 3D model. The holistic incremental mapper registers the images and bundle-adjusts points, lines, vanishing points, planes and the wireframe jointly, rather than reconstructing points first and fitting the structures onto frozen poses afterwards.
 
-This is the pipeline of our `ECCV 2024 <https://arxiv.org/abs/2409.19811>`_ and ECCV 2026 papers; see the *Citation* section of the README for details.
+This is the pipeline of our `ECCV 2024 <https://arxiv.org/abs/2409.19811>`_ and ECCV 2026 papers; see the *Citations* section of the README for details.
 
 A reconstruction runs in two stages: a **frontend** that detects and matches features over the images, and a **mapper** that incrementally registers the images and optimizes the reconstruction.
 
