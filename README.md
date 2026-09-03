@@ -32,11 +32,13 @@ This yields a sparse 3D reconstruction with geometric primitives (planes, sphere
 
 ## Installation
 
+LIMAP has been tested on **Linux**, **macOS** and **Windows**.
+
 **Dependencies:**
 * Python 3.10/11/12/13
 * CMake >= 3.17
 * CUDA (for deep learning based detectors/matchers)
-* System dependencies [[Command line](./misc/install/dependencies.md)]
+* System dependencies [[Per-platform guide](./misc/install/dependencies.md)]
 
 *Note that one cannot visualize reconstructions on Python 3.13, as there are no
 published wheels available for open3d and our 3D viewer depends on it.*
