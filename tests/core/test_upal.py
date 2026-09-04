@@ -328,3 +328,18 @@ def test_joint_detection_resumes_a_partial_run(detector, image_pair, tmp_path):
     )
     with h5py.File(str(feature_path), "r") as fd:
         assert set(fd.keys()) == set(image_names.values())
+
+
+@pytest.mark.ci_workflow
+def test_joint_options_use_the_shared_weight_root():
+    """weight_path must stay None so weights_root() decides.
+
+    Pinning a root here would send the joint path to a different directory
+    than every other detector, downloading the same checkpoint twice.
+    """
+    from limap.image.joint_point_line import JointPointLineDetectionOptions
+
+    joint = JointPointLineDetectionOptions()
+    assert joint.weight_path is None
+    assert joint.detector_options.base_options.weight_path is None
+    assert joint.as_line_detection_options().weight_path is None

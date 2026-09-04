@@ -55,9 +55,7 @@ class UPALMatcher(BaseMatcher):
                 nearest1 = scores.argmax(dim=0)
                 index1 = torch.arange(len(scores), device=scores.device)
                 mutual = nearest1[nearest2] == index1
-                matches = torch.stack(
-                    [index1[mutual], nearest2[mutual]], dim=1
-                )
+                matches = torch.stack([index1[mutual], nearest2[mutual]], dim=1)
             else:
                 topk = min(self.topk, scores.shape[1])
                 nearest2 = torch.argsort(scores, dim=1)[:, -topk:]

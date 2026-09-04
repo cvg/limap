@@ -16,7 +16,7 @@ class JointPointLineDetectionOptions:
     """
 
     skip_exists: bool = True
-    weight_path: Path = Path.home() / ".limap" / "models"
+    weight_path: Path | None = None
 
     method: str = "upal"
 
@@ -25,7 +25,8 @@ class JointPointLineDetectionOptions:
     @property
     def detector_options(self) -> DetectorOptions:
         options = deepcopy(self._detector_options)
-        options.base_options.weight_path = self.weight_path
+        if self.weight_path is not None:
+            options.base_options.weight_path = self.weight_path
         return options
 
     @detector_options.setter

@@ -174,7 +174,9 @@ class UPALDetector(BaseDetector):
             return np.zeros((0, 5), dtype=np.float32)
 
         lines = (
-            torch.from_numpy(segments[:, :4]).to(distance_field).reshape(-1, 2, 2)
+            torch.from_numpy(segments[:, :4])
+            .to(distance_field)
+            .reshape(-1, 2, 2)
         )
         scores = torch.from_numpy(segments[:, 4]).to(distance_field)
         lengths = torch.linalg.vector_norm(lines[:, 1] - lines[:, 0], dim=1)
@@ -186,8 +188,18 @@ class UPALDetector(BaseDetector):
         samples = lines[:, :1] + (lines[:, 1:] - lines[:, :1]) * torch.linspace(
             0, 1, 32, device=lines.device
         ).view(1, -1, 1)
-        x = samples[..., 0].round().long().clamp_(0, distance_field.shape[1] - 1)
-        y = samples[..., 1].round().long().clamp_(0, distance_field.shape[0] - 1)
+        x = (
+            samples[..., 0]
+            .round()
+            .long()
+            .clamp_(0, distance_field.shape[1] - 1)
+        )
+        y = (
+            samples[..., 1]
+            .round()
+            .long()
+            .clamp_(0, distance_field.shape[0] - 1)
+        )
         keep = distance_field[y, x].mean(dim=1) <= self.max_mean_distance
         lines, scores = lines[keep], scores[keep]
         return (
