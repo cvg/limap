@@ -7,6 +7,7 @@ from .point import PointDetectionOptions, PointMatcherOptions
 from .line import LineDetectionOptions, LineMatcherOptions
 from .groups import GroupDescriptionOptions
 from .dense_matcher import DenseMatchingOptions
+from .joint_point_line import JointPointLineMatcherOptions
 
 
 @dataclass
@@ -18,6 +19,12 @@ class ImageDescriptionOptions:
         default_factory=LineDetectionOptions
     )
     use_joint_point_line_detection: bool = False
+
+    # Set when a joint point-line matcher will run: the point features are
+    # then taken from the line description rather than detected separately,
+    # since the matcher's junctions are that same pass's keypoints. Derived by
+    # the runners from ImageAssociationOptions, not meant to be set in a config.
+    joint_point_line_matcher: JointPointLineMatcherOptions | None = None
 
     # Skip point detection entirely (use existing points from reconstruction)
     skip_point_detection: bool = False
@@ -51,7 +58,12 @@ class ImageAssociationOptions:
     )
 
     # use classical feature matching
+    # Match points and lines in a single pass, replacing both point_matcher
+    # and line_matcher.
     use_joint_point_line_matcher: bool = False
+    joint_point_line_matcher: JointPointLineMatcherOptions = field(
+        default_factory=JointPointLineMatcherOptions
+    )
     point_descriptor_path: Path | None = None
     point_matcher: PointMatcherOptions = field(
         default_factory=PointMatcherOptions

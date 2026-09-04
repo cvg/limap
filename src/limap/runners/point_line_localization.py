@@ -64,6 +64,11 @@ class PointLineLocalizationOptions:
     def image_description(self) -> ImageDescriptionOptions:
         """Image description options with propagated skip_exists/weight_path."""
         options = deepcopy(self._image_description)
+        options.joint_point_line_matcher = (
+            self.image_association.joint_point_line_matcher
+            if self._image_association.use_joint_point_line_matcher
+            else None
+        )
         options.line_detection.skip_exists = self.skip_exists
         if self.weight_path is not None:
             options.line_detection.weight_path = self.weight_path
@@ -81,8 +86,10 @@ class PointLineLocalizationOptions:
         """Image association options with propagated skip_exists/weight_path."""
         options = deepcopy(self._image_association)
         options.line_matcher.skip_exists = self.skip_exists
+        options.joint_point_line_matcher.skip_exists = self.skip_exists
         if self.weight_path is not None:
             options.line_matcher.weight_path = self.weight_path
+            options.joint_point_line_matcher.weight_path = self.weight_path
         return options
 
     @image_association.setter

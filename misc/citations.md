@@ -168,7 +168,8 @@ both.
 ### GlueStick
 
 [GlueStick](https://github.com/cvg/GlueStick) — the default line matcher in
-LIMAP.
+LIMAP, and its joint point-line matcher
+(`cfgs/structure_triangulation/gluestick_joint.yaml`).
 
 ```bibtex
 @inproceedings{pautrat2023gluestick,
