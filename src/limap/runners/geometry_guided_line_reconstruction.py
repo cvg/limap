@@ -49,7 +49,7 @@ class GeometryGuidedLineReconstructionOptions:
 
     # Top-level options
     max_image_dim: int | None = None
-    weight_path: Path = Path.home() / ".limap" / "models"
+    weight_path: Path | None = None
     skip_exists: bool = False
     n_visible_views: int = 4
     n_neighbors: int = 100
@@ -72,7 +72,8 @@ class GeometryGuidedLineReconstructionOptions:
     def line_detection(self) -> LineDetectionOptions:
         options = deepcopy(self._line_detection)
         options.skip_exists = self.skip_exists
-        options.weight_path = self.weight_path
+        if self.weight_path is not None:
+            options.weight_path = self.weight_path
         return options
 
     @line_detection.setter
