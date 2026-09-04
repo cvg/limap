@@ -10,7 +10,7 @@ from .register_matcher import MatcherOptions
 class LineDetectionOptions:
     skip_exists: bool = True
     compute_descinfo: bool = True
-    weight_path: Path = Path.home() / ".limap" / "models"
+    weight_path: Path | None = None
 
     detector_method: str = "deeplsd"
     extractor_method: str | None = "wireframe"
@@ -23,7 +23,8 @@ class LineDetectionOptions:
     @property
     def detector_options(self) -> DetectorOptions:
         options = deepcopy(self._detector_options)
-        options.base_options.weight_path = self.weight_path
+        if self.weight_path is not None:
+            options.base_options.weight_path = self.weight_path
         return options
 
     @detector_options.setter
@@ -33,7 +34,8 @@ class LineDetectionOptions:
     @property
     def extractor_options(self) -> ExtractorOptions:
         options = deepcopy(self._extractor_options)
-        options.base_options.weight_path = self.weight_path
+        if self.weight_path is not None:
+            options.base_options.weight_path = self.weight_path
         return options
 
     @extractor_options.setter
@@ -44,7 +46,7 @@ class LineDetectionOptions:
 @dataclass
 class LineMatcherOptions:
     skip_exists: bool = True
-    weight_path: Path = Path.home() / ".limap" / "models"
+    weight_path: Path | None = None
 
     method: str = "gluestick"
     _matching_options: MatcherOptions = field(default_factory=MatcherOptions)
@@ -52,7 +54,8 @@ class LineMatcherOptions:
     @property
     def matching_options(self) -> MatcherOptions:
         options = deepcopy(self._matching_options)
-        options.weight_path = self.weight_path
+        if self.weight_path is not None:
+            options.base_options.weight_path = self.weight_path
         return options
 
     @matching_options.setter
