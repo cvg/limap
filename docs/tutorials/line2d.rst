@@ -3,6 +3,9 @@ Line detection, description and matching
 
 LIMAP provides modular interfaces for line detection, description and matching under :py:mod:`limap.image.line`.
 
+The detectors, descriptors and matchers below are external methods; their BibTeX
+entries are collected `here <https://github.com/cvg/limap/blob/main/misc/citations.md>`_. Please cite the ones you use.
+
 -----------------------------------------------------
 Minimal example on line detection and description
 -----------------------------------------------------
