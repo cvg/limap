@@ -38,7 +38,7 @@ LIMAP has been tested on **Linux**, **macOS** and **Windows**.
 * Python 3.10/11/12/13
 * CMake >= 3.17
 * CUDA (for deep learning based detectors/matchers)
-* System dependencies [[Per-platform guide](./misc/install/dependencies.md)]
+* System dependencies [[Per-platform guide](https://github.com/cvg/limap/blob/main/misc/install/dependencies.md)]
 
 *Note that one cannot visualize reconstructions on Python 3.13, as there are no
 published wheels available for open3d and our 3D viewer depends on it.*
@@ -110,7 +110,7 @@ python -m pip install -Ive ".[all,dev]"
   point reconstruction are unaffected — no pipeline touches open3d.
 * Several further methods (HAWP, TP-LSD, LBD, RoMa, Progressive-X) are not
   installed by any of the above. Each is cloned and pip-installed separately.
-  See the per-method guides under [`misc/install/`](./misc/install/), also
+  See the per-method guides under [`misc/install/`](https://github.com/cvg/limap/tree/main/misc/install/), also
   linked from the detector and matcher lists further down.
 </details>
 
@@ -235,31 +235,31 @@ If you wish to use the methods with **separate installation needed** you need to
 
 **Note**: PR on integration of new features are very welcome.
 
-Each method below links its BibTeX entry, collected in [`misc/citations.md`](misc/citations.md). Please cite the ones you use.
+Each method below links its BibTeX entry, collected in [`misc/citations.md`](https://github.com/cvg/limap/blob/main/misc/citations.md). Please cite the ones you use.
 
 **The following line detectors are currently supported:**
-- [LSD](https://github.com/iago-suarez/pytlsd) [[BibTeX](misc/citations.md#lsd)]
-- [SOLD2](https://github.com/cvg/SOLD2) [[BibTeX](misc/citations.md#sold2)]
-- [HAWP](https://github.com/cherubicXN/hawp) [[BibTeX](misc/citations.md#hawp)] (separate installation needed [[Guide](misc/install/hawpv3.md)])
-- [TP-LSD](https://github.com/Siyuada7/TP-LSD) [[BibTeX](misc/citations.md#tp-lsd)] (separate installation needed [[Guide](misc/install/tp_lsd.md)])
-- [DeepLSD](https://github.com/cvg/DeepLSD) [[BibTeX](misc/citations.md#deeplsd)]
+- [LSD](https://github.com/iago-suarez/pytlsd) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#lsd)]
+- [SOLD2](https://github.com/cvg/SOLD2) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#sold2)]
+- [HAWP](https://github.com/cherubicXN/hawp) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#hawp)] (separate installation needed [[Guide](https://github.com/cvg/limap/blob/main/misc/install/hawpv3.md)])
+- [TP-LSD](https://github.com/Siyuada7/TP-LSD) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#tp-lsd)] (separate installation needed [[Guide](https://github.com/cvg/limap/blob/main/misc/install/tp_lsd.md)])
+- [DeepLSD](https://github.com/cvg/DeepLSD) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#deeplsd)]
 
 **The following line descriptors/matchers are currently supported:**
-- [LBD](https://github.com/iago-suarez/pytlbd) [[BibTeX](misc/citations.md#lbd)] (separate installation needed [[Guide](misc/install/lbd.md)])
-- [SOLD2](https://github.com/cvg/SOLD2) [[BibTeX](misc/citations.md#sold2)]
-- [LineTR](https://github.com/yosungho/LineTR) [[BibTeX](misc/citations.md#linetr)]
-- [L2D2](https://github.com/hichem-abdellali/L2D2) [[BibTeX](misc/citations.md#l2d2)]
-- Endpoint matching with [SuperPoint](https://github.com/magicleap/SuperPointPretrainedNetwork) [[BibTeX](misc/citations.md#superpoint)] + Nearest Neighbors
-- Endpoint matching with [SuperPoint](https://github.com/magicleap/SuperPointPretrainedNetwork) [[BibTeX](misc/citations.md#superpoint)] + [SuperGlue](https://github.com/magicleap/SuperGluePretrainedNetwork) [[BibTeX](misc/citations.md#superglue)]
-- [GlueStick](https://github.com/cvg/GlueStick) [[BibTeX](misc/citations.md#gluestick)]
-- Custom line matcher based on dense matcher [RoMa](https://github.com/Parskatt/RoMa) [[BibTeX](misc/citations.md#roma)] (separate installation needed [[Guide](misc/install/roma.md)])
+- [LBD](https://github.com/iago-suarez/pytlbd) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#lbd)] (separate installation needed [[Guide](https://github.com/cvg/limap/blob/main/misc/install/lbd.md)])
+- [SOLD2](https://github.com/cvg/SOLD2) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#sold2)]
+- [LineTR](https://github.com/yosungho/LineTR) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#linetr)]
+- [L2D2](https://github.com/hichem-abdellali/L2D2) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#l2d2)]
+- Endpoint matching with [SuperPoint](https://github.com/magicleap/SuperPointPretrainedNetwork) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#superpoint)] + Nearest Neighbors
+- Endpoint matching with [SuperPoint](https://github.com/magicleap/SuperPointPretrainedNetwork) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#superpoint)] + [SuperGlue](https://github.com/magicleap/SuperGluePretrainedNetwork) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#superglue)]
+- [GlueStick](https://github.com/cvg/GlueStick) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#gluestick)]
+- Custom line matcher based on dense matcher [RoMa](https://github.com/Parskatt/RoMa) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#roma)] (separate installation needed [[Guide](https://github.com/cvg/limap/blob/main/misc/install/roma.md)])
 
 **The following vanishing point estimators are currently supported:**
-- [JLinkage](https://github.com/B1ueber2y/JLinkage) [[BibTeX](misc/citations.md#jlinkage)]
-- [Progressive-X](https://github.com/danini/progressive-x) [[BibTeX](misc/citations.md#progressive-x)] (separate installation needed [[Guide](https://github.com/danini/progressive-x/blob/master/README.md)])
+- [JLinkage](https://github.com/B1ueber2y/JLinkage) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#jlinkage)]
+- [Progressive-X](https://github.com/danini/progressive-x) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#progressive-x)] (separate installation needed [[Guide](https://github.com/danini/progressive-x/blob/master/README.md)])
 
 **The following plane detectors are currently supported:**
-- [PxwPlanar](https://github.com/alpayozkan/PixelwisePlanarity) [[BibTeX](misc/citations.md#pxwplanar)]
+- [PxwPlanar](https://github.com/alpayozkan/PixelwisePlanarity) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#pxwplanar)]
 
 No separate installation is needed: `pxwplanar` is pulled in by `requirements.txt` and its weights download from Hugging Face on first use. It does require the MoGe fork that `pxwplanar` pins; another MoGe install in the same environment will shadow it and break metric prediction on CUDA.
 
