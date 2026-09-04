@@ -10,6 +10,9 @@ adjustment, which is what makes the reconstruction *holistic*.
 The detectors live under :py:mod:`limap.image.groups` and follow the same
 registry pattern as the line detectors in :doc:`line2d`.
 
+The vanishing point and plane detectors below are external methods; their BibTeX
+entries are collected `here <https://github.com/cvg/limap/blob/main/misc/citations.md>`_. Please cite the ones you use.
+
 -----------------------------------------------------
 Vanishing point detection
 -----------------------------------------------------
