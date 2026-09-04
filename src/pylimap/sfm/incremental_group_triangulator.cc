@@ -6,6 +6,7 @@
 namespace py = pybind11;
 
 #include <thirdparty/pycolmap/helpers.h>
+#include <thirdparty/pycolmap/pybind11_extension.h>
 
 #include "limap/sfm/incremental_group_triangulator.h"
 

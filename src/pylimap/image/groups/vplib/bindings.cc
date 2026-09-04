@@ -8,6 +8,7 @@
 #include <vector>
 
 #include <thirdparty/pycolmap/helpers.h>
+#include <thirdparty/pycolmap/pybind11_extension.h>
 
 #include "limap/image/groups/vplib/JLinkage/JLinkage.h"
 #include "limap/image/groups/vplib/base_vp_detector.h"

@@ -4,6 +4,7 @@
 #include <pybind11/stl_bind.h>
 
 #include <thirdparty/pycolmap/helpers.h>
+#include <thirdparty/pycolmap/pybind11_extension.h>
 
 #include "limap/estimators/bundle_adjustment/bundle_adjustment.h"
 #include "limap/estimators/bundle_adjustment/group_bundle_adjustment.h"
