@@ -5,7 +5,7 @@
 
 # import limap
 # version = limap.__version__
-version = "2.0.0.dev"
+version = "2.1.0.dev"
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
