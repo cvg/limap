@@ -39,9 +39,7 @@ class PointLineLocalizationOptions:
 
     # Common options that propagate to nested options
     skip_exists: bool = False
-    weight_path: Path = field(
-        default_factory=lambda: Path.home() / ".limap" / "models"
-    )
+    weight_path: Path | None = None
     max_image_dim: int | None = None
 
     # Image description (point/line detection) - same structure as triangulation
@@ -67,7 +65,8 @@ class PointLineLocalizationOptions:
         """Image description options with propagated skip_exists/weight_path."""
         options = deepcopy(self._image_description)
         options.line_detection.skip_exists = self.skip_exists
-        options.line_detection.weight_path = self.weight_path
+        if self.weight_path is not None:
+            options.line_detection.weight_path = self.weight_path
         options.skip_group_description = (
             True  # Never describe groups in localization
         )
@@ -82,7 +81,8 @@ class PointLineLocalizationOptions:
         """Image association options with propagated skip_exists/weight_path."""
         options = deepcopy(self._image_association)
         options.line_matcher.skip_exists = self.skip_exists
-        options.line_matcher.weight_path = self.weight_path
+        if self.weight_path is not None:
+            options.line_matcher.weight_path = self.weight_path
         return options
 
     @image_association.setter
@@ -105,7 +105,8 @@ class PointLineLocalizationOptions:
         """Line detection options with propagated skip_exists/weight_path."""
         options = deepcopy(self._image_description.line_detection)
         options.skip_exists = self.skip_exists
-        options.weight_path = self.weight_path
+        if self.weight_path is not None:
+            options.weight_path = self.weight_path
         return options
 
     @property
@@ -113,7 +114,8 @@ class PointLineLocalizationOptions:
         """Line matching options with propagated skip_exists/weight_path."""
         options = deepcopy(self._image_association.line_matcher)
         options.skip_exists = self.skip_exists
-        options.weight_path = self.weight_path
+        if self.weight_path is not None:
+            options.weight_path = self.weight_path
         return options
 
 

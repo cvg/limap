@@ -26,7 +26,7 @@ from .structure_frontend import (
 @dataclass
 class AutomaticStructureTriangulationOptions:
     max_image_dim: int | None = None
-    weight_path: Path = Path.home() / ".limap" / "models"
+    weight_path: Path | None = None
     skip_exists: bool = False
     skip_frontend_if_exists_database: bool = False
     # Delete the detections and descriptors once they have been imported
@@ -70,8 +70,10 @@ class AutomaticStructureTriangulationOptions:
             and (not self.image_association.use_dense_matching)
         )
         options.line_detection.skip_exists = self.skip_exists
-        options.line_detection.weight_path = self.weight_path
-        options.group_description.plane_detection.weight_path = self.weight_path
+        if self.weight_path is not None:
+            options.line_detection.weight_path = self.weight_path
+            plane_detection = options.group_description.plane_detection
+            plane_detection.weight_path = self.weight_path
         # Disable group description when not using groups
         if not self.use_groups:
             options.skip_group_description = True
@@ -86,7 +88,8 @@ class AutomaticStructureTriangulationOptions:
         options = deepcopy(self._image_association)
         options.skip_line_matching = self.use_exhaustive_line_matching
         options.line_matcher.skip_exists = self.skip_exists
-        options.line_matcher.weight_path = self.weight_path
+        if self.weight_path is not None:
+            options.line_matcher.weight_path = self.weight_path
         # Disable group matching when not using groups
         if not self.use_groups:
             options.skip_group_matching = True

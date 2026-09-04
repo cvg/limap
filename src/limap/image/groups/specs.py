@@ -17,7 +17,7 @@ class VPDetectionOptions:
 
 @dataclass
 class PlaneDetectionOptions:
-    weight_path: Path = Path.home() / ".limap" / "models"
+    weight_path: Path | None = None
     skip_exists: bool = True
     method: str = "pxwplanar"
     visualize: bool = True
@@ -28,7 +28,8 @@ class PlaneDetectionOptions:
     @property
     def options(self) -> planelib.DetectorOptions:
         options = deepcopy(self._options)
-        options.base_options.weight_path = self.weight_path
+        if self.weight_path is not None:
+            options.base_options.weight_path = self.weight_path
         return options
 
     @options.setter
