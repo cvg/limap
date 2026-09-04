@@ -235,29 +235,31 @@ If you wish to use the methods with **separate installation needed** you need to
 
 **Note**: PR on integration of new features are very welcome.
 
+Each method below links its BibTeX entry, collected in [`misc/citations.md`](misc/citations.md). Please cite the ones you use.
+
 **The following line detectors are currently supported:**
-- [LSD](https://github.com/iago-suarez/pytlsd)
-- [SOLD2](https://github.com/cvg/SOLD2)
-- [HAWP](https://github.com/cherubicXN/hawp) (separate installation needed [[Guide](misc/install/hawpv3.md)])
-- [TP-LSD](https://github.com/Siyuada7/TP-LSD) (separate installation needed [[Guide](misc/install/tp_lsd.md)]) 
-- [DeepLSD](https://github.com/cvg/DeepLSD)
+- [LSD](https://github.com/iago-suarez/pytlsd) [[BibTeX](misc/citations.md#lsd)]
+- [SOLD2](https://github.com/cvg/SOLD2) [[BibTeX](misc/citations.md#sold2)]
+- [HAWP](https://github.com/cherubicXN/hawp) [[BibTeX](misc/citations.md#hawp)] (separate installation needed [[Guide](misc/install/hawpv3.md)])
+- [TP-LSD](https://github.com/Siyuada7/TP-LSD) [[BibTeX](misc/citations.md#tp-lsd)] (separate installation needed [[Guide](misc/install/tp_lsd.md)])
+- [DeepLSD](https://github.com/cvg/DeepLSD) [[BibTeX](misc/citations.md#deeplsd)]
 
 **The following line descriptors/matchers are currently supported:**
-- [LBD](https://github.com/iago-suarez/pytlbd) (separate installation needed [[Guide](misc/install/lbd.md)])
-- [SOLD2](https://github.com/cvg/SOLD2)
-- [LineTR](https://github.com/yosungho/LineTR)
-- [L2D2](https://github.com/hichem-abdellali/L2D2)
-- Endpoint matching with [SuperPoint](https://github.com/magicleap/SuperPointPretrainedNetwork) + Nearest Neighbors
-- Endpoint matching with [SuperPoint](https://github.com/magicleap/SuperPointPretrainedNetwork) + [SuperGlue](https://github.com/magicleap/SuperGluePretrainedNetwork)
-- [GlueStick](https://github.com/cvg/GlueStick)
-- Custom line matcher based on dense matcher [RoMa](https://github.com/Parskatt/RoMa) (separate installation needed [[Guide](misc/install/roma.md)])
+- [LBD](https://github.com/iago-suarez/pytlbd) [[BibTeX](misc/citations.md#lbd)] (separate installation needed [[Guide](misc/install/lbd.md)])
+- [SOLD2](https://github.com/cvg/SOLD2) [[BibTeX](misc/citations.md#sold2)]
+- [LineTR](https://github.com/yosungho/LineTR) [[BibTeX](misc/citations.md#linetr)]
+- [L2D2](https://github.com/hichem-abdellali/L2D2) [[BibTeX](misc/citations.md#l2d2)]
+- Endpoint matching with [SuperPoint](https://github.com/magicleap/SuperPointPretrainedNetwork) [[BibTeX](misc/citations.md#superpoint)] + Nearest Neighbors
+- Endpoint matching with [SuperPoint](https://github.com/magicleap/SuperPointPretrainedNetwork) [[BibTeX](misc/citations.md#superpoint)] + [SuperGlue](https://github.com/magicleap/SuperGluePretrainedNetwork) [[BibTeX](misc/citations.md#superglue)]
+- [GlueStick](https://github.com/cvg/GlueStick) [[BibTeX](misc/citations.md#gluestick)]
+- Custom line matcher based on dense matcher [RoMa](https://github.com/Parskatt/RoMa) [[BibTeX](misc/citations.md#roma)] (separate installation needed [[Guide](misc/install/roma.md)])
 
 **The following vanishing point estimators are currently supported:**
-- [JLinkage](https://github.com/B1ueber2y/JLinkage)
-- [Progressive-X](https://github.com/danini/progressive-x) (separation installation needed [[Guide](https://github.com/danini/progressive-x/blob/master/README.md)])
+- [JLinkage](https://github.com/B1ueber2y/JLinkage) [[BibTeX](misc/citations.md#jlinkage)]
+- [Progressive-X](https://github.com/danini/progressive-x) [[BibTeX](misc/citations.md#progressive-x)] (separate installation needed [[Guide](https://github.com/danini/progressive-x/blob/master/README.md)])
 
 **The following plane detectors are currently supported:**
-- [PxwPlanar](https://github.com/alpayozkan/PixelwisePlanarity) - monocular plane segmentation from a 4-head MoGe-2 backbone (planarity, metric depth, normals and mask) followed by GPU-accelerated region growing (ECCV 2026)
+- [PxwPlanar](https://github.com/alpayozkan/PixelwisePlanarity) [[BibTeX](misc/citations.md#pxwplanar)]
 
 No separate installation is needed: `pxwplanar` is pulled in by `requirements.txt` and its weights download from Hugging Face on first use. It does require the MoGe fork that `pxwplanar` pins; another MoGe install in the same environment will shadow it and break metric prediction on CUDA.
 
