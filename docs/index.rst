@@ -8,7 +8,7 @@ Welcome to LIMAP's documentation!
 
 .. image:: media/teaser.png
 
-LIMAP is a toolbox for holistic 3D mapping, localization and structure from motion (SfM) with structured features. Alongside keypoints, it treats **lines**, **vanishing points**, **planes**, **parametric primitives** (spheres, cylinders, ellipsoids, cuboids, cones) and the **wireframe** connecting them as first-class citizens of the reconstruction, optimized jointly with the camera poses. It grew out of the highlight paper `3D Line Mapping Revisited <https://arxiv.org/abs/2303.17504>`_ at CVPR 2023 in Vancouver, Canada, with the SfM pipeline introduced and further improved in subsequent papers at `ECCV 2024 <https://arxiv.org/abs/2409.19811>`_ and ECCV 2026. Contributors to this project are from the `Computer Vision and Geometry Group <https://cvg.ethz.ch>`_ at `ETH Zurich <https://ethz.ch/en.html>`_.
+LIMAP is a toolbox for holistic 3D mapping, localization and structure from motion (SfM) with structured features. Alongside keypoints, it treats **lines**, **vanishing points**, **planes**, **parametric primitives** (spheres, cylinders, ellipsoids, cuboids, cones) and the **wireframe** connecting them as first-class citizens of the reconstruction, optimized jointly with the camera poses. It grew out of the highlight paper `3D Line Mapping Revisited <https://arxiv.org/abs/2303.17504>`_ at CVPR 2023 in Vancouver, Canada, with the SfM pipeline introduced and further improved in subsequent papers at `ECCV 2024 <https://arxiv.org/abs/2409.19811>`_ and `ECCV 2026 <https://arxiv.org/abs/2609.04026>`_. Contributors to this project are from the `Computer Vision and Geometry Group <https://cvg.ethz.ch>`_ at `ETH Zurich <https://ethz.ch/en.html>`_.
 
 Three pipelines are provided:
 
