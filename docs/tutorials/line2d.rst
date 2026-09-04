@@ -20,6 +20,13 @@ Detection and description operate directly on an image file path. Here is a mini
     extractor = line2d.get_extractor("sold2", line2d.ExtractorOptions())
     desc = extractor.extract(image_path, segs)  # descriptors for the detected segments
 
+A detector that also describes can do both in one network pass. `UPAL <https://github.com/francois141/upal>`_ additionally predicts keypoints, so the whole frontend can run off a single pass per image with ``use_joint_point_line_detection`` (see ``cfgs/structure_triangulation/upal.yaml``):
+
+.. code-block:: python
+
+    detector = line2d.get_detector("upal", line2d.DetectorOptions())
+    segs, desc = detector.detect_and_extract(image_path)
+
 -----------------------------------------------------
 Minimal example on line matching
 -----------------------------------------------------

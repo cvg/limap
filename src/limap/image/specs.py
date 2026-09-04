@@ -7,6 +7,7 @@ from .point import PointDetectionOptions, PointMatcherOptions
 from .line import LineDetectionOptions, LineMatcherOptions
 from .groups import GroupDescriptionOptions
 from .dense_matcher import DenseMatchingOptions
+from .joint_point_line import JointPointLineDetectionOptions
 
 
 @dataclass
@@ -18,6 +19,9 @@ class ImageDescriptionOptions:
         default_factory=LineDetectionOptions
     )
     use_joint_point_line_detection: bool = False
+    joint_point_line_detection: JointPointLineDetectionOptions = field(
+        default_factory=JointPointLineDetectionOptions
+    )
 
     # Skip point detection entirely (use existing points from reconstruction)
     skip_point_detection: bool = False

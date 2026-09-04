@@ -10,6 +10,7 @@ _UNCERTAINTY2D_DEFAULTS: dict[str, float] = {
     "sold2": 5.0,
     "hawpv3": 5.0,
     "tp_lsd": 5.0,
+    "upal": 2.0,
 }
 
 
@@ -34,10 +35,28 @@ def get_uncertainty2d(method: str) -> float:
 
 
 @dataclass
+class UPALOptions:
+    """Options for the UPAL joint point-line network.
+
+    The keypoints double as the seeds for point-seeded LSD. The number of
+    segments is capped by ``BaseDetectorOptions.max_num_2d_segs`` like every
+    other detector; these are upstream's own filtering defaults.
+    """
+
+    # UPAL's detector is top-k with no score threshold, so this is a hard
+    # count, not a cap: every image returns exactly this many keypoints. For
+    # scale, aliked-n16 is threshold-based and yields a few hundred.
+    max_num_keypoints: int = 4096
+    min_line_length: float = 25.0
+    max_mean_distance: float = 2.0
+
+
+@dataclass
 class DetectorOptions:
     base_options: BaseDetectorOptions = field(
         default_factory=BaseDetectorOptions
     )
+    upal_options: UPALOptions = field(default_factory=UPALOptions)
 
 
 def get_detector(method: str, loptions: DetectorOptions):
@@ -62,6 +81,10 @@ def get_detector(method: str, loptions: DetectorOptions):
         from .DeepLSD import DeepLSDDetector
 
         return DeepLSDDetector(options)
+    elif method == "upal":
+        from ..joint_point_line.UPAL import UPALDetector
+
+        return UPALDetector(options, loptions.upal_options)
     else:
         raise NotImplementedError
 
@@ -71,6 +94,7 @@ class ExtractorOptions:
     base_options: BaseDetectorOptions = field(
         default_factory=BaseDetectorOptions
     )
+    upal_options: UPALOptions = field(default_factory=UPALOptions)
 
 
 def get_extractor(method: str, loptions: ExtractorOptions):
@@ -109,5 +133,9 @@ def get_extractor(method: str, loptions: ExtractorOptions):
         from .dense import DenseNaiveExtractor
 
         return DenseNaiveExtractor(options)
+    elif method == "upal":
+        from ..joint_point_line.UPAL import UPALDetector
+
+        return UPALDetector(options, loptions.upal_options)
     else:
         raise NotImplementedError

@@ -108,7 +108,7 @@ python -m pip install -Ive ".[all,dev]"
   and the 3D helpers in `limap.visualize` do not run there. The `pxwplanar` plane
   detector also depends on open3d, so it is skipped on 3.13 as well. Line and
   point reconstruction are unaffected — no pipeline touches open3d.
-* Several further methods (HAWP, TP-LSD, LBD, RoMa, Progressive-X) are not
+* Several further methods (HAWP, TP-LSD, LBD, RoMa, Progressive-X, UPAL) are not
   installed by any of the above. Each is cloned and pip-installed separately.
   See the per-method guides under [`misc/install/`](./misc/install/), also
   linked from the detector and matcher lists further down.
@@ -241,6 +241,7 @@ If you wish to use the methods with **separate installation needed** you need to
 - [HAWP](https://github.com/cherubicXN/hawp) (separate installation needed [[Guide](misc/install/hawpv3.md)])
 - [TP-LSD](https://github.com/Siyuada7/TP-LSD) (separate installation needed [[Guide](misc/install/tp_lsd.md)]) 
 - [DeepLSD](https://github.com/cvg/DeepLSD)
+- [UPAL](https://github.com/francois141/upal) - joint point and line detection (ECCV 2026) (separate installation needed [[Guide](misc/install/upal.md)])
 
 **The following line descriptors/matchers are currently supported:**
 - [LBD](https://github.com/iago-suarez/pytlbd) (separate installation needed [[Guide](misc/install/lbd.md)])
@@ -251,6 +252,9 @@ If you wish to use the methods with **separate installation needed** you need to
 - Endpoint matching with [SuperPoint](https://github.com/magicleap/SuperPointPretrainedNetwork) + [SuperGlue](https://github.com/magicleap/SuperGluePretrainedNetwork)
 - [GlueStick](https://github.com/cvg/GlueStick)
 - Custom line matcher based on dense matcher [RoMa](https://github.com/Parskatt/RoMa) (separate installation needed [[Guide](misc/install/roma.md)])
+- Endpoint matching with [UPAL](https://github.com/francois141/upal) + Nearest Neighbors (separate installation needed [[Guide](misc/install/upal.md)])
+
+UPAL detects *and* describes both points and lines in a single network pass: see `cfgs/structure_triangulation/upal.yaml`.
 
 **The following vanishing point estimators are currently supported:**
 - [JLinkage](https://github.com/B1ueber2y/JLinkage)
