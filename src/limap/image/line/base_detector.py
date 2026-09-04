@@ -316,7 +316,7 @@ class BaseDetector:
                 Each row corresponds to x1, y1, x2, y2 and score.
             descinfo_folder (str): Path to the extracted descriptors.
         """
-        assert self.do_merge_lines
+        assert not self.do_merge_lines
         seg_folder = self.get_segments_folder(output_folder)
         descinfo_folder = self.get_descinfo_folder(output_folder)
         if not skip_exists:
