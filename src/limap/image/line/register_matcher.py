@@ -58,7 +58,7 @@ def get_matcher(method: str, loptions: MatcherOptions, extractor: Any):
 
         return UPALMatcher(extractor, options)
     elif method == "gluestick":
-        from .GlueStick import GlueStickMatcher
+        from ..joint_point_line.GlueStick import GlueStickMatcher
 
         return GlueStickMatcher(extractor, options)
     elif method == "dense_roma":

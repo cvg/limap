@@ -70,8 +70,17 @@ class AutomaticStructureTriangulationOptions:
             and (not self.image_association.use_dense_matching)
         )
         options.line_detection.skip_exists = self.skip_exists
+        options.joint_point_line_detection.skip_exists = self.skip_exists
+        # A joint matcher's keypoints come from the line description, so the
+        # description step has to know one is coming.
+        options.joint_point_line_matcher = (
+            self.image_association.joint_point_line_matcher
+            if self._image_association.use_joint_point_line_matcher
+            else None
+        )
         if self.weight_path is not None:
             options.line_detection.weight_path = self.weight_path
+            options.joint_point_line_detection.weight_path = self.weight_path
             plane_detection = options.group_description.plane_detection
             plane_detection.weight_path = self.weight_path
         # Disable group description when not using groups
@@ -88,8 +97,10 @@ class AutomaticStructureTriangulationOptions:
         options = deepcopy(self._image_association)
         options.skip_line_matching = self.use_exhaustive_line_matching
         options.line_matcher.skip_exists = self.skip_exists
+        options.joint_point_line_matcher.skip_exists = self.skip_exists
         if self.weight_path is not None:
             options.line_matcher.weight_path = self.weight_path
+            options.joint_point_line_matcher.weight_path = self.weight_path
         # Disable group matching when not using groups
         if not self.use_groups:
             options.skip_group_matching = True

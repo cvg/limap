@@ -8,6 +8,7 @@
 namespace py = pybind11;
 
 #include <thirdparty/pycolmap/helpers.h>
+#include <thirdparty/pycolmap/pybind11_extension.h>
 
 #include "limap/estimators/bundle_adjustment/bundle_adjustment.h"
 #include "limap/sfm/incremental_line_triangulator.h"
