@@ -1,0 +1,25 @@
+---
+###############################
+# LightGlueStick frontend: the same wireframe junctions as
+# gluestick_joint.yaml, matched by a lighter network.
+base_config_file: "cfgs/structure_triangulation/default.yaml"
+
+_image_description:
+  # No point_detection here: the joint matcher's keypoints come out of the
+  # same SuperPoint pass that describes the lines, so the description step
+  # exports those rather than running a second detector over the same images.
+  line_detection:
+    detector_method: "deeplsd"
+    extractor_method: "wireframe"
+
+_image_association:
+  # The joint matcher supplies both halves, so the inherited point_matcher and
+  # line_matcher settings are unused here.
+  use_joint_point_line_matcher: True
+  joint_point_line_matcher:
+    method: "lightgluestick"
+    # Uncomment to let the network stop early on the pairs it is already
+    # confident about, trading a few matches for the speed-up.
+    # _matching_options:
+    #   lightgluestick_options:
+    #     depth_confidence: 0.95

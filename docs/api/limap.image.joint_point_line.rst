@@ -29,7 +29,7 @@ point features, the segments and the line descriptors together.
 Matching
 --------
 
-GlueStick and its successors match points and lines together, in one pass over
+GlueStick and LightGlueStick match points and lines together, in one pass over
 an image pair. Running a point matcher and a line matcher separately over the
 same pairs does the shared work twice, so a joint matcher replaces both: it
 writes its point half in hloc's match file format and its line half in the
