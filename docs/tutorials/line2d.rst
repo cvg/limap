@@ -39,6 +39,37 @@ The matcher type must be compatible with the extractor. Here is a minimal exampl
     matches = matcher.match_pair(desc1, desc2)
 
 -----------------------------------------------------
+Joint point-line matching
+-----------------------------------------------------
+
+`GlueStick <https://github.com/cvg/GlueStick>`_ matches points and lines in a
+single pass, so the matcher above throws away half of what the network already
+computed. :py:mod:`limap.image.joint_point_line` keeps both halves: it
+describes an image from the line descriptors *and* the point features that fed
+the COLMAP database, and returns the point matches alongside the line matches.
+
+.. code-block:: python
+
+    from limap.image.joint_point_line import (
+        JointPointLineMatcherOptions,
+        get_joint_matcher,
+    )
+
+    options = JointPointLineMatcherOptions()
+    matcher = get_joint_matcher(options.method, options.matching_options)
+    desc1 = matcher.describe(descinfo_folder, feature_path, img_id1, name1)
+    desc2 = matcher.describe(descinfo_folder, feature_path, img_id2, name2)
+    result = matcher.match_pair(desc1, desc2)
+    result.point_matches0  # per keypoint of image 1, its match or -1
+    result.line_matches    # (N, 2) pairs of line indices
+
+In a pipeline this replaces both ``point_matcher`` and ``line_matcher``; turn
+it on with ``use_joint_point_line_matcher``, as in
+``cfgs/structure_triangulation/gluestick_joint.yaml``. The point matches index
+the keypoints of the COLMAP database, so the point detector has to be the one
+the joint matcher was trained with -- SuperPoint, for GlueStick.
+
+-----------------------------------------------------
 Visualization
 -----------------------------------------------------
 

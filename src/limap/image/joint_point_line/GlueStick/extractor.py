@@ -11,7 +11,7 @@ from pycolmap import logging
 import limap.util.io as limapio
 from limap.image.point.superpoint import SuperPoint, sample_descriptors
 
-from ..base_detector import (
+from ...line.base_detector import (
     BaseDetector,
     DefaultDetectorOptions,
 )
@@ -67,6 +67,8 @@ class WireframeExtractor(BaseDetector):
         - the junctions score of shape [N*2 + n]
         - the descriptor of each junction of shape [256, N*2 + n]
         - the index of each line endpoints of shape [N, 2]
+        - the number of leading junctions that are line junctions rather \
+          than keypoints, which the joint matcher needs to split the two
         """
         if len(segs) == 0:
             return {
@@ -77,6 +79,7 @@ class WireframeExtractor(BaseDetector):
                 "junc_scores": np.empty((0,)),
                 "junc_desc": np.empty((256, 0)),
                 "lines_junc_idx": np.empty((0, 2)),
+                "n_line_junctions": 0,
             }
         lines = segs[:, :4].reshape(-1, 2)
         line_scores = segs[:, -1] * np.sqrt(
@@ -150,4 +153,6 @@ class WireframeExtractor(BaseDetector):
             "junc_scores": all_scores,
             "junc_desc": all_descs,
             "lines_junc_idx": lines_junc_idx,
+            # lines_to_wireframe returns its junctions per batch element.
+            "n_line_junctions": len(line_points[0]),
         }

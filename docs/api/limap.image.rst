@@ -16,3 +16,4 @@ COLMAP database and the LIMAP structure database.
    limap.image.groups.vplib
    limap.image.groups.planelib
    limap.image.dense_matcher
+   limap.image.joint_point_line

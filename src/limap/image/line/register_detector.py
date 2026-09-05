@@ -102,7 +102,7 @@ def get_extractor(method: str, loptions: ExtractorOptions):
 
         return SuperPointEndpointsExtractor(options)
     elif method == "wireframe":
-        from .GlueStick import WireframeExtractor
+        from ..joint_point_line.GlueStick import WireframeExtractor
 
         return WireframeExtractor(options)
     elif method == "dense_naive":
