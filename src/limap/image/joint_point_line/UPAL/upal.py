@@ -16,7 +16,7 @@ from ...line.base_detector import (
 
 # Pinned so the checkpoint stays in step with the inference code it is loaded
 # into; upstream ships no versioned release.
-_UPAL_COMMIT = "91d79a08a57766b319d144950ab9e9cf9615e429"
+_UPAL_COMMIT = "62a022f1c4b01f2dfebd53e963109eb0dcdad505"
 _UPAL_WEIGHTS_URL = (
     f"https://raw.githubusercontent.com/francois141/upal/{_UPAL_COMMIT}"
     "/weights/upal.tar"
