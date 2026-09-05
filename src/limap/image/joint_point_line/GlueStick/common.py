@@ -4,11 +4,6 @@ import torch
 
 from limap.util.model_weights import download_weights, resolve_weight_path
 
-# SuperPoint's detection noise, recorded on the exported keypoints so that the
-# pose-guided geometric verification scales its threshold the way it does for
-# hloc's own SuperPoint features.
-DETECTION_NOISE = 2.0
-
 _WEIGHTS_URL = (
     "https://github.com/cvg/GlueStick/releases/download/v0.1_arxiv/"
     "checkpoint_GlueStick_MD.tar"
@@ -34,11 +29,7 @@ def load_gluestick(weight_path, device):
 
 
 def build_inputs(descinfo1, descinfo2, device):
-    """Assemble the network input dict from two per-image descriptions.
-
-    Both the wireframe descinfo and the joint description use the same keys,
-    so the two matchers share this.
-    """
+    """Assemble the network input dict from two wireframe descriptions."""
 
     inputs = {
         "image_size0": tuple(descinfo1["image_shape"]),
@@ -56,3 +47,18 @@ def build_inputs(descinfo1, descinfo2, device):
         inputs[f"line_scores{suffix}"] = tensor("line_scores")
         inputs[f"lines_junc_idx{suffix}"] = tensor("lines_junc_idx", torch.long)
     return inputs
+
+
+def run_gluestick(net, descinfo1, descinfo2, device):
+    """Match two wireframe descriptions, in the layout the matchers expect."""
+    inputs = build_inputs(descinfo1, descinfo2, device)
+    with torch.no_grad():
+        out = net(inputs)
+    return (
+        out["matches0"].cpu().numpy()[0],
+        out["match_scores0"].cpu().numpy()[0],
+        out["line_matches0"].cpu().numpy()[0],
+        # Absent when an image has no keypoints at all, which is also the case
+        # where there is nothing to rank.
+        out["raw_line_scores"][0] if "raw_line_scores" in out else None,
+    )

@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 
+from ..line.register_matcher import LightGlueStickOptions
 from .base_joint_matcher import BaseJointMatcherOptions
 
 
@@ -7,6 +8,9 @@ from .base_joint_matcher import BaseJointMatcherOptions
 class JointMatcherOptions:
     base_options: BaseJointMatcherOptions = field(
         default_factory=BaseJointMatcherOptions
+    )
+    lightgluestick_options: LightGlueStickOptions = field(
+        default_factory=LightGlueStickOptions
     )
 
 
@@ -27,8 +31,10 @@ def get_joint_matcher_class(method: str):
         from .GlueStick import GlueStickJointMatcher
 
         return GlueStickJointMatcher
-    # TODO: support LightGlueStick, which matches the same junctions with a
-    # lighter network and needs no change outside this branch.
+    elif method == "lightgluestick":
+        from .LightGlueStick import LightGlueStickJointMatcher
+
+        return LightGlueStickJointMatcher
     else:
         raise NotImplementedError
 
@@ -44,4 +50,9 @@ def get_joint_matcher(method: str, loptions: JointMatcherOptions):
         The joint matcher, a subclass of \
         :class:`~limap.image.joint_point_line.base_joint_matcher.BaseJointMatcher`
     """
-    return get_joint_matcher_class(method)(loptions.base_options)
+    matcher_class = get_joint_matcher_class(method)
+    if method == "lightgluestick":
+        return matcher_class(
+            loptions.base_options, loptions.lightgluestick_options
+        )
+    return matcher_class(loptions.base_options)

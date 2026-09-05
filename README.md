@@ -253,10 +253,11 @@ Each method below links its BibTeX entry, collected in [`misc/citations.md`](htt
 - Endpoint matching with [SuperPoint](https://github.com/magicleap/SuperPointPretrainedNetwork) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#superpoint)] + Nearest Neighbors
 - Endpoint matching with [SuperPoint](https://github.com/magicleap/SuperPointPretrainedNetwork) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#superpoint)] + [SuperGlue](https://github.com/magicleap/SuperGluePretrainedNetwork) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#superglue)]
 - [GlueStick](https://github.com/cvg/GlueStick) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#gluestick)]
+- [LightGlueStick](https://github.com/aubingazhib/LightGlueStick) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#lightgluestick)] (separate installation needed [[Guide](https://github.com/cvg/limap/blob/main/misc/install/lightgluestick.md)])
 - Custom line matcher based on dense matcher [RoMa](https://github.com/Parskatt/RoMa) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#roma)] (separate installation needed [[Guide](https://github.com/cvg/limap/blob/main/misc/install/roma.md)])
 - Endpoint matching with [UPAL](https://github.com/francois141/upal) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#upal)] + Nearest Neighbors (separate installation needed [[Guide](https://github.com/cvg/limap/blob/main/misc/install/upal.md)])
 
-UPAL detects *and* describes both points and lines in a single network pass, so it can drive the point frontend too: see `cfgs/structure_triangulation/upal.yaml`.
+UPAL *detects* and describes both points and lines in a single network pass, so it can drive the point frontend too: see `cfgs/structure_triangulation/upal.yaml`. GlueStick and LightGlueStick then *match* both in a single pass as well, replacing the separate point and line matchers: see `cfgs/structure_triangulation/gluestick_joint.yaml` and `cfgs/structure_triangulation/lightgluestick_joint.yaml`.
 
 **The following vanishing point estimators are currently supported:**
 - [JLinkage](https://github.com/B1ueber2y/JLinkage) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#jlinkage)]
