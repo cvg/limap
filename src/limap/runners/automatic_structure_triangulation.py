@@ -70,6 +70,7 @@ class AutomaticStructureTriangulationOptions:
             and (not self.image_association.use_dense_matching)
         )
         options.line_detection.skip_exists = self.skip_exists
+        options.joint_point_line_detection.skip_exists = self.skip_exists
         # A joint matcher's keypoints come from the line description, so the
         # description step has to know one is coming.
         options.joint_point_line_matcher = (
@@ -79,6 +80,7 @@ class AutomaticStructureTriangulationOptions:
         )
         if self.weight_path is not None:
             options.line_detection.weight_path = self.weight_path
+            options.joint_point_line_detection.weight_path = self.weight_path
             plane_detection = options.group_description.plane_detection
             plane_detection.weight_path = self.weight_path
         # Disable group description when not using groups

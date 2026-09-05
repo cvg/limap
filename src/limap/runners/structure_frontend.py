@@ -102,6 +102,7 @@ def cleanup_frontend_workspace(output_dir: Path) -> None:
     dirs_to_delete = [
         frontend_dir / "line_detections",
         frontend_dir / "line_matchings",
+        frontend_dir / "joint_detections",
         frontend_dir / "joint_matchings",
         frontend_dir / "dense_warps",
         # Normal maps only needed for plane-to-group conversion

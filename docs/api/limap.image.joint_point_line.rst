@@ -1,5 +1,33 @@
-Joint point-line matching
-=========================
+Joint point-line detection and matching
+=======================================
+
+Networks that handle points and lines together do work that the separate point
+and line paths would do twice. :py:mod:`limap.image.joint_point_line` keeps
+both halves, at the two stages where the saving arises: detection, where one
+pass over an image yields the keypoints, the segments and the line descriptors,
+and matching, where one pass over an image pair yields the point matches and
+the line matches.
+
+Detection
+---------
+
+Some networks predict keypoints and line segments from a single shared
+backbone. Running them through the separate point and line paths would encode
+each image twice, so the joint path drives one pass per image and writes the
+point features, the segments and the line descriptors together.
+
+.. module:: limap.image.joint_point_line
+
+.. autofunction:: joint_point_line_detection
+
+.. autoclass:: JointPointLineDetectionOptions
+   :members:
+   :undoc-members:
+   :special-members: __init__
+   :member-order: groupwise
+
+Matching
+--------
 
 GlueStick and its successors match points and lines together, in one pass over
 an image pair. Running a point matcher and a line matcher separately over the
@@ -17,16 +45,16 @@ the junctions the matcher sees are exactly the ones the descriptors were built
 from.
 
 Instantiate a joint matcher
----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. module:: limap.image.joint_point_line
+.. currentmodule:: limap.image.joint_point_line
 
 .. autofunction:: get_joint_matcher
 
 .. autofunction:: get_joint_matcher_class
 
 Base interface and results
---------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. currentmodule:: limap.image.joint_point_line.base_joint_matcher
 
@@ -45,7 +73,7 @@ Base interface and results
    :member-order: groupwise
 
 Options
--------
+^^^^^^^
 
 .. autoclass:: JointPointLineMatcherOptions
    :members:
@@ -66,7 +94,7 @@ Options
    :member-order: groupwise
 
 Association
------------
+^^^^^^^^^^^
 
 .. autofunction:: joint_point_line_description
 

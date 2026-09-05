@@ -70,8 +70,36 @@ def image_description(
 
     image_names = {i: image_path / img.name for i, img in recon.images.items()}
     if options.use_joint_point_line_detection:
-        # TODO: support in the future with UPAL
-        raise NotImplementedError
+        # One network pass per image yields both halves; the artifacts are the
+        # same three the separate paths below produce.
+        from .joint_point_line import joint_point_line_detection
+
+        if options.skip_point_detection:
+            raise ValueError(
+                "skip_point_detection cannot be combined with "
+                "use_joint_point_line_detection: the joint detector produces "
+                "the points and the lines from the same pass."
+            )
+
+        # point_detection and line_detection are usually inherited from a base
+        # config, so say plainly that neither is what runs here.
+        logging.warning(
+            "Joint detection with "
+            f"'{options.joint_point_line_detection.method}' supplies both the "
+            f"points and the lines: point_detection "
+            f"('{options.point_detection.method}') and line_detection "
+            f"('{options.line_detection.detector_method}' / "
+            f"'{options.line_detection.extractor_method}') are unused."
+        )
+
+        feature_path, all_2d_segs, descinfo_folder = joint_point_line_detection(
+            options.joint_point_line_detection,
+            image_names,
+            {i: img.name for i, img in recon.images.items()},
+            workspace_path / "joint_detections",
+            workspace_path,
+        )
+        _import_point_features(hloc, db_path, feature_path)
     else:
         # A joint matcher's keypoints come out of the same pass as its line
         # descriptors, so the lines are described first and the points are
@@ -126,23 +154,20 @@ def image_description(
                 workspace_path,
             )
             _import_point_features(hloc, db_path, feature_path)
-        all_2d_lines = limap.geometry.get_all_lines_2d(all_2d_segs)
-        del all_2d_segs
-        with limap.scene.StructureDatabase.open(
-            structure_db_path
-        ) as structure_db:
-            if options.skip_point_detection:
-                limap.scene.initialize_structures_from_reconstruction(
-                    structure_db, recon
-                )
-            else:
-                image_ids = list(recon.images.keys())
-                with pycolmap.Database.open(db_path) as db:
-                    limap.scene.initialize_structures(
-                        structure_db, image_ids, db
-                    )
-            limap.scene.import_line_detections(structure_db, all_2d_lines)
-        del all_2d_lines
+
+    all_2d_lines = limap.geometry.get_all_lines_2d(all_2d_segs)
+    del all_2d_segs
+    with limap.scene.StructureDatabase.open(structure_db_path) as structure_db:
+        if options.skip_point_detection:
+            limap.scene.initialize_structures_from_reconstruction(
+                structure_db, recon
+            )
+        else:
+            image_ids = list(recon.images.keys())
+            with pycolmap.Database.open(db_path) as db:
+                limap.scene.initialize_structures(structure_db, image_ids, db)
+        limap.scene.import_line_detections(structure_db, all_2d_lines)
+    del all_2d_lines
 
     # Group description reads points and lines from databases per-image
     if not options.skip_group_description:
@@ -249,6 +274,13 @@ def image_association(
     else:
         pairs_path = workspace_path / "pairs-from-neighbors.txt"
         image_names_hloc = {i: img.name for i, img in recon.images.items()}
+        # A joint detector describes its own lines, so the matchers' extractor
+        # comes from it rather than from line_detection.
+        line_det_options = (
+            desc_options.joint_point_line_detection.as_line_detection_options()
+            if desc_options.use_joint_point_line_detection
+            else desc_options.line_detection
+        )
 
         if options.use_joint_point_line_matcher and (
             not options.skip_line_matching
@@ -295,7 +327,7 @@ def image_association(
                 neighbors,
                 options.point_descriptor_path,
                 options.line_descriptor_path,
-                desc_options.line_detection.extractor_method,
+                line_det_options.extractor_method,
                 workspace_path / "joint_matchings",
             )
             _import_point_matches(
@@ -348,7 +380,7 @@ def image_association(
                     options.line_descriptor_path,
                     workspace_path / "line_matchings",
                     neighbors,
-                    desc_options.line_detection,
+                    line_det_options,
                     options.line_matcher,
                 )
                 with limap.scene.StructureDatabase.open(

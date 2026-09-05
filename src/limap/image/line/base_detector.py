@@ -152,6 +152,24 @@ class BaseDetector:
         raise NotImplementedError
 
     @typechecked
+    def detect_and_extract_joint(
+        self, image_path: Path, with_points: bool = True
+    ) -> tuple[np.ndarray, Any, dict | None]:
+        """
+        Virtual method (for detectors that predict keypoints as well as \
+        lines) - detect and describe both from a single network pass
+
+        Args:
+            image_path: full path to the image
+            with_points: whether to also return the keypoint predictions
+        Returns:
+            segs, descinfo: as from the `detect_and_extract` method.
+            points: dict of keypoints, scores, descriptors and image_size \
+                in the hloc layout, or None when `with_points` is False
+        """
+        raise NotImplementedError
+
+    @typechecked
     def sample_descinfo_by_indexes(
         self, descinfo: Any, indexes: list[int]
     ) -> Any:
@@ -316,7 +334,7 @@ class BaseDetector:
                 Each row corresponds to x1, y1, x2, y2 and score.
             descinfo_folder (str): Path to the extracted descriptors.
         """
-        assert self.do_merge_lines
+        assert not self.do_merge_lines
         seg_folder = self.get_segments_folder(output_folder)
         descinfo_folder = self.get_descinfo_folder(output_folder)
         if not skip_exists:

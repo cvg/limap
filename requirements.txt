@@ -5,8 +5,8 @@
 #     python -m pip install -Ive ".[all]"
 #     python -m pip install -r requirements.txt
 #
-# Several further methods (HAWP, TP-LSD, LBD, RoMa, Progressive-X) need manual
-# installation and are deliberately absent here.
+# Several further methods (HAWP, TP-LSD, LBD, RoMa, Progressive-X, UPAL) need
+# manual installation and are deliberately absent here.
 pytlsd@git+https://github.com/iago-suarez/pytlsd.git@4180ab8
 deeplsd@git+https://github.com/cvg/DeepLSD.git@88c589d
 gluestick@git+https://github.com/cvg/GlueStick.git@7d81673

@@ -7,7 +7,10 @@ from .point import PointDetectionOptions, PointMatcherOptions
 from .line import LineDetectionOptions, LineMatcherOptions
 from .groups import GroupDescriptionOptions
 from .dense_matcher import DenseMatchingOptions
-from .joint_point_line import JointPointLineMatcherOptions
+from .joint_point_line import (
+    JointPointLineDetectionOptions,
+    JointPointLineMatcherOptions,
+)
 
 
 @dataclass
@@ -19,6 +22,9 @@ class ImageDescriptionOptions:
         default_factory=LineDetectionOptions
     )
     use_joint_point_line_detection: bool = False
+    joint_point_line_detection: JointPointLineDetectionOptions = field(
+        default_factory=JointPointLineDetectionOptions
+    )
 
     # Set when a joint point-line matcher will run: the point features are
     # then taken from the line description rather than detected separately,

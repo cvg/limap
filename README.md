@@ -108,7 +108,7 @@ python -m pip install -Ive ".[all,dev]"
   and the 3D helpers in `limap.visualize` do not run there. The `pxwplanar` plane
   detector also depends on open3d, so it is skipped on 3.13 as well. Line and
   point reconstruction are unaffected — no pipeline touches open3d.
-* Several further methods (HAWP, TP-LSD, LBD, RoMa, Progressive-X) are not
+* Several further methods (HAWP, TP-LSD, LBD, RoMa, Progressive-X, UPAL) are not
   installed by any of the above. Each is cloned and pip-installed separately.
   See the per-method guides under [`misc/install/`](https://github.com/cvg/limap/tree/main/misc/install/), also
   linked from the detector and matcher lists further down.
@@ -243,6 +243,7 @@ Each method below links its BibTeX entry, collected in [`misc/citations.md`](htt
 - [HAWP](https://github.com/cherubicXN/hawp) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#hawp)] (separate installation needed [[Guide](https://github.com/cvg/limap/blob/main/misc/install/hawpv3.md)])
 - [TP-LSD](https://github.com/Siyuada7/TP-LSD) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#tp-lsd)] (separate installation needed [[Guide](https://github.com/cvg/limap/blob/main/misc/install/tp_lsd.md)])
 - [DeepLSD](https://github.com/cvg/DeepLSD) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#deeplsd)]
+- [UPAL](https://github.com/francois141/upal) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#upal)] (separate installation needed [[Guide](https://github.com/cvg/limap/blob/main/misc/install/upal.md)])
 
 **The following line descriptors/matchers are currently supported:**
 - [LBD](https://github.com/iago-suarez/pytlbd) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#lbd)] (separate installation needed [[Guide](https://github.com/cvg/limap/blob/main/misc/install/lbd.md)])
@@ -253,6 +254,9 @@ Each method below links its BibTeX entry, collected in [`misc/citations.md`](htt
 - Endpoint matching with [SuperPoint](https://github.com/magicleap/SuperPointPretrainedNetwork) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#superpoint)] + [SuperGlue](https://github.com/magicleap/SuperGluePretrainedNetwork) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#superglue)]
 - [GlueStick](https://github.com/cvg/GlueStick) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#gluestick)]
 - Custom line matcher based on dense matcher [RoMa](https://github.com/Parskatt/RoMa) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#roma)] (separate installation needed [[Guide](https://github.com/cvg/limap/blob/main/misc/install/roma.md)])
+- Endpoint matching with [UPAL](https://github.com/francois141/upal) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#upal)] + Nearest Neighbors (separate installation needed [[Guide](https://github.com/cvg/limap/blob/main/misc/install/upal.md)])
+
+UPAL detects *and* describes both points and lines in a single network pass, so it can drive the point frontend too: see `cfgs/structure_triangulation/upal.yaml`.
 
 **The following vanishing point estimators are currently supported:**
 - [JLinkage](https://github.com/B1ueber2y/JLinkage) [[BibTeX](https://github.com/cvg/limap/blob/main/misc/citations.md#jlinkage)]

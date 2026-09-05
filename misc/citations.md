@@ -86,6 +86,21 @@ self-supervised model of the journal version; please cite both.
 }
 ```
 
+### UPAL
+
+[UPAL](https://github.com/francois141/upal) — also used as a line descriptor and
+matcher, and as a point detector and descriptor. It recovers segments with
+point-seeded LSD, so please cite [LSD](#lsd) as well.
+
+```bibtex
+@inproceedings{costa2026unified,
+  title={{Unified and Efficient Point-Line Local Features}},
+  author={Costa, Fran{\c c}ois and Kreft, Raphael and Goedeke, Eckhard and M{\"o}ller, Felix and Shah, Hardik and Rajaraman, Ramanathan and Liu, Shaohui and Pautrat, R{\'e}mi and Pollefeys, Marc},
+  booktitle={Proc. of the European Conf. on Computer Vision (ECCV)},
+  year={2026}
+}
+```
+
 ## Line descriptors and matchers
 
 ### LBD

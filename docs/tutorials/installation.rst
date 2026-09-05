@@ -94,7 +94,7 @@ A few things worth knowing:
   not run there. The ``pxwplanar`` plane detector also depends on open3d, so it is
   skipped on 3.13 as well. Line and point reconstruction are unaffected -- no
   pipeline touches open3d.
-* Several further methods (HAWP, TP-LSD, LBD, RoMa, Progressive-X) are not
+* Several further methods (HAWP, TP-LSD, LBD, RoMa, Progressive-X, UPAL) are not
   installed by any of the above. Each is cloned and pip-installed separately.
   See the per-method guides under `misc/install/
   <https://github.com/cvg/limap/tree/main/misc/install>`_.

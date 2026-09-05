@@ -70,8 +70,10 @@ class PointLineLocalizationOptions:
             else None
         )
         options.line_detection.skip_exists = self.skip_exists
+        options.joint_point_line_detection.skip_exists = self.skip_exists
         if self.weight_path is not None:
             options.line_detection.weight_path = self.weight_path
+            options.joint_point_line_detection.weight_path = self.weight_path
         options.skip_group_description = (
             True  # Never describe groups in localization
         )

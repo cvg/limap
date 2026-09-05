@@ -53,6 +53,10 @@ def get_matcher(method: str, loptions: MatcherOptions, extractor: Any):
         return SuperGlueEndpointsMatcher(
             extractor, options, weights=loptions.superglue_options.weights
         )
+    elif method == "upal":
+        from ..joint_point_line.UPAL import UPALMatcher
+
+        return UPALMatcher(extractor, options)
     elif method == "gluestick":
         from ..joint_point_line.GlueStick import GlueStickMatcher
 

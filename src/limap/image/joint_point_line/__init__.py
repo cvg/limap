@@ -6,13 +6,17 @@ from .register_joint_matcher import (
     get_joint_matcher,
     get_joint_matcher_class,
 )
-from .specs import JointPointLineMatcherOptions
+from .specs import (
+    JointPointLineDetectionOptions,
+    JointPointLineMatcherOptions,
+)
 
 _LAZY_ATTRS = {
     "BaseJointMatcherOptions": "base_joint_matcher",
     "BaseJointMatcher": "base_joint_matcher",
     "JointMatchResult": "base_joint_matcher",
     "remap_point_matches": "base_joint_matcher",
+    "joint_point_line_detection": "process",
     "joint_point_line_description": "process",
     "joint_point_line_matching": "process",
     "write_hloc_features": "base_joint_matcher",
@@ -23,10 +27,12 @@ __all__ = [
     "BaseJointMatcherOptions",
     "JointMatchResult",
     "JointMatcherOptions",
+    "JointPointLineDetectionOptions",
     "JointPointLineMatcherOptions",
     "get_joint_matcher",
     "get_joint_matcher_class",
     "joint_point_line_description",
+    "joint_point_line_detection",
     "joint_point_line_matching",
     "remap_point_matches",
     "write_hloc_features",

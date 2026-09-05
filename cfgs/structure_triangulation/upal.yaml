@@ -1,0 +1,19 @@
+---
+###############################
+# UPAL frontend: one network pass per image for both points and lines.
+base_config_file: "cfgs/structure_triangulation/default.yaml"
+
+_image_description:
+  # UPAL supplies the points and the lines from one pass, so the inherited
+  # point_detection and line_detection settings are unused here.
+  use_joint_point_line_detection: True
+  joint_point_line_detection:
+    method: "upal"
+
+_image_association:
+  # UPAL descriptors are 128-d and have no trained LightGlue, so points are
+  # matched by mutual nearest neighbour.
+  point_matcher:
+    method: "NN-mutual"
+  line_matcher:
+    method: "upal"

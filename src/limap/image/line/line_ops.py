@@ -32,7 +32,7 @@ def line_detection(
     if (
         options.compute_descinfo
         and (options.detector_method == options.extractor_method)
-        and (not options.detector_method.do_merge_lines)
+        and (not detector.do_merge_lines)
     ):
         (
             all_2d_segs,
