@@ -14,7 +14,7 @@ if(FETCH_POSELIB)
     set(WERROR OFF CACHE BOOL "Disable -Werror in PoseLib" FORCE)
     FetchContent_Declare(PoseLib
         GIT_REPOSITORY    https://github.com/PoseLib/PoseLib.git
-        GIT_TAG           1758bd6d20f607c276388d28b5ba88f3651e85e9
+        GIT_TAG           db542cc2be5827307bd2326fca7ab390db2af2ee
         EXCLUDE_FROM_ALL
     )
     FetchContent_MakeAvailable(PoseLib)

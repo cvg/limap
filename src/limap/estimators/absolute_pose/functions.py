@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 import pycolmap
 
-import limap.estimators as _estimators
+from limap._limap._estimators import _absolute_pose
 from limap.geometry import Line2d, Line3d
 
 
@@ -13,8 +13,8 @@ def estimate_absolute_pose(
     p3ds: list[np.ndarray],
     p2ds: list[np.ndarray],
     camera: pycolmap.Camera,
-    options: _estimators.PointLineAbsolutePoseOptions | None = None,
-) -> _estimators.PointLineAbsolutePoseResult:
+    options: _absolute_pose.PointLineAbsolutePoseOptions | None = None,
+) -> _absolute_pose.PointLineAbsolutePoseResult:
     """
     Estimate absolute camera pose from point and line correspondences.
 
@@ -33,8 +33,8 @@ def estimate_absolute_pose(
         PointLineAbsolutePoseResult containing pose and RANSAC statistics
     """
     if options is None:
-        options = _estimators.PointLineAbsolutePoseOptions()
+        options = _absolute_pose.PointLineAbsolutePoseOptions()
 
-    return _estimators.estimate_point_line_absolute_pose(
+    return _absolute_pose.estimate_point_line_absolute_pose(
         l3ds, l2ds, p3ds, p2ds, camera, options
     )
