@@ -245,12 +245,14 @@ def associate_via_dense_matching(
                     db.write_matches(
                         img_id, ng_img_id, point_matches.astype(np.uint32)
                     )
-                    # skip geometric verification for now
+                    # Skip geometric verification for now. The config must
+                    # not stay UNDEFINED: COLMAP drops such pairs on load.
                     db.write_two_view_geometry(
                         img_id,
                         ng_img_id,
                         pycolmap.TwoViewGeometry(
-                            inlier_matches=point_matches.astype(np.uint32)
+                            config=pycolmap.TwoViewGeometryConfiguration.CALIBRATED,
+                            inlier_matches=point_matches.astype(np.uint32),
                         ),
                     )
                 if len(line_matches) > 0 and not struct_db.exists_line_matches(
