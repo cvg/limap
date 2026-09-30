@@ -11,6 +11,9 @@ itself, with PoseLib, JLinkage and libigl, is built in-tree by `FetchContent`.
 sudo apt-get install \
     ninja-build \
     build-essential \
+    libboost-program-options-dev \
+    libboost-graph-dev \
+    libboost-system-dev \
     libeigen3-dev \
     libflann-dev \
     libopenimageio-dev \
@@ -25,23 +28,6 @@ sudo apt-get install \
     libqt5opengl5-dev \
     libcgal-dev \
     libceres-dev \
-```
-
-**Boost >= 1.84** is required, to match the backend the `pycolmap` wheels are
-built with (see [colmap#4672](https://github.com/colmap/colmap/issues/4672)). Ubuntu 24.04 ships 1.83; in a conda environment:
-
-```bash
-conda install -c conda-forge libboost-devel
-```
-
-Otherwise build it (only `graph` and `program_options` are compiled):
-
-```bash
-wget https://archives.boost.io/release/1.90.0/source/boost_1_90_0.tar.bz2
-tar xf boost_1_90_0.tar.bz2 && cd boost_1_90_0
-./bootstrap.sh --prefix="$HOME/.local/boost" --with-libraries=graph,program_options
-./b2 -j"$(nproc)" --with-graph --with-program_options install
-export BOOST_ROOT="$HOME/.local/boost"
 ```
 
 ## macOS

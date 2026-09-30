@@ -195,6 +195,29 @@ def _hloc_pairs_from_neighbors(
                 f.write(f"{image_names[head]} {image_names[loc]}\n")
 
 
+def _mark_pose_verified_geometries(db: pycolmap.Database) -> None:
+    """Set the config of pose-verified pairs to CALIBRATED.
+
+    hloc's pose-guided verification leaves them UNDEFINED, which COLMAP's
+    DatabaseCache (>= 4.2.1) skips, dropping every point correspondence.
+    """
+    undefined = pycolmap.TwoViewGeometryConfiguration.UNDEFINED
+    for pair_id, two_view_geometry in zip(
+        *db.read_two_view_geometries(), strict=True
+    ):
+        if (
+            two_view_geometry.config != undefined
+            or len(two_view_geometry.inlier_matches) == 0
+        ):
+            continue
+        two_view_geometry.config = (
+            pycolmap.TwoViewGeometryConfiguration.CALIBRATED
+        )
+        db.update_two_view_geometry(
+            *pycolmap.pair_id_to_image_pair(pair_id), two_view_geometry
+        )
+
+
 def _import_point_matches(
     hloc, options, recon, db_path, pairs_path, match_path
 ) -> None:
@@ -232,6 +255,7 @@ def _import_point_matches(
                 pairs_path,
                 match_path,
             )
+            _mark_pose_verified_geometries(db)
     else:
         hloc.triangulation.estimation_and_geometric_verification(
             db_path, pairs_path
