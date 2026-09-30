@@ -1,4 +1,5 @@
 #include <ceres/version.h>
+#include <colmap/util/hash_containers.h>
 #include <pybind11/iostream.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -27,6 +28,7 @@ PYBIND11_MODULE(_limap, m) {
   m.attr("__version__") = py::str("dev");
 #endif
   m.attr("__ceres_version__") = py::str(CERES_VERSION_STRING);
+  m.attr("__hash_map_backend__") = py::str(colmap::kHashMapBackend);
 
   py::add_ostream_redirect(m, "ostream_redirect");
 

@@ -36,16 +36,10 @@ if(FETCH_COLMAP)
     # scripts disable it for the same reason.
     set(ONNX_ENABLED OFF CACHE BOOL "Disable ONNX in COLMAP" FORCE)
     set(TESTS_ENABLED OFF CACHE BOOL "Disable tests in COLMAP" FORCE)
-    # ABI of the types shared with pycolmap. Needs Boost >= 1.84.
-    # TODO: drop once colmap/colmap#4673 lands.
-    if(NOT DEFINED COLMAP_HASH_MAP_BACKEND)
-        set(COLMAP_HASH_MAP_BACKEND "BOOST" CACHE STRING
-            "Match the hash map backend of the pycolmap wheels" FORCE)
-    endif()
-    # Corresponding to COLMAP 4.2.0 release.
+    # Corresponding to COLMAP 4.2.1 release.
     FetchContent_Declare(COLMAP
         GIT_REPOSITORY    https://github.com/colmap/colmap.git
-        GIT_TAG           83583625d3ceb12dd8d6a42cc657696701adcee8
+        GIT_TAG           bd1fcf654d2dd8fefa1466999c190a246f83f4b9
         EXCLUDE_FROM_ALL
     )
     FetchContent_MakeAvailable(COLMAP)
