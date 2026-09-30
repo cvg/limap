@@ -49,11 +49,13 @@ The matcher type must be compatible with the extractor. Here is a minimal exampl
 Joint point-line matching
 -----------------------------------------------------
 
-`GlueStick <https://github.com/cvg/GlueStick>`_ matches points and lines in a
-single pass, so the matcher above throws away half of what the network already
-computed. :py:mod:`limap.image.joint_point_line` keeps both halves: it
-describes an image from the line descriptors *and* the point features that fed
-the COLMAP database, and returns the point matches alongside the line matches.
+`GlueStick <https://github.com/cvg/GlueStick>`_ and its lighter successor
+`LightGlueStick <https://github.com/aubingazhib/LightGlueStick>`_ match points
+and lines in a single pass, so the matcher above throws away half of what the
+network already computed. :py:mod:`limap.image.joint_point_line` keeps both
+halves: it describes an image from the line descriptors *and* the point
+features that fed the COLMAP database, and returns the point matches alongside
+the line matches.
 
 .. code-block:: python
 
@@ -72,9 +74,12 @@ the COLMAP database, and returns the point matches alongside the line matches.
 
 In a pipeline this replaces both ``point_matcher`` and ``line_matcher``; turn
 it on with ``use_joint_point_line_matcher``, as in
-``cfgs/structure_triangulation/gluestick_joint.yaml``. The point matches index
-the keypoints of the COLMAP database, so the point detector has to be the one
-the joint matcher was trained with -- SuperPoint, for GlueStick.
+``cfgs/structure_triangulation/gluestick_joint.yaml`` and
+``cfgs/structure_triangulation/lightgluestick_joint.yaml``. The point matches
+index the keypoints of the COLMAP database, so the point detector has to be the
+one the joint matcher was trained with -- SuperPoint, for both of these. They
+also read the same ``wireframe`` line descriptors, so switching between them
+costs nothing but the matching step.
 
 -----------------------------------------------------
 Visualization

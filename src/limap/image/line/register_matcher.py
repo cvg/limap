@@ -9,6 +9,18 @@ class SuperGlueMatcherOptions:
 
 
 @dataclass
+class LightGlueStickOptions:
+    """Options for the LightGlueStick matcher.
+
+    :param depth_confidence: confidence above which the network stops early, \
+        skipping the remaining transformer layers. Disabled at -1; 0.95 is \
+        what upstream suggests, and buys speed for a few lost matches.
+    """
+
+    depth_confidence: float = -1.0
+
+
+@dataclass
 class DenseMatcherOptions:
     one_to_many: bool = False
     weights: str = "outdoor"
@@ -22,6 +34,9 @@ class MatcherOptions:
     )
     dense_options: DenseMatcherOptions = field(
         default_factory=DenseMatcherOptions
+    )
+    lightgluestick_options: LightGlueStickOptions = field(
+        default_factory=LightGlueStickOptions
     )
 
 
@@ -61,6 +76,12 @@ def get_matcher(method: str, loptions: MatcherOptions, extractor: Any):
         from ..joint_point_line.GlueStick import GlueStickMatcher
 
         return GlueStickMatcher(extractor, options)
+    elif method == "lightgluestick":
+        from ..joint_point_line.LightGlueStick import LightGlueStickMatcher
+
+        return LightGlueStickMatcher(
+            extractor, options, loptions.lightgluestick_options
+        )
     elif method == "dense_roma":
         from .dense import BaseDenseLineMatcherOptions, RoMaLineMatcher
 

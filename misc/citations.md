@@ -195,6 +195,22 @@ LIMAP, and its joint point-line matcher
 }
 ```
 
+### LightGlueStick
+
+[LightGlueStick](https://github.com/aubingazhib/LightGlueStick) — a lighter
+matcher over the same wireframe junctions as [GlueStick](#gluestick), whose
+SuperPoint frontend it shares, so please cite both
+(`cfgs/structure_triangulation/lightgluestick_joint.yaml`).
+
+```bibtex
+@inproceedings{ubingazhibov2025lightgluestick,
+  title={{LightGlueStick}: a Fast and Robust Glue for Joint {Point-Line} Matching},
+  author={Ubingazhibov, Aidyn and Pautrat, R{\'e}mi and Su{\'a}rez, Iago and Liu, Shaohui and Pollefeys, Marc and Larsson, Viktor},
+  booktitle={Proc. of the Int. Conf. on Computer Vision (ICCV) Workshop on Large Scale Cross Device Localization (CroCoDL)},
+  year={2025}
+}
+```
+
 ### RoMa
 
 [RoMa](https://github.com/Parskatt/RoMa) — the dense matcher behind the custom
