@@ -98,4 +98,6 @@ class LBDExtractor(BaseDetector):
         _, pyramid = process_pyramid(img, pytlsd.lsd, presmooth=False)
         descriptors = pytlbd.lbd_multiscale_pyr(pyramid, ms_lines, 9, 7)
 
-        return {"ms_lines": ms_lines, "line_descriptors": descriptors}
+        ms_lines_array = np.empty(len(ms_lines), dtype=object)
+        ms_lines_array[:] = ms_lines
+        return {"ms_lines": ms_lines_array, "line_descriptors": descriptors}
